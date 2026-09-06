@@ -12,7 +12,6 @@ dependencies = [
  "aa-function-tools",
  "aa-kernel",
  "aa-llm",
- "aa-ollama",
  "aa-server",
  "aa-session",
  "anyhow",
@@ -143,20 +142,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "aa-ollama"
-version = "0.1.0"
-dependencies = [
- "aa-core",
- "async-trait",
- "futures-util",
- "reqwest 0.12.28",
- "serde",
- "serde_json",
- "tokio",
- "tracing",
-]
-
-[[package]]
 name = "aa-server"
 version = "0.1.0"
 dependencies = [
@@ -167,7 +152,6 @@ dependencies = [
  "aa-function-tools",
  "aa-kernel",
  "aa-llm",
- "aa-ollama",
  "aa-session",
  "anyhow",
  "axum",

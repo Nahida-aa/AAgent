@@ -45,7 +45,7 @@ pub async fn cmd_run(
     );
 
     let provider: Arc<dyn ModelProvider> = match resolved.provider.as_str() {
-        "ollama" => Arc::new(aa_ollama::OllamaProvider::new(aa_ollama::OllamaConfig {
+        "ollama" => Arc::new(aa_llm::OllamaProvider::new(aa_llm::OllamaConfig {
             base_url: resolved.base_url.clone(),
             default_model: resolved.model.clone(),
         })),

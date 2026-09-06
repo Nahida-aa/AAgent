@@ -10,7 +10,6 @@ members = [
     "packages/llm",
     "packages/cli",
     "packages/server",
-    "packages/ollama",
     "packages/config",
     "packages/session",
     "packages/app/src-tauri",

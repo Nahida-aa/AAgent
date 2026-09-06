@@ -1,3 +1,9 @@
+//! OpenAI `/chat/completions` 线协议实现。
+//!
+//! 兼容任何 OpenAI 风格接口（DeepSeek、Groq、Cerebras 等），
+//! 通过 `providers.rs` 中的 profile 门面来选择厂商。
+//! 支持同步与 SSE 流式，流式下增量拼接 tool-call 参数。
+
 use std::collections::HashMap;
 
 use aa_core::llm::{
@@ -9,15 +15,32 @@ use async_trait::async_trait;
 use futures_util::StreamExt;
 use reqwest::Client;
 
-use crate::types;
+/// OpenAI 兼容 Provider 配置。
+#[derive(Debug, Clone)]
+pub struct OpenAiConfig {
+    pub base_url: String,
+    pub api_key: String,
+    pub default_model: String,
+}
 
+impl Default for OpenAiConfig {
+    fn default() -> Self {
+        Self {
+            base_url: "https://api.deepseek.com".into(),
+            api_key: std::env::var("AA_API_KEY").unwrap_or_default(),
+            default_model: "deepseek-chat".into(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct OpenAiCompatibleProvider {
     client: Client,
-    config: types::OpenAiConfig,
+    config: OpenAiConfig,
 }
 
 impl OpenAiCompatibleProvider {
-    pub fn new(config: types::OpenAiConfig) -> Self {
+    pub fn new(config: OpenAiConfig) -> Self {
         Self {
             client: Client::new(),
             config,
@@ -241,7 +264,7 @@ async fn stream_worker(
 
 fn build_request(
     req: &ModelRequest,
-    config: &types::OpenAiConfig,
+    config: &OpenAiConfig,
     stream: bool,
 ) -> types::ChatRequest {
     let model = if req.config.model.is_empty() {
@@ -330,5 +353,141 @@ fn role_from_str(s: &str) -> Role {
         "assistant" => Role::Assistant,
         "tool" => Role::Tool,
         _ => Role::User,
+    }
+}
+
+// OpenAI 请求/响应类型
+
+mod types {
+    #[derive(serde::Serialize)]
+    pub struct ChatRequest {
+        pub model: String,
+        pub messages: Vec<Message>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub tools: Option<Vec<Tool>>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub temperature: Option<f32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub max_tokens: Option<u32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub top_p: Option<f32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub stream: Option<bool>,
+    }
+
+    #[derive(serde::Serialize)]
+    pub struct Message {
+        pub role: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub content: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub tool_calls: Option<Vec<ToolCall>>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub tool_call_id: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub name: Option<String>,
+    }
+
+    #[derive(serde::Serialize)]
+    pub struct Tool {
+        #[serde(rename = "type")]
+        pub tool_type: String,
+        pub function: ToolFunction,
+    }
+
+    #[derive(serde::Serialize)]
+    pub struct ToolFunction {
+        pub name: String,
+        pub description: String,
+        pub parameters: serde_json::Value,
+    }
+
+    #[derive(serde::Serialize, serde::Deserialize)]
+    pub struct ToolCall {
+        pub id: String,
+        #[serde(rename = "type")]
+        pub call_type: String,
+        pub function: ToolCallFunction,
+    }
+
+    #[derive(serde::Serialize, serde::Deserialize)]
+    pub struct ToolCallFunction {
+        pub name: String,
+        pub arguments: String,
+    }
+
+    #[derive(serde::Deserialize)]
+    pub struct ChatResponse {
+        pub choices: Vec<Choice>,
+        #[serde(default)]
+        pub usage: Option<Usage>,
+    }
+
+    #[derive(serde::Deserialize)]
+    #[allow(dead_code)]
+    pub struct Choice {
+        pub message: ResponseMessage,
+        #[serde(default)]
+        pub finish_reason: Option<String>,
+    }
+
+    #[derive(serde::Deserialize)]
+    #[allow(dead_code)]
+    pub struct ResponseMessage {
+        pub role: String,
+        #[serde(default)]
+        pub content: Option<String>,
+        #[serde(default)]
+        pub tool_calls: Option<Vec<ToolCall>>,
+    }
+
+    #[derive(serde::Deserialize)]
+    pub struct Usage {
+        pub prompt_tokens: u32,
+        pub completion_tokens: u32,
+        pub total_tokens: u32,
+    }
+
+    // SSE 流式事件
+
+    #[derive(serde::Deserialize)]
+    pub struct StreamChunk {
+        pub choices: Vec<StreamChoice>,
+        #[serde(default)]
+        pub usage: Option<Usage>,
+    }
+
+    #[derive(serde::Deserialize)]
+    pub struct StreamChoice {
+        pub delta: Delta,
+        #[serde(default)]
+        pub finish_reason: Option<String>,
+    }
+
+    #[derive(serde::Deserialize)]
+    #[allow(dead_code)]
+    pub struct Delta {
+        #[serde(default)]
+        pub role: Option<String>,
+        #[serde(default)]
+        pub content: Option<String>,
+        #[serde(default)]
+        pub tool_calls: Option<Vec<StreamToolCall>>,
+    }
+
+    #[derive(serde::Deserialize)]
+    #[allow(dead_code)]
+    pub struct StreamToolCall {
+        pub index: u64,
+        pub id: Option<String>,
+        #[serde(rename = "type")]
+        pub call_type: Option<String>,
+        pub function: Option<StreamToolCallFunction>,
+    }
+
+    #[derive(serde::Deserialize)]
+    pub struct StreamToolCallFunction {
+        pub name: Option<String>,
+        pub arguments: Option<String>,
     }
 }

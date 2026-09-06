@@ -11,7 +11,6 @@ aa-function-tools = { path = "../function-tools" }
 aa-extension-mcp = { path = "../extension-mcp" }
 aa-core = { path = "../core" }
 aa-llm = { path = "../llm" }
-aa-ollama = { path = "../ollama" }
 aa-config = { path = "../config" }
 aa-session = { path = "../session" }
 aa-server = { path = "../server" }

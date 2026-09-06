@@ -1,3 +1,8 @@
+//! Ollama `/api/chat` 线协议实现。
+//!
+//! 面向本地 Ollama 服务的 provider。支持同步与流式调用，
+//! 流式结束时一次性上报 tool-call（Ollama 在 `done` 时才给出完整参数）。
+
 use aa_core::llm::{
     Message as CoreMessage, ModelError, ModelProvider, ModelRequest, ModelResponse, ProviderId,
     Role, StreamEvent, ToolCall as CoreToolCall, ToolCallFunction as CoreFunction,
@@ -7,15 +12,30 @@ use async_trait::async_trait;
 use futures_util::StreamExt;
 use reqwest::Client;
 
-use crate::types;
+/// Ollama Provider 配置。
+#[derive(Debug, Clone)]
+pub struct OllamaConfig {
+    pub base_url: String,
+    pub default_model: String,
+}
 
+impl Default for OllamaConfig {
+    fn default() -> Self {
+        Self {
+            base_url: "http://localhost:11434".into(),
+            default_model: "llama3.2".into(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct OllamaProvider {
     client: Client,
-    config: types::OllamaConfig,
+    config: OllamaConfig,
 }
 
 impl OllamaProvider {
-    pub fn new(config: types::OllamaConfig) -> Self {
+    pub fn new(config: OllamaConfig) -> Self {
         Self {
             client: Client::new(),
             config,
@@ -197,7 +217,7 @@ async fn stream_worker(
 
 fn build_request(
     req: &ModelRequest,
-    config: &types::OllamaConfig,
+    config: &OllamaConfig,
     stream: bool,
 ) -> types::ChatRequest {
     let model = if req.config.model.is_empty() {
@@ -289,5 +309,104 @@ fn role_from_str(s: &str) -> Role {
         "assistant" => Role::Assistant,
         "tool" => Role::Tool,
         _ => Role::User,
+    }
+}
+
+// Ollama 请求/响应类型
+
+mod types {
+    #[derive(serde::Serialize)]
+    pub struct ChatRequest {
+        pub model: String,
+        pub messages: Vec<Message>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub tools: Option<Vec<Tool>>,
+        pub stream: bool,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub options: Option<Options>,
+    }
+
+    #[derive(serde::Serialize)]
+    pub struct Options {
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub temperature: Option<f32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub num_predict: Option<u32>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub top_p: Option<f32>,
+    }
+
+    #[derive(serde::Serialize)]
+    pub struct Message {
+        pub role: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub content: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub tool_calls: Option<Vec<ToolCall>>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub images: Option<Vec<String>>,
+    }
+
+    #[derive(serde::Serialize)]
+    pub struct Tool {
+        #[serde(rename = "type")]
+        pub tool_type: String,
+        pub function: ToolFunction,
+    }
+
+    #[derive(serde::Serialize)]
+    pub struct ToolFunction {
+        pub name: String,
+        pub description: String,
+        pub parameters: serde_json::Value,
+    }
+
+    #[derive(serde::Serialize)]
+    pub struct ToolCall {
+        pub function: ToolCallFunction,
+    }
+
+    #[derive(serde::Serialize)]
+    pub struct ToolCallFunction {
+        pub name: String,
+        pub arguments: serde_json::Value,
+    }
+
+    // Response types
+
+    #[derive(serde::Deserialize)]
+    #[allow(dead_code)]
+    pub struct ChatResponse {
+        pub model: String,
+        pub message: ResponseMessage,
+        pub done: bool,
+        #[serde(default)]
+        pub done_reason: Option<String>,
+        #[serde(default)]
+        pub total_duration: Option<u64>,
+        #[serde(default)]
+        pub prompt_eval_count: Option<u32>,
+        #[serde(default)]
+        pub eval_count: Option<u32>,
+    }
+
+    #[derive(serde::Deserialize)]
+    pub struct ResponseMessage {
+        pub role: String,
+        #[serde(default)]
+        pub content: String,
+        #[serde(default)]
+        pub tool_calls: Vec<ResponseToolCall>,
+    }
+
+    #[derive(serde::Deserialize)]
+    pub struct ResponseToolCall {
+        pub function: ResponseToolCallFunction,
+    }
+
+    #[derive(serde::Deserialize)]
+    pub struct ResponseToolCallFunction {
+        pub name: String,
+        pub arguments: serde_json::Value,
     }
 }

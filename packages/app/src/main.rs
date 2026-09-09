@@ -1,5 +1,5 @@
 use aa_app_lib::app::AppShell;
-use gpui::{App, AppContext, Bounds, WindowBounds, WindowOptions, px, size};
+use gpui::{App, AppContext, Bounds, WindowBounds, WindowDecorations, WindowOptions, px, size};
 use gpui_platform::application;
 
 fn main() {
@@ -10,6 +10,7 @@ fn main() {
         cx.open_window(
             WindowOptions {
                 window_bounds: Some(WindowBounds::Windowed(bounds)),
+                window_decorations: Some(WindowDecorations::Client),
                 ..Default::default()
             },
             |_, cx| cx.new(AppShell::new),

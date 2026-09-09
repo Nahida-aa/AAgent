@@ -12,6 +12,7 @@ dependencies = [
  "gpui",
  "gpui_platform",
  "gpui_util",
+ "parking_lot",
  "serde",
  "serde_json",
  "tracing",

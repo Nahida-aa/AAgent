@@ -12,7 +12,7 @@ members = [
     "packages/server",
     "packages/config",
     "packages/session",
-    "packages/app/src-tauri",
+    "packages/app",
 ]
 
 [workspace.package]

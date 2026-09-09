@@ -7,9 +7,9 @@
   "scripts": {
     "dev": "cd packages/tui && bun run dev",
     "dev:tui": "cd packages/tui && bun run dev",
-    "dev:web": "cd packages/app && bun run dev",
-    "dev:desktop": "cd packages/app && bun run tauri dev",
+    "dev:web": "cd packages/webui && bun run dev",
     "dev:server": "cargo run -p aa-server",
+    "dev:app": "cargo run -p aa-app",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "stats": "scc . --exclude-dir node_modules,dist,build,target,venv,.venv,__pycache__,.git,vendor,out,cmake-build-debug,CMakeFiles --exclude-ext lock,json,md,yaml,yml,toml,ini,conf",

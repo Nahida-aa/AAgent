@@ -5,11 +5,12 @@
 //! - opencode 式 `Provider::configure(kind)` 让"厂商配置"先于"模型选择"。
 
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use aa_core::llm::ModelProvider;
 
 use crate::protocols::ollama_chat::{OllamaConfig, OllamaProvider};
-use crate::protocols::openai_chat::{OpenAiConfig, OpenAiCompatibleProvider};
+use crate::protocols::openai_chat::{OpenAiCompatibleProvider, OpenAiConfig};
 
 /// 可构建的 provider 种类。
 #[derive(Debug, Clone)]
@@ -35,6 +36,11 @@ impl ProviderKind {
             }
             Self::Ollama(config) => Box::new(OllamaProvider::new(config.clone())),
         }
+    }
+
+    /// 构建可分享给多任务的 provider 实例。
+    pub fn build_arc(&self) -> Arc<dyn ModelProvider> {
+        Arc::from(self.build())
     }
 
     /// 本地 Ollama。
@@ -86,11 +92,7 @@ pub mod profiles {
 
     /// DeepSeek。
     pub fn deepseek(api_key: impl Into<String>, default_model: impl Into<String>) -> ProviderKind {
-        ProviderKind::openai_compatible(
-            "https://api.deepseek.com/v1",
-            api_key,
-            default_model,
-        )
+        ProviderKind::openai_compatible("https://api.deepseek.com/v1", api_key, default_model)
     }
 
     /// Groq(免费高速推理)。
@@ -100,27 +102,22 @@ pub mod profiles {
 
     /// Cerebras(高速推理)。
     pub fn cerebras(api_key: impl Into<String>, default_model: impl Into<String>) -> ProviderKind {
-        ProviderKind::openai_compatible(
-            "https://api.cerebras.ai/v1",
-            api_key,
-            default_model,
-        )
+        ProviderKind::openai_compatible("https://api.cerebras.ai/v1", api_key, default_model)
     }
 
     /// Together AI。
-    pub fn togetherai(api_key: impl Into<String>, default_model: impl Into<String>) -> ProviderKind {
-        ProviderKind::openai_compatible(
-            "https://api.together.xyz/v1",
-            api_key,
-            default_model,
-        )
+    pub fn togetherai(
+        api_key: impl Into<String>,
+        default_model: impl Into<String>,
+    ) -> ProviderKind {
+        ProviderKind::openai_compatible("https://api.together.xyz/v1", api_key, default_model)
     }
 }
 
 /// 按 `ProviderId` 注册的 provider 集合。
 #[derive(Default)]
 pub struct ProviderRegistry {
-    map: HashMap<String, Box<dyn ModelProvider>>,
+    map: HashMap<String, Arc<dyn ModelProvider>>,
 }
 
 impl ProviderRegistry {
@@ -129,28 +126,24 @@ impl ProviderRegistry {
     }
 
     /// 注册一种 provider,id 取自 `ProviderKind::kind_id()`。
-    pub fn register(&mut self, kind: ProviderKind) {
-        let id = kind.kind_id().to_owned();
-        self.map.insert(id, kind.build());
+    pub fn register(&mut self, kind: ProviderKind) -> &mut Self {
+        self.register_as(kind.kind_id(), kind)
     }
 
     /// 以自定义 id 注册。
     pub fn register_as(&mut self, id: impl Into<String>, kind: ProviderKind) -> &mut Self {
-        self.map.insert(id.into(), kind.build());
+        self.map.insert(id.into(), kind.build_arc());
         self
     }
 
+    /// 借出 provider 引用。
     pub fn get(&self, id: &str) -> Option<&dyn ModelProvider> {
-        self.map.get(id).map(|b| b.as_ref())
+        self.map.get(id).map(|a| a.as_ref())
     }
 
-    pub fn resolve(&self, id: &str) -> Result<&dyn ModelProvider, String> {
-        self.get(id).ok_or_else(|| {
-            format!(
-                "provider '{id}' 未注册(已注册: {})",
-                self.map.keys().cloned().collect::<Vec<_>>().join(", ")
-            )
-        })
+    /// 取出可分享的 provider 实例。
+    pub fn get_arc(&self, id: &str) -> Option<Arc<dyn ModelProvider>> {
+        self.map.get(id).cloned()
     }
 
     pub fn ids(&self) -> impl Iterator<Item = &str> {

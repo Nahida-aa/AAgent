@@ -10,5 +10,5 @@ pub mod protocols;
 pub mod providers;
 
 pub use protocols::ollama_chat::{OllamaConfig, OllamaProvider};
-pub use protocols::openai_chat::{OpenAiConfig, OpenAiCompatibleProvider};
+pub use protocols::openai_chat::{OpenAiCompatibleProvider, OpenAiConfig};
 pub use providers::{Provider, ProviderKind, ProviderRegistry};

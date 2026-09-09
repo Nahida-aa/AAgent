@@ -30,9 +30,7 @@ fn local_ips() -> Vec<IpAddr> {
             let mut ptr = ifap;
             while !ptr.is_null() {
                 let ifa = &*ptr;
-                if !ifa.ifa_addr.is_null()
-                    && (*ifa.ifa_addr).sa_family as i32 == libc::AF_INET
-                {
+                if !ifa.ifa_addr.is_null() && (*ifa.ifa_addr).sa_family as i32 == libc::AF_INET {
                     let sin = &*(ifa.ifa_addr as *const libc::sockaddr_in);
                     let ip = std::net::Ipv4Addr::from(sin.sin_addr.s_addr.to_ne_bytes());
                     if !ip.is_loopback() && !ip.is_link_local() {

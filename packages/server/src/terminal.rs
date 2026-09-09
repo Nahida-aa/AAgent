@@ -5,14 +5,14 @@ use std::sync::Arc;
 
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::extract::{Path, State};
-use axum::response::{IntoResponse, Json};
 use axum::http::StatusCode;
+use axum::response::{IntoResponse, Json};
 use futures_util::{SinkExt, StreamExt};
 use nix::fcntl::OFlag;
 use nix::pty::{self, Winsize};
 use nix::unistd;
 use serde::{Deserialize, Serialize};
-use tokio::sync::{mpsc, Mutex, RwLock};
+use tokio::sync::{Mutex, RwLock, mpsc};
 use uuid::Uuid;
 
 const DEFAULT_SHELL: &str = "sh";
@@ -30,8 +30,8 @@ impl PtySession {
             .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
         pty::grantpt(&master).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
         pty::unlockpt(&master).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
-        let slave_name =
-            unsafe { pty::ptsname(&master) }.map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+        let slave_name = unsafe { pty::ptsname(&master) }
+            .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
 
         let slave = std::fs::File::options()
             .read(true)
@@ -50,7 +50,10 @@ impl PtySession {
             .stderr(unsafe { std::process::Stdio::from_raw_fd(fd_err) })
             .spawn()?;
 
-        Ok(PtySession { master_fd: master, child })
+        Ok(PtySession {
+            master_fd: master,
+            child,
+        })
     }
 
     pub fn raw_fd(&self) -> RawFd {
@@ -157,7 +160,12 @@ enum TerminalControl {
 pub struct PtyBridge;
 
 impl PtyBridge {
-    pub async fn spawn(socket: WebSocket, manager: TerminalManager, id: Uuid, remove_on_close: bool) {
+    pub async fn spawn(
+        socket: WebSocket,
+        manager: TerminalManager,
+        id: Uuid,
+        remove_on_close: bool,
+    ) {
         let (mut sender, mut receiver) = socket.split();
 
         let dup_fd = {
@@ -172,13 +180,8 @@ impl PtyBridge {
         let reader = tokio::task::spawn_blocking(move || {
             let mut buf = vec![0u8; 8192];
             loop {
-                let n = unsafe {
-                    libc::read(
-                        dup_fd,
-                        buf.as_mut_ptr() as *mut libc::c_void,
-                        buf.len(),
-                    )
-                };
+                let n =
+                    unsafe { libc::read(dup_fd, buf.as_mut_ptr() as *mut libc::c_void, buf.len()) };
                 if n <= 0 {
                     break;
                 }
@@ -278,9 +281,7 @@ pub(crate) struct SessionList {
     pub(crate) sessions: Vec<String>,
 }
 
-pub(crate) async fn list_sessions(
-    State(state): State<crate::AppState>,
-) -> Json<SessionList> {
+pub(crate) async fn list_sessions(State(state): State<crate::AppState>) -> Json<SessionList> {
     let ids = state.terminal.list().await;
     Json(SessionList {
         sessions: ids.iter().map(|u| u.to_string()).collect(),
@@ -295,7 +296,11 @@ pub(crate) struct CreateSessionResponse {
 pub(crate) async fn create_session(
     State(state): State<crate::AppState>,
 ) -> Result<Json<CreateSessionResponse>, StatusCode> {
-    let id = state.terminal.create(None).await.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let id = state
+        .terminal
+        .create(None)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     Ok(Json(CreateSessionResponse { id: id.to_string() }))
 }
 

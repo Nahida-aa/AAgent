@@ -3,5 +3,34 @@ name = "aa-app"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+publish = false
+description = "AAgent GPUI desktop client"
+
+[lib]
+name = "aa_app_lib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "aa-app"
+path = "src/main.rs"
 
 [dependencies]
+gpui.workspace = true
+gpui_util.workspace = true
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+futures = { workspace = true }
+alacritty_terminal = { git = "https://github.com/zed-industries/alacritty", rev = "4c129667ce56611becdc82de6e28218c80e2e88f" }
+
+[target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
+gpui_platform = { workspace = true, features = ["font-kit", "wayland", "x11"] }
+
+[target.'cfg(not(any(target_os = "linux", target_os = "freebsd", target_family = "wasm")))'.dependencies]
+gpui_platform = { workspace = true }
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+gpui_platform = { workspace = true }
+wasm-bindgen = "0.2.120"

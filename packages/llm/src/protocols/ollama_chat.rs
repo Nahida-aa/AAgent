@@ -215,11 +215,7 @@ async fn stream_worker(
     Ok(())
 }
 
-fn build_request(
-    req: &ModelRequest,
-    config: &OllamaConfig,
-    stream: bool,
-) -> types::ChatRequest {
+fn build_request(req: &ModelRequest, config: &OllamaConfig, stream: bool) -> types::ChatRequest {
     let model = if req.config.model.is_empty() {
         config.default_model.clone()
     } else {

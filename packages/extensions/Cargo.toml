@@ -3,7 +3,7 @@ name = "aa-extensions"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "aaBot Extension loader and runtime manager"
+description = "AAgent Extension loader and runtime manager"
 
 [dependencies]
 aa-core = { path = "../core" }

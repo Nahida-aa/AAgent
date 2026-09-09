@@ -187,7 +187,7 @@ function RouteComponent() {
           >
             ☰
           </button>
-          <span class="font-semibold text-[#c9d1d9]">aaBot</span>
+          <span class="font-semibold text-[#c9d1d9]">AAgent</span>
           {h() && (
             <span class="text-xs text-[#555]">
               {h()!.provider}/{h()!.model}

@@ -31,7 +31,7 @@ pub(crate) struct ToolResult {
     responses(
         (status = 200, description = "List all available tools", body = Vec<ToolInfo>)
     ),
-    tag = "aaBot"
+    tag = "AAgent"
 )]
 pub(crate) async fn list_tools(State(state): State<AppState>) -> Json<Vec<ToolInfo>> {
     let registry = state.registry.read().await;
@@ -59,7 +59,7 @@ pub(crate) async fn list_tools(State(state): State<AppState>) -> Json<Vec<ToolIn
         (status = 404, description = "Tool not found", body = String),
         (status = 500, description = "Tool execution failed", body = String),
     ),
-    tag = "aaBot"
+    tag = "AAgent"
 )]
 pub(crate) async fn call_tool(
     State(state): State<AppState>,

@@ -18,7 +18,7 @@ interface MyRouterContext {
 }
 export const Route = createRootRoute<MyRouterContext>({
   head: () => ({
-    title: 'aaBot',
+    title: 'AAgent',
     meta: [{
       name: 'viewport',
       content: 'width=device-width, initial-scale=1',

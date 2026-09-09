@@ -10,7 +10,7 @@ pub fn register(port: u16) -> anyhow::Result<ServiceDaemon> {
 
     let info = ServiceInfo::new(
         "_aa._tcp.local.",
-        "aaBot Server",
+        "AAgent Server",
         "aa-server.local.",
         &addrs as &[&str],
         port,

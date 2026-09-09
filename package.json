@@ -1,5 +1,5 @@
 {
-  "name": "aa-bot-root",
+  "name": "aa-agent-root",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -12,6 +12,7 @@
     "dev:server": "cargo run -p aa-server",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
+    "stats": "scc . --exclude-dir node_modules,dist,build,target,venv,.venv,__pycache__,.git,vendor,out,cmake-build-debug,CMakeFiles --exclude-ext lock,json,md,yaml,yml,toml,ini,conf",
     "prepare": "bunx lefthook install"
   },
   "devDependencies": {

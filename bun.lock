@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "aa-bot-root",
+      "name": "aa-agent-root",
       "devDependencies": {
         "oxfmt": "^0.61.0",
         "typescript": "^7.0.2",

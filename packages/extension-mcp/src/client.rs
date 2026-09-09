@@ -65,7 +65,7 @@ impl McpClient {
                 serde_json::json!({
                     "protocolVersion": "2025-03-26",
                     "capabilities": {},
-                    "clientInfo": { "name": "aaBot", "version": "0.1.0" },
+                    "clientInfo": { "name": "AAgent", "version": "0.1.0" },
                 }),
             )
             .await?;

@@ -1,6 +1,6 @@
 //! 扩展系统核心定义。
 //!
-//! 扩展是 aaBot 的主要扩展机制。内置 Rust 插件、WASM 插件、s5r 子进程插件
+//! 扩展是 AAgent 的主要扩展机制。内置 Rust 插件、WASM 插件、s5r 子进程插件
 //! 都通过此系统接入内核。
 
 use std::sync::Arc;
@@ -13,7 +13,7 @@ use crate::event::ExtensionEvent;
 
 /// 扩展的核心接口。
 ///
-/// 扩展通过实现此 trait 挂入 aaBot 生命周期。
+/// 扩展通过实现此 trait 挂入 AAgent 生命周期。
 /// register() 阶段声明能力（工具、钩子、命令），
 /// start() 后进入运行态。
 #[async_trait::async_trait]

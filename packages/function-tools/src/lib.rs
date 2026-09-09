@@ -416,7 +416,7 @@ impl Tool for WebFetch {
 
         let client = Client::builder()
             .timeout(Duration::from_secs(timeout_secs))
-            .user_agent("aaBot/0.1")
+            .user_agent("AAgent/0.1")
             .build()
             .map_err(|e| ToolError::Execution(format!("build client: {e}")))?;
 

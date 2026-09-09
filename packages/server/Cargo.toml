@@ -3,7 +3,7 @@ name = "aa-server"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "aaBot HTTP/WS API 服务"
+description = "AAgent HTTP/WS API 服务"
 
 [dependencies]
 aa-kernel = { path = "../kernel" }

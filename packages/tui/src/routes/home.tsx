@@ -160,7 +160,7 @@ export const Home: Component<HomeProps> = (props) => {
     <box width="100%" height="100%" flexDirection="column">
       {/* Header */}
       <box height={1} flexDirection="row" paddingLeft={2} paddingRight={2}>
-        <text fg="cyan">aaBot</text>
+        <text fg="cyan">AAgent</text>
         <box width={1} />
         <Show when={connected()}>
           <text fg="#555">
@@ -187,7 +187,7 @@ export const Home: Component<HomeProps> = (props) => {
       <box flexGrow={1} alignItems="center" paddingLeft={2} paddingRight={2}>
         <box flexGrow={1} minHeight={0} />
         <box flexShrink={0}>
-          <text fg="cyan">aaBot – AI Assistant</text>
+          <text fg="cyan">AAgent – AI Assistant</text>
         </box>
         <box height={1} minHeight={0} flexShrink={1} />
 

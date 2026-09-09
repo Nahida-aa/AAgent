@@ -3,7 +3,7 @@ name = "aa-cli"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "aaBot CLI entry point"
+description = "AAgent CLI entry point"
 
 [dependencies]
 aa-kernel = { path = "../kernel" }

@@ -21,7 +21,7 @@ export const Sidebar: Component<SidebarProps> = (props) => {
     <box width={SIDEBAR_WIDTH} height="100%" flexDirection="column" backgroundColor="#0d1117">
       {/* Brand */}
       <box height={1} flexDirection="row" paddingLeft={1}>
-        <text fg="cyan">aaBot</text>
+        <text fg="cyan">AAgent</text>
         <box flexGrow={1} />
         <box on:press={props.onBack}>
           <text fg="#555">[←]</text>

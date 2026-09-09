@@ -28,7 +28,7 @@ pub async fn cmd_run(
     let tool_defs = registry.all_definitions();
     let tool_instances = registry.all_tools();
 
-    println!("aaBot ready | tools: {}", tool_defs.len());
+    println!("AAgent ready | tools: {}", tool_defs.len());
 
     if args.no_llm {
         for t in &tool_defs {
@@ -184,7 +184,7 @@ pub async fn cmd_run(
 fn system_message() -> Message {
     Message {
         role: Role::System,
-        content: "You are aaBot, an AI assistant. You have access to filesystem tools. Help the user with their tasks.".into(),
+        content: "You are AAgent, an AI assistant. You have access to filesystem tools. Help the user with their tasks.".into(),
         tool_calls: None,
         tool_call_id: None,
         name: None,

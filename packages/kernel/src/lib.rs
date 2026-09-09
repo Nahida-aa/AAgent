@@ -1,4 +1,4 @@
-//! aaBot 微内核。
+//! AAgent 微内核。
 //!
 //! 拥有运行时级的注册表和宿主组合契约。具体工具、扩展加载器、
 //! 服务器、CLI 从此 crate 外部注册自身。
@@ -37,7 +37,7 @@ impl Kernel {
     }
 }
 
-/// 可嵌入 aaBot 内核的构建器。
+/// 可嵌入 AAgent 内核的构建器。
 #[derive(Default)]
 #[allow(dead_code)]
 pub struct KernelBuilder {

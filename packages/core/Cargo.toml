@@ -3,7 +3,7 @@ name = "aa-core"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "aaBot core types: Extension trait, Registrar, lifecycle events"
+description = "AAgent core types: Extension trait, Registrar, lifecycle events"
 
 [dependencies]
 aa-kernel = { path = "../kernel" }

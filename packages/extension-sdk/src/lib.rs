@@ -1,4 +1,4 @@
-//! aaBot Extension SDK。
+//! AAgent Extension SDK。
 //!
 //! 扩展开发的稳定公共 API。扩展作者只需依赖此 crate。
 //! 所有需要暴露给扩展的类型均在此重新导出。

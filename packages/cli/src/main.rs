@@ -7,7 +7,7 @@ mod markdown;
 mod run;
 
 #[derive(Parser)]
-#[command(name = "aa", version, about = "aaBot - 个人 AI 助手")]
+#[command(name = "aa", version, about = "AAgent - 个人 AI 助手")]
 struct Cli {
     #[command(subcommand)]
     command: Option<Command>,

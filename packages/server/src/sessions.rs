@@ -30,7 +30,7 @@ pub(crate) struct SessionDetail {
     responses(
         (status = 200, description = "List saved sessions", body = Vec<SessionSummary>)
     ),
-    tag = "aaBot"
+    tag = "AAgent"
 )]
 /// List saved sessions (most recent first).
 pub(crate) async fn list_sessions() -> Json<Vec<SessionSummary>> {
@@ -78,7 +78,7 @@ pub(crate) async fn get_session(
         (status = 200, description = "Session deleted"),
         (status = 404, description = "Session not found")
     ),
-    tag = "aaBot"
+    tag = "AAgent"
 )]
 pub(crate) async fn delete_session(
     Path(id): Path<String>,

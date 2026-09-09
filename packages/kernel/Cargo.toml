@@ -3,7 +3,7 @@ name = "aa-kernel"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "aaBot microkernel: ToolPack and ToolRegistry primitives"
+description = "AAgent microkernel: ToolPack and ToolRegistry primitives"
 
 [dependencies]
 serde = { workspace = true }

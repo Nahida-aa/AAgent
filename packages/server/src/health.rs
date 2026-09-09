@@ -20,7 +20,7 @@ pub(crate) struct HealthResponse {
     responses(
         (status = 200, description = "Server health status", body = HealthResponse)
     ),
-    tag = "aaBot"
+    tag = "AAgent"
 )]
 pub(crate) async fn health(State(state): State<AppState>) -> Json<HealthResponse> {
     let count = state.registry.read().await.len();

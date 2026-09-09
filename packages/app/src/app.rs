@@ -2,18 +2,18 @@ use std::path::PathBuf;
 
 use gpui::{AppContext, Context, Entity, ParentElement, Render, Styled};
 
-use crate::terminal::TerminalView;
+use crate::agent_panel::AgentPanel;
 
 /// AAgent desktop app shell.
 pub struct AppShell {
-    terminal: Entity<TerminalView>,
+    panel: Entity<AgentPanel>,
 }
 
 impl AppShell {
     pub fn new(cx: &mut Context<Self>) -> Self {
         let working_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-        let terminal = cx.new(|cx| TerminalView::new(None, working_dir, cx));
-        Self { terminal }
+        let panel = cx.new(|cx| AgentPanel::new(cx, working_dir));
+        Self { panel }
     }
 }
 
@@ -25,7 +25,7 @@ impl Render for AppShell {
     ) -> impl gpui::IntoElement {
         gpui::div()
             .flex_grow(1.0)
-            .bg(gpui::rgb(0x0d1117))
-            .child(self.terminal.clone())
+            .bg(gpui::rgb(0x141417))
+            .child(self.panel.clone())
     }
 }

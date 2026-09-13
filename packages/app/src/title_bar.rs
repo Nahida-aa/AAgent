@@ -61,10 +61,60 @@ impl TitleBar {
         gpui::rgb(0x141417)
     }
 
-    fn render_label(&self) -> impl IntoElement {
+    /// Left-aligned project name trigger.
+    ///
+    /// Mirrors zed's `render_project_name`: no project is selected in this
+    /// placeholder app, so it renders muted like zed's "Open Recent Project"
+    /// state, with a hover affordance to suggest it is clickable.
+    fn render_project_name(&self) -> impl IntoElement {
         gpui::div()
-            .text_color(gpui::rgb(0x9a9aa2))
-            .child(self.title.clone())
+            .id("project-name")
+            .px_1p5()
+            .py_0p5()
+            .rounded(gpui::rems(0.25))
+            .hover(|style| style.bg(gpui::rgb(0x2e2e33)))
+            .child(
+                gpui::div()
+                    .text_size(gpui::rems(0.7))
+                    .text_color(gpui::rgb(0x8a8a92))
+                    .child(self.title.clone()),
+            )
+    }
+
+    /// Right-aligned user menu placeholder (avatar + name).
+    ///
+    /// Zed shows the signed-in user here via a profile menu; we render a static
+    /// placeholder circle so the layout still has the shape of the real app.
+    fn render_user_menu(&self) -> impl IntoElement {
+        gpui::div()
+            .id("user-menu")
+            .flex_row()
+            .items_center()
+            .gap_1()
+            .px_1()
+            .py_0p5()
+            .rounded(gpui::rems(0.25))
+            .hover(|style| style.bg(gpui::rgb(0x2e2e33)))
+            .child(
+                gpui::div()
+                    .size(gpui::px(18.0))
+                    .rounded_full()
+                    .bg(gpui::rgb(0x3a3a40))
+                    .items_center()
+                    .justify_center()
+                    .child(
+                        gpui::div()
+                            .text_size(gpui::rems(0.625))
+                            .text_color(gpui::rgb(0xdbdbe1))
+                            .child("A"),
+                    ),
+            )
+            .child(
+                gpui::div()
+                    .text_size(gpui::rems(0.7))
+                    .text_color(gpui::rgb(0x9a9aa2))
+                    .child("AAgent"),
+            )
     }
 
     fn render_control_button(&self, kind: WindowControlKind) -> impl IntoElement {
@@ -143,8 +193,15 @@ impl TitleBar {
             .on_mouse_down(MouseButton::Right, move |event, window, _cx| {
                 window.show_window_menu(event.position);
             })
-            .child(self.render_label())
-            .child(self.render_window_controls(window, cx))
+            .child(self.render_project_name())
+            .child(
+                gpui::div()
+                    .flex_row()
+                    .items_center()
+                    .gap_1p5()
+                    .child(self.render_user_menu())
+                    .child(self.render_window_controls(window, cx)),
+            )
     }
 }
 

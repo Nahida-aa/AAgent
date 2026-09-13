@@ -89,8 +89,11 @@ impl AgentPanel {
             .rounded(gpui::rems(0.25))
             .hover(|style| style.bg(gpui::rgb(0x2a2a2e)))
             .active(|style| style.bg(gpui::rgb(0x3a3a40)))
-            .on_click(cx.listener(|this, _event, _window, _cx| {
+            .on_click(cx.listener(|this, _event, window, _cx| {
                 this.toggle_new_thread_menu();
+                if this.new_thread_menu_open {
+                    window.focus(&this.focus_handle, _cx);
+                }
             }))
             .child(gpui::div().text_color(gpui::rgb(0x8a8a92)).child("+"));
 
@@ -404,7 +407,27 @@ impl AgentPanel {
 
 impl Render for AgentPanel {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let menu: Option<gpui::AnyElement> = self
+        let overlay = self.new_thread_menu_open.then(|| {
+            gpui::div()
+                .id("new-thread-menu-overlay")
+                .absolute()
+                .inset_0()
+                .track_focus(&self.focus_handle.clone())
+                .on_key_down(
+                    cx.listener(|this, event: &gpui::KeyDownEvent, _window, _cx| {
+                        if event.keystroke.key == "escape" {
+                            this.new_thread_menu_open = false;
+                        }
+                    }),
+                )
+                .on_click(cx.listener(|this, _event, window, _cx| {
+                    this.new_thread_menu_open = false;
+                    window.focus(&this.focus_handle, _cx);
+                }))
+                .into_any_element()
+        });
+
+        let menu = self
             .new_thread_menu_open
             .then(|| self.render_new_thread_menu(cx).into_any_element());
 
@@ -426,6 +449,7 @@ impl Render for AgentPanel {
                     .child(self.render_toolbar(cx))
                     .child(self.render_surface(cx)),
             )
+            .children(overlay.into_iter())
             .children(menu.into_iter())
     }
 }

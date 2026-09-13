@@ -11,7 +11,7 @@ use alacritty_terminal::term::Config;
 use alacritty_terminal::term::Term;
 use alacritty_terminal::term::cell::{Cell, Flags};
 use alacritty_terminal::tty::{self, Options, Shell};
-use alacritty_terminal::vte::ansi::Color;
+use alacritty_terminal::vte::ansi::{Color, CursorShape};
 use gpui::{Pixels, px};
 use parking_lot::Mutex;
 
@@ -204,6 +204,34 @@ impl AlacrittyBackend {
         }
         (cells, rows, cols)
     }
+
+    /// Snapshot the cursor position/shape in display coordinates.
+    ///
+    /// The grid reports the cursor's line as an offset from the top of the
+    /// whole buffer; adding the scrollback `display_offset` yields the on-screen
+    /// row (see zed's `DisplayCursor::from`).
+    pub fn read_cursor(&self) -> Option<DisplayCursor> {
+        let term = self.term.lock();
+        let content = term.renderable_content();
+        let display_row = content.cursor.point.line.0 + content.display_offset as i32;
+        let rows = term.grid().screen_lines() as i32;
+        if content.cursor.shape == CursorShape::Hidden || display_row < 0 || display_row >= rows {
+            return None;
+        }
+        Some(DisplayCursor {
+            row: display_row,
+            col: content.cursor.point.column.0,
+            shape: content.cursor.shape,
+        })
+    }
+}
+
+/// Cursor position in display coordinates, plus its shape.
+#[derive(Clone, Copy, Debug)]
+pub struct DisplayCursor {
+    pub row: i32,
+    pub col: usize,
+    pub shape: CursorShape,
 }
 
 fn cell_to_display(cell: &Cell) -> DisplayCell {
@@ -265,6 +293,31 @@ mod tests {
         assert!(
             contains_smoke,
             "expected echo output in grid, got: {text:?}"
+        );
+    }
+
+    #[test]
+    fn cursor_is_visible_after_shell_output() {
+        let backend = AlacrittyBackend::new(
+            test_bounds(),
+            Some("/bin/sh".into()),
+            std::env::current_dir().unwrap(),
+        )
+        .expect("pty spawn");
+
+        backend.write_input(b"printf 'aaBot-smoke\\n'\r");
+        std::thread::sleep(Duration::from_millis(500));
+
+        let cursor = backend.read_cursor().expect("cursor should be visible");
+        let (_, rows, _) = backend.read_cells();
+        assert_eq!(
+            cursor.shape,
+            alacritty_terminal::vte::ansi::CursorShape::Block,
+            "default cursor style is block"
+        );
+        assert!(
+            (0..rows as i32).contains(&cursor.row),
+            "cursor row {cursor:?} should be on-screen ({rows} rows)"
         );
     }
 }

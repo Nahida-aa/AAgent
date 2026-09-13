@@ -15,6 +15,14 @@ const DEFAULT_BG: Rgba = Rgba {
     a: 1.0,
 };
 
+/// Block-style cursor fill; matches the app's accent blue.
+const CURSOR_COLOR: Rgba = Rgba {
+    r: 0x6e as f32 / 255.0,
+    g: 0xa8 as f32 / 255.0,
+    b: 0xfe as f32 / 255.0,
+    a: 1.0,
+};
+
 /// Renders one terminal screenful. Paints cell backgrounds as quads and each
 /// visible line as a shaped line; refined run-splitting can come later.
 pub struct TerminalElement {
@@ -25,6 +33,95 @@ pub struct TerminalElement {
 impl TerminalElement {
     pub fn new(backend: Arc<AlacrittyBackend>, bounds: TerminalBounds) -> Self {
         Self { backend, bounds }
+    }
+
+    /// Paints the terminal cursor. Block draws the full cell (opaque), then
+    /// re-draws the cell's character in the terminal background so it reads as
+    /// reverse video; Underline/Beam/HollowBlock draw thin strips or outlines.
+    fn paint_cursor(
+        &self,
+        bounds: Bounds<Pixels>,
+        cells: &[crate::terminal::alacritty::DisplayCell],
+        rows: usize,
+        cols: usize,
+        window: &mut Window,
+        cx: &mut App,
+    ) {
+        use alacritty_terminal::vte::ansi::CursorShape;
+
+        let Some(cursor) = self.backend.read_cursor() else {
+            return;
+        };
+        let (row, col) = (cursor.row as usize, cursor.col);
+        if row >= rows || col >= cols {
+            return;
+        }
+        let origin = bounds.origin;
+        let cell_width = self.bounds.cell_width;
+        let line_height = self.bounds.line_height;
+        let font_size = self.bounds.font_size;
+        let x0 = px(col as f32 * f32::from(cell_width));
+        let y0 = px(row as f32 * f32::from(line_height));
+
+        let cursor_color = CURSOR_COLOR;
+        match cursor.shape {
+            CursorShape::Block => {
+                let cell_bounds =
+                    Bounds::new(origin + point(x0, y0), size(cell_width, line_height));
+                window.paint_quad(fill(cell_bounds, cursor_color));
+
+                let cell = cells[row * cols + col];
+                let ch = cell.c;
+                if !ch.is_whitespace() && ch != '\0' {
+                    let run = TextRun {
+                        len: ch.len_utf8(),
+                        font: window.text_style().font(),
+                        color: DEFAULT_BG.into(),
+                        ..Default::default()
+                    };
+                    let shaped = window.text_system().shape_line(
+                        SharedString::from(ch.to_string()),
+                        font_size,
+                        &[run],
+                        None,
+                    );
+                    let _ = shaped.paint(
+                        origin + point(x0, y0),
+                        line_height,
+                        TextAlign::Left,
+                        None,
+                        window,
+                        cx,
+                    );
+                }
+            }
+            CursorShape::Underline => {
+                let underline = Bounds::new(
+                    origin + point(x0, y0 + line_height - px(2.0)),
+                    size(cell_width, px(2.0)),
+                );
+                window.paint_quad(fill(underline, cursor_color));
+            }
+            CursorShape::Beam => {
+                let beam = Bounds::new(origin + point(x0, y0), size(px(2.0), line_height));
+                window.paint_quad(fill(beam, cursor_color));
+            }
+            CursorShape::HollowBlock => {
+                let cell_bounds =
+                    Bounds::new(origin + point(x0, y0), size(cell_width, line_height));
+                window.paint_quad(fill(cell_bounds, cursor_color));
+                // Hollow block: invert the cell so the interior reads as the
+                // terminal background with a colored border.
+                window.paint_quad(fill(
+                    Bounds::new(
+                        origin + point(x0 + px(2.0), y0 + px(2.0)),
+                        size(cell_width - px(4.0), line_height - px(4.0)),
+                    ),
+                    DEFAULT_BG,
+                ));
+            }
+            CursorShape::Hidden => {}
+        }
     }
 }
 
@@ -176,6 +273,8 @@ impl Element for TerminalElement {
                 cx,
             );
         }
+
+        self.paint_cursor(bounds, &cells, rows, cols, window, cx);
     }
 }
 

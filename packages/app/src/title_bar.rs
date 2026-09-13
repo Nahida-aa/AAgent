@@ -1,8 +1,9 @@
 use gpui::{
     App, Context, FocusHandle, Focusable, InteractiveElement, IntoElement, MouseButton,
-    ParentElement, Pixels, Render, Rgba, StatefulInteractiveElement, Styled, Window, WindowButton,
+    ParentElement, Pixels, Render, StatefulInteractiveElement, Styled, Window, WindowButton,
     WindowButtonLayout, px, svg,
 };
+use ui_gpui::theme::ActiveTheme;
 
 /// Platform-appropriate title bar height.
 ///
@@ -15,8 +16,8 @@ pub fn platform_title_bar_height(window: &Window) -> Pixels {
 /// A client-side-decoration window control button.
 ///
 /// Zed renders these through `WindowControl` in the `platform_title_bar`
-/// crate; we reproduce the visuals with inline SVG data so no asset loader
-/// is required.
+/// crate; we load the same zed-style icons as embedded SVGs from the shared
+/// `assets` crate.
 #[derive(Clone, Copy)]
 enum WindowControlKind {
     Minimize,
@@ -25,18 +26,14 @@ enum WindowControlKind {
     Restore,
 }
 
-const MINIMIZE_SVG: &str = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M4 8H12\" stroke=\"#DCE0E5\" stroke-width=\"1.2\"/></svg>";
-const MAXIMIZE_SVG: &str = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M11.5 4.5H4.5V11.5H11.5V4.5Z\" stroke=\"#DCE0E5\" stroke-width=\"1.2\"/></svg>";
-const RESTORE_SVG: &str = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M9.5 6.5H3.5V12.5H9.5V6.5Z\" stroke=\"#DCE0E5\" stroke-width=\"1.2\"/><path d=\"M10 8.5H12.5V3.5H7.5V6\" stroke=\"#DCE0E5\" stroke-width=\"1.2\"/></svg>";
-const CLOSE_SVG: &str = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M11.5 4.5L4.5 11.5\" stroke=\"#DCE0E5\" stroke-width=\"1.2\" stroke-linecap=\"square\" stroke-linejoin=\"round\"/><path d=\"M4.5 4.5L11.5 11.5\" stroke=\"#DCE0E5\" stroke-width=\"1.2\" stroke-linecap=\"square\" stroke-linejoin=\"round\"/></svg>";
-
 impl WindowControlKind {
-    fn svg_data(&self) -> &'static str {
+    /// Asset path in the shared `assets` crate (matches zed's `generic_*.svg`).
+    fn icon_path(&self) -> &'static str {
         match self {
-            Self::Minimize => MINIMIZE_SVG,
-            Self::Maximize => MAXIMIZE_SVG,
-            Self::Restore => RESTORE_SVG,
-            Self::Close => CLOSE_SVG,
+            Self::Minimize => "icons/generic_minimize.svg",
+            Self::Maximize => "icons/generic_maximize.svg",
+            Self::Restore => "icons/generic_restore.svg",
+            Self::Close => "icons/generic_close.svg",
         }
     }
 }
@@ -56,9 +53,9 @@ impl TitleBar {
         }
     }
 
-    fn title_bar_color(&self) -> Rgba {
-        // `tab_bar_background` equivalent for our custom dark theme.
-        gpui::rgb(0x141417)
+    fn title_bar_color(&self, cx: &App) -> gpui::Hsla {
+        use ui_gpui::theme::ActiveTheme;
+        cx.theme().colors().panel_background
     }
 
     /// Left-aligned project name trigger.
@@ -66,17 +63,18 @@ impl TitleBar {
     /// Mirrors zed's `render_project_name`: no project is selected in this
     /// placeholder app, so it renders muted like zed's "Open Recent Project"
     /// state, with a hover affordance to suggest it is clickable.
-    fn render_project_name(&self) -> impl IntoElement {
+    fn render_project_name(&self, cx: &App) -> impl IntoElement {
+        let colors = cx.theme().colors();
         gpui::div()
             .id("project-name")
             .px_1p5()
             .py_0p5()
             .rounded(gpui::rems(0.25))
-            .hover(|style| style.bg(gpui::rgb(0x2e2e33)))
+            .hover(|style| style.bg(colors.ghost_element_hover))
             .child(
                 gpui::div()
                     .text_size(gpui::rems(0.7))
-                    .text_color(gpui::rgb(0x8a8a92))
+                    .text_color(colors.text_muted)
                     .child(self.title.clone()),
             )
     }
@@ -85,7 +83,8 @@ impl TitleBar {
     ///
     /// Zed shows the signed-in user here via a profile menu; we render a static
     /// placeholder circle so the layout still has the shape of the real app.
-    fn render_user_menu(&self) -> impl IntoElement {
+    fn render_user_menu(&self, cx: &App) -> impl IntoElement {
+        let colors = cx.theme().colors();
         gpui::div()
             .id("user-menu")
             .flex_row()
@@ -94,30 +93,31 @@ impl TitleBar {
             .px_1()
             .py_0p5()
             .rounded(gpui::rems(0.25))
-            .hover(|style| style.bg(gpui::rgb(0x2e2e33)))
+            .hover(|style| style.bg(colors.ghost_element_hover))
             .child(
                 gpui::div()
                     .size(gpui::px(18.0))
                     .rounded_full()
-                    .bg(gpui::rgb(0x3a3a40))
+                    .bg(colors.element_background)
                     .items_center()
                     .justify_center()
                     .child(
                         gpui::div()
                             .text_size(gpui::rems(0.625))
-                            .text_color(gpui::rgb(0xdbdbe1))
+                            .text_color(colors.text)
                             .child("A"),
                     ),
             )
             .child(
                 gpui::div()
                     .text_size(gpui::rems(0.7))
-                    .text_color(gpui::rgb(0x9a9aa2))
+                    .text_color(colors.text_muted)
                     .child("AAgent"),
             )
     }
 
-    fn render_control_button(&self, kind: WindowControlKind) -> impl IntoElement {
+    fn render_control_button(&self, kind: WindowControlKind, cx: &App) -> impl IntoElement {
+        let colors = cx.theme().colors();
         let id = match &kind {
             WindowControlKind::Minimize => "minimize",
             WindowControlKind::Maximize => "maximize",
@@ -131,17 +131,17 @@ impl TitleBar {
             .items_center()
             .justify_center()
             .rounded(gpui::rems(0.5))
-            .hover(|style| style.bg(gpui::rgb(0x2e2e33)))
-            .active(|style| style.bg(gpui::rgb(0x3a3a40)))
+            .hover(|style| style.bg(colors.ghost_element_hover))
+            .active(|style| style.bg(colors.ghost_element_active))
             .on_click(move |_event, window, _cx| match kind {
                 WindowControlKind::Minimize => window.minimize_window(),
                 WindowControlKind::Maximize | WindowControlKind::Restore => window.zoom_window(),
                 WindowControlKind::Close => window.remove_window(),
             })
-            .child(svg().size_4().flex_none().data(kind.svg_data().as_bytes()))
+            .child(svg().size_4().flex_none().path(kind.icon_path()))
     }
 
-    fn render_window_controls(&self, window: &mut Window, _cx: &mut App) -> impl IntoElement {
+    fn render_window_controls(&self, window: &mut Window, cx: &mut App) -> impl IntoElement {
         let layout = WindowButtonLayout::linux_default();
         let is_maximized = window.is_maximized();
 
@@ -150,15 +150,17 @@ impl TitleBar {
             .iter()
             .filter_map(|&b| b)
             .map(|b| match b {
-                WindowButton::Minimize => self.render_control_button(WindowControlKind::Minimize),
+                WindowButton::Minimize => {
+                    self.render_control_button(WindowControlKind::Minimize, cx)
+                }
                 WindowButton::Maximize => {
                     if is_maximized {
-                        self.render_control_button(WindowControlKind::Restore)
+                        self.render_control_button(WindowControlKind::Restore, cx)
                     } else {
-                        self.render_control_button(WindowControlKind::Maximize)
+                        self.render_control_button(WindowControlKind::Maximize, cx)
                     }
                 }
-                WindowButton::Close => self.render_control_button(WindowControlKind::Close),
+                WindowButton::Close => self.render_control_button(WindowControlKind::Close, cx),
             })
             .collect::<Vec<_>>();
 
@@ -167,7 +169,8 @@ impl TitleBar {
 
     fn render_titlebar(&self, window: &mut Window, cx: &mut App) -> impl IntoElement {
         let height = platform_title_bar_height(window);
-        let bg = self.title_bar_color();
+        let bg = self.title_bar_color(cx);
+        let colors = cx.theme().colors();
 
         gpui::div()
             .id("titlebar")
@@ -181,7 +184,7 @@ impl TitleBar {
             .bg(bg)
             .flex_none()
             .border_b_1()
-            .border_color(gpui::rgb(0x2a2a2e))
+            .border_color(colors.border_variant)
             .on_click(|event, window, _cx| {
                 if event.click_count() == 2 && window.is_resizable() {
                     window.zoom_window();
@@ -193,13 +196,13 @@ impl TitleBar {
             .on_mouse_down(MouseButton::Right, move |event, window, _cx| {
                 window.show_window_menu(event.position);
             })
-            .child(self.render_project_name())
+            .child(self.render_project_name(cx))
             .child(
                 gpui::div()
                     .flex_row()
                     .items_center()
                     .gap_1p5()
-                    .child(self.render_user_menu())
+                    .child(self.render_user_menu(cx))
                     .child(self.render_window_controls(window, cx)),
             )
     }

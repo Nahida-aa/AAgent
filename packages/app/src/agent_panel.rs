@@ -1,7 +1,10 @@
 use gpui::{
     App, AppContext, Context, ElementId, Entity, FocusHandle, Focusable, InteractiveElement,
-    IntoElement, ParentElement, Render, SharedString, StatefulInteractiveElement, Styled, Window,
+    IntoElement, ParentElement, Render, SharedString, StatefulInteractiveElement, Styled,
+    Subscription, Window,
 };
+use ui_gpui::theme::ActiveTheme;
+use ui_gpui::{Editor, EditorEvent};
 
 use crate::terminal::TerminalView;
 
@@ -38,8 +41,9 @@ pub struct AgentPanel {
     pub selected_agent: Agent,
     pub terminal: Entity<TerminalView>,
     pub new_thread_menu_open: bool,
-    pub composer_focus: FocusHandle,
-    pub composer_text: String,
+    pub composer: Entity<Editor>,
+    /// Subscriptions must live as long as the entity (Editor events).
+    pub _subscriptions: Vec<Subscription>,
 }
 
 const EXTERNAL_AGENT_PLACEHOLDERS: &[&str] = &["opencode"];
@@ -47,16 +51,36 @@ const EXTERNAL_AGENT_PLACEHOLDERS: &[&str] = &["opencode"];
 impl AgentPanel {
     pub fn new(cx: &mut Context<Self>, working_dir: std::path::PathBuf) -> Self {
         let focus_handle = cx.focus_handle();
-        let composer_focus = cx.focus_handle();
         let terminal = cx.new(|cx| TerminalView::new(None, working_dir, cx));
+
+        let composer = cx.new(|cx| {
+            let colors = cx.theme().colors();
+            let bg = colors.editor_background;
+            let border = colors.border_variant;
+            let placeholder = colors.text_placeholder;
+            Editor::single_line(cx)
+                .placeholder("Message AAgent…")
+                .submit_on_enter(true)
+                .bg(bg)
+                .border_color(border)
+                .placeholder_color(placeholder)
+        });
+
+        let subscription = cx.subscribe(&composer, |this, _editor, event: &EditorEvent, cx| {
+            if matches!(event, EditorEvent::Submitted) {
+                // TODO(ui): wire into session::run_turn. For now just clear after send.
+                this.composer.update(cx, |editor, cx| editor.clear(cx));
+            }
+        });
+
         Self {
             focus_handle,
             surface: VisibleSurface::AgentThread,
             selected_agent: Agent::AAgent,
             terminal,
             new_thread_menu_open: false,
-            composer_focus,
-            composer_text: String::new(),
+            composer,
+            _subscriptions: vec![subscription],
         }
     }
 
@@ -76,7 +100,23 @@ impl AgentPanel {
         &self.selected_agent == agent
     }
 
+    /// Placeholder "send": emits the editor text, clears, refocuses the editor.
+    fn send(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        // TODO(ui): push to a message list / call the agent.
+        let _message = self.composer.read(cx).text();
+        self.composer.update(cx, |editor, cx| editor.clear(cx));
+        window.focus(&self.composer.focus_handle(cx), cx);
+    }
+
     fn render_toolbar(&self, cx: &mut Context<Self>) -> impl IntoElement {
+        use ui_gpui::theme::ActiveTheme;
+        let colors = cx.theme().colors();
+        let hover_bg = colors.ghost_element_hover;
+        let active_bg = colors.ghost_element_active;
+        let icon_muted = colors.icon_muted;
+        let text_muted = colors.text_muted;
+        let border = colors.border_variant;
+
         let selected_agent_label = self.selected_agent.label().to_string();
 
         let new_thread_menu_button = gpui::div()
@@ -87,15 +127,15 @@ impl AgentPanel {
             .items_center()
             .justify_center()
             .rounded(gpui::rems(0.25))
-            .hover(|style| style.bg(gpui::rgb(0x2a2a2e)))
-            .active(|style| style.bg(gpui::rgb(0x3a3a40)))
+            .hover(move |style| style.bg(hover_bg))
+            .active(move |style| style.bg(active_bg))
             .on_click(cx.listener(|this, _event, window, _cx| {
                 this.toggle_new_thread_menu();
                 if this.new_thread_menu_open {
                     window.focus(&this.focus_handle, _cx);
                 }
             }))
-            .child(gpui::div().text_color(gpui::rgb(0x8a8a92)).child("+"));
+            .child(gpui::div().text_color(icon_muted).child("+"));
 
         let options_menu_button = gpui::div()
             .id("options_menu_btn")
@@ -105,17 +145,17 @@ impl AgentPanel {
             .items_center()
             .justify_center()
             .rounded(gpui::rems(0.25))
-            .hover(|style| style.bg(gpui::rgb(0x2a2a2e)))
-            .active(|style| style.bg(gpui::rgb(0x3a3a40)))
-            .child(gpui::div().text_color(gpui::rgb(0x8a8a92)).child("…"));
+            .hover(move |style| style.bg(hover_bg))
+            .active(move |style| style.bg(active_bg))
+            .child(gpui::div().text_color(icon_muted).child("…"));
 
         let title = match self.surface {
             VisibleSurface::Terminal => gpui::div()
-                .text_color(gpui::rgb(0x8a8a92))
+                .text_color(text_muted)
                 .child(format!("New {} Thread", selected_agent_label))
                 .into_any_element(),
             VisibleSurface::AgentThread => gpui::div()
-                .text_color(gpui::rgb(0xdbdbe1))
+                .text_color(colors.text)
                 .child(selected_agent_label)
                 .into_any_element(),
         };
@@ -128,9 +168,9 @@ impl AgentPanel {
             .items_center()
             .justify_between()
             .px(gpui::rems(0.5))
-            .bg(gpui::rgb(0x1a1a1e))
+            .bg(colors.panel_background)
             .border_b_1()
-            .border_color(gpui::rgb(0x2a2a2e))
+            .border_color(border)
             .child(
                 gpui::div()
                     .flex_row()
@@ -152,6 +192,15 @@ impl AgentPanel {
     }
 
     fn render_new_thread_menu(&self, cx: &mut Context<Self>) -> impl IntoElement {
+        use ui_gpui::theme::ActiveTheme;
+        let colors = cx.theme().colors();
+        let hover_bg = colors.element_hover;
+        let accent = colors.text_accent;
+        let unselected = colors.element_background;
+        let text = colors.text;
+        let menu_bg = colors.elevated_surface_background;
+        let border = colors.border_variant;
+
         let menu_items = std::iter::once(Agent::AAgent)
             .chain(std::iter::once(Agent::Terminal))
             .chain(
@@ -175,7 +224,7 @@ impl AgentPanel {
                     .px(gpui::rems(0.25))
                     .py(gpui::rems(0.125))
                     .gap_1()
-                    .hover(|style| style.bg(gpui::rgb(0x2e2e33)))
+                    .hover(move |style| style.bg(hover_bg))
                     .on_click(cx.listener(move |this, _event, _window, _cx| {
                         this.selected_agent = agent.clone();
                         this.new_thread();
@@ -185,17 +234,9 @@ impl AgentPanel {
                             .w(gpui::px(8.0))
                             .h(gpui::px(8.0))
                             .rounded_full()
-                            .bg(if is_selected {
-                                gpui::rgb(0x6ea8fe)
-                            } else {
-                                gpui::rgb(0x3a3a40)
-                            }),
+                            .bg(if is_selected { accent } else { unselected }),
                     )
-                    .child(
-                        gpui::div()
-                            .text_color(gpui::rgb(0xdbdbe1))
-                            .child(label.to_string()),
-                    )
+                    .child(gpui::div().text_color(text).child(label.to_string()))
             })
             .collect::<Vec<_>>();
 
@@ -209,9 +250,9 @@ impl AgentPanel {
             .py(gpui::rems(0.25))
             .overflow_y_scroll()
             .rounded_md()
-            .bg(gpui::rgb(0x232327))
+            .bg(menu_bg)
             .border_1()
-            .border_color(gpui::rgb(0x3a3a40))
+            .border_color(border)
             .shadow_lg()
             .children(item_elements)
     }
@@ -236,7 +277,12 @@ impl AgentPanel {
 
     /// Placeholder message list. Mirrors the flex-1 scrollable region that
     /// zed's thread view reserves above the composer.
-    fn render_message_region(&self, _cx: &mut Context<Self>) -> impl IntoElement {
+    fn render_message_region(&self, cx: &mut Context<Self>) -> impl IntoElement {
+        use ui_gpui::theme::ActiveTheme;
+        let colors = cx.theme().colors();
+        let title_muted = colors.text_muted;
+        let subtitle = colors.text_placeholder;
+
         let has_messages = false;
         let empty_state = if !has_messages {
             gpui::div()
@@ -251,13 +297,13 @@ impl AgentPanel {
                         .items_center()
                         .child(
                             gpui::div()
-                                .text_color(gpui::rgb(0x8a8a92))
+                                .text_color(title_muted)
                                 .child(gpui::Text::new_inaccessible("New AAgent Thread".into()))
                                 .into_any_element(),
                         )
                         .child(
                             gpui::div()
-                                .text_color(gpui::rgb(0x6a6a72))
+                                .text_color(subtitle)
                                 .child(gpui::Text::new_inaccessible(
                                     "Ask AAgent a question or choose a different agent from the + menu.".into(),
                                 ))
@@ -277,54 +323,23 @@ impl AgentPanel {
     }
 
     /// Bottom composer mirroring zed's `render_message_editor`:
-    /// editor region + a footer row with add-context/thinking + mode/model/send.
+    /// a `ui-gpui` Editor input + a footer row with add-context/thinking + mode/model/send.
     fn render_composer(&self, cx: &mut Context<Self>) -> impl IntoElement {
-        let has_text = !self.composer_text.is_empty();
-        let placeholder = !has_text;
+        use ui_gpui::theme::ActiveTheme;
+        let colors = cx.theme().colors();
+        let border_variant = colors.border_variant;
+        let element_bg = colors.element_background;
+        let element_hover = colors.element_hover;
+        let element_active = colors.element_active;
+        let text = colors.text;
 
-        let composer_focus = self.composer_focus.clone();
         let editor_region = gpui::div()
             .id("message-editor")
             .w_full()
             .min_h_0()
+            .px_2()
             .py_1()
-            .text_color(if placeholder {
-                gpui::rgb(0x6a6a72)
-            } else {
-                gpui::rgb(0xdbdbe1)
-            })
-            .track_focus(&composer_focus)
-            .on_key_down(
-                cx.listener(|this, event: &gpui::KeyDownEvent, _window, _cx| {
-                    let keystroke = &event.keystroke;
-                    if let Some(c) = &keystroke.key_char {
-                        if !keystroke.modifiers.control
-                            && !keystroke.modifiers.alt
-                            && !keystroke.modifiers.platform
-                        {
-                            this.composer_text.push_str(c);
-                        }
-                    } else if keystroke.key == "backspace" {
-                        this.composer_text.pop();
-                    }
-                    if let Some(_c) = &this.composer_text.chars().next() {
-                        // no-op: future send handling
-                    }
-                }),
-            )
-            .child(if placeholder {
-                gpui::div()
-                    .text_color(gpui::rgb(0x6a6a72))
-                    .child(gpui::Text::new_inaccessible("Message AAgent…".into()))
-                    .into_any_element()
-            } else {
-                gpui::div()
-                    .text_color(gpui::rgb(0xdbdbe1))
-                    .child(gpui::Text::new_inaccessible(
-                        self.composer_text.as_str().into(),
-                    ))
-                    .into_any_element()
-            });
+            .child(self.composer.clone());
 
         let send_button = gpui::div()
             .id("send-button")
@@ -332,19 +347,13 @@ impl AgentPanel {
             .px_2()
             .py_1()
             .rounded(gpui::rems(0.25))
-            .bg(gpui::rgb(0x2e2e33))
-            .hover(|style| style.bg(gpui::rgb(0x3a3a40)))
-            .active(|style| style.bg(gpui::rgb(0x4a4a50)))
-            .on_click({
-                let composer_focus = self.composer_focus.clone();
-                cx.listener(move |this, _event, window, _cx| {
-                    this.composer_text.clear();
-                    window.focus(&composer_focus, _cx);
-                })
-            })
+            .bg(element_bg)
+            .hover(move |style| style.bg(element_hover))
+            .active(move |style| style.bg(element_active))
+            .on_click(cx.listener(|this, _event, window, cx| this.send(window, cx)))
             .child(
                 gpui::div()
-                    .text_color(gpui::rgb(0xdbdbe1))
+                    .text_color(text)
                     .child(gpui::Text::new_inaccessible("Send".into()))
                     .into_any_element(),
             );
@@ -367,9 +376,9 @@ impl AgentPanel {
             .flex_row()
             .py_2()
             .justify_center()
-            .bg(gpui::rgb(0x111115))
+            .bg(colors.panel_background)
             .border_t_1()
-            .border_color(gpui::rgb(0x2a2a2e))
+            .border_color(border_variant)
             .child(
                 gpui::div()
                     .w_full()
@@ -389,16 +398,20 @@ impl AgentPanel {
             )
     }
 
-    fn render_footer_button(&self, label: &str, _cx: &Context<Self>) -> impl IntoElement {
+    fn render_footer_button(&self, label: &str, cx: &Context<Self>) -> impl IntoElement {
+        use ui_gpui::theme::ActiveTheme;
+        let colors = cx.theme().colors();
+        let hover_bg = colors.ghost_element_hover;
+        let text_muted = colors.text_muted;
         gpui::div()
             .flex_none()
             .px_1p5()
             .py_0p5()
             .rounded(gpui::rems(0.25))
-            .hover(|style| style.bg(gpui::rgb(0x2e2e33)))
+            .hover(move |style| style.bg(hover_bg))
             .child(
                 gpui::div()
-                    .text_color(gpui::rgb(0x9a9aa2))
+                    .text_color(text_muted)
                     .child(gpui::Text::new_inaccessible(label.into()))
                     .into_any_element(),
             )
@@ -407,6 +420,10 @@ impl AgentPanel {
 
 impl Render for AgentPanel {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        use ui_gpui::theme::ActiveTheme;
+        let colors = cx.theme().colors();
+        let panel_bg = colors.panel_background;
+
         let overlay = self.new_thread_menu_open.then(|| {
             gpui::div()
                 .id("new-thread-menu-overlay")
@@ -438,7 +455,7 @@ impl Render for AgentPanel {
             .size_full()
             .relative()
             .track_focus(&self.focus_handle.clone())
-            .bg(gpui::rgb(0x141417))
+            .bg(panel_bg)
             .on_click(cx.listener(|this, _event, window, _cx| {
                 window.focus(&this.focus_handle, _cx);
             }))

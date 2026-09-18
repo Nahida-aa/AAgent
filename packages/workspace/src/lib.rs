@@ -1,20 +1,16 @@
 //! Workspace 层：对齐 zed `workspace` crate。
 //!
-//! AAgent 主线（GPUI 桌面）的整体布局：
+//! AAgent 主线（GPUI 桌面）的整体布局 — 完全照搬 Zed 的 4 种 BottomDockLayout：
 //!
 //! ```
-//! ┌───────────────────────────────────────┐
-//! │ TitleBar                              │
-//! ├───────┬───────────────────┬───────────┤
-//! │       │                   │           │
-//! │ Left  │   Center Pane    │   Right   │
-//! │ Dock  │   (AgentPanel)   │   Dock    │
-//! │       │                   │           │
-//! ├───────┴───────────────────┴───────────┤
-//! │ Bottom Dock                           │
-//! ├───────────────────────────────────────┤
-//! │ StatusBar (PanelButtons + 普通项)     │
-//! └───────────────────────────────────────┘
+//! Contained (默认):           Full:
+//! ┌──────┬───────┬──────┐    ┌───────────────────────────┐
+//! │ Left │Center │Right │    │ Left  │   Center   │ Right │
+//! │ Dock │Pane   │ Dock  │    │ Dock  │   Pane     │ Dock  │
+//! │      ├───────┤       │    ├──────┴───┬───────┴──────┤
+//! │      │Bottom │       │    │   Bottom Dock (全宽)    │
+//! │      │ Dock  │       │    └───────────────────────────┘
+//! └──────┴───────┴──────┘
 //! ```
 //!
 //! 三层抽象（对齐 zed）：
@@ -32,8 +28,8 @@ pub mod status_bar;
 use std::collections::HashMap;
 
 use gpui::{
-    Context, DragMoveEvent, Entity, ParentElement, Render, Styled, Window, div, hsla, prelude::*,
-    px,
+    App, Context, DragMoveEvent, Entity, IntoElement, ParentElement, Render, Styled, Window, div,
+    hsla, prelude::*, px,
 };
 use ui_gpui::theme::ActiveTheme;
 
@@ -42,6 +38,36 @@ use dock_position::DockPosition;
 use panel::{PanelEntry, PanelKind};
 use panel_buttons::PanelButtons;
 use status_bar::StatusBar;
+
+/// Bottom dock 布局（对齐 zed `settings_content/src/workspace.rs`）。
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BottomDockLayout {
+    /// 夹在左右 dock 之间（默认）
+    Contained,
+    /// 窗口全宽
+    Full,
+    /// 左侧与 Left Dock 对齐，右侧夹在中间区域
+    LeftAligned,
+    /// 右侧与 Right Dock 对齐，左侧夹在中间区域
+    RightAligned,
+}
+
+impl Default for BottomDockLayout {
+    fn default() -> Self {
+        Self::Contained
+    }
+}
+
+impl BottomDockLayout {
+    fn from_str(s: &str) -> Self {
+        match s.to_ascii_lowercase().as_str() {
+            "full" => Self::Full,
+            "left_aligned" => Self::LeftAligned,
+            "right_aligned" => Self::RightAligned,
+            _ => Self::Contained,
+        }
+    }
+}
 
 /// 顶层 Workspace entity。对齐 zed `Workspace` 但做了大幅简化。
 /// Zed 的 Workspace ~3000 行（含 Pane、ItemHandle、ModalLayer、TeleportLayer 等），
@@ -82,9 +108,8 @@ impl Workspace {
 
         // 3. Dock 默认全关（对齐 Zed Dock::new 硬编码 is_open: false）。
         // Zed 没有 default.json 里的 open 字段 — 首次启动全关，
-        // 用户点击 PanelButtons 或 command 触发打开。
-        // 持久化恢复由后续 settings store / KVP 层负责。
-        // starts_open 是 Panel trait 的方法 — 现阶段简化处理为全关。
+        // 但 Panel trait 有 starts_open() 方法（Project 面板默认为 true）。
+        // 现阶段简化为全关 — 后续加 Panel trait 时支持 starts_open。
 
         let left_dock = cx.new(|_| left_dock);
         let bottom_dock = cx.new(|_| bottom_dock);
@@ -186,108 +211,205 @@ impl Workspace {
             cx.notify();
         });
     }
+
+    /// 对齐 zed `render_dock` — 返回 Dock 容器。
+    ///
+    /// 关键点：即使 Dock 关闭也返回容器（flex_none 不占空间），
+    /// 保证 focus handle 始终挂载（否则 toggle_panel_focus 无法聚焦关闭的面板）。
+    /// 尺寸只在 dock 打开时应用。
+    fn render_dock(dock: &Entity<Dock>, position: DockPosition, cx: &App) -> impl IntoElement {
+        let dock_ref = dock.read(cx);
+        let is_open = dock_ref.is_open();
+        let size = dock_ref.current_size();
+
+        let id = match position {
+            DockPosition::Left => "left-dock",
+            DockPosition::Right => "right-dock",
+            DockPosition::Bottom => "bottom-dock",
+        };
+
+        let mut container = div()
+            .id(id)
+            .flex_none()
+            .overflow_hidden()
+            .child(dock.clone());
+
+        if is_open {
+            match position {
+                DockPosition::Left | DockPosition::Right => {
+                    container = container.w(px(size));
+                }
+                DockPosition::Bottom => {
+                    container = container.h(px(size));
+                }
+            }
+        }
+
+        container
+    }
+
+    /// 从 SettingsStore 读取 bottom_dock_layout（默认 Contained）。
+    fn read_bottom_dock_layout(cx: &App) -> BottomDockLayout {
+        if let Some(store) = cx.try_global::<settings::SettingsStore>() {
+            if let Ok(s) = store.try_get_path::<String>(&["bottom_dock_layout"]) {
+                return BottomDockLayout::from_str(&s);
+            }
+        }
+        BottomDockLayout::default()
+    }
 }
 
 impl Render for Workspace {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let colors = cx.theme().colors();
 
-        // 读取三个 dock 的开/关状态 + 尺寸（决定是否占空间 + 多大）
-        let left_open = self.left_dock.read(cx).is_open();
-        let right_open = self.right_dock.read(cx).is_open();
-        let bottom_open = self.bottom_dock.read(cx).is_open();
-        let left_size = self.left_dock.read(cx).current_size();
-        let right_size = self.right_dock.read(cx).current_size();
-        let bottom_size = self.bottom_dock.read(cx).current_size();
+        let left_dock = Self::render_dock(&self.left_dock, DockPosition::Left, cx);
+        let right_dock = Self::render_dock(&self.right_dock, DockPosition::Right, cx);
+        let bottom_dock = Self::render_dock(&self.bottom_dock, DockPosition::Bottom, cx);
 
-        // 读取 sidebar 状态（StatusBar 里的 SidebarStatus）
-        let sidebar = self.status_bar.read(cx).sidebar();
-        let sidebar_left = sidebar.open && sidebar.side == DockPosition::Left;
-        let sidebar_right = sidebar.open && sidebar.side == DockPosition::Right;
-
-        // Sidebar 占位内容（后续换成文件树）
-        let sidebar_content = |pos: DockPosition| {
-            div()
-                .w(px(220.0))
-                .h_full()
-                .flex()
-                .items_center()
-                .justify_center()
-                .bg(colors.panel_background)
-                .border_color(colors.border)
-                .text_size(px(13.0))
-                .text_color(hsla(0.0, 0.0, 0.5, 1.0))
-                .map(|el| match pos {
-                    DockPosition::Left => el.border_r_1(),
-                    DockPosition::Right => el.border_l_1(),
-                    _ => el,
-                })
-                .child(format!("Sidebar ({:?})", pos))
-        };
-
-        // 主区域布局（flex_1 占满剩余空间）
-        let main_area = div()
+        // Center placeholder — 后续换成真实 Pane/PaneGroup
+        let center = div()
             .flex_1()
             .flex()
-            .flex_col()
-            .size_full()
-            .bg(colors.background)
+            .items_center()
+            .justify_center()
             .overflow_hidden()
-            // 上半部分：flex_row（sidebar-left | left dock | center | right dock | sidebar-right）
-            .child(
-                div()
-                    .flex_1()
-                    .flex()
-                    .flex_row()
-                    .size_full()
-                    .overflow_hidden()
-                    // Sidebar（左侧，在 Left Dock 左边）
-                    .when(sidebar_left, |el| {
-                        el.child(sidebar_content(DockPosition::Left))
-                    })
-                    // Left Dock（打开时才占空间，宽度 = active panel default_width）
-                    .when(left_open, |el| {
-                        el.child(
-                            div()
-                                .w(px(left_size))
-                                .h_full()
-                                .child(self.left_dock.clone()),
-                        )
-                    })
-                    // Center placeholder
-                    .child(
-                        div()
-                            .flex_1()
-                            .flex()
-                            .items_center()
-                            .justify_center()
-                            .text_size(px(14.0))
-                            .text_color(hsla(0.0, 0.0, 0.5, 1.0))
-                            .child("AAgent Center (placeholder)"),
-                    )
-                    // Right Dock（打开时才占空间，宽度 = active panel default_width）
-                    .when(right_open, |el| {
-                        el.child(
-                            div()
-                                .w(px(right_size))
-                                .h_full()
-                                .child(self.right_dock.clone()),
-                        )
-                    })
-                    // Sidebar（右侧，在 Right Dock 右边）
-                    .when(sidebar_right, |el| {
-                        el.child(sidebar_content(DockPosition::Right))
-                    }),
-            )
-            // Bottom Dock（打开时才占空间，叠在底部，高度 = active panel default_height）
-            .when(bottom_open, |el| {
-                el.child(
+            .text_size(px(14.0))
+            .text_color(hsla(0.0, 0.0, 0.5, 1.0))
+            .child("AAgent Center (placeholder)");
+
+        // 读取 bottom dock 布局
+        let bottom_layout = Self::read_bottom_dock_layout(cx);
+
+        // 主区域 — 4 种布局树（对齐 zed workspace.rs:L9748-L9982）
+        let main_area = match bottom_layout {
+            // ┌──────┬──────────┬──────┐
+            // │ Left │  Center  │Right │
+            // │ Dock │  ┌──────┐│ Dock │
+            // │      │  │Bottom││      │
+            // │      │  └──────┘│      │
+            // └──────┴──────────┴──────┘
+            BottomDockLayout::Contained => div()
+                .flex()
+                .flex_row()
+                .h_full()
+                .child(left_dock)
+                .child(
                     div()
-                        .w_full()
-                        .h(px(bottom_size))
-                        .child(self.bottom_dock.clone()),
+                        .flex()
+                        .flex_col()
+                        .flex_1()
+                        .h_full()
+                        .overflow_hidden()
+                        .child(center)
+                        .child(bottom_dock),
                 )
-            });
+                .child(right_dock)
+                .into_any_element(),
+
+            // ┌──────────────────────────┐
+            // │ Left  │   Center   │Right │
+            // │ Dock  │            │ Dock  │
+            // ├───────┴────────────┴──────┤
+            // │     Bottom Dock (全宽)     │
+            // └──────────────────────────┘
+            BottomDockLayout::Full => div()
+                .flex()
+                .flex_col()
+                .h_full()
+                .child(
+                    div()
+                        .flex()
+                        .flex_row()
+                        .flex_1()
+                        .overflow_hidden()
+                        .child(left_dock)
+                        .child(
+                            div()
+                                .flex()
+                                .flex_col()
+                                .flex_1()
+                                .overflow_hidden()
+                                .child(center),
+                        )
+                        .child(right_dock),
+                )
+                .child(bottom_dock)
+                .into_any_element(),
+
+            // ┌──────┬─────────────────────┐
+            // │ Left │      Center         │
+            // │ Dock │  ┌──────────────┐   │
+            // │      │  │   Bottom     │   │
+            // │      │  └──────────────┘   │
+            // └──────┴─────────────────────┘
+            BottomDockLayout::LeftAligned => div()
+                .flex()
+                .flex_row()
+                .h_full()
+                .child(
+                    div()
+                        .flex()
+                        .flex_col()
+                        .flex_1()
+                        .h_full()
+                        .child(
+                            div()
+                                .flex()
+                                .flex_row()
+                                .flex_1()
+                                .overflow_hidden()
+                                .child(left_dock)
+                                .child(
+                                    div()
+                                        .flex()
+                                        .flex_col()
+                                        .flex_1()
+                                        .overflow_hidden()
+                                        .child(center),
+                                ),
+                        )
+                        .child(bottom_dock),
+                )
+                .child(right_dock)
+                .into_any_element(),
+
+            // ┌─────────────────────┬──────┐
+            // │      Center         │Right │
+            // │  ┌──────────────┐   │ Dock │
+            // │  │   Bottom     │   │      │
+            // │  └──────────────┘   │      │
+            // └─────────────────────┴──────┘
+            BottomDockLayout::RightAligned => div()
+                .flex()
+                .flex_row()
+                .h_full()
+                .child(left_dock)
+                .child(
+                    div()
+                        .flex()
+                        .flex_col()
+                        .flex_1()
+                        .h_full()
+                        .child(
+                            div()
+                                .flex()
+                                .flex_row()
+                                .flex_1()
+                                .child(
+                                    div()
+                                        .flex()
+                                        .flex_col()
+                                        .flex_1()
+                                        .overflow_hidden()
+                                        .child(center),
+                                )
+                                .child(right_dock),
+                        )
+                        .child(bottom_dock),
+                )
+                .into_any_element(),
+        };
 
         div()
             .flex()
@@ -304,18 +426,15 @@ impl Render for Workspace {
                       cx| {
                     match e.drag(cx).0 {
                         DockPosition::Left => {
-                            let size = e.event.position.x.as_f32();
-                            workspace.resize_left_dock(size, cx);
+                            workspace.resize_left_dock(e.event.position.x.as_f32(), cx);
                         }
                         DockPosition::Right => {
-                            // Right dock resize — 简化处理：直接用鼠标 x 坐标
                             // Zed 用 workspace.bounds.right() - e.event.position.x
-                            let size = e.event.position.x.as_f32();
-                            workspace.resize_right_dock(size, cx);
+                            // AAgent 简化为直接用鼠标坐标（后续加 bounds 时再精确化）
+                            workspace.resize_right_dock(e.event.position.x.as_f32(), cx);
                         }
                         DockPosition::Bottom => {
-                            let size = e.event.position.y.as_f32();
-                            workspace.resize_bottom_dock(size, cx);
+                            workspace.resize_bottom_dock(e.event.position.y.as_f32(), cx);
                         }
                     }
                 },

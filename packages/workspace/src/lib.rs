@@ -80,6 +80,11 @@ impl Workspace {
         let bottom_dock = cx.new(|cx| bottom_dock);
         let right_dock = cx.new(|cx| right_dock);
 
+        // 订阅 3 个 dock — Dock toggle / 面板增删时 Workspace 需要重新渲染
+        cx.observe(&left_dock, |_, _, cx| cx.notify()).detach();
+        cx.observe(&bottom_dock, |_, _, cx| cx.notify()).detach();
+        cx.observe(&right_dock, |_, _, cx| cx.notify()).detach();
+
         // 3. 创建 all_docks HashMap（PanelButtons 右键菜单跨 Dock 搬面板需要）
         let all_docks: HashMap<DockPosition, Entity<Dock>> = [
             (DockPosition::Left, left_dock.clone()),

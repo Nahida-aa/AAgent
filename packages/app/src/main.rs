@@ -18,6 +18,9 @@ fn main() {
             ui_gpui::bind_input_keys(cx);
             ui_gpui::base::input::editor::bind_editor_keys(cx);
 
+            // 设置系统（RustEmbed default.json → gpui Global SettingsStore）
+            settings::SettingsStore::init(cx);
+
             let bounds = Bounds::centered(None, size(1100.0.into(), px(720.0)), cx);
             cx.open_window(
                 WindowOptions {

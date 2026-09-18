@@ -1,30 +1,34 @@
-//! AAgent LLM 配置系统。
+//! AAgent 设置系统（对齐 Zed `crates/settings`，极简版）。
 //!
-//! 加载顺序（后面的覆盖前面的）：
-//!   1. RustEmbed 内嵌的 `settings/default.json`（对齐 Zed settings crate 模式）
-//!   2. 硬编码默认值
-//!   3. `AA_*` 环境变量
-//!   4. 旧的 `AA_LLM_*` 环境变量（向后兼容）
-//!   5. `aa.json`（当前目录或 `~/.config/aa/`）
+//! 两层加载模型：
+//!   1. RustEmbed 内嵌的 `settings/default.json`（兜底）
+//!   2. `aa.json`（后续覆盖 —— 目前还没接）
+//!
+//! 不做 Zed 那套 Settings trait / RegisterSetting 宏 / 文件 watch / 多层合并。
+//! 各 Setting struct 直接 `serde::Deserialize` 从 JSON Value 树读，各自字段默认自己管。
 
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
+use gpui::{App, Global};
 use rust_embed::RustEmbed;
 use serde::Deserialize;
+use serde::de::DeserializeOwned;
+use serde_json::Value;
 
-// 对齐 Zed crates/settings/src/settings.rs 的 SettingsAssets 模式：
-// settings 归 settings crate 自己 embed，icons/fonts 归 aa-gpui-kit-assets。
+// ---------- RustEmbed ----------
+
+/// 对齐 Zed crates/settings/src/settings.rs 的 SettingsAssets 模式：
+/// settings 归 settings crate 自己 embed，icons/fonts 归 aa-gpui-kit-assets。
 #[derive(RustEmbed)]
 #[folder = "../../assets"]
 #[include = "settings/*"]
 #[exclude = "*.DS_Store"]
 pub struct SettingsAssets;
 
-/// 从内嵌资源读取 default.json，返回 Cow 借用。
-/// 对齐 Zed `default_settings()` —— 应用启动时 settings store 用它做兜底。
-pub fn default_settings() -> Cow<'static, str> {
+/// 从内嵌资源读取 default.json 原始文本。
+fn embedded_default_json() -> Cow<'static, str> {
     match SettingsAssets::get("settings/default.json")
         .expect("settings/default.json must be embedded")
         .data
@@ -35,6 +39,95 @@ pub fn default_settings() -> Cow<'static, str> {
         Cow::Owned(bytes) => {
             Cow::Owned(String::from_utf8(bytes).expect("embedded default.json is UTF-8"))
         }
+    }
+}
+
+// ---------- SettingsStore ----------
+
+/// 全局设置存储。gpui `Global` trait 让它能通过 `cx.global::<SettingsStore>()` 访问。
+///
+/// 内部持有一棵 serde_json::Value（从 default.json 解析的完整 JSON 值树）。
+/// 各 Setting struct 通过 `SettingsStore::get_raw::<T>()` 从 Value 树反序列化。
+pub struct SettingsStore {
+    /// 内嵌 default.json 解析后的 JSON 值树（兜底）
+    defaults: Value,
+    /// 运行时可覆盖的 JSON 值树（目前为空占位）
+    overrides: Value,
+}
+
+impl SettingsStore {
+    /// 应用启动时调用，初始化 SettingsStore 并注册为 gpui Global。
+    /// 用 json5 解析（default.json 有 `//` 注释，serde_json 不支持）。
+    pub fn init(cx: &mut App) {
+        let defaults: Value =
+            json5::from_str(&embedded_default_json()).expect("default.json must be valid JSON5");
+        let store = Self {
+            defaults,
+            overrides: Value::Object(serde_json::Map::new()),
+        };
+        cx.set_global(store);
+    }
+
+    /// 合并后的设置值树（overrides 优先覆盖 defaults）。
+    /// 目前 overrides 永远是空 Object，但合并基础设施在这了。
+    pub fn merged(&self) -> Value {
+        if self.overrides.is_object() && !self.overrides.as_object().unwrap().is_empty() {
+            merge_values(self.defaults.clone(), self.overrides.clone())
+        } else {
+            self.defaults.clone()
+        }
+    }
+
+    /// 从 merged 设置里按路径取一个字段。
+    /// 例如 `store.get_path::<f64>(["ui", "ui_font_size"])`。
+    /// 路径上任何一环缺失 → panic（和 Zed Settings::from_settings 行为一致）。
+    pub fn get_path<T>(&self, path: &[&str]) -> T
+    where
+        T: DeserializeOwned,
+    {
+        let merged = self.merged();
+        let mut current = &merged;
+        for (i, key) in path.iter().enumerate() {
+            let next = current.get(*key).unwrap_or_else(|| {
+                panic!(
+                    "settings path `{}` missing key `{key}`",
+                    path[..i].join(".")
+                )
+            });
+            current = next;
+        }
+        serde_json::from_value(current.clone()).unwrap_or_else(|e| {
+            panic!("settings path `{}` deserialize failed: {e}", path.join("."))
+        })
+    }
+
+    /// 从 merged 设置里反序列化整个 Value 树为 T。
+    pub fn get_raw<T>(&self) -> T
+    where
+        T: DeserializeOwned,
+    {
+        serde_json::from_value(self.merged())
+            .unwrap_or_else(|e| panic!("settings deserialize failed: {e}"))
+    }
+}
+
+impl Global for SettingsStore {}
+
+/// 递归合并两个 JSON Value（source 覆盖 target 中同路径的值）。
+fn merge_values(target: Value, source: Value) -> Value {
+    match (target, source) {
+        (Value::Object(mut t), Value::Object(s)) => {
+            for (k, sv) in s {
+                let tv = t.remove(&k);
+                let merged = match tv {
+                    Some(tv) => merge_values(tv, sv),
+                    None => sv,
+                };
+                t.insert(k, merged);
+            }
+            Value::Object(t)
+        }
+        (_, source) => source,
     }
 }
 

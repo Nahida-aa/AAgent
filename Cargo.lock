@@ -17,6 +17,7 @@ dependencies = [
  "parking_lot",
  "serde",
  "serde_json",
+ "settings",
  "tracing",
  "tracing-subscriber",
  "ui-gpui",
@@ -3989,6 +3990,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "json5"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96b0db21af676c1ce64250b5f40f3ce2cf27e4e47cb91ed91eb6fe9350b430c1"
+dependencies = [
+ "pest",
+ "pest_derive",
+ "serde",
+]
+
+[[package]]
 name = "kasuari"
 version = "0.4.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6631,6 +6643,8 @@ dependencies = [
 name = "settings"
 version = "0.1.0"
 dependencies = [
+ "gpui",
+ "json5",
  "rust-embed",
  "serde",
  "serde_json",

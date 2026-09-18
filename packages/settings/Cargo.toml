@@ -3,12 +3,14 @@ name = "settings"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "AAgent LLM 配置系统 (aa.json + env var fallback)"
+description = "AAgent 设置系统 (RustEmbed default.json → gpui Global SettingsStore)"
 
 [dependencies]
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
-rust-embed = "8"
+rust-embed = { version = "8", features = ["include-exclude"] }
+json5 = "0.4"
+gpui.workspace = true
 
 [dev-dependencies]
 tempfile = { workspace = true }

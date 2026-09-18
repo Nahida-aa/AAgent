@@ -21,7 +21,6 @@
 
 pub mod dock;
 pub mod multi_workspace;
-pub mod panel;
 pub mod panel_buttons;
 pub mod status_bar;
 
@@ -36,11 +35,11 @@ use gpui::{
 };
 use ui_gpui::theme::ActiveTheme;
 
-use dock::{Dock, DraggedDock};
-use panel::{
+use dock::panel::{
     AgentPanel, CollabPanel, DebugPanel, GitPanel, OutlinePanel, PanelHandle, ProjectPanel,
     TerminalPanel,
 };
+use dock::{Dock, DraggedDock};
 use panel_buttons::PanelButtons;
 use status_bar::StatusBar;
 

@@ -1,5 +1,7 @@
 //! Dock 面板容器，对齐 zed `dock.rs`。
 
+pub mod panel;
+
 use std::sync::Arc;
 
 use gpui::{
@@ -9,7 +11,7 @@ use gpui::{
 use settings_content::DockPosition;
 use ui_gpui::theme::ActiveTheme;
 
-use crate::panel::PanelHandle;
+use self::panel::PanelHandle;
 
 /// Resize handle 的大小（对齐 zed dock.rs `RESIZE_HANDLE_SIZE = px(6.)`）。
 pub(crate) const RESIZE_HANDLE_SIZE: f32 = 6.0;

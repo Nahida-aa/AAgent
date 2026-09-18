@@ -206,20 +206,20 @@ impl Dock {
 impl Render for Dock {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> gpui::AnyElement {
         if !self.is_open || self.panels.is_empty() {
-            return div().into_any_element();
+            return div().id("dock-panel").into_any_element();
         }
 
         let colors = cx.theme().colors();
         let position = self.position;
 
-        // 渲染 active panel 的 entity（对齐 zed dock.rs:1360）
+        // 渲染 active panel 的 entity — zed dock.rs:L1360-1365
         let content = self
             .active_panel_index
             .and_then(|i| self.panels.get(i))
             .map(|p| p.to_any().into_any_element())
             .unwrap_or_else(|| div().into_any_element());
 
-        // Resize handle — 对齐 zed dock.rs `create_resize_handle()`
+        // Resize handle — 对齐 zed dock.rs:L1275-1331
         let resize_handle = {
             let pos = self.position;
             let handle = div()
@@ -246,6 +246,7 @@ impl Render for Dock {
                 )
                 .occlude();
 
+            // Zed dock.rs:L1303-1331 — handle 绝对定位在 dock 的对侧边缘
             match pos {
                 DockPosition::Left => deferred(
                     handle
@@ -277,24 +278,61 @@ impl Render for Dock {
             }
         };
 
+        // Zed dock.rs:L1334-1369 — 关键差异:
+        // 1. dock-panel 没有 .relative()（resize handle 用 absolute 相对于最近的 positioned ancestor,
+        //    这里 Dock 的 parent (workspace render_dock 的容器) 也是 relative? 不对...
+        //    实际上 Dock render 内部没有 relative, 但 resize handle 的 absolute 会相对于祖先的 relative。
+        //    我们的容器也没有 relative, 那 resize handle 的 absolute 可能相对于 body... 这是个问题。
+        //    等等让我再看 Zed — Zed 的 dock-panel 也没有 relative, 但 resize handle 是 deferred。
+        //    实际上 GPUI 的 absolute 是相对于最近的 position!=static 的祖先。
+        //    #workspace 是 relative, main_area 的 div 没有 relative, 那 dock-panel 的 absolute handle
+        //    会相对于 #workspace 定位? 不对, 应该有一个 relative 的定位上下文。
+        //    哦等等 — 我们之前在 Dock render 里加了 .relative(), Zed 没有。但 Zed 的 resize handle 也是
+        //    绝对定位的。让我再看看... Zed 的 deferred 是什么意思? GPUI 的 deferred 就是延迟渲染,
+        //    absolute 定位一样会找祖先 relative。也许 Zed 的 dock-panel 虽然没显式 .relative(),
+        //    但 div 默认就是 position: relative? 让我假设我们需要保留 .relative()。
+        //
+        // 2. flex 方向按 axis: Left/Right=Horizontal→flex_row, Bottom=Vertical→flex_col
+        //    我们之前完全搞反了!
+        //
+        // 3. panel content 有中间 div 包裹 (w_full.h_full) — zed dock.rs:L1355-1366
+
+        let dock_axis_is_horizontal = matches!(position, DockPosition::Left | DockPosition::Right);
+
         let root = div()
             .id("dock-panel")
-            .relative()
-            .w_full()
-            .h_full()
+            .relative() // 保留: resize handle absolute 需要定位上下文
+            .flex()
             .bg(colors.panel_background)
             .border_color(colors.border)
             .overflow_hidden()
-            .map(|el| match position {
-                DockPosition::Left | DockPosition::Right => el.flex_col(),
-                DockPosition::Bottom => el.flex_row(),
+            .map(|el| {
+                if dock_axis_is_horizontal {
+                    // Left/Right dock: 高度可变 (flex_row 让 panel content + handle 横向?
+                    // 不对, handle 是 absolute 的, 所以 flex 方向只影响中间的 content div)
+                    el.w_full().h_full().flex_row()
+                } else {
+                    // Bottom dock
+                    el.w_full().h_full().flex_col()
+                }
             })
             .map(|el| match position {
                 DockPosition::Left => el.border_r_1(),
                 DockPosition::Right => el.border_l_1(),
                 DockPosition::Bottom => el.border_t_1(),
             })
-            .child(content)
+            // Zed dock.rs:L1354-1366 — 中间 div 包裹 content, 占满 dock-panel
+            .child(
+                div()
+                    .map(|el| {
+                        if dock_axis_is_horizontal {
+                            el.w_full().h_full()
+                        } else {
+                            el.w_full().h_full()
+                        }
+                    })
+                    .child(content),
+            )
             .child(resize_handle);
 
         root.into_any_element()

@@ -395,58 +395,38 @@ impl Workspace {
 
     /// 对齐 zed `render_dock` — 返回 Dock 容器。
     ///
-    /// 关键点：即使 Dock 关闭也返回容器（flex_none 不占空间），
-    /// 保证 focus handle 始终挂载。
-    ///
-    /// 当 Dock 的 active panel 支持 flexible sizing（Agent 面板）且没有用户覆盖的固定尺寸时，
-    /// 用 flex_grow(1.0) 让它和 Center 等宽（对齐 zed `default_dock_flex` 返回 1.0）。
+    /// Zed 关键实现 (workspace.rs:L8660-8720)：
+    /// - 容器默认 `.flex().flex_none()` — 不管开/关都有 flex_none (flex_grow=0, flex_shrink=0)
+    ///   然后通过 `.w(size)` / `.h(size)` 设置固定尺寸
+    /// - Bottom dock 只设 `.h(size)`, 不设 flex_shrink
+    /// - Left/Right dock 设 `.w(size)` + `flex_shrink(1.0)` (allow shrink when space tight)
     fn render_dock(dock: &Entity<Dock>, position: DockPosition, cx: &App) -> impl IntoElement {
         let dock_ref = dock.read(cx);
         let is_open = dock_ref.is_open();
         let size = dock_ref.current_size(cx);
 
-        // 判断是否 flexible sizing：
-        let is_flexible = match position {
-            DockPosition::Left | DockPosition::Right => {
-                !dock_ref.has_size_override()
-                    && dock_ref
-                        .active_panel_index()
-                        .and_then(|i| dock_ref.panels().get(i))
-                        .map(|p| p.supports_flexible_size(cx))
-                        .unwrap_or(false)
-            }
-            DockPosition::Bottom => false,
-        };
+        let is_bottom = matches!(position, DockPosition::Bottom);
 
-        let id = match position {
-            DockPosition::Left => "left-dock",
-            DockPosition::Right => "right-dock",
-            DockPosition::Bottom => "bottom-dock",
-        };
-
-        let mut container = div().id(id).overflow_hidden().child(dock.clone());
+        // Zed 默认 flex_none + flex — workspace.rs:L8669-8672
+        let mut container = div()
+            .id(match position {
+                DockPosition::Left => "left-dock",
+                DockPosition::Right => "right-dock",
+                DockPosition::Bottom => "bottom-dock",
+            })
+            .flex()
+            .overflow_hidden()
+            .flex_none()
+            .child(dock.clone());
 
         if is_open {
-            if is_flexible && matches!(position, DockPosition::Left | DockPosition::Right) {
-                // Flexible sizing — 和 Center 1:1 等宽。
-                // 关键：flex_basis(0) — 没有它默认 flex-basis:auto 会按内容大小分配，
-                // 不是等分（对齐 zed workspace.rs:L8696 + gpui flex_1() 的实现）。
-                container = container
-                    .flex_grow(1.0)
-                    .flex_shrink(1.0)
-                    .flex_basis(gpui::relative(0.));
+            if is_bottom {
+                // Bottom dock — zed dock.rs:L8712-8717: 只设 h(size), 不设 flex_shrink
+                container = container.h(px(size));
             } else {
-                match position {
-                    DockPosition::Left | DockPosition::Right => {
-                        container = container.w(px(size)).flex_shrink(1.0);
-                    }
-                    DockPosition::Bottom => {
-                        container = container.h(px(size));
-                    }
-                }
+                // Left/Right dock
+                container = container.w(px(size)).flex_shrink(1.0);
             }
-        } else {
-            container = container.flex_none();
         }
 
         container
@@ -607,15 +587,15 @@ impl Render for Workspace {
         };
 
         let mut root = div()
+            .relative()
+            .size_full()
             .flex()
             .flex_col()
-            .size_full()
-            .bg(colors.panel_background)
             .overflow_hidden()
             // TitleBar — 对齐 zed workspace.rs:L9612 `.when_some(self.titlebar_item)`
             .when_some(self.titlebar_item.clone(), |root, item| root.child(item))
-            // 对齐 zed workspace.rs:L9647-L9706 — canvas 在 flex_1 容器内, bounds = main_area bounds
-            // (不包括 titlebar 和 statusbar), 这样 resize_bottom_dock 的 max height 才正确
+            // 对齐 zed workspace.rs:L9647 — status_bar 在这个 flex_1 容器内
+            // (不是 root 的 child), 这样 #workspace 的 flex_1 高度才正确
             .child(
                 div()
                     .size_full()
@@ -641,7 +621,6 @@ impl Render for Workspace {
                                             let bounds_changed = workspace.bounds != bounds;
                                             workspace.bounds = bounds;
 
-                                            // 对齐 zed — 只在 bounds_changed 时 clamp dock panel sizes
                                             if bounds_changed {
                                                 workspace.left_dock.update(cx, |dock, cx| {
                                                     dock.clamp_panel_size(
@@ -666,46 +645,50 @@ impl Render for Workspace {
                                 .absolute()
                                 .size_full()
                             })
+                            // 对齐 zed — on_drag_move 挂在 #workspace div 上 (workspace.rs:L9707-L9745)
+                            .on_drag_move::<DraggedDock>(cx.listener(
+                                move |workspace: &mut Self,
+                                      e: &DragMoveEvent<DraggedDock>,
+                                      _window: &mut Window,
+                                      cx| {
+                                    if workspace.previous_dock_drag_coordinates
+                                        != Some(e.event.position)
+                                    {
+                                        workspace.previous_dock_drag_coordinates =
+                                            Some(e.event.position);
+                                        let bounds = workspace.bounds;
+                                        let pos = e.event.position;
+                                        match e.drag(cx).0 {
+                                            DockPosition::Left => {
+                                                workspace.resize_left_dock(
+                                                    pos.x.as_f32()
+                                                        - bounds.left().as_f32(),
+                                                    cx,
+                                                );
+                                            }
+                                            DockPosition::Right => {
+                                                workspace.resize_right_dock(
+                                                    bounds.right().as_f32()
+                                                        - pos.x.as_f32(),
+                                                    cx,
+                                                );
+                                            }
+                                            DockPosition::Bottom => {
+                                                workspace.resize_bottom_dock(
+                                                    bounds.bottom().as_f32()
+                                                        - pos.y.as_f32(),
+                                                    cx,
+                                                );
+                                            }
+                                        }
+                                    }
+                                },
+                            ))
                             .child(main_area),
-                    ),
-            )
-            // StatusBar
-            .child(self.status_bar.clone())
-            // 顶层 on_drag_move listener — 接收所有 Dock resize 拖拽事件
-            // 对齐 zed workspace.rs:L9707-L9740
-            .on_drag_move::<DraggedDock>(cx.listener(
-                move |workspace: &mut Self,
-                      e: &DragMoveEvent<DraggedDock>,
-                      _window: &mut Window,
-                      cx| {
-                    // 对齐 zed L9710 — 坐标去重, 避免相同位置重复触发 resize
-                    if workspace.previous_dock_drag_coordinates != Some(e.event.position) {
-                        workspace.previous_dock_drag_coordinates = Some(e.event.position);
-                        let bounds = workspace.bounds;
-                        let pos = e.event.position;
-                        match e.drag(cx).0 {
-                            DockPosition::Left => {
-                                workspace.resize_left_dock(
-                                    pos.x.as_f32() - bounds.left().as_f32(),
-                                    cx,
-                                );
-                            }
-                            DockPosition::Right => {
-                                workspace.resize_right_dock(
-                                    bounds.right().as_f32() - pos.x.as_f32(),
-                                    cx,
-                                );
-                            }
-                            DockPosition::Bottom => {
-                                workspace.resize_bottom_dock(
-                                    bounds.bottom().as_f32() - pos.y.as_f32(),
-                                    cx,
-                                );
-                            }
-                        }
-                    }
-                },
-            ));
+                    )
+                    // StatusBar — 在 flex_1 容器内 (和 #workspace 同级), 对齐 zed workspace.rs:L10009
+                    .child(self.status_bar.clone()),
+            );
 
         // 外部注册的 workspace action — 逐个 chain on_action
         for action_cb in self.workspace_actions.iter() {

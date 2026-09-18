@@ -86,6 +86,11 @@ impl Sidebar {
     fn render_bottom_bar(&mut self, cx: &mut Context<Self>) -> gpui::AnyElement {
         let is_archive = self.show_archive;
         let on_right = self.side == SidebarSide::Right;
+        let sidebar_open_icon = if on_right {
+            IconName::ThreadsSidebarRightOpen
+        } else {
+            IconName::ThreadsSidebarLeftOpen
+        };
 
         let colors = cx.theme().colors();
 
@@ -103,7 +108,7 @@ impl Sidebar {
             // 1. Sidebar close toggle — 调 MultiWorkspace.close_sidebar()
             .child({
                 let mw = self.multi_workspace.clone();
-                IconButton::new("sidebar-close-toggle", IconName::ThreadsSidebarLeftClosed)
+                IconButton::new("sidebar-close-toggle", sidebar_open_icon)
                     .size(px(22.0))
                     .icon_size(px(14.0))
                     .radius(ButtonRadius::Medium)
@@ -122,10 +127,10 @@ impl Sidebar {
                     })
                     .into_any_element()
             })
-            // 2. Archive toggle — 归档/历史
+            // 2. History toggle — Clock 图标（对齐 zed IconName::Clock）
             .child({
                 let archive = is_archive;
-                let base = IconButton::new("sidebar-toggle-archive", IconName::Minimize)
+                let base = IconButton::new("sidebar-toggle-archive", IconName::Clock)
                     .size(px(22.0))
                     .icon_size(px(14.0))
                     .radius(ButtonRadius::Medium)
@@ -149,14 +154,14 @@ impl Sidebar {
             })
             // 3. flex_1 spacer
             .child(div().flex_1())
-            // 4. Add Project
+            // 4. Open Project — FolderAdd 图标（对齐 zed render_recent_projects_button）
             .child({
-                IconButton::new("sidebar-add-project", IconName::Menu)
+                IconButton::new("sidebar-add-project", IconName::FolderAdd)
                     .size(px(22.0))
                     .icon_size(px(14.0))
                     .radius(ButtonRadius::Medium)
-                    .aria_label("Add Project")
-                    .tooltip(Tooltip::text("Add Project"))
+                    .aria_label("Open Project")
+                    .tooltip(Tooltip::text("Open Project"))
                     .tooltip_anchor(gpui::Anchor::BottomRight)
                     .tooltip_attach(gpui::Anchor::TopRight)
                     .into_any_element()

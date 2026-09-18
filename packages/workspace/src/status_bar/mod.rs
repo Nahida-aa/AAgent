@@ -330,6 +330,8 @@ impl Render for StatusBar {
             .id("status-bar")
             .flex()
             .flex_row()
+            .flex_none()
+            .flex_shrink(0.0)
             .w_full()
             .items_center()
             .justify_between()

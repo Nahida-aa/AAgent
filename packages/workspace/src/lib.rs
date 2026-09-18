@@ -613,12 +613,17 @@ impl Render for Workspace {
             .size_full()
             .bg(colors.panel_background)
             .overflow_hidden()
-            // canvas — 每帧更新 bounds（对齐 zed workspace.rs:L9669-L9706）
+            // canvas — 每帧更新 bounds，但只在实际变化时才 update（对齐 zed observe_window_bounds
+            // 而非 canvas 每帧 update — canvas 每帧 update 会导致 drag lag + dock 回弹）
             .child(
                 canvas(
                     move |bounds, _, cx| {
                         this.update(cx, |workspace, cx| {
-                            workspace.bounds = bounds;
+                            // 只有 bounds 真正变了才 update — 避免每帧重渲染循环
+                            if workspace.bounds != bounds {
+                                workspace.bounds = bounds;
+                                cx.notify();
+                            }
                         });
                     },
                     |_, _, _, _| {},

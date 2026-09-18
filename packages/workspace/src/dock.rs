@@ -3,7 +3,6 @@
 use gpui::{
     Context, IntoElement, ParentElement, Render, Styled, Window, div, hsla, prelude::*, px,
 };
-use ui_gpui::IconButton;
 use ui_gpui::theme::ActiveTheme;
 
 use crate::dock_position::DockPosition;
@@ -107,9 +106,6 @@ impl Render for Dock {
 
         let colors = cx.theme().colors();
         let position = self.position;
-        let dock = cx.entity();
-
-        let axis = position.axis();
 
         let mut root = div()
             .id("dock-panel")
@@ -118,7 +114,7 @@ impl Render for Dock {
             .bg(colors.panel_background)
             .border_color(colors.border)
             .overflow_hidden()
-            .map(|el| match axis {
+            .map(|el| match position.axis() {
                 gpui::Axis::Horizontal => el.flex_col(),
                 gpui::Axis::Vertical => el.flex_row(),
             })
@@ -129,30 +125,8 @@ impl Render for Dock {
                 _ => el,
             });
 
-        // Tab bar
-        let mut tab_bar = div().flex_row().items_center().gap_1().px_1().py_0p5();
-        for (i, entry) in self.panel_entries.iter().enumerate() {
-            let is_active = Some(i) == self.active_panel_index;
-            let icon = entry.icon();
-            let label = entry.icon_tooltip();
-            let dock = dock.clone();
-            tab_bar = tab_bar.child(
-                IconButton::new(format!("dock-tab-{}-{}", self.position.label(), i), icon)
-                    .size(px(22.0))
-                    .icon_size(px(14.0))
-                    .radius(ui_gpui::ButtonRadius::Medium)
-                    .aria_label(label)
-                    .selected(is_active)
-                    .on_click(move |_ev, _window, cx| {
-                        dock.update(cx, |dock, cx| {
-                            dock.activate_panel(i);
-                            cx.notify();
-                        });
-                    }),
-            );
-        }
-
-        // Active panel content — 占位
+        // Active panel content — 占位（后续换成真实 Panel entity 渲染）
+        // Zed Dock Render 没有 tab bar —— 激活的 Panel 自己渲染自己的 UI。
         let active_kind = self
             .active_panel_index
             .and_then(|i| self.panel_entries.get(i))
@@ -160,10 +134,12 @@ impl Render for Dock {
 
         let content = match active_kind {
             Some(kind) => div()
+                .flex_1()
                 .flex()
                 .items_center()
                 .justify_center()
-                .size_full()
+                .w_full()
+                .h_full()
                 .text_size(px(16.0))
                 .text_color(hsla(0.0, 0.0, 0.5, 1.0))
                 .child(format!("{} (placeholder)", kind.aria_label()))
@@ -171,6 +147,6 @@ impl Render for Dock {
             None => gpui::Empty.into_any_element(),
         };
 
-        root.child(tab_bar).child(content).into_any_element()
+        root.child(content).into_any_element()
     }
 }

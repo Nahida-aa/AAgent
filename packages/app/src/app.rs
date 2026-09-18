@@ -1,8 +1,8 @@
 use std::path::PathBuf;
 
 use crate::initialize::panels::initialize_panels;
-use crate::title_bar::TitleBar;
 use aa_sidebar::Sidebar;
+use aa_title_bar::TitleBar;
 use gpui::{Context, Decorations, Entity, ParentElement, Render, Styled, Window, prelude::*};
 use ui_gpui::theme::ActiveTheme;
 use workspace::{MultiWorkspace, Workspace};

@@ -1,7 +1,21 @@
 [package]
-name = "title-bar"
+name = "aa-title-bar"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+publish = false
+description = "GPUI 桌面自绘标题栏（CSD/SSD）"
 
 [dependencies]
+gpui.workspace = true
+aa-gpui-kit-assets.workspace = true
+ui-gpui.workspace = true
+
+[target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
+gpui_platform = { workspace = true, features = ["font-kit", "wayland", "x11"] }
+
+[target.'cfg(not(any(target_os = "linux", target_os = "freebsd", target_family = "wasm")))'.dependencies]
+gpui_platform = { workspace = true }
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+gpui_platform = { workspace = true }

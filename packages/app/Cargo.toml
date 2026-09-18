@@ -19,6 +19,7 @@ workspace.workspace = true
 aa-sidebar.workspace = true
 aa-terminal.workspace = true
 aa-terminal-view.workspace = true
+aa-title-bar.workspace = true
 settings.workspace = true
 gpui.workspace = true
 gpui_util.workspace = true

@@ -72,6 +72,7 @@ aa-sidebar = { path = "packages/sidebar" }
 aa-terminal = { path = "packages/terminal" }
 aa-terminal-view = { path = "packages/terminal-view" }
 aa-task = { path = "packages/task" }
+aa-title-bar = { path = "packages/title-bar" }
 settings = { path = "packages/settings" }
 settings-content = { path = "packages/settings-content" }
 settings-macros = { path = "packages/settings-macros" }

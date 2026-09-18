@@ -133,9 +133,9 @@ impl Panel for TerminalPanel {
         "Terminal Panel"
     }
 
-    /// 开发阶段自动打开底部 Dock。对齐 Zed TerminalPanel 默认 false
-    /// （settings 可配）— AAgent 暂未实现 settings，先硬编码 true。
+    /// 对齐 Zed TerminalPanel — 从 settings 读，默认 false。
+    /// 现在还没 settings 系统，先硬编码 false。
     fn starts_open(&self, _cx: &App) -> bool {
-        true
+        false
     }
 }

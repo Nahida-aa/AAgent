@@ -47,7 +47,7 @@ use dock::panel::{
     AgentPanel, CollabPanel, DebugPanel, GitPanel, OutlinePanel, Panel, PanelHandle, ProjectPanel,
 };
 use dock::panel_buttons::PanelButtons;
-use dock::{Dock, DraggedDock};
+use dock::{Dock, DraggedDock, RESIZE_HANDLE_SIZE};
 use status_bar::StatusBar;
 
 /// Bottom dock 布局（对齐 zed `settings_content/src/workspace.rs`）。
@@ -356,25 +356,38 @@ impl Workspace {
     }
 
     /// 对齐 zed `resize_left_dock` — 调整左 dock 宽度。
+    /// 关键 clamp: 不能把右 dock 挤没（对齐 zed workspace.rs:L8969-8980）。
     fn resize_left_dock(&mut self, new_size: f32, cx: &mut Context<Self>) {
+        let ws_width = self.bounds.size.width.as_f32();
+        let right_size = self.right_dock.read(cx).current_size(cx);
+        let max_size = ws_width - right_size - RESIZE_HANDLE_SIZE;
+        let size = new_size.min(max_size);
         self.left_dock.update(cx, |dock, cx| {
-            dock.set_size(new_size);
+            dock.set_size(size);
             cx.notify();
         });
     }
 
     /// 对齐 zed `resize_right_dock` — 调整右 dock 宽度。
+    /// 关键 clamp: 不能把左 dock 挤没（对齐 zed workspace.rs:L8988-8998）。
     fn resize_right_dock(&mut self, new_size: f32, cx: &mut Context<Self>) {
+        let ws_width = self.bounds.size.width.as_f32();
+        let left_size = self.left_dock.read(cx).current_size(cx);
+        let max_size = ws_width - left_size - RESIZE_HANDLE_SIZE;
+        let size = new_size.min(max_size);
         self.right_dock.update(cx, |dock, cx| {
-            dock.set_size(new_size);
+            dock.set_size(size);
             cx.notify();
         });
     }
 
     /// 对齐 zed `resize_bottom_dock` — 调整底部 dock 高度。
+    /// 关键 clamp: 上限 = bounds.height - RESIZE_HANDLE_SIZE（对齐 zed workspace.rs:L9006）。
     fn resize_bottom_dock(&mut self, new_size: f32, cx: &mut Context<Self>) {
+        let max_size = self.bounds.size.height.as_f32() - RESIZE_HANDLE_SIZE;
+        let size = new_size.min(max_size);
         self.bottom_dock.update(cx, |dock, cx| {
-            dock.set_size(new_size);
+            dock.set_size(size);
             cx.notify();
         });
     }

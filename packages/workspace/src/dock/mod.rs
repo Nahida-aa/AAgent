@@ -15,7 +15,7 @@ use ui_gpui::theme::ActiveTheme;
 use self::panel::{Panel, PanelHandle};
 
 /// Resize handle 的大小（对齐 zed dock.rs `RESIZE_HANDLE_SIZE = px(6.)`）。
-pub(crate) const RESIZE_HANDLE_SIZE: f32 = 6.0;
+pub const RESIZE_HANDLE_SIZE: f32 = 6.0;
 
 /// 拖拽 marker — 标识当前哪个 Dock 正在被 resize。
 /// Workspace 顶层 div 的 `on_drag_move` listener 会匹配这个类型。

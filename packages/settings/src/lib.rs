@@ -12,15 +12,15 @@
 //!   - 宏展开生成 `inventory::submit!` 条目（编译期收集）
 //!   - `SettingsStore::init()` 时遍历 `inventory::collect!(RegisteredSetting)` 初始化
 
-use std::any::TypeId;
-
 use rust_embed::RustEmbed;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 
 pub mod settings_store;
 
-pub use settings_store::SettingsStore;
+pub use settings_store::{
+    AnySettingValue, RegisteredSetting, RelPath, SettingValue, SettingsStore, WorktreeId,
+};
 
 // ---------- SettingsContent ----------
 
@@ -81,53 +81,12 @@ pub trait Settings: 'static + Sized + Send + Sync + DeserializeOwned {
     }
 }
 
-// ---------- RegisterSetting 基础设施 ----------
-
-/// inventory 编译期收集的注册条目。
-///
-/// 每个 `#[derive(RegisterSetting)]` 生成一个这样的条目，由
-/// `inventory::collect!` 在 `SettingsStore::init()` 时拉取。
-pub struct RegisteredSetting {
-    pub settings_value: fn() -> Box<dyn AnySettingValue>,
-    pub from_settings: fn(&SettingsContent) -> Box<dyn std::any::Any>,
-    pub id: fn() -> TypeId,
-}
-
-inventory::collect!(RegisteredSetting);
-
-/// 每种 setting 类型的运行时值存储。
-///
-/// Zed 有 global + per-worktree local，AAgent 简化版只有 global。
-#[derive(Debug)]
-pub struct SettingValue<T: Settings> {
-    pub global_value: Option<T>,
-}
-
-/// Type-erased 的 SettingValue trait object。
-pub trait AnySettingValue: 'static + Send + Sync {
-    /// 设置类型名（debug 用）。
-    fn type_name(&self) -> &'static str;
-
-    /// 从 SettingsContent 构造一个值（用于初始化）。
-    fn from_settings(&self, content: &SettingsContent) -> Box<dyn std::any::Any>;
-}
-
-impl<T: Settings> AnySettingValue for SettingValue<T> {
-    fn type_name(&self) -> &'static str {
-        std::any::type_name::<T>()
-    }
-
-    fn from_settings(&self, content: &SettingsContent) -> Box<dyn std::any::Any> {
-        Box::new(T::from_settings(content))
-    }
-}
-
 // ---------- private 模块（宏需要） ----------
 
 /// #[doc(hidden)] — 给 `settings-macros::RegisterSetting` 宏展开用的类型。
 #[doc(hidden)]
 pub mod private {
-    pub use crate::{RegisteredSetting, SettingValue};
+    pub use crate::settings_store::setting_value::{RegisteredSetting, SettingValue};
     pub use inventory;
 }
 

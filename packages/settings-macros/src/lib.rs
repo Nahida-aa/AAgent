@@ -46,6 +46,7 @@ pub fn derive_register_setting(input: TokenStream) -> TokenStream {
                 settings_value: || {
                     Box::new(settings::private::SettingValue::<#type_name> {
                         global_value: None,
+                        local_values: Vec::new(),
                     }),
                 },
                 from_settings: |content| {

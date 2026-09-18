@@ -4,6 +4,10 @@
 //! 运行时可叠加用户 settings.json 覆盖。
 //! 各 Setting struct 通过 `SettingsStore::get_path` / `get_raw` 读取。
 
+pub mod setting_value;
+
+pub use setting_value::{AnySettingValue, RegisteredSetting, RelPath, SettingValue, WorktreeId};
+
 use std::path::PathBuf;
 
 use gpui::{App, Global};

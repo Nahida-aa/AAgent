@@ -10,6 +10,7 @@ description = "GPUI 桌面自绘标题栏（CSD/SSD）"
 gpui.workspace = true
 aa-gpui-kit-assets.workspace = true
 ui-gpui.workspace = true
+workspace.workspace = true
 
 [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
 gpui_platform = { workspace = true, features = ["font-kit", "wayland", "x11"] }

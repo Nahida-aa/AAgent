@@ -31,8 +31,8 @@ pub struct AppShell {
 impl AppShell {
     pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
         let _working_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-        let title_bar = cx.new(|cx| TitleBar::new("AAgent", cx));
         let workspace = cx.new(|cx| Workspace::new(cx));
+        let title_bar = cx.new(|cx| TitleBar::new("AAgent", workspace.clone(), cx));
         let multi_workspace = cx.new(|cx| MultiWorkspace::new(workspace.clone(), cx));
 
         // 1. 创建 Sidebar entity（独立于 workspace crate 的内容容器）

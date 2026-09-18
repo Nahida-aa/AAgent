@@ -17,9 +17,9 @@
 //!   Wayland 下点按钮会变成拖窗口（aa-player `window_controls_group` 同款处理）。
 
 use gpui::{
-    AnyElement, App, Context, FocusHandle, Focusable, InteractiveElement, IntoElement, MouseButton,
-    ParentElement, Pixels, Render, StatefulInteractiveElement, Styled, Window, WindowButton,
-    WindowButtonLayout, WindowControlArea, px, svg,
+    AnyElement, App, Context, Entity, FocusHandle, Focusable, InteractiveElement, IntoElement,
+    MouseButton, ParentElement, Pixels, Render, StatefulInteractiveElement, Styled, WeakEntity,
+    Window, WindowButton, WindowButtonLayout, WindowControlArea, px, svg,
 };
 
 #[cfg(target_os = "windows")]
@@ -27,6 +27,7 @@ use gpui::MAX_BUTTONS_PER_SIDE;
 
 use ui_gpui::theme::ActiveTheme;
 use ui_gpui::{ButtonRadius, ButtonStyle, IconButton, IconName};
+use workspace::Workspace;
 
 /// Platform-appropriate title bar height.
 ///
@@ -73,15 +74,23 @@ pub struct TitleBar {
     pub title: String,
     pub app_menu_open: bool,
     pub recent_projects_open: bool,
+    /// 弱引用 Workspace — Zed TitleBar 持有它来读取项目名/Git 分支等状态。
+    /// AAgent 当前不使用，但预留以便后续扩展（对齐 Zed 架构）。
+    pub workspace: WeakEntity<Workspace>,
 }
 
 impl TitleBar {
-    pub fn new(title: impl Into<String>, cx: &mut Context<Self>) -> Self {
+    pub fn new(
+        title: impl Into<String>,
+        workspace: Entity<Workspace>,
+        cx: &mut Context<Self>,
+    ) -> Self {
         Self {
             focus_handle: cx.focus_handle(),
             title: title.into(),
             app_menu_open: false,
             recent_projects_open: false,
+            workspace: workspace.downgrade(),
         }
     }
 

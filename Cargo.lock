@@ -255,6 +255,7 @@ dependencies = [
  "gpui",
  "gpui_platform",
  "ui-gpui",
+ "workspace",
 ]
 
 [[package]]

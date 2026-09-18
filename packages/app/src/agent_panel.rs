@@ -121,6 +121,7 @@ impl AgentPanel {
 
         let new_thread_menu_button = gpui::div()
             .id("new_thread_menu_btn")
+            .flex()
             .h(gpui::px(24.0))
             .w(gpui::px(24.0))
             .flex_none()
@@ -139,6 +140,7 @@ impl AgentPanel {
 
         let options_menu_button = gpui::div()
             .id("options_menu_btn")
+            .flex()
             .h(gpui::px(24.0))
             .w(gpui::px(24.0))
             .flex_none()
@@ -162,6 +164,7 @@ impl AgentPanel {
 
         gpui::div()
             .id("agent-panel-toolbar")
+            .flex()
             .flex_row()
             .h(gpui::px(32.0))
             .flex_shrink_0()
@@ -173,6 +176,7 @@ impl AgentPanel {
             .border_color(border)
             .child(
                 gpui::div()
+                    .flex()
                     .flex_row()
                     .items_center()
                     .flex_1()
@@ -182,6 +186,7 @@ impl AgentPanel {
             )
             .child(
                 gpui::div()
+                    .flex()
                     .flex_row()
                     .items_center()
                     .flex_none()
@@ -218,6 +223,7 @@ impl AgentPanel {
                 let label = agent.label().to_string();
                 gpui::div()
                     .id(ElementId::Name(SharedString::from(label.clone())))
+                    .flex()
                     .flex_row()
                     .items_center()
                     .w_full()
@@ -269,6 +275,7 @@ impl AgentPanel {
 
     fn render_conversation(&self, cx: &mut Context<Self>) -> impl IntoElement {
         gpui::div()
+            .flex()
             .flex_col()
             .size_full()
             .child(self.render_message_region(cx))
@@ -286,6 +293,7 @@ impl AgentPanel {
         let has_messages = false;
         let empty_state = if !has_messages {
             gpui::div()
+                .flex()
                 .flex_col()
                 .items_center()
                 .justify_center()
@@ -293,6 +301,7 @@ impl AgentPanel {
                 .p_4()
                 .child(
                     gpui::div()
+                        .flex()
                         .flex_col()
                         .items_center()
                         .child(
@@ -359,6 +368,7 @@ impl AgentPanel {
             );
 
         let footer_left = gpui::div()
+            .flex()
             .flex_row()
             .flex_wrap()
             .gap_0p5()
@@ -366,6 +376,7 @@ impl AgentPanel {
             .child(self.render_footer_button("Thinking", cx));
 
         let footer_right = gpui::div()
+            .flex()
             .flex_row()
             .gap_1()
             .child(self.render_footer_button("Auto", cx))
@@ -373,6 +384,7 @@ impl AgentPanel {
             .child(send_button);
 
         gpui::div()
+            .flex()
             .flex_row()
             .py_2()
             .justify_center()
@@ -384,11 +396,13 @@ impl AgentPanel {
                     .w_full()
                     .max_w(gpui::px(760.0))
                     .px_2()
+                    .flex()
                     .flex_col()
                     .gap_2()
                     .child(editor_region)
                     .child(
                         gpui::div()
+                            .flex()
                             .flex_row()
                             .w_full()
                             .justify_between()
@@ -451,6 +465,7 @@ impl Render for AgentPanel {
         gpui::div()
             .id("agent-panel")
             .key_context("agent_panel")
+            .flex()
             .flex_col()
             .size_full()
             .relative()
@@ -462,6 +477,7 @@ impl Render for AgentPanel {
             .child(
                 gpui::div()
                     .size_full()
+                    .flex()
                     .flex_col()
                     .child(self.render_toolbar(cx))
                     .child(self.render_surface(cx)),

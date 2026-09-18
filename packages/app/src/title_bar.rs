@@ -26,6 +26,7 @@ use gpui::{
 use gpui::MAX_BUTTONS_PER_SIDE;
 
 use ui_gpui::theme::ActiveTheme;
+use ui_gpui::{ButtonRadius, ButtonStyle, IconButton, IconName};
 
 /// Platform-appropriate title bar height.
 ///
@@ -45,13 +46,13 @@ enum WindowControlKind {
 }
 
 impl WindowControlKind {
-    /// Asset path in the shared `assets` crate (matches zed's `generic_*.svg`).
-    fn icon_path(&self) -> &'static str {
+    /// Icon in the shared `assets` crate (zed's `generic_*.svg`).
+    fn icon(&self) -> IconName {
         match self {
-            Self::Minimize => "icons/generic_minimize.svg",
-            Self::Maximize => "icons/generic_maximize.svg",
-            Self::Restore => "icons/generic_restore.svg",
-            Self::Close => "icons/generic_close.svg",
+            Self::Minimize => IconName::Minimize,
+            Self::Maximize => IconName::Maximize,
+            Self::Restore => IconName::Restore,
+            Self::Close => IconName::Close,
         }
     }
 
@@ -70,6 +71,8 @@ impl WindowControlKind {
 pub struct TitleBar {
     pub focus_handle: FocusHandle,
     pub title: String,
+    pub app_menu_open: bool,
+    pub recent_projects_open: bool,
 }
 
 impl TitleBar {
@@ -77,6 +80,8 @@ impl TitleBar {
         Self {
             focus_handle: cx.focus_handle(),
             title: title.into(),
+            app_menu_open: false,
+            recent_projects_open: false,
         }
     }
 
@@ -85,25 +90,166 @@ impl TitleBar {
         cx.theme().colors().panel_background
     }
 
-    /// Left-aligned project name trigger.
+    /// Left-aligned application menu trigger (hamburger icon button).
     ///
-    /// Mirrors zed's `render_project_name`: no project is selected in this
-    /// placeholder app, so it renders muted like zed's "Open Recent Project"
-    /// state, with a hover affordance to suggest it is clickable.
-    fn render_project_name(&self, cx: &App) -> impl IntoElement {
-        let colors = cx.theme().colors();
+    /// Mirrors zed's `ApplicationMenu::render_application_menu`
+    /// (application_menu.rs): an icon button with the menu glyph, subtle style,
+    /// tooltip "Open Application Menu", opening the client-side app menu.
+    fn render_application_menu_trigger(&self, cx: &mut Context<Self>) -> impl IntoElement {
+        IconButton::new("application-menu-trigger", IconName::Menu)
+            .style(ButtonStyle::Subtle)
+            .aria_label("Open Application Menu")
+            .on_click(cx.listener(|this, _event, _window, _cx| {
+                this.app_menu_open = !this.app_menu_open;
+            }))
+    }
+
+    /// The application menu popover (below the hamburger trigger).
+    ///
+    /// Placeholder for zed's `ApplicationMenu` menu bar; only About/Quit are
+    /// wired up for now.
+    fn render_application_menu(&self, top: Pixels, cx: &mut Context<Self>) -> impl IntoElement {
+        let colors = cx.theme().colors().clone();
+        let text = colors.text;
+        let border = colors.border_variant;
+        let hover = colors.element_hover;
+        let menu_bg = colors.elevated_surface_background;
+
         gpui::div()
-            .id("project-name")
+            .id("application-menu")
+            .absolute()
+            .top(top)
+            .left(gpui::rems(0.5))
+            .w(gpui::px(200.0))
+            .py(gpui::rems(0.25))
+            .rounded_md()
+            .bg(menu_bg)
+            .border_1()
+            .border_color(border)
+            .shadow_lg()
+            // 弹出层按住不触发标题栏拖动。
+            .on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation())
+            .children(vec![
+                gpui::div()
+                    .id("app-menu-about")
+                    .flex()
+                    .flex_row()
+                    .items_center()
+                    .w_full()
+                    .px(gpui::rems(0.25))
+                    .py(gpui::rems(0.125))
+                    .gap_1()
+                    .hover(move |style| style.bg(hover))
+                    .on_click(cx.listener(|this, _event, _window, _cx| {
+                        this.app_menu_open = false;
+                    }))
+                    .child(gpui::div().text_color(text).child("About AAgent"))
+                    .into_any_element(),
+                gpui::div()
+                    .id("app-menu-quit")
+                    .flex()
+                    .flex_row()
+                    .items_center()
+                    .w_full()
+                    .px(gpui::rems(0.25))
+                    .py(gpui::rems(0.125))
+                    .gap_1()
+                    .hover(move |style| style.bg(hover))
+                    .on_click(cx.listener(|_this, _event, window, _cx| {
+                        window.remove_window();
+                    }))
+                    .child(gpui::div().text_color(text).child("Quit"))
+                    .into_any_element(),
+            ])
+    }
+
+    /// "Open Recent Project" trigger (zed's `project_name_trigger`).
+    ///
+    /// A separate left-side button opening the recent-projects popover (zed
+    /// `title_bar.rs render_project_name`); muted since no project is open.
+    fn render_recent_projects_trigger(&self, cx: &mut Context<Self>) -> impl IntoElement {
+        let colors = cx.theme().colors().clone();
+        gpui::div()
+            .id("recent-projects-trigger")
+            .flex()
+            .flex_row()
+            .items_center()
+            .gap_1()
             .px_1p5()
             .py_0p5()
             .rounded(gpui::rems(0.25))
             .hover(|style| style.bg(colors.ghost_element_hover))
+            .active(|style| style.bg(colors.ghost_element_active))
+            .on_click(cx.listener(|this, _event, _window, _cx| {
+                this.recent_projects_open = !this.recent_projects_open;
+            }))
             .child(
                 gpui::div()
                     .text_size(gpui::rems(0.7))
                     .text_color(colors.text_muted)
-                    .child(self.title.clone()),
+                    .child("Open Recent Project"),
             )
+            .child(
+                svg()
+                    .size_3p5()
+                    .flex_none()
+                    .text_color(colors.icon_muted)
+                    .path("icons/chevron_down.svg"),
+            )
+    }
+
+    /// Recent-projects popover. Placeholder list (no projects yet), mirroring
+    /// zed's `RecentProjects` popover shape.
+    fn render_recent_projects_menu(&self, top: Pixels, cx: &mut Context<Self>) -> impl IntoElement {
+        let colors = cx.theme().colors().clone();
+        let text_muted = colors.text_muted;
+        let border = colors.border_variant;
+        let menu_bg = colors.elevated_surface_background;
+
+        gpui::div()
+            .id("recent-projects-menu")
+            .absolute()
+            .top(top)
+            .left(gpui::rems(0.5))
+            .w(gpui::px(240.0))
+            .py(gpui::rems(0.25))
+            .rounded_md()
+            .bg(menu_bg)
+            .border_1()
+            .border_color(border)
+            .shadow_lg()
+            // 弹出层按住不触发标题栏拖动。
+            .on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation())
+            .children(vec![
+                gpui::div()
+                    .flex()
+                    .flex_row()
+                    .items_center()
+                    .w_full()
+                    .px(gpui::rems(0.5))
+                    .pb_1()
+                    .child(
+                        gpui::div()
+                            .text_size(gpui::rems(0.75))
+                            .text_color(text_muted)
+                            .child("Recent Projects"),
+                    )
+                    .into_any_element(),
+                gpui::div()
+                    .flex()
+                    .flex_row()
+                    .items_center()
+                    .w_full()
+                    .px(gpui::rems(0.25))
+                    .py(gpui::rems(0.125))
+                    .gap_1()
+                    .child(
+                        gpui::div()
+                            .text_color(text_muted)
+                            .child("No Recent Projects"),
+                    )
+                    .into_any_element(),
+            ])
     }
 
     /// Right-aligned user menu placeholder (avatar + name).
@@ -114,6 +260,7 @@ impl TitleBar {
         let colors = cx.theme().colors();
         gpui::div()
             .id("user-menu")
+            .flex()
             .flex_row()
             .items_center()
             .gap_1()
@@ -126,6 +273,7 @@ impl TitleBar {
                     .size(gpui::px(18.0))
                     .rounded_full()
                     .bg(colors.element_background)
+                    .flex()
                     .items_center()
                     .justify_center()
                     .child(
@@ -143,28 +291,21 @@ impl TitleBar {
             )
     }
 
-    fn render_control_button(
-        &self,
-        kind: WindowControlKind,
-        id: String,
-        cx: &App,
-    ) -> impl IntoElement {
-        let colors = cx.theme().colors();
-        gpui::div()
-            .id(id)
-            .w(px(24.0))
-            .h(px(24.0))
-            .items_center()
-            .justify_center()
-            .rounded(gpui::rems(0.5))
-            .hover(|style| style.bg(colors.ghost_element_hover))
-            .active(|style| style.bg(colors.ghost_element_active))
+    fn render_control_button(&self, kind: WindowControlKind, id: String) -> impl IntoElement {
+        IconButton::new(id, kind.icon())
+            // Subtle：hover 浮现 ghost 背景；圆形 hover 由 radius(Full) 提供。
+            .style(ButtonStyle::Subtle)
+            .radius(ButtonRadius::Full)
+            .aria_label(match kind {
+                WindowControlKind::Minimize => "Minimize",
+                WindowControlKind::Maximize | WindowControlKind::Restore => "Maximize",
+                WindowControlKind::Close => "Close",
+            })
             .on_click(move |_event, window, _cx| match kind {
                 WindowControlKind::Minimize => window.minimize_window(),
                 WindowControlKind::Maximize | WindowControlKind::Restore => window.zoom_window(),
                 WindowControlKind::Close => window.remove_window(),
             })
-            .child(svg().size_4().flex_none().path(kind.icon_path()))
     }
 
     /// Window-control button placement: Windows is always right-aligned
@@ -199,7 +340,6 @@ impl TitleBar {
         side: &'static str,
         buttons: &[Option<WindowButton>; 3],
         is_maximized: bool,
-        cx: &App,
     ) -> AnyElement {
         let items = buttons
             .iter()
@@ -212,15 +352,13 @@ impl TitleBar {
                     WindowButton::Maximize => WindowControlKind::Maximize,
                     WindowButton::Close => WindowControlKind::Close,
                 };
-                Some(self.render_control_button(
-                    kind,
-                    format!("{side}-{}-{i}", kind.element_id()),
-                    cx,
-                ))
+                Some((kind, format!("{side}-{}-{i}", kind.element_id())))
             })
+            .map(|(kind, id)| self.render_control_button(kind, id))
             .collect::<Vec<_>>();
 
         gpui::div()
+            .flex()
             .flex_row()
             .items_center()
             .h_full()
@@ -229,25 +367,54 @@ impl TitleBar {
             .into_any_element()
     }
 
-    fn render_titlebar(&self, window: &mut Window, cx: &mut App) -> impl IntoElement {
+    fn render_titlebar(&self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let height = platform_title_bar_height(window);
         let bg = self.title_bar_color(cx);
-        let colors = cx.theme().colors();
+        let colors = cx.theme().colors().clone();
         let layout = Self::effective_button_layout(cx);
         let is_maximized = window.is_maximized();
 
         let left_controls = (layout.left.iter().any(Option::is_some))
-            .then(|| self.render_window_controls_group("tb-l", &layout.left, is_maximized, cx));
-        let right_controls =
-            self.render_window_controls_group("tb-r", &layout.right, is_maximized, cx);
+            .then(|| self.render_window_controls_group("tb-l", &layout.left, is_maximized));
+        let right_controls = self.render_window_controls_group("tb-r", &layout.right, is_maximized);
+
+        let app_menu = self.app_menu_open.then(|| {
+            self.render_application_menu(height + px(6.0), cx)
+                .into_any_element()
+        });
+        let recent_projects_menu = self.recent_projects_open.then(|| {
+            self.render_recent_projects_menu(height + px(6.0), cx)
+                .into_any_element()
+        });
+
+        // zed 把「左侧整组」与右侧整组各压成一个 flex 子项，`justify_between`
+        // 只在这两组间分配空间——左组永远居左上角，不会因左侧有窗口按钮而居中。
+        // 左组顺序同 zed: window controls -> Application Menu -> Open Recent Project。
+        let left_side = gpui::div()
+            .flex()
+            .flex_row()
+            .items_center()
+            .gap_1()
+            .children(left_controls.into_iter())
+            .child(self.render_application_menu_trigger(cx))
+            .child(self.render_recent_projects_trigger(cx));
+
+        let right_side = gpui::div()
+            .flex()
+            .flex_row()
+            .items_center()
+            .gap_1p5()
+            .child(self.render_user_menu(cx))
+            .child(right_controls);
 
         gpui::div()
             .id("titlebar")
+            .flex()
             .flex_row()
+            .relative()
             .w_full()
             .h(height)
             .px_2()
-            .gap_1()
             .items_center()
             .justify_between()
             .bg(bg)
@@ -268,16 +435,10 @@ impl TitleBar {
                     window.zoom_window();
                 }
             })
-            .children(left_controls.into_iter())
-            .child(self.render_project_name(cx))
-            .child(
-                gpui::div()
-                    .flex_row()
-                    .items_center()
-                    .gap_1p5()
-                    .child(self.render_user_menu(cx))
-                    .child(right_controls),
-            )
+            .child(left_side)
+            .child(right_side)
+            .children(app_menu.into_iter())
+            .children(recent_projects_menu.into_iter())
     }
 }
 

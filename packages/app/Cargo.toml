@@ -15,6 +15,7 @@ name = "aa-app"
 path = "src/main.rs"
 
 [dependencies]
+workspace = { path = "../workspace" }
 gpui.workspace = true
 gpui_util.workspace = true
 serde = { workspace = true }
@@ -23,6 +24,7 @@ anyhow = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 futures = { workspace = true }
+chrono = { workspace = true }
 parking_lot = { workspace = true }
 alacritty_terminal = { git = "https://github.com/zed-industries/alacritty", rev = "4c129667ce56611becdc82de6e28218c80e2e88f" }
 # gpui_learn 共享库:内嵌 zed 图标/字体/主题的 assets + 自研 ui 库。

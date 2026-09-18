@@ -12,7 +12,7 @@ members = [
     "packages/server",
     "packages/config",
     "packages/session",
-    "packages/app",
+    "packages/app", "packages/ui", "packages/workspace",
 ]
 
 [workspace.package]

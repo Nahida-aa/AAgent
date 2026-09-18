@@ -216,6 +216,20 @@ impl Workspace {
         &self.status_bar
     }
 
+    /// MultiWorkspace 创建 Sidebar 后传给 Workspace，Workspace 传给 StatusBar。
+    /// StatusBar toggle sidebar 时直接调 Sidebar entity。
+    pub fn set_sidebar_entity(
+        &mut self,
+        sidebar: &Entity<crate::sidebar::Sidebar>,
+        cx: &mut Context<Self>,
+    ) {
+        self.status_bar.update(cx, |bar, cx| {
+            bar.set_sidebar_entity(sidebar.clone());
+            bar.set_sidebar(sidebar.read(cx).status());
+            cx.notify();
+        });
+    }
+
     /// 对齐 zed `resize_left_dock` — 调整左 dock 宽度。
     fn resize_left_dock(&mut self, new_size: f32, cx: &mut Context<Self>) {
         self.left_dock.update(cx, |dock, cx| {

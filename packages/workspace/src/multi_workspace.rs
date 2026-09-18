@@ -32,10 +32,15 @@ impl MultiWorkspace {
         sidebar.update(cx, |s, cx| {
             s.set_multi_workspace(this_entity.clone());
         });
+        // 把 Sidebar entity 传给 Workspace → StatusBar
+        workspace.update(cx, |w, cx| {
+            let sidebar_for_bar = sidebar.clone();
+            w.set_sidebar_entity(&sidebar_for_bar, cx);
+        });
 
-        // 订阅 workspace — 重渲染
+        // 订阅 workspace — Workspace StatusBar 变 → MultiWorkspace 重渲染
         cx.observe(&workspace, |_, _, cx| cx.notify()).detach();
-        // 订阅 sidebar — sidebar open/close/toggle 时重渲染
+        // 订阅 sidebar — Sidebar open/close/toggle 时 MultiWorkspace 重渲染 sidebar
         cx.observe(&sidebar, |_, _, cx| cx.notify()).detach();
 
         Self { workspace, sidebar }

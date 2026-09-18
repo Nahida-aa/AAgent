@@ -16,6 +16,7 @@ path = "src/main.rs"
 
 [dependencies]
 workspace = { path = "../workspace" }
+aa-sidebar = { path = "../sidebar" }
 settings = { path = "../settings" }
 gpui.workspace = true
 gpui_util.workspace = true

@@ -1,19 +1,34 @@
-//! SidebarRenderState — MultiWorkspace 从 Sidebar entity 投影出的只读渲染状态。
+//! Sidebar 状态类型 — SidebarStatus（entity 层）+ SidebarRenderState（render 层投影）。
 //!
 //! 对齐 zed `workspace::SidebarRenderState`（multi_workspace.rs L64）。
 //!
-//! 为什么不直接用 SidebarStatus？
-//! - SidebarStatus 属于 Sidebar entity（sidebar/mod.rs）— 是 "entity 状态" 层
-//! - SidebarRenderState 属于 MultiWorkspace — 是 "render 层" 的只读投影
-//! - PlatformTitleBar / 其他上层需要读 sidebar 状态但不应该直接依赖 Sidebar entity
-//!   （避免循环依赖 + 隔离 entity 内部细节）
-//!
-//! Zed 的 SidebarRenderState 只有 `{ open, side }` — 和 SidebarStatus 完全同构。
-//! 但 Zed 也保持了两个独立类型 — 它们演进速度不同（SidebarStatus 可能加字段，
-//! SidebarRenderState 只暴露渲染需要的最小集）。
+//! 为什么两个类型？
+//! - SidebarStatus — MultiWorkspace 持有的 Sidebar 开关/侧位置状态。
+//!   **留在 workspace crate**，因为 MultiWorkspace / StatusBar 都需要读它，
+//!   不能依赖 sidebar crate（会循环）。Sidebar entity 独立后是纯内容容器，
+//!   不知道 open/side（那是 MultiWorkspace 的事）。
+//! - SidebarRenderState — MultiWorkspace 投影的只读视图，暴露给 PlatformTitleBar 等上层。
+//!   Zed 也保持两个独立类型 — 演进速度不同。
 
-use crate::sidebar::SidebarStatus;
 use settings_content::SidebarSide;
+
+/// Sidebar 开关状态（entity 层）。
+/// **留在 workspace crate** — Sidebar entity 独立后，workspace 不依赖 sidebar crate，
+/// 所以 SidebarStatus 不能跟着 entity 走。
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub struct SidebarStatus {
+    pub open: bool,
+    pub side: SidebarSide,
+}
+
+impl Default for SidebarStatus {
+    fn default() -> Self {
+        Self {
+            open: false,
+            side: SidebarSide::Left,
+        }
+    }
+}
 
 /// Sidebar 的只读渲染状态 — MultiWorkspace.render() 和 PlatformTitleBar 用。
 /// 对齐 zed `SidebarRenderState`。

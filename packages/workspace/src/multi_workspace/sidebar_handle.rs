@@ -12,13 +12,12 @@ use super::sidebar::Sidebar;
 
 /// dyn object trait — MultiWorkspace 通过它与 Sidebar entity 交互。
 ///
-/// 当 Sidebar 在独立 crate 时，workspace crate 不能依赖 sidebar crate
-/// （循环依赖），所以 MultiWorkspace 存 `Option<Box<dyn SidebarHandle>>`
-/// 而不是 `Entity<Sidebar>`。
+/// Sidebar entity 在独立 `packages/sidebar/` crate，workspace crate 不能
+/// 依赖 sidebar crate（会循环：sidebar→workspace 单向可以），所以
+/// MultiWorkspace 存 `Option<Box<dyn SidebarHandle>>` 而不是 `Entity<Sidebar>`。
 ///
-/// AAgent 现在 Sidebar 还在 workspace crate 内（循环依赖不存在），
-/// MultiWorkspace 仍然强类型存 `Entity<Sidebar>`。
-/// 桥接 impl 已写好，等 Sidebar 独立时只需改字段类型。
+/// Sidebar crate 的 Entity<Sidebar> 通过下面的 bridge impl 自动成为
+/// SidebarHandle，App 层只需 `Box::new(sidebar_entity)` 注入即可。
 ///
 /// 对齐 zed `SidebarHandle`（L162-L180）。
 pub trait SidebarHandle: Send + Sync {

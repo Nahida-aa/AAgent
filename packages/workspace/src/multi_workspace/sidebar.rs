@@ -8,13 +8,13 @@
 use gpui::{App, Context, Pixels, Render};
 use settings_content::SidebarSide;
 
-/// Sidebar entity 的强类型接口契约 — Sidebar entity 自己实现。
+/// Sidebar entity 的强类型接口契约 — Sidebar entity 在独立 `packages/sidebar/` crate
+/// 自己实现此 trait。
 ///
-/// - 当 Sidebar 还在 workspace crate 内时，MultiWorkspace 强类型存
-///   `Entity<Sidebar>` 并调此 trait 的方法。
-/// - 当 Sidebar 迁到独立 `packages/sidebar/` crate 后，MultiWorkspace
-///   通过 `Box<dyn SidebarHandle>`（sidebar_handle.rs）间接持有，
-///   桥接 impl 会把 Sidebar 的 Entity 自动转为 SidebarHandle。
+/// MultiWorkspace 通过 `Box<dyn SidebarHandle>`（sidebar_handle.rs）间接持有 Sidebar，
+/// bridge impl 把 `Entity<Sidebar>` 自动转为 `SidebarHandle`。
+/// 这样 workspace crate 不依赖 sidebar crate（避免循环），sidebar crate 单向
+/// 依赖 workspace crate（Sidebar trait 定义在这里）。
 ///
 /// 对齐 zed `workspace::Sidebar`（multi_workspace.rs L121）。
 pub trait Sidebar: Render + Sized {

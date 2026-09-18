@@ -21,12 +21,10 @@
 
 pub mod dock;
 pub mod multi_workspace;
-pub mod sidebar;
 pub mod status_bar;
 
-pub use multi_workspace::{MultiWorkspace, SidebarRenderState};
+pub use multi_workspace::{MultiWorkspace, SidebarHandle, SidebarRenderState, SidebarStatus};
 pub use settings_content::DockPosition;
-pub use sidebar::{Sidebar, SidebarStatus};
 
 use std::collections::HashMap;
 
@@ -216,16 +214,23 @@ impl Workspace {
         &self.status_bar
     }
 
-    /// MultiWorkspace 创建 Sidebar 后传给 Workspace，Workspace 传给 StatusBar。
-    /// StatusBar toggle sidebar 时直接调 Sidebar entity。
-    pub fn set_sidebar_entity(
+    /// App 层创建 MultiWorkspace 后传给 Workspace，Workspace 传给 StatusBar。
+    /// StatusBar toggle sidebar 时通过 MultiWorkspace 中转（不直接碰 Sidebar entity）。
+    pub fn set_multi_workspace(
         &mut self,
-        sidebar: &Entity<crate::sidebar::Sidebar>,
+        mw: Entity<crate::multi_workspace::MultiWorkspace>,
         cx: &mut Context<Self>,
     ) {
         self.status_bar.update(cx, |bar, cx| {
-            bar.set_sidebar_entity(sidebar.clone());
-            bar.set_sidebar(sidebar.read(cx).status());
+            bar.set_multi_workspace(mw.clone());
+            cx.notify();
+        });
+    }
+
+    /// 同步 sidebar 状态 — MultiWorkspace toggle 后调。
+    pub fn sync_sidebar_status(&mut self, status: SidebarStatus, cx: &mut Context<Self>) {
+        self.status_bar.update(cx, |bar, cx| {
+            bar.sync_sidebar_status(status);
             cx.notify();
         });
     }

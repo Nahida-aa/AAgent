@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 use crate::title_bar::TitleBar;
+use aa_sidebar::Sidebar;
 use gpui::{Context, Decorations, Entity, ParentElement, Render, Styled, prelude::*};
 use ui_gpui::theme::ActiveTheme;
 use workspace::{MultiWorkspace, Workspace};
@@ -31,7 +32,29 @@ impl AppShell {
         let _working_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
         let title_bar = cx.new(|cx| TitleBar::new("AAgent", cx));
         let workspace = cx.new(|cx| Workspace::new(cx));
-        let multi_workspace = cx.new(|cx| MultiWorkspace::new(workspace, cx));
+        let multi_workspace = cx.new(|cx| MultiWorkspace::new(workspace.clone(), cx));
+
+        // 1. 创建 Sidebar entity（独立于 workspace crate 的内容容器）
+        let sidebar = cx.new(|cx| Sidebar::new(cx));
+
+        // 2. Sidebar 绑定 MultiWorkspace 弱引用 — 底部栏关闭按钮回调需要
+        sidebar.update(cx, |s, cx| {
+            s.set_multi_workspace(multi_workspace.clone());
+            cx.notify();
+        });
+
+        // 3. 注入 MultiWorkspace — Entity<Sidebar> → Box<dyn SidebarHandle>（bridge impl）
+        multi_workspace.update(cx, |mw, cx| {
+            mw.set_sidebar(Box::new(sidebar.clone()), cx);
+            cx.notify();
+        });
+
+        // 4. Workspace/StatusBar 绑定 MultiWorkspace — Sidebar toggle 走 MultiWorkspace 中转
+        workspace.update(cx, |w, cx| {
+            w.set_multi_workspace(multi_workspace.clone(), cx);
+            cx.notify();
+        });
+
         Self {
             title_bar,
             multi_workspace,

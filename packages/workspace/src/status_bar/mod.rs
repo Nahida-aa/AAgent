@@ -27,7 +27,7 @@ use ui_gpui::{
 };
 
 use crate::dock::panel_buttons::PanelButtons;
-use crate::sidebar::SidebarStatus;
+use crate::multi_workspace::SidebarStatus;
 use settings_content::SidebarSide;
 
 /// 状态栏项（对齐 zed `StatusItemView`）。
@@ -66,10 +66,11 @@ pub struct StatusBar {
     left_items: Vec<Box<dyn StatusItemViewHandle>>,
     right_items: Vec<Box<dyn StatusItemViewHandle>>,
     hidden_items: HashSet<TypeId>,
-    /// 缓存的 sidebar 状态 — 也直接持有 Sidebar entity 的弱引用，
-    /// toggle 时直接同步（避免 StatusBar 缓存和 Sidebar entity 状态不一致）。
+    /// 缓存的 sidebar 状态（同步自 MultiWorkspace）。
     sidebar: SidebarStatus,
-    sidebar_entity: Option<WeakEntity<crate::sidebar::Sidebar>>,
+    /// MultiWorkspace 弱引用 — toggle 时通过它中转。
+    /// 不再直接引用 Sidebar entity（Sidebar entity 独立后会循环）。
+    multi_workspace: Option<WeakEntity<crate::multi_workspace::MultiWorkspace>>,
 }
 
 impl StatusBar {
@@ -79,13 +80,18 @@ impl StatusBar {
             right_items: Vec::new(),
             hidden_items: HashSet::new(),
             sidebar: SidebarStatus::default(),
-            sidebar_entity: None,
+            multi_workspace: None,
         }
     }
 
-    /// 设置 Sidebar entity 弱引用 — MultiWorkspace 创建后通过 Workspace 传入。
-    pub fn set_sidebar_entity(&mut self, sidebar: Entity<crate::sidebar::Sidebar>) {
-        self.sidebar_entity = Some(sidebar.downgrade());
+    /// 设置 MultiWorkspace 弱引用 — App 层创建后通过 Workspace 传入。
+    pub fn set_multi_workspace(&mut self, mw: Entity<crate::multi_workspace::MultiWorkspace>) {
+        self.multi_workspace = Some(mw.downgrade());
+    }
+
+    /// 同步 sidebar 状态 — MultiWorkspace 变化时调。
+    pub fn sync_sidebar_status(&mut self, status: SidebarStatus) {
+        self.sidebar = status;
     }
 
     pub fn add_left_item<T: StatusItemView>(&mut self, item: Entity<T>) {
@@ -290,22 +296,20 @@ impl StatusBar {
             .children(children.into_iter().rev())
     }
 
-    /// toggle sidebar — 直接调 Sidebar entity（通过弱引用升级）。
-    /// Sidebar entity 改变后 MultiWorkspace 重渲染 sidebar。
+    /// toggle sidebar — 通过 MultiWorkspace 中转（Sidebar 独立后 StatusBar
+    /// 不能直接依赖 Sidebar entity，循环依赖）。
     pub fn toggle_sidebar(&mut self, side: SidebarSide, cx: &mut Context<Self>) {
-        // 先更新缓存
+        // 先更新缓存（乐观更新）
         if self.sidebar.side == side {
             self.sidebar.open = !self.sidebar.open;
         } else {
             self.sidebar.side = side;
             self.sidebar.open = true;
         }
-        // 同步给 Sidebar entity
-        if let Some(weak) = self.sidebar_entity.as_ref() {
+        // 通知 MultiWorkspace 更新真实状态
+        if let Some(weak) = self.multi_workspace.as_ref() {
             if let Some(mut entity) = weak.upgrade() {
-                entity.update(cx, |s, cx| {
-                    s.toggle(side, cx);
-                });
+                entity.update(cx, |mw, cx| mw.toggle_sidebar(side, cx));
             }
         }
         cx.notify();
@@ -314,11 +318,9 @@ impl StatusBar {
     pub fn set_side(&mut self, side: SidebarSide, cx: &mut Context<Self>) {
         self.sidebar.side = side;
         self.sidebar.open = true;
-        if let Some(weak) = self.sidebar_entity.as_ref() {
+        if let Some(weak) = self.multi_workspace.as_ref() {
             if let Some(mut entity) = weak.upgrade() {
-                entity.update(cx, |s, cx| {
-                    s.open(side, cx);
-                });
+                entity.update(cx, |mw, cx| mw.set_sidebar_side(side, cx));
             }
         }
         cx.notify();

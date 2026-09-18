@@ -1,7 +1,13 @@
 [package]
-name = "sidebar"
+name = "aa-sidebar"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+publish = false
+description = "AAgent Sidebar entity (Agent Threads list + bottom bar)"
 
 [dependencies]
+workspace = { path = "../workspace" }
+settings-content = { path = "../settings-content" }
+gpui.workspace = true
+ui-gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui-gpui" }

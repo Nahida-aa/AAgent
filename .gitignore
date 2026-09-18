@@ -5,6 +5,7 @@ target/
 node_modules/
 
 .agents/*.local.md
+*.local.md
 
 # TanStack Router generated
 .tanstack/

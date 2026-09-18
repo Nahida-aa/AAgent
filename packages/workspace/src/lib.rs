@@ -18,9 +18,10 @@
 //! ```
 //!
 //! 三层抽象（对齐 zed）：
-//! - **Dock** — 面板容器（Left/Bottom/Right 三实例）
+//! - **Dock** — 面板容器（Left/Bottom/Right 三实例），内置 resize handle
 //! - **PanelButtons** — 状态栏上的 Dock 按钮，关联一个 Dock entity
-//! - **Workspace** — 顶层 entity，持有 3 Dock + center pane + status bar
+//! - **Workspace** — 顶层 entity，持有 3 Dock + center pane + status bar，
+//!   顶层 div 监听 `on_drag_move<DraggedDock>` 接收所有 Dock resize 拖拽事件
 
 pub mod dock;
 pub mod dock_position;
@@ -30,10 +31,13 @@ pub mod status_bar;
 
 use std::collections::HashMap;
 
-use gpui::{Context, Entity, ParentElement, Render, Styled, Window, div, hsla, prelude::*, px};
+use gpui::{
+    Context, DragMoveEvent, Entity, ParentElement, Render, Styled, Window, div, hsla, prelude::*,
+    px,
+};
 use ui_gpui::theme::ActiveTheme;
 
-use dock::Dock;
+use dock::{Dock, DraggedDock};
 use dock_position::DockPosition;
 use panel::{PanelEntry, PanelKind};
 use panel_buttons::PanelButtons;
@@ -76,27 +80,22 @@ impl Workspace {
             }
         }
 
-        // 3. 默认打开有面板的 Dock（Zed: Project Panel 在右默认打开；Agent 在左默认打开；Bottom 默认关）
-        if !right_dock.panel_entries().is_empty() {
-            right_dock.set_open(true);
-            right_dock.activate_panel(0); // Project 是第一个
-        }
-        if !left_dock.panel_entries().is_empty() {
-            left_dock.set_open(true);
-            left_dock.activate_panel(0); // Agent 是第一个
-        }
-        // Bottom 默认关闭（Terminal 不自动弹出）
+        // 3. Dock 默认全关（对齐 Zed Dock::new 硬编码 is_open: false）。
+        // Zed 没有 default.json 里的 open 字段 — 首次启动全关，
+        // 用户点击 PanelButtons 或 command 触发打开。
+        // 持久化恢复由后续 settings store / KVP 层负责。
+        // starts_open 是 Panel trait 的方法 — 现阶段简化处理为全关。
 
-        let left_dock = cx.new(|cx| left_dock);
-        let bottom_dock = cx.new(|cx| bottom_dock);
-        let right_dock = cx.new(|cx| right_dock);
+        let left_dock = cx.new(|_| left_dock);
+        let bottom_dock = cx.new(|_| bottom_dock);
+        let right_dock = cx.new(|_| right_dock);
 
         // 订阅 3 个 dock — Dock toggle / 面板增删时 Workspace 需要重新渲染
         cx.observe(&left_dock, |_, _, cx| cx.notify()).detach();
         cx.observe(&bottom_dock, |_, _, cx| cx.notify()).detach();
         cx.observe(&right_dock, |_, _, cx| cx.notify()).detach();
 
-        // 3. 创建 all_docks HashMap（PanelButtons 右键菜单跨 Dock 搬面板需要）
+        // 4. 创建 all_docks HashMap（PanelButtons 右键菜单跨 Dock 搬面板需要）
         let all_docks: HashMap<DockPosition, Entity<Dock>> = [
             (DockPosition::Left, left_dock.clone()),
             (DockPosition::Bottom, bottom_dock.clone()),
@@ -104,7 +103,7 @@ impl Workspace {
         ]
         .into();
 
-        // 4. 创建 3 个 PanelButtons（Dock 关联的状态栏按钮）
+        // 5. 创建 3 个 PanelButtons（Dock 关联的状态栏按钮）
         let left_dock_buttons =
             cx.new(|cx| PanelButtons::new(left_dock.clone(), all_docks.clone(), cx));
         let bottom_dock_buttons =
@@ -112,7 +111,7 @@ impl Workspace {
         let right_dock_buttons =
             cx.new(|cx| PanelButtons::new(right_dock.clone(), all_docks.clone(), cx));
 
-        // 4. 创建 StatusBar + 组装
+        // 6. 创建 StatusBar + 组装
         let status_bar = cx.new(|cx| {
             let mut bar = StatusBar::new(cx);
 
@@ -163,16 +162,43 @@ impl Workspace {
     pub fn status_bar(&self) -> &Entity<StatusBar> {
         &self.status_bar
     }
+
+    /// 对齐 zed `resize_left_dock` — 调整左 dock 宽度。
+    fn resize_left_dock(&mut self, new_size: f32, cx: &mut Context<Self>) {
+        self.left_dock.update(cx, |dock, cx| {
+            dock.set_size(new_size);
+            cx.notify();
+        });
+    }
+
+    /// 对齐 zed `resize_right_dock` — 调整右 dock 宽度。
+    fn resize_right_dock(&mut self, new_size: f32, cx: &mut Context<Self>) {
+        self.right_dock.update(cx, |dock, cx| {
+            dock.set_size(new_size);
+            cx.notify();
+        });
+    }
+
+    /// 对齐 zed `resize_bottom_dock` — 调整底部 dock 高度。
+    fn resize_bottom_dock(&mut self, new_size: f32, cx: &mut Context<Self>) {
+        self.bottom_dock.update(cx, |dock, cx| {
+            dock.set_size(new_size);
+            cx.notify();
+        });
+    }
 }
 
 impl Render for Workspace {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let colors = cx.theme().colors();
 
-        // 读取三个 dock 的开/关状态（决定是否占空间）
+        // 读取三个 dock 的开/关状态 + 尺寸（决定是否占空间 + 多大）
         let left_open = self.left_dock.read(cx).is_open();
         let right_open = self.right_dock.read(cx).is_open();
         let bottom_open = self.bottom_dock.read(cx).is_open();
+        let left_size = self.left_dock.read(cx).current_size();
+        let right_size = self.right_dock.read(cx).current_size();
+        let bottom_size = self.bottom_dock.read(cx).current_size();
 
         // 读取 sidebar 状态（StatusBar 里的 SidebarStatus）
         let sidebar = self.status_bar.read(cx).sidebar();
@@ -199,62 +225,102 @@ impl Render for Workspace {
                 .child(format!("Sidebar ({:?})", pos))
         };
 
+        // 主区域布局（flex_1 占满剩余空间）
+        let main_area = div()
+            .flex_1()
+            .flex()
+            .flex_col()
+            .size_full()
+            .bg(colors.background)
+            .overflow_hidden()
+            // 上半部分：flex_row（sidebar-left | left dock | center | right dock | sidebar-right）
+            .child(
+                div()
+                    .flex_1()
+                    .flex()
+                    .flex_row()
+                    .size_full()
+                    .overflow_hidden()
+                    // Sidebar（左侧，在 Left Dock 左边）
+                    .when(sidebar_left, |el| {
+                        el.child(sidebar_content(DockPosition::Left))
+                    })
+                    // Left Dock（打开时才占空间，宽度 = active panel default_width）
+                    .when(left_open, |el| {
+                        el.child(
+                            div()
+                                .w(px(left_size))
+                                .h_full()
+                                .child(self.left_dock.clone()),
+                        )
+                    })
+                    // Center placeholder
+                    .child(
+                        div()
+                            .flex_1()
+                            .flex()
+                            .items_center()
+                            .justify_center()
+                            .text_size(px(14.0))
+                            .text_color(hsla(0.0, 0.0, 0.5, 1.0))
+                            .child("AAgent Center (placeholder)"),
+                    )
+                    // Right Dock（打开时才占空间，宽度 = active panel default_width）
+                    .when(right_open, |el| {
+                        el.child(
+                            div()
+                                .w(px(right_size))
+                                .h_full()
+                                .child(self.right_dock.clone()),
+                        )
+                    })
+                    // Sidebar（右侧，在 Right Dock 右边）
+                    .when(sidebar_right, |el| {
+                        el.child(sidebar_content(DockPosition::Right))
+                    }),
+            )
+            // Bottom Dock（打开时才占空间，叠在底部，高度 = active panel default_height）
+            .when(bottom_open, |el| {
+                el.child(
+                    div()
+                        .w_full()
+                        .h(px(bottom_size))
+                        .child(self.bottom_dock.clone()),
+                )
+            });
+
         div()
             .flex()
             .flex_col()
             .size_full()
             .bg(colors.panel_background)
             .overflow_hidden()
-            // 主区域（flex_1 占满剩余空间）
-            .child(
-                div()
-                    .flex_1()
-                    .flex()
-                    .flex_col()
-                    .size_full()
-                    .bg(colors.background)
-                    .overflow_hidden()
-                    // 上半部分：flex_row（sidebar-left | left dock | center | right dock | sidebar-right）
-                    .child(
-                        div()
-                            .flex_1()
-                            .flex()
-                            .flex_row()
-                            .size_full()
-                            .overflow_hidden()
-                            // Sidebar（左侧，在 Left Dock 左边）
-                            .when(sidebar_left, |el| {
-                                el.child(sidebar_content(DockPosition::Left))
-                            })
-                            // Left Dock（打开时才占空间）
-                            .when(left_open, |el| {
-                                el.child(div().w(px(280.0)).h_full().child(self.left_dock.clone()))
-                            })
-                            // Center placeholder
-                            .child(
-                                div()
-                                    .flex_1()
-                                    .flex()
-                                    .items_center()
-                                    .justify_center()
-                                    .text_size(px(14.0))
-                                    .text_color(hsla(0.0, 0.0, 0.5, 1.0))
-                                    .child("AAgent Center (placeholder)"),
-                            )
-                            // Right Dock（打开时才占空间）
-                            .when(right_open, |el| {
-                                el.child(div().w(px(280.0)).h_full().child(self.right_dock.clone()))
-                            })
-                            // Sidebar（右侧，在 Right Dock 右边）
-                            .when(sidebar_right, |el| {
-                                el.child(sidebar_content(DockPosition::Right))
-                            }),
-                    )
-                    // Bottom Dock（打开时才占空间，叠在底部）
-                    .when(bottom_open, |el| {
-                        el.child(div().w_full().h(px(240.0)).child(self.bottom_dock.clone()))
-                    }),
-            )
+            // 顶层 on_drag_move listener — 接收所有 Dock resize 拖拽事件
+            // 对齐 zed workspace.rs:L9707-L9740
+            .on_drag_move::<DraggedDock>(cx.listener(
+                move |workspace: &mut Self,
+                      e: &DragMoveEvent<DraggedDock>,
+                      _window: &mut Window,
+                      cx| {
+                    match e.drag(cx).0 {
+                        DockPosition::Left => {
+                            let size = e.event.position.x.as_f32();
+                            workspace.resize_left_dock(size, cx);
+                        }
+                        DockPosition::Right => {
+                            // Right dock resize — 简化处理：直接用鼠标 x 坐标
+                            // Zed 用 workspace.bounds.right() - e.event.position.x
+                            let size = e.event.position.x.as_f32();
+                            workspace.resize_right_dock(size, cx);
+                        }
+                        DockPosition::Bottom => {
+                            let size = e.event.position.y.as_f32();
+                            workspace.resize_bottom_dock(size, cx);
+                        }
+                    }
+                },
+            ))
+            .child(main_area)
             // StatusBar
             .child(self.status_bar.clone())
     }

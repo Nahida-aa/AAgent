@@ -121,6 +121,29 @@ impl PanelKind {
             PanelKind::Terminal | PanelKind::Debug => true,
         }
     }
+
+    /// 默认尺寸（对齐 zed 各面板 default.json 里的 default_width / default_height）。
+    /// (width, height) — width 用于 Left/Right Dock，height 用于 Bottom Dock。
+    ///
+    /// Zed default.json 里的值：
+    /// - Project:  width=240
+    /// - Git:      width=360
+    /// - Collab:   width=240
+    /// - Outline:  width=300
+    /// - Agent:    width=640, height=320
+    /// - Terminal: width=640, height=320
+    /// - Debug:    (未在 default.json 显式给出，用 320/320)
+    pub fn default_size(self) -> (f32, f32) {
+        match self {
+            PanelKind::Project => (240.0, 240.0),
+            PanelKind::Git => (360.0, 360.0),
+            PanelKind::Collab => (240.0, 240.0),
+            PanelKind::Outline => (300.0, 300.0),
+            PanelKind::Agent => (640.0, 320.0),
+            PanelKind::Terminal => (640.0, 320.0),
+            PanelKind::Debug => (320.0, 320.0),
+        }
+    }
 }
 
 // ---------- PanelEntry ----------

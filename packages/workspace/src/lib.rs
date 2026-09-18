@@ -22,9 +22,11 @@
 pub mod dock;
 pub mod multi_workspace;
 pub mod status_bar;
+pub mod terminal;
 
 pub use multi_workspace::{MultiWorkspace, SidebarHandle, SidebarRenderState};
 pub use settings_content::DockPosition;
+pub use terminal::TerminalProvider;
 
 use std::collections::HashMap;
 use std::path::PathBuf;

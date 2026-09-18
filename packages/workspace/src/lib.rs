@@ -35,15 +35,16 @@ pub use settings_content::DockPosition;
 pub use terminal::{NewCenterTerminal, NewTerminal, OpenTerminal, TerminalProvider};
 
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use gpui::{
-    App, Axis, Bounds, Context, DragMoveEvent, Entity, IntoElement, ParentElement, Render, Styled,
-    Window, canvas, div, hsla, prelude::*, px,
+    Action, App, Axis, Bounds, Context, DragMoveEvent, Entity, IntoElement, ParentElement, Render,
+    Styled, Window, canvas, div, hsla, prelude::*, px,
 };
 use ui_gpui::theme::ActiveTheme;
 
 use dock::panel::{
-    AgentPanel, CollabPanel, DebugPanel, GitPanel, OutlinePanel, PanelHandle, ProjectPanel,
+    AgentPanel, CollabPanel, DebugPanel, GitPanel, OutlinePanel, Panel, PanelHandle, ProjectPanel,
 };
 use dock::panel_buttons::PanelButtons;
 use dock::{Dock, DraggedDock};
@@ -94,6 +95,34 @@ pub struct Workspace {
     /// Workspace 边界 — 用于 resize 计算右 dock / 底 dock 的尺寸。
     /// 通过 canvas element 更新（对齐 zed workspace.rs:L9669-L9706）。
     bounds: Bounds<gpui::Pixels>,
+    /// 外部注册的 action callback 收集器。
+    /// Zed 用 `Vec<Box<dyn Fn(Div, ...) -> Div>>` 在 render 顶层 div 上应用。
+    /// 我们简化为 `Vec<Box<dyn ActionCallback>>`，render 时 chain on_action。
+    workspace_actions: Vec<Box<dyn ActionCallback>>,
+}
+
+/// 类型擦除的 action callback — 包装 `impl Fn(&mut Self, &A, ...)`。
+trait ActionCallback: 'static {
+    fn apply(&self, div: gpui::Div, cx: &mut Context<Workspace>) -> gpui::Div;
+}
+
+struct TypedActionCallback<
+    A: Action,
+    F: Fn(&mut Workspace, &A, &mut Window, &mut Context<Workspace>) + 'static,
+> {
+    callback: Arc<F>,
+    _marker: std::marker::PhantomData<A>,
+}
+
+impl<A: Action, F: Fn(&mut Workspace, &A, &mut Window, &mut Context<Workspace>) + 'static>
+    ActionCallback for TypedActionCallback<A, F>
+{
+    fn apply(&self, div: gpui::Div, cx: &mut Context<Workspace>) -> gpui::Div {
+        let cb = self.callback.clone();
+        div.on_action(
+            cx.listener(move |workspace, event, window, cx| cb(workspace, event, window, cx)),
+        )
+    }
 }
 
 impl Workspace {
@@ -220,11 +249,117 @@ impl Workspace {
             center,
             status_bar,
             bounds: Bounds::default(),
+            workspace_actions: Vec::new(),
         }
     }
 
     pub fn status_bar(&self) -> &Entity<StatusBar> {
         &self.status_bar
+    }
+
+    /// 注册 action handler — 外部 crate（terminal-view 等）在 observe_new 里调用。
+    /// 对齐 Zed `Workspace::register_action::<A>(callback)`。
+    pub fn register_action<A: Action>(
+        &mut self,
+        callback: impl Fn(&mut Workspace, &A, &mut Window, &mut Context<Workspace>) + 'static,
+    ) {
+        self.workspace_actions
+            .push(Box::new(TypedActionCallback::<A, _> {
+                callback: Arc::new(callback),
+                _marker: std::marker::PhantomData,
+            }));
+    }
+
+    // ---------- 泛型 Panel 操作（对齐 Zed Workspace::add_panel / toggle_panel_focus）----------
+    //
+    // 这些方法让外部 crate（terminal-view 等）能注册自己的 Panel 类型，
+    // Workspace 不需要知道具体类型 — 通过泛型 T: Panel 抽象。
+
+    /// 按 Panel 默认位置注入到对应 Dock。
+    /// 对齐 zed `Workspace::add_panel::<T>`。
+    pub fn add_panel<T: Panel>(&mut self, panel: Entity<T>, cx: &mut Context<Self>) {
+        use std::sync::Arc;
+        let position = panel.read(cx).default_position(cx);
+        let panel_handle = Arc::new(panel) as Arc<dyn PanelHandle>;
+
+        let dock_entity = match position {
+            DockPosition::Left => &self.left_dock,
+            DockPosition::Right => &self.right_dock,
+            DockPosition::Bottom => &self.bottom_dock,
+        };
+
+        dock_entity.update(cx, |dock, cx| {
+            dock.add_panel(panel_handle);
+            cx.notify();
+        });
+    }
+
+    /// 打开并 focus 指定类型的 Panel（通过 PanelButtons 的 Dock 触发）。
+    /// 对齐 zed `Workspace::toggle_panel_focus::<T>`。
+    pub fn toggle_panel_focus<T: Panel>(&mut self, cx: &mut Context<Self>) -> bool {
+        let (dock_entity, is_open) = self.find_dock_with_panel::<T>(cx);
+        let was_open = is_open;
+
+        if let Some(dock_entity) = dock_entity {
+            dock_entity.update(cx, |dock, cx| {
+                if was_open {
+                    dock.set_open(false);
+                } else {
+                    dock.open_panel::<T>();
+                }
+                cx.notify();
+            });
+        }
+
+        !was_open
+    }
+
+    /// 让指定类型的 Panel 所在 Dock 打开。
+    pub fn open_panel<T: Panel>(&mut self, cx: &mut Context<Self>) {
+        if let Some(dock_entity) = self.find_dock_entity::<T>(cx) {
+            dock_entity.update(cx, |dock, cx| {
+                dock.open_panel::<T>();
+                cx.notify();
+            });
+        }
+    }
+
+    /// 让指定类型的 Panel 所在 Dock 关闭。
+    pub fn close_panel<T: Panel>(&self, cx: &mut Context<Self>) {
+        if let Some(dock_entity) = self.find_dock_entity::<T>(cx) {
+            dock_entity.update(cx, |dock, cx| {
+                dock.close_panel::<T>();
+                cx.notify();
+            });
+        }
+    }
+
+    fn find_dock_entity<T: Panel>(&self, cx: &App) -> Option<&Entity<Dock>> {
+        if self.left_dock.read(cx).has_panel::<T>() {
+            Some(&self.left_dock)
+        } else if self.right_dock.read(cx).has_panel::<T>() {
+            Some(&self.right_dock)
+        } else if self.bottom_dock.read(cx).has_panel::<T>() {
+            Some(&self.bottom_dock)
+        } else {
+            None
+        }
+    }
+
+    fn find_dock_with_panel<T: Panel>(&self, cx: &App) -> (Option<&Entity<Dock>>, bool) {
+        if let Some(dock) = self.find_dock_entity::<T>(cx) {
+            let is_open = dock.read(cx).is_open();
+            (Some(dock), is_open)
+        } else {
+            (None, false)
+        }
+    }
+
+    /// 遍历所有 Dock，按类型拿到 Entity<T>（对齐 Zed workspace.rs:4825）。
+    pub fn panel<T: Panel>(&self, cx: &App) -> Option<Entity<T>> {
+        [&self.left_dock, &self.bottom_dock, &self.right_dock]
+            .iter()
+            .find_map(|dock| dock.read(cx).panel::<T>())
     }
 
     /// App 层创建 MultiWorkspace 后传给 Workspace，Workspace 传给 StatusBar。
@@ -479,7 +614,7 @@ impl Render for Workspace {
 
         let this = cx.entity();
 
-        div()
+        let mut root = div()
             .flex()
             .flex_col()
             .size_full()
@@ -524,6 +659,13 @@ impl Render for Workspace {
             ))
             .child(main_area)
             // StatusBar
-            .child(self.status_bar.clone())
+            .child(self.status_bar.clone());
+
+        // 外部注册的 workspace action — 逐个 chain on_action
+        for action_cb in self.workspace_actions.iter() {
+            root = action_cb.apply(root, cx);
+        }
+
+        root
     }
 }

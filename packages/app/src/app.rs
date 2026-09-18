@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use crate::title_bar::TitleBar;
 use aa_sidebar::Sidebar;
+use aa_terminal_view::TerminalPanel;
 use gpui::{Context, Decorations, Entity, ParentElement, Render, Styled, prelude::*};
 use ui_gpui::theme::ActiveTheme;
 use workspace::{MultiWorkspace, Workspace};
@@ -52,6 +53,14 @@ impl AppShell {
         // 4. Workspace/StatusBar 绑定 MultiWorkspace — Sidebar toggle 走 MultiWorkspace 中转
         workspace.update(cx, |w, cx| {
             w.set_multi_workspace(multi_workspace.clone(), cx);
+            cx.notify();
+        });
+
+        // 5. 创建 TerminalPanel entity 注入 Workspace 的 bottom Dock
+        // 对齐 Zed App 层 TerminalPanel::load() 注入 Workspace
+        let terminal_panel = cx.new(|cx| TerminalPanel::new(cx));
+        workspace.update(cx, |w, cx| {
+            w.add_panel::<TerminalPanel>(terminal_panel, cx);
             cx.notify();
         });
 

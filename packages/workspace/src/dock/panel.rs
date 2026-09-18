@@ -35,6 +35,8 @@ pub trait Panel: Render + Sized {
 
 // ---------- PanelHandle trait ----------
 
+use std::any::Any;
+
 /// Dock 持有的 trait object。对齐 zed `dock.rs::PanelHandle`。
 pub trait PanelHandle: Send + Sync {
     fn panel_id(&self) -> EntityId;
@@ -46,6 +48,8 @@ pub trait PanelHandle: Send + Sync {
     fn supports_flexible_size(&self, cx: &App) -> bool;
     fn icon(&self, cx: &App) -> IconName;
     fn icon_tooltip(&self, cx: &App) -> &'static str;
+    /// 用于 downcast 回 Entity<T>（Zed 用 AnyView::downcast）。
+    fn as_any(&self) -> &dyn Any;
 }
 
 impl<T: Panel> PanelHandle for Entity<T> {
@@ -76,6 +80,9 @@ impl<T: Panel> PanelHandle for Entity<T> {
     }
     fn icon_tooltip(&self, cx: &App) -> &'static str {
         self.read(cx).icon_tooltip(cx)
+    }
+    fn as_any(&self) -> &dyn Any {
+        self as &dyn Any
     }
 }
 

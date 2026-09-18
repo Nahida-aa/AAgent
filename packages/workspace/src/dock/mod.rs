@@ -6,13 +6,13 @@ pub mod panel_buttons;
 use std::sync::Arc;
 
 use gpui::{
-    App, Context, IntoElement, MouseButton, MouseDownEvent, MouseUpEvent, ParentElement, Render,
-    Styled, Window, deferred, div, hsla, prelude::*, px,
+    App, Context, Entity, IntoElement, MouseButton, MouseDownEvent, MouseUpEvent, ParentElement,
+    Render, Styled, Window, deferred, div, hsla, prelude::*, px,
 };
 use settings_content::DockPosition;
 use ui_gpui::theme::ActiveTheme;
 
-use self::panel::PanelHandle;
+use self::panel::{Panel, PanelHandle};
 
 /// Resize handle 的大小（对齐 zed dock.rs `RESIZE_HANDLE_SIZE = px(6.)`）。
 pub(crate) const RESIZE_HANDLE_SIZE: f32 = 6.0;
@@ -145,6 +145,49 @@ impl Dock {
     /// 重置为 active panel 的 default_size。
     pub fn reset_size(&mut self) {
         self.size_override = None;
+    }
+
+    // ---------- 泛型查找（对齐 Zed dock.rs `panel_index_for_type` / `panel::<T>`）----------
+
+    /// 按 Panel 类型查找 index — 用 T::panel_key() 和 PanelHandle::panel_key() 比对。
+    pub fn panel_index_for_type<T: Panel>(&self) -> Option<usize> {
+        let target = T::panel_key();
+        self.panels.iter().position(|p| p.panel_key() == target)
+    }
+
+    /// 按 Panel 类型拿到 Entity<T>（Zed dock.rs:521）。
+    ///
+    /// 实现方式：先按 panel_key 找到 index，再从 Arc<dyn PanelHandle> downcast 成 Entity<T>。
+    /// PanelHandle::as_any() 返回 &dyn Any，我们用 Any::downcast_ref 拿回 Entity<T>。
+    pub fn panel<T: Panel>(&self) -> Option<Entity<T>> {
+        let target = T::panel_key();
+        self.panels
+            .iter()
+            .find(|p| p.panel_key() == target)
+            .and_then(|p| {
+                let any: &dyn std::any::Any = p.as_any();
+                any.downcast_ref::<Entity<T>>().cloned()
+            })
+    }
+
+    /// Dock 里有没有这个类型的 panel。
+    pub fn has_panel<T: Panel>(&self) -> bool {
+        self.panel_index_for_type::<T>().is_some()
+    }
+
+    /// 让 Dock 打开并激活指定类型的 panel。
+    pub fn open_panel<T: Panel>(&mut self) {
+        if let Some(index) = self.panel_index_for_type::<T>() {
+            self.is_open = true;
+            self.active_panel_index = Some(index);
+        }
+    }
+
+    /// 让 Dock 关闭（如果里面有这个类型的 panel）。
+    pub fn close_panel<T: Panel>(&mut self) {
+        if self.panel_index_for_type::<T>().is_some() {
+            self.is_open = false;
+        }
     }
 }
 

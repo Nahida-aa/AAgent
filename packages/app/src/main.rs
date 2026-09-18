@@ -21,6 +21,9 @@ fn main() {
             // 设置系统（RustEmbed default.json → gpui Global SettingsStore）
             settings::SettingsStore::init(cx);
 
+            // TerminalPanel action handler 注册（对齐 Zed terminal_view::init(cx)）
+            aa_terminal_view::TerminalPanel::init(cx);
+
             let bounds = Bounds::centered(None, size(1100.0.into(), px(720.0)), cx);
             cx.open_window(
                 WindowOptions {

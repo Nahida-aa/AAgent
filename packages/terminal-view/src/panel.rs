@@ -4,13 +4,21 @@
 //! Zed 版持有完整 PaneGroup + 多 pane + 持久化 + action handler。
 //! AAgent 最小版：一个 active_pane，每次 new_terminal() 创建 TerminalView 加进去。
 
-use gpui::{App, AppContext, Context, Entity, IntoElement, Render, Window, px};
+use gpui::{
+    App, AppContext, Context, Entity, EventEmitter, IntoElement, Render, Window, actions, px,
+};
 use ui_gpui::IconName;
 use workspace::DockPosition;
 use workspace::Pane;
 use workspace::dock::panel::Panel;
 
 use crate::view::TerminalView;
+
+// ---------- TerminalPanel 自身 action ----------
+
+actions!(terminal_panel, [Toggle, ToggleFocus]);
+
+// ---------- TerminalPanel entity ----------
 
 /// 底部终端面板 — 一个 Dock Panel，内部持有一个 Pane。
 ///
@@ -23,6 +31,8 @@ use crate::view::TerminalView;
 pub struct TerminalPanel {
     active_pane: Entity<Pane>,
 }
+
+impl EventEmitter<()> for TerminalPanel {}
 
 impl TerminalPanel {
     pub fn new(cx: &mut Context<Self>) -> Self {
@@ -37,6 +47,43 @@ impl TerminalPanel {
         self.active_pane.update(cx, |pane, cx| {
             pane.add_item(terminal, cx);
         });
+    }
+
+    // ---------- Zed init() 注册 action handler ----------
+
+    /// App 层启动时调用 — 注册 Workspace 级别的 action handler。
+    ///
+    /// 对齐 zed `terminal_panel::init(cx)` (terminal_panel.rs:55)。
+    /// 用 `cx.observe_new` 在每个 Workspace 创建时注册 handler：
+    /// - workspace::NewTerminal → TerminalPanel::new_terminal
+    /// - TerminalPanel::ToggleFocus → toggle_panel_focus::<TerminalPanel>
+    pub fn init(cx: &mut App) {
+        cx.observe_new(|workspace: &mut workspace::Workspace, _window, cx| {
+            // NewTerminal → TerminalPanel::new_terminal + open panel
+            workspace.register_action(|workspace, _: &workspace::NewTerminal, _, cx| {
+                // 通过 Workspace::panel::<TerminalPanel>(cx) 拿到 entity
+                if let Some(terminal_panel) = workspace.panel::<Self>(cx) {
+                    terminal_panel.update(cx, |panel, cx| {
+                        panel.new_terminal(cx);
+                    });
+                    workspace.open_panel::<Self>(cx);
+                }
+            });
+
+            // ToggleFocus — 打开/关闭 TerminalPanel 的 Dock
+            workspace.register_action(|workspace, _: &ToggleFocus, _, cx| {
+                workspace.toggle_panel_focus::<Self>(cx);
+            });
+
+            // Toggle — toggle，已开则 close
+            workspace.register_action(|workspace, _: &Toggle, _, cx| {
+                let opened = workspace.toggle_panel_focus::<Self>(cx);
+                if !opened {
+                    workspace.close_panel::<Self>(cx);
+                }
+            });
+        })
+        .detach();
     }
 }
 

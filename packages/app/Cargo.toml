@@ -18,6 +18,7 @@ path = "src/main.rs"
 workspace.workspace = true
 aa-sidebar.workspace = true
 aa-terminal.workspace = true
+aa-terminal-view.workspace = true
 settings.workspace = true
 gpui.workspace = true
 gpui_util.workspace = true

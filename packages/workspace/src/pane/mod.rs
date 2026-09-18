@@ -5,6 +5,7 @@
 //! 子模块：
 //! - [event] — Event enum（Empty, ActiveItemChanged, ItemAdded, ItemClosed）
 //! - [history] — ActivationHistory，实现 "activate last"
+//! - [navigation] — NavHistory，实现 "go back / go forward" 在 tab 间
 //! - [activate_item] — ActivateItem action（带字段的 action 单独放）
 //! - [dragged] — DraggedTab / DraggedSelection drag marker
 
@@ -21,11 +22,13 @@ pub mod activate_item;
 pub mod dragged;
 pub mod event;
 pub mod history;
+pub mod navigation;
 
 pub use activate_item::ActivateItem;
 pub use dragged::{DraggedSelection, DraggedTab};
 pub use event::Event;
 pub use history::ActivationHistory;
+pub use navigation::NavHistory;
 
 actions!(
     pane,
@@ -36,6 +39,12 @@ actions!(
         ClosePane,
         /// 激活最近激活过的 item（对齐 zed ActivateLastItem）。
         ActivateLastItem,
+        /// 在最近浏览过的 tab 里回退（对齐 zed GoBack）。
+        GoBack,
+        /// 在最近浏览过的 tab 里前进（对齐 zed GoForward）。
+        GoForward,
+        /// 重开最近关闭的 tab（对齐 zed ReopenClosedItem）。
+        ReopenClosedItem,
     ]
 );
 
@@ -47,6 +56,8 @@ pub struct Pane {
     close_pane_if_empty: bool,
     /// 激活历史 — 最近激活的 item 排最前，实现 "activate last"。
     activation_history: ActivationHistory,
+    /// 导航历史 — back/forward 栈，实现 GoBack/GoForward。
+    nav_history: NavHistory,
 }
 
 impl Pane {
@@ -57,14 +68,22 @@ impl Pane {
             active_item_index: 0,
             close_pane_if_empty: true,
             activation_history: ActivationHistory::new(),
+            nav_history: NavHistory::new(),
         }
     }
 
     pub fn add_item<T: Item>(&mut self, item: Entity<T>, cx: &mut Context<Self>) {
         let entity_id = item.entity_id();
         self.items.push(Box::new(item) as Box<dyn ItemHandle>);
+        let prev_active_id = self
+            .items
+            .get(self.active_item_index)
+            .map(|it| it.item_id());
         self.active_item_index = self.items.len() - 1;
         self.activation_history.record_activation(entity_id);
+        if let Some(from) = prev_active_id {
+            self.nav_history.record_navigation(from, entity_id);
+        }
         cx.emit(Event::ItemAdded(entity_id));
         cx.emit(Event::ActiveItemChanged);
         cx.notify();
@@ -74,9 +93,11 @@ impl Pane {
         if index >= self.items.len() || self.active_item_index == index {
             return;
         }
+        let from_id = self.items[self.active_item_index].item_id();
         self.active_item_index = index;
-        let entity_id = self.items[index].item_id();
-        self.activation_history.record_activation(entity_id);
+        let to_id = self.items[index].item_id();
+        self.activation_history.record_activation(to_id);
+        self.nav_history.record_navigation(from_id, to_id);
         cx.emit(Event::ActiveItemChanged);
         cx.notify();
     }
@@ -88,6 +109,7 @@ impl Pane {
         let closed_id = self.items[index].item_id();
         let _ = self.items.remove(index);
         self.activation_history.remove(closed_id);
+        self.nav_history.record_closed(closed_id);
 
         if self.items.is_empty() {
             self.active_item_index = 0;
@@ -113,6 +135,51 @@ impl Pane {
                 self.activate_item(index, cx);
             }
         }
+    }
+
+    /// GoBack — 回到上一个 tab。
+    /// 对齐 Zed 的 GoBack action。
+    pub fn go_back(&mut self, cx: &mut Context<Self>) {
+        if let Some(target_id) = self.nav_history.go_back() {
+            if let Some(index) = self.items.iter().position(|it| it.item_id() == target_id) {
+                // 直接设 index，不走 activate_item（避免污染 nav_history）
+                if self.active_item_index != index {
+                    self.active_item_index = index;
+                    self.activation_history.record_activation(target_id);
+                    cx.emit(Event::ActiveItemChanged);
+                    cx.notify();
+                }
+            }
+        }
+    }
+
+    /// GoForward — 前进到下一个 tab。
+    /// 对齐 Zed 的 GoForward action。
+    pub fn go_forward(&mut self, cx: &mut Context<Self>) {
+        if let Some(target_id) = self.nav_history.go_forward() {
+            if let Some(index) = self.items.iter().position(|it| it.item_id() == target_id) {
+                if self.active_item_index != index {
+                    self.active_item_index = index;
+                    self.activation_history.record_activation(target_id);
+                    cx.emit(Event::ActiveItemChanged);
+                    cx.notify();
+                }
+            }
+        }
+    }
+
+    /// ReopenClosedItem — 弹出最近关闭的 tab（目前只返回 EntityId，
+    /// 真正的 "重新加回 Pane" 逻辑由 Workspace 或 Panel 消费）。
+    pub fn pop_closed(&mut self) -> Option<EntityId> {
+        self.nav_history.pop_closed()
+    }
+
+    pub fn can_go_back(&self) -> bool {
+        self.nav_history.can_go_back()
+    }
+
+    pub fn can_go_forward(&self) -> bool {
+        self.nav_history.can_go_forward()
     }
 
     pub fn items(&self) -> &[Box<dyn ItemHandle>] {
@@ -166,6 +233,12 @@ impl Render for Pane {
             )
             .on_action(cx.listener(|this: &mut Self, _: &ActivateLastItem, _, cx| {
                 this.activate_last_item(cx);
+            }))
+            .on_action(cx.listener(|this: &mut Self, _: &GoBack, _, cx| {
+                this.go_back(cx);
+            }))
+            .on_action(cx.listener(|this: &mut Self, _: &GoForward, _, cx| {
+                this.go_forward(cx);
             }))
             .child(self.render_tab_bar(cx))
             .child(self.render_active_item(cx))

@@ -393,21 +393,24 @@ impl Workspace {
         });
     }
 
-    /// 对齐 zed `render_dock` — 返回 Dock 容器。
+    /// 对齐 zed `render_dock(&self, position, dock, window, cx)` (workspace.rs:L8628-8720)。
     ///
-    /// Zed 关键实现 (workspace.rs:L8660-8720)：
-    /// - 容器默认 `.flex().flex_none()` — 不管开/关都有 flex_none (flex_grow=0, flex_shrink=0)
-    ///   然后通过 `.w(size)` / `.h(size)` 设置固定尺寸
-    /// - Bottom dock 只设 `.h(size)`, 不设 flex_shrink
-    /// - Left/Right dock 设 `.w(size)` + `flex_shrink(1.0)` (allow shrink when space tight)
-    fn render_dock(dock: &Entity<Dock>, position: DockPosition, cx: &App) -> impl IntoElement {
+    /// Zed 关键实现：
+    /// - 容器默认 `.flex().flex_none()` — 不管开/关都有 flex_none
+    /// - Left/Right dock: `.w(size)` + `flex_shrink(1.0)`
+    /// - Bottom dock: `.h(size)` 不加 flex_shrink
+    fn render_dock(
+        &self,
+        position: DockPosition,
+        dock: &Entity<Dock>,
+        cx: &App,
+    ) -> impl IntoElement {
         let dock_ref = dock.read(cx);
         let is_open = dock_ref.is_open();
         let size = dock_ref.current_size(cx);
 
         let is_bottom = matches!(position, DockPosition::Bottom);
 
-        // Zed 默认 flex_none + flex — workspace.rs:L8669-8672
         let mut container = div()
             .id(match position {
                 DockPosition::Left => "left-dock",
@@ -421,10 +424,8 @@ impl Workspace {
 
         if is_open {
             if is_bottom {
-                // Bottom dock — zed dock.rs:L8712-8717: 只设 h(size), 不设 flex_shrink
                 container = container.h(px(size));
             } else {
-                // Left/Right dock
                 container = container.w(px(size)).flex_shrink(1.0);
             }
         }
@@ -447,9 +448,9 @@ impl Render for Workspace {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let colors = cx.theme().colors();
 
-        let left_dock = Self::render_dock(&self.left_dock, DockPosition::Left, cx);
-        let right_dock = Self::render_dock(&self.right_dock, DockPosition::Right, cx);
-        let bottom_dock = Self::render_dock(&self.bottom_dock, DockPosition::Bottom, cx);
+        let left_dock = self.render_dock(DockPosition::Left, &self.left_dock, cx);
+        let right_dock = self.render_dock(DockPosition::Right, &self.right_dock, cx);
+        let bottom_dock = self.render_dock(DockPosition::Bottom, &self.bottom_dock, cx);
 
         let center = self.center.render();
 

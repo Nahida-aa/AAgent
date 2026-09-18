@@ -28,8 +28,8 @@ pub mod status_bar;
 use std::collections::HashMap;
 
 use gpui::{
-    App, Context, DragMoveEvent, Entity, IntoElement, ParentElement, Render, Styled, Window, div,
-    hsla, prelude::*, px,
+    App, Bounds, Context, DragMoveEvent, Entity, IntoElement, ParentElement, Render, Styled,
+    Window, canvas, div, hsla, prelude::*, px,
 };
 use ui_gpui::theme::ActiveTheme;
 
@@ -79,6 +79,9 @@ pub struct Workspace {
     right_dock: Entity<Dock>,
     /// 状态栏（含 PanelButtons + 普通状态项）。
     status_bar: Entity<StatusBar>,
+    /// Workspace 边界 — 用于 resize 计算右 dock / 底 dock 的尺寸。
+    /// 通过 canvas element 更新（对齐 zed workspace.rs:L9669-L9706）。
+    bounds: Bounds<gpui::Pixels>,
 }
 
 impl Workspace {
@@ -181,6 +184,7 @@ impl Workspace {
             bottom_dock,
             right_dock,
             status_bar,
+            bounds: Bounds::default(),
         }
     }
 
@@ -411,12 +415,27 @@ impl Render for Workspace {
                 .into_any_element(),
         };
 
+        let this = cx.entity();
+
         div()
             .flex()
             .flex_col()
             .size_full()
             .bg(colors.panel_background)
             .overflow_hidden()
+            // canvas — 每帧更新 bounds（对齐 zed workspace.rs:L9669-L9706）
+            .child(
+                canvas(
+                    move |bounds, _, cx| {
+                        this.update(cx, |workspace, cx| {
+                            workspace.bounds = bounds;
+                        });
+                    },
+                    |_, _, _, _| {},
+                )
+                .absolute()
+                .size_full(),
+            )
             // 顶层 on_drag_move listener — 接收所有 Dock resize 拖拽事件
             // 对齐 zed workspace.rs:L9707-L9740
             .on_drag_move::<DraggedDock>(cx.listener(
@@ -424,17 +443,19 @@ impl Render for Workspace {
                       e: &DragMoveEvent<DraggedDock>,
                       _window: &mut Window,
                       cx| {
+                    let bounds = workspace.bounds;
+                    let pos = e.event.position;
                     match e.drag(cx).0 {
                         DockPosition::Left => {
-                            workspace.resize_left_dock(e.event.position.x.as_f32(), cx);
+                            workspace.resize_left_dock(pos.x.as_f32() - bounds.left().as_f32(), cx);
                         }
                         DockPosition::Right => {
-                            // Zed 用 workspace.bounds.right() - e.event.position.x
-                            // AAgent 简化为直接用鼠标坐标（后续加 bounds 时再精确化）
-                            workspace.resize_right_dock(e.event.position.x.as_f32(), cx);
+                            workspace
+                                .resize_right_dock(bounds.right().as_f32() - pos.x.as_f32(), cx);
                         }
                         DockPosition::Bottom => {
-                            workspace.resize_bottom_dock(e.event.position.y.as_f32(), cx);
+                            workspace
+                                .resize_bottom_dock(bounds.bottom().as_f32() - pos.y.as_f32(), cx);
                         }
                     }
                 },

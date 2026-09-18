@@ -273,8 +273,13 @@ impl Workspace {
 
         if is_open {
             if is_flexible && matches!(position, DockPosition::Left | DockPosition::Right) {
-                // Flexible sizing — 和 Center 1:1 等宽
-                container = container.flex_grow(1.0).flex_shrink(1.0);
+                // Flexible sizing — 和 Center 1:1 等宽。
+                // 关键：flex_basis(0) — 没有它默认 flex-basis:auto 会按内容大小分配，
+                // 不是等分（对齐 zed workspace.rs:L8696 + gpui flex_1() 的实现）。
+                container = container
+                    .flex_grow(1.0)
+                    .flex_shrink(1.0)
+                    .flex_basis(gpui::relative(0.));
             } else {
                 match position {
                     DockPosition::Left | DockPosition::Right => {

@@ -15,10 +15,10 @@ use std::collections::HashMap;
 use gpui::{
     Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, prelude::*, px,
 };
-use ui_gpui::IconButton;
 use ui_gpui::component::context_menu::ContextMenuEntry;
+use ui_gpui::component::divider::{Divider, DividerColor};
 use ui_gpui::component::tooltip::Tooltip;
-use ui_gpui::right_click_menu;
+use ui_gpui::{IconButton, right_click_menu};
 
 use crate::dock::Dock;
 use crate::dock_position::DockPosition;
@@ -85,10 +85,22 @@ impl Render for PanelButtons {
                 let current_pos = dock_position;
                 let docks_for_menu = all_docks.clone();
 
+                // Zed dock.rs:L1397 — 根据 dock 位置选择菜单锚点
+                // Left dock: 按钮组左对齐，菜单从按钮上方弹出
+                // Right/Bottom: 按钮组右对齐
+                let (menu_anchor, menu_attach) = match dock_position {
+                    DockPosition::Left => (gpui::Anchor::BottomLeft, gpui::Anchor::TopLeft),
+                    DockPosition::Bottom | DockPosition::Right => {
+                        (gpui::Anchor::BottomRight, gpui::Anchor::TopRight)
+                    }
+                };
+
                 let menu_id: gpui::SharedString =
                     format!("panel-btn-menu-{dock_position:?}-{i}").into();
 
                 right_click_menu::<ui_gpui::ContextMenu>(menu_id)
+                    .anchor(menu_anchor)
+                    .attach(menu_attach)
                     .trigger(move |_is_active, _window, _cx| {
                         IconButton::new(format!("panel-btn-{dock_position:?}-{i}"), icon)
                             .size(px(22.0))
@@ -97,6 +109,9 @@ impl Render for PanelButtons {
                             .aria_label(label)
                             .selected(is_active)
                             .tooltip(Tooltip::text(entry_label.to_string()))
+                            // 状态栏按钮 tooltip 在上方弹出（状态栏在底部，默认向下会出屏）
+                            .tooltip_anchor(gpui::Anchor::BottomLeft)
+                            .tooltip_attach(gpui::Anchor::TopLeft)
                             .on_click(move |_ev, _window, cx| {
                                 dock_for_click.update(cx, |dock, cx| {
                                     if dock.is_open() && dock.active_panel_index() == Some(i) {
@@ -114,6 +129,7 @@ impl Render for PanelButtons {
                         let entry = entry_for_menu.clone();
                         let pos = current_pos;
                         let docks = docks_for_menu.clone();
+                        let entry_kind = entry_for_menu.kind;
 
                         let positions: [DockPosition; 3] = [
                             DockPosition::Left,
@@ -124,8 +140,12 @@ impl Render for PanelButtons {
                         ui_gpui::ContextMenu::build(cx, move |menu, _| {
                             let mut menu = menu;
                             for target in positions {
+                                // Zed dock.rs:L1453 — position_is_valid 过滤
+                                if !entry_kind.position_is_valid(target) {
+                                    continue;
+                                }
                                 let is_current = target == pos;
-                                let entry = entry.clone();
+                                let entry = entry_for_menu.clone();
                                 let docks = docks.clone();
                                 menu = menu.item(
                                     ContextMenuEntry::new(format!("Dock {}", target.label()))
@@ -174,12 +194,24 @@ impl Render for PanelButtons {
             buttons.reverse();
         }
 
+        let has_buttons = !buttons.is_empty();
+
+        // Zed dock.rs:L1572-L1583 — 按钮组前后加 Divider
+        // Right / Bottom dock: Divider 在左侧（按钮组前面）
+        // Left dock: Divider 在右侧（按钮组后面）
         div()
             .flex()
             .flex_row()
             .items_center()
-            .gap_0p5()
+            .gap_1()
+            .when(
+                has_buttons && matches!(dock_position, DockPosition::Right | DockPosition::Bottom),
+                |this| this.child(Divider::vertical().color(DividerColor::Border)),
+            )
             .children(buttons)
+            .when(has_buttons && dock_position == DockPosition::Left, |this| {
+                this.child(Divider::vertical().color(DividerColor::Border))
+            })
             .into_any_element()
     }
 }

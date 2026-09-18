@@ -128,6 +128,14 @@ impl StatusBar {
         }
     }
 
+    /// 设置 sidebar 在左侧还是右侧（sidebar toggle 右键菜单调用）。
+    pub fn set_side(&mut self, side: DockPosition) {
+        if side != DockPosition::Bottom {
+            self.sidebar.side = side;
+            self.sidebar.open = true;
+        }
+    }
+
     // ---- 渲染 ----
 
     fn visible_left_items(&self) -> impl Iterator<Item = &Box<dyn StatusItemViewHandle>> {
@@ -142,41 +150,85 @@ impl StatusBar {
             .filter(|item| !self.hidden_items.contains(&item.item_type()))
     }
 
-    /// 折叠时的 sidebar toggle（对齐 zed `StatusBar::render_sidebar_toggle`）：
-    /// 右侧 toggle 左侧一条、左侧 toggle 右侧一条 `Divider::vertical`。
-    fn render_sidebar_toggle(&self, on_right: bool, cx: &mut Context<Self>) -> impl IntoElement {
+    /// 折叠时的 sidebar toggle（对齐 zed `StatusBar::render_sidebar_toggle`）。
+    /// 右键菜单：sidebar 在 Left / Right 间切换（不能 Bottom，sidebar 是侧边栏概念）。
+    fn render_sidebar_toggle(&self, on_right: bool, cx: &mut Context<Self>) -> gpui::AnyElement {
         let bar = cx.entity();
+        let current_side = self.sidebar.side;
         let divider = || Divider::vertical().color(DividerColor::Border);
-        let toggle = IconButton::new(
-            if on_right {
-                "toggle-workspace-sidebar"
-            } else {
-                "toggle-workspace-sidebar-left"
-            },
-            if on_right {
-                IconName::ThreadsSidebarRightClosed
-            } else {
-                IconName::ThreadsSidebarLeftClosed
-            },
-        )
-        .size(px(22.0))
-        .icon_size(px(14.0))
-        .radius(ButtonRadius::Medium)
-        .aria_label("Open threads sidebar")
-        .tooltip(Tooltip::text("Open Threads Sidebar"))
-        .on_click(move |_event, _window, cx| {
-            let side = if on_right {
-                DockPosition::Right
-            } else {
-                DockPosition::Left
-            };
-            bar.update(cx, |bar, _| bar.toggle_sidebar(side));
-        });
-        let mut children = Vec::new();
+
+        // Zed dock.rs:L242-251 — 根据 toggle 在左还是右选择菜单锚点
+        let (menu_anchor, menu_attach) = if on_right {
+            (gpui::Anchor::BottomRight, gpui::Anchor::TopRight)
+        } else {
+            (gpui::Anchor::BottomLeft, gpui::Anchor::TopLeft)
+        };
+
+        // Zed sidebar_side_context_menu — 只有 Left / Right 两项
+        let bar_for_click = bar.clone();
+        let bar_for_menu = bar.clone();
+        let toggle = right_click_menu::<ContextMenu>("sidebar-toggle-menu")
+            .anchor(menu_anchor)
+            .attach(menu_attach)
+            .trigger(move |_is_active, _window, _cx| {
+                let bar = bar_for_click.clone();
+                IconButton::new(
+                    if on_right {
+                        "toggle-workspace-sidebar"
+                    } else {
+                        "toggle-workspace-sidebar-left"
+                    },
+                    if on_right {
+                        IconName::ThreadsSidebarRightClosed
+                    } else {
+                        IconName::ThreadsSidebarLeftClosed
+                    },
+                )
+                .size(px(22.0))
+                .icon_size(px(14.0))
+                .radius(ButtonRadius::Medium)
+                .aria_label("Open threads sidebar")
+                // 状态栏按钮 tooltip 在上方弹出（状态栏在底部，默认向下会出屏）
+                .tooltip(Tooltip::text("Open Threads Sidebar"))
+                .tooltip_anchor(gpui::Anchor::BottomLeft)
+                .tooltip_attach(gpui::Anchor::TopLeft)
+                .on_click(move |_event, _window, cx| {
+                    let side = if on_right {
+                        DockPosition::Right
+                    } else {
+                        DockPosition::Left
+                    };
+                    bar.update(cx, |bar, _| bar.toggle_sidebar(side));
+                })
+                .into_any_element()
+            })
+            .menu(move |_window, cx| {
+                let bar = bar_for_menu.clone();
+                ContextMenu::build(cx, move |menu, _| {
+                    let current = current_side;
+                    let mut menu = menu;
+                    let positions: [(DockPosition, &str); 2] =
+                        [(DockPosition::Left, "Left"), (DockPosition::Right, "Right")];
+                    for (pos, label) in positions {
+                        let bar = bar.clone();
+                        let is_current = pos == current;
+                        menu =
+                            menu.item(ContextMenuEntry::new(label).checked(is_current).on_click(
+                                move |_window, cx| {
+                                    bar.update(cx, |bar, _| bar.set_side(pos));
+                                },
+                            ));
+                    }
+                    menu
+                })
+            })
+            .into_any_element();
+
+        let mut children: Vec<gpui::AnyElement> = Vec::new();
         if on_right {
             children.push(divider().into_any_element());
         }
-        children.push(toggle.into_any_element());
+        children.push(toggle);
         if !on_right {
             children.push(divider().into_any_element());
         }
@@ -186,6 +238,7 @@ impl StatusBar {
             .items_center()
             .gap_0p5()
             .children(children)
+            .into_any_element()
     }
 
     /// 普通项 + 其右键 Hide 菜单。

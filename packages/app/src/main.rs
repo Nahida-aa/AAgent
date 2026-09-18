@@ -9,9 +9,9 @@ fn main() {
     tracing_subscriber::fmt::init();
 
     application()
-        .with_assets(assets::Assets)
+        .with_assets(aa_gpui_kit_assets::Assets)
         .run(|cx: &mut App| {
-            assets::Assets
+            aa_gpui_kit_assets::Assets
                 .load_fonts(cx)
                 .expect("failed to load embedded fonts");
             ui_gpui::theme::init_theme(cx);

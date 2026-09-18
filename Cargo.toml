@@ -10,7 +10,7 @@ members = [
     "packages/llm",
     "packages/cli",
     "packages/server",
-    "packages/config",
+    "packages/settings",
     "packages/session",
     "packages/app", "packages/ui", "packages/workspace",
 ]

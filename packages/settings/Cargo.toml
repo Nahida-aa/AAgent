@@ -1,5 +1,5 @@
 [package]
-name = "aa-config"
+name = "settings"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -8,6 +8,7 @@ description = "AAgent LLM 配置系统 (aa.json + env var fallback)"
 [dependencies]
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
+rust-embed = "8"
 
 [dev-dependencies]
 tempfile = { workspace = true }

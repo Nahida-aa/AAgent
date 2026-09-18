@@ -12,7 +12,7 @@ aa-extensions = { path = "../extensions" }
 aa-function-tools = { path = "../function-tools" }
 aa-extension-mcp = { path = "../extension-mcp" }
 aa-llm = { path = "../llm" }
-aa-config = { path = "../config" }
+settings = { path = "../settings" }
 aa-session = { path = "../session" }
 axum = { workspace = true, features = ["default", "ws"] }
 nix = { version = "0.29", features = ["fs", "term"] }

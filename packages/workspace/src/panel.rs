@@ -55,12 +55,35 @@ impl PanelKind {
         }
     }
 
-    /// 默认 dock 位置，对齐 zed Classic 布局。
+    /// 默认 dock 位置，对齐 zed default.json。
+    ///
+    /// Zed classic 布局:
+    /// - Project / Git / Collab / Outline → Right（右侧 dock）
+    /// - Agent → Left（左侧 dock）
+    /// - Terminal / Debug → Bottom（底部 dock）
     pub fn default_position(self) -> DockPosition {
         match self {
-            PanelKind::Project | PanelKind::Git => DockPosition::Left,
-            PanelKind::Terminal => DockPosition::Bottom,
-            _ => DockPosition::Right,
+            PanelKind::Project | PanelKind::Git | PanelKind::Collab | PanelKind::Outline => {
+                DockPosition::Right
+            }
+            PanelKind::Agent => DockPosition::Left,
+            PanelKind::Terminal | PanelKind::Debug => DockPosition::Bottom,
+        }
+    }
+
+    /// 这个面板能不能放到指定 Dock 位置（对齐 zed `Panel::position_is_valid`）。
+    ///
+    /// Zed 各面板的策略（只列差异的）：
+    /// - Project / Git / Collab / Outline → Left | Right（侧边栏，不能底部）
+    /// - Agent → != Bottom（左右，不能底部）
+    /// - Terminal / Debugger → 全部三个
+    pub fn position_is_valid(self, position: DockPosition) -> bool {
+        match self {
+            PanelKind::Project | PanelKind::Git | PanelKind::Collab | PanelKind::Outline => {
+                matches!(position, DockPosition::Left | DockPosition::Right)
+            }
+            PanelKind::Agent => position != DockPosition::Bottom,
+            PanelKind::Terminal | PanelKind::Debug => true,
         }
     }
 }

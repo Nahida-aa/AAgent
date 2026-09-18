@@ -1,15 +1,42 @@
 //! AAgent LLM 配置系统。
 //!
 //! 加载顺序（后面的覆盖前面的）：
-//!   1. 硬编码默认值
-//!   2. `AA_*` 环境变量
-//!   3. 旧的 `AA_LLM_*` 环境变量（向后兼容）
-//!   4. `aa.json`（当前目录或 `~/.config/aa/`）
+//!   1. RustEmbed 内嵌的 `settings/default.json`（对齐 Zed settings crate 模式）
+//!   2. 硬编码默认值
+//!   3. `AA_*` 环境变量
+//!   4. 旧的 `AA_LLM_*` 环境变量（向后兼容）
+//!   5. `aa.json`（当前目录或 `~/.config/aa/`）
 
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
+use rust_embed::RustEmbed;
 use serde::Deserialize;
+
+// 对齐 Zed crates/settings/src/settings.rs 的 SettingsAssets 模式：
+// settings 归 settings crate 自己 embed，icons/fonts 归 aa-gpui-kit-assets。
+#[derive(RustEmbed)]
+#[folder = "../../assets"]
+#[include = "settings/*"]
+#[exclude = "*.DS_Store"]
+pub struct SettingsAssets;
+
+/// 从内嵌资源读取 default.json，返回 Cow 借用。
+/// 对齐 Zed `default_settings()` —— 应用启动时 settings store 用它做兜底。
+pub fn default_settings() -> Cow<'static, str> {
+    match SettingsAssets::get("settings/default.json")
+        .expect("settings/default.json must be embedded")
+        .data
+    {
+        Cow::Borrowed(bytes) => {
+            Cow::Borrowed(std::str::from_utf8(bytes).expect("embedded default.json is UTF-8"))
+        }
+        Cow::Owned(bytes) => {
+            Cow::Owned(String::from_utf8(bytes).expect("embedded default.json is UTF-8"))
+        }
+    }
+}
 
 /// 完整的 LLM 配置。
 #[derive(Debug, Clone, Deserialize)]

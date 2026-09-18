@@ -6,9 +6,9 @@ version = 4
 name = "aa-app"
 version = "0.1.0"
 dependencies = [
+ "aa-gpui-kit-assets",
  "alacritty_terminal",
  "anyhow",
- "assets",
  "chrono",
  "futures",
  "gpui",
@@ -28,7 +28,6 @@ dependencies = [
 name = "aa-cli"
 version = "0.1.0"
 dependencies = [
- "aa-config",
  "aa-core",
  "aa-extension-mcp",
  "aa-function-tools",
@@ -43,19 +42,11 @@ dependencies = [
  "pulldown-cmark",
  "ratatui",
  "serde_json",
+ "settings",
  "tokio",
  "tracing",
  "tracing-subscriber",
  "uuid",
-]
-
-[[package]]
-name = "aa-config"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "tempfile",
 ]
 
 [[package]]
@@ -139,6 +130,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "aa-gpui-kit-assets"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "gpui",
+ "rust-embed",
+]
+
+[[package]]
 name = "aa-kernel"
 version = "0.1.0"
 dependencies = [
@@ -167,7 +167,6 @@ dependencies = [
 name = "aa-server"
 version = "0.1.0"
 dependencies = [
- "aa-config",
  "aa-core",
  "aa-extension-mcp",
  "aa-extensions",
@@ -184,6 +183,7 @@ dependencies = [
  "nix",
  "serde",
  "serde_json",
+ "settings",
  "tokio",
  "tower-http",
  "tracing",
@@ -540,15 +540,6 @@ dependencies = [
  "wayland-client",
  "wayland-protocols",
  "zbus",
-]
-
-[[package]]
-name = "assets"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "gpui",
- "rust-embed",
 ]
 
 [[package]]
@@ -6637,6 +6628,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "settings"
+version = "0.1.0"
+dependencies = [
+ "rust-embed",
+ "serde",
+ "serde_json",
+ "tempfile",
+]
+
+[[package]]
 name = "sha1"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7768,7 +7769,7 @@ version = "0.1.0"
 name = "ui-gpui"
 version = "0.1.0"
 dependencies = [
- "assets",
+ "aa-gpui-kit-assets",
  "gpui",
  "gpui_macros",
  "serde",

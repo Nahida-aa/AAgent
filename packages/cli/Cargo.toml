@@ -11,7 +11,7 @@ aa-function-tools = { path = "../function-tools" }
 aa-extension-mcp = { path = "../extension-mcp" }
 aa-core = { path = "../core" }
 aa-llm = { path = "../llm" }
-aa-config = { path = "../config" }
+settings = { path = "../settings" }
 aa-session = { path = "../session" }
 aa-server = { path = "../server" }
 axum = { workspace = true, features = ["default"] }

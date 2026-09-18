@@ -12,22 +12,49 @@ Before editing files for a substantial task:
 
 <!-- intent-skills:end -->
 
+- 修改代码后, 如果认为适合提交, 就自行提交
+
+## ⚠️ 主线声明
+
+**GPUI 桌面（packages/app + packages/workspace + packages/ui）是唯一主线。**
+
+以下前端方案是历史遗留或实验性的，**不保证能编译、能运行或与主线兼容**：
+- `packages/cli/` — Ratatui TUI（旧 CLI 入口）
+- `packages/tui/` — OpenTUI + Solid.js TUI（Bun）
+- `packages/webui/` — Solid.js Web 前端（TanStack Router）
+- `packages/ui-solid/` — Kobalte UI 组件库
+- `packages/shared/` — TS 共享 lib
+
+`cargo check --workspace` 只要求主线相关包通过（`kernel`、`core`、`llm`、`extensions`、`extension-sdk`、`extension-mcp`、`function-tools`、`config`、`session`、`server`、`app`、`workspace`、`ui`）。其他包即使编译失败也不阻塞提交。
+
+---
+
 所有代码统一放在 `packages/` 下，不分 Rust/TS：
 
-- `packages/kernel/` 微内核
-- `packages/core/` 核心类型（Extension trait 等）
-- `packages/extensions/` 扩展系统 + WASM 加载器
+**主线包（必须编译通过）：**
+
+- `packages/kernel/` 微内核（ToolRegistry、ToolProvider）
+- `packages/core/` 核心类型（Extension trait、LLM 抽象）
+- `packages/extensions/` 扩展系统 + WASM 加载器（wasmtime Component Model）
 - `packages/extension-sdk/` 扩展公开 API
-- `packages/cli/` 主入口（`aa`=TUI, `aa run`=行模式, `aa tool`, `aa extension`）
-- `packages/tui/` OpenTUI + Solid.js TUI（Bun，参考 opencode 结构）
-- `packages/server/` HTTP/API 服务（axum, `/chat` SSE, `/health`, `/tools`）
-- `packages/app/` Solid.js 前端 + Tauri 桌面（Web API 通信，无 IPC）
-- `packages/function-tools/` LLM function calling 工具集
-- `packages/llm/` LLM Provider 实现（OpenAI 兼容）
-- `packages/ollama/` Ollama 原生 Provider（/api/chat）
+- `packages/extension-mcp/` MCP 客户端适配器（JSON-RPC 2.0 over stdio）
+- `packages/function-tools/` LLM function calling 工具集（fs 工具）
+- `packages/llm/` LLM Provider 实现（OpenAI 兼容 + Ollama 原生）
 - `packages/config/` LLM 配置系统（aa.json + AA_* env）
 - `packages/session/` 共享对话循环（run_turn），事件驱动
-- `packages/extension-*/` 内置扩展
+- `packages/server/` HTTP/API 服务（axum, `/chat` SSE, `/health`, `/tools`）
+- `packages/workspace/` **GPUI Workspace 框架**（状态栏、面板、Dock）
+- `packages/ui/` **GPUI UI 组件层**
+- `packages/app/` **GPUI 桌面前端**（主窗口、标题栏、Agent 面板）
+
+**非主线（仅参考/历史，不保证编译）：**
+
+- `packages/cli/` 旧 CLI 入口（`aa run` 行模式、Ratatui TUI）
+- `packages/tui/` OpenTUI + Solid.js TUI（独立 Bun 进程）
+- `packages/webui/` Solid.js + TanStack Router Web 前端
+- `packages/ui-solid/` Kobalte 共享 UI 组件库
+- `packages/shared/` TS 共享 lib（utils、i18n）
+- `packages/sdk-ts/` 自动生成的 TypeScript SDK（openapi-ts）
 
 **Rust edition**: 2024（`set_var`/`remove_var` 需 `unsafe` 块）
 
@@ -35,28 +62,32 @@ Before editing files for a substantial task:
 
 ## 架构决策
 
-- **Server 层不单独拆 C/S**，内嵌在 `packages/server/` 作为同进程调用边界（参考 opencode CLI→`Server.Default().app.fetch()`）
-- CLI/TUI 直接调 `session::run_turn()`，不走网络
-- `packages/server/` 可选暴露 HTTP/SSE（`aa serve`）给远程客户端（`--attach`）
+- **Server 层不单独拆 C/S**，内嵌在 `packages/server/` 作为同进程调用边界
+- **主线（GPUI 桌面）直接调 `session::run_turn()`**，不走网络、不走 SSE
+- `packages/server/` 可选暴露 HTTP/SSE（`aa serve`）给远程客户端（非主线前端用）
 
-## TUI 架构（OpenTUI + Solid.js）
+## GPUI 桌面架构（主线）
 
-- TUI 是独立 Bun 进程（`packages/tui/`），通过 localhost HTTP/SSE 连 Rust server
-- `aa` 无参数 → 启动 Rust server + 启动 Bun TUI
-- `aa serve` → 只启动 server（headless）
-- `aa attach <url>` → 连接到远程 server
-- **服务器生命周期**：TUI 启动时自动检查 `/health`，未运行则 spawn server，TUI 退出时 kill server
-- **UI 组织参考 opencode**：`routes/`, `component/`, `context/`, `util/`
-- **SSE 协议**：AG-UI JSON over SSE（TEXT_MESSAGE_START/CONTENT/END, TOOL_CALL_START/ARGS/END, RUN_STARTED/FINISHED/ERROR）
-- **`@opentui/*` 必须 0.3.4**（0.4.1 Solid context 不传播），JSX 通过 Babel 插件转换，需要 `bunfig.toml` + `--conditions=browser`（见 CORRECTIONS.md）
+- `packages/app/` — 应用入口：主窗口、标题栏（SSD/CSD 条件渲染）、Agent 面板
+- `packages/workspace/` — Workspace 框架：StatusBar（left/right/hidden items）、DockSide、面板切换
+- `packages/ui/` — 共享 GPUI UI 组件
+- **GPUI 来源**：Zed git rev `f6838a7c`（pin 在根 Cargo.toml `[patch.crates-io]`）
+- **WindowControlArea**：`Drag` + `Close/Minimize/Maximize` 按钮布局（吸收自 aa-player）
+- **服务器调用**：同进程 `session::run_turn()`，不经过 HTTP
 
-## App 架构（Web + Tauri 共用）
+## 非主线架构（仅供参考，不保证工作）
 
-- `packages/app/` 是统一的前端包，同时支持 Web 和 Tauri 桌面
-- 开发：`bun dev`（纯 web）或 `bun run tauri dev`（桌面）
-- 前端通过 HTTP/SSE 与 Rust server 通信，不走 Tauri IPC
-- `src-tauri/` 只做 sidecar 启动和窗口管理，不包含业务逻辑
-- Web API（文件对话框、剪贴板）在 Tauri webview 中正常工作
+### 旧 CLI（Ratatui）
+- `aa run` — 行模式对话
+- `aa` — Ratatui TUI
+
+### OpenTUI + Solid.js TUI
+- 独立 Bun 进程，localhost HTTP/SSE 连 Rust server
+- `@opentui/*` 必须 0.3.4（0.4.1 Solid context 不传播）
+- JSX 通过 Babel 插件转换，需 `bunfig.toml` + `--conditions=browser`
+
+### WebUI（Solid.js + TanStack）
+- 通过 HTTP/SSE 连接 Rust server
 
 ## 已验证
 

@@ -9,7 +9,11 @@
 //! - 单 Workspace（不需要多窗口）
 //! - 单 Sidebar entity（open/close/toggle 由 MultiWorkspace 统一管理）
 
+pub mod sidebar_handle;
 pub mod sidebar_render_state;
+
+pub use sidebar_handle::SidebarTrait;
+pub use sidebar_render_state::SidebarRenderState;
 
 use gpui::{
     App, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, prelude::*, px,
@@ -19,8 +23,6 @@ use ui_gpui::theme::ActiveTheme;
 use crate::Workspace;
 use crate::sidebar::{Sidebar, SidebarStatus};
 use settings_content::SidebarSide;
-
-pub use sidebar_render_state::SidebarRenderState;
 
 /// 顶层 MultiWorkspace entity。
 pub struct MultiWorkspace {

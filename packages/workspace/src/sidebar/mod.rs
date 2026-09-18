@@ -46,6 +46,8 @@ pub struct Sidebar {
     status: SidebarStatus,
     /// 是否显示 archive/history 视图（对齐 zed SidebarView::Archive）。
     show_archive: bool,
+    /// sidebar 宽度（默认 200px，对齐 zed sidebar width）。
+    width: gpui::Pixels,
     /// 弱引用 MultiWorkspace（close_sidebar 需要反向调用 MultiWorkspace 方法）。
     /// 用 WeakEntity 避免循环引用（MultiWorkspace → Sidebar → MultiWorkspace）。
     multi_workspace: Option<WeakEntity<MultiWorkspace>>,
@@ -56,6 +58,7 @@ impl Sidebar {
         Self {
             status: SidebarStatus::default(),
             show_archive: false,
+            width: px(200.),
             multi_workspace: None,
         }
     }
@@ -227,5 +230,30 @@ impl Render for Sidebar {
             .child(placeholder_list)
             // Bottom bar
             .child(self.render_bottom_bar(cx))
+    }
+}
+
+// 对齐 zed: Sidebar entity 实现 workspace::Sidebar trait
+// 将来 Sidebar 独立到 packages/sidebar/ crate 后，MultiWorkspace
+// 会通过 Box<dyn SidebarHandle> 持有（解耦循环依赖）
+impl crate::multi_workspace::sidebar_handle::SidebarTrait for Sidebar {
+    fn width(&self, _cx: &App) -> gpui::Pixels {
+        self.width
+    }
+
+    fn set_width(&mut self, width: Option<gpui::Pixels>, _cx: &mut Context<Self>) {
+        if let Some(w) = width {
+            self.width = w.max(px(120.)); // 最小 120px
+        } else {
+            self.width = px(200.); // reset 默认
+        }
+    }
+
+    fn has_notifications(&self, _cx: &App) -> bool {
+        false // AAgent 暂时没有未读通知机制
+    }
+
+    fn side(&self, _cx: &App) -> SidebarSide {
+        self.status.side
     }
 }

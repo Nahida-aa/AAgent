@@ -209,6 +209,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "aagent-actions"
+version = "0.1.0"
+dependencies = [
+ "gpui",
+ "schemars",
+ "serde",
+]
+
+[[package]]
 name = "accesskit"
 version = "0.24.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3071,6 +3080,8 @@ dependencies = [
  "waker-fn",
  "web-time",
  "windows 0.62.2",
+ "zed-font-kit",
+ "zed-scap",
 ]
 
 [[package]]

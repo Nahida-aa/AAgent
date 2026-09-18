@@ -1,0 +1,10 @@
+[package]
+name = "aagent-actions"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+gpui = "0.2.2"
+serde = { version = "1", features = ["derive"] }
+schemars = "1.0"

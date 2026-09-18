@@ -127,51 +127,11 @@ impl<A: Action, F: Fn(&mut Workspace, &A, &mut Window, &mut Context<Workspace>) 
 
 impl Workspace {
     pub fn new(cx: &mut Context<Self>) -> Self {
-        use std::sync::Arc;
-
         // 1. 创建 3 个 Dock（对齐 zed workspace.rs:L1970-L1972）
-        let mut left_dock = Dock::new(DockPosition::Left);
-        let mut bottom_dock = Dock::new(DockPosition::Bottom);
-        let mut right_dock = Dock::new(DockPosition::Right);
-
-        // 2. 创建 7 个 Panel Entity（每个是独立的 GPUI entity），
-        //    按各自默认位置注册到对应 Dock。
-        //
-        // Zed default.json 布局:
-        // - Project/Git/Collab/Outline → Right
-        // - Agent → Left
-        // - Terminal/Debug → Bottom
-        let mut add_panel_to_dock = |dock: &mut Dock, panel: Arc<dyn PanelHandle>| {
-            dock.add_panel(panel);
-        };
-
-        // Left Dock — Agent
-        let agent = Arc::new(cx.new(|_| AgentPanel)) as Arc<dyn PanelHandle>;
-        add_panel_to_dock(&mut left_dock, agent);
-
-        // Right Dock — Project, Git, Collab, Outline
-        let project = Arc::new(cx.new(|_| ProjectPanel)) as Arc<dyn PanelHandle>;
-        add_panel_to_dock(&mut right_dock, project);
-
-        let git = Arc::new(cx.new(|_| GitPanel)) as Arc<dyn PanelHandle>;
-        add_panel_to_dock(&mut right_dock, git);
-
-        let collab = Arc::new(cx.new(|_| CollabPanel)) as Arc<dyn PanelHandle>;
-        add_panel_to_dock(&mut right_dock, collab);
-
-        let outline = Arc::new(cx.new(|_| OutlinePanel)) as Arc<dyn PanelHandle>;
-        add_panel_to_dock(&mut right_dock, outline);
-
-        // Bottom Dock — TerminalPanel 在 aa-terminal-view crate，
-        // 由 App 层创建并注入（避免 workspace→terminal-view 循环依赖）。
-        // 这里先放 DebugPanel 占位，TerminalPanel 由 App 层后续 add_panel 进来。
-        let debug = Arc::new(cx.new(|_| DebugPanel)) as Arc<dyn PanelHandle>;
-        add_panel_to_dock(&mut bottom_dock, debug);
-
-        // 3. Dock 默认全关（对齐 Zed Dock::new 硬编码 is_open: false）。
-        // Zed 没有 default.json 里的 open 字段 — 首次启动全关，
-        // 但 Panel trait 有 starts_open() 方法（Project 面板默认为 true）。
-        // 现阶段简化为全关 — 后续加 Panel trait 时支持 starts_open。
+        // Zed: Dock::new() 都是空的 — 面板统一在 initialize_panels 里注入
+        let left_dock = Dock::new(DockPosition::Left);
+        let bottom_dock = Dock::new(DockPosition::Bottom);
+        let right_dock = Dock::new(DockPosition::Right);
 
         let left_dock = cx.new(|_| left_dock);
         let bottom_dock = cx.new(|_| bottom_dock);

@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 
+use crate::initialize::panels::initialize_panels;
 use crate::title_bar::TitleBar;
 use aa_sidebar::Sidebar;
-use aa_terminal_view::TerminalPanel;
-use gpui::{Context, Decorations, Entity, ParentElement, Render, Styled, prelude::*};
+use gpui::{Context, Decorations, Entity, ParentElement, Render, Styled, Window, prelude::*};
 use ui_gpui::theme::ActiveTheme;
 use workspace::{MultiWorkspace, Workspace};
 
@@ -16,10 +16,10 @@ use workspace::{MultiWorkspace, Workspace};
 /// └── MultiWorkspace
 ///     ├── [Sidebar?] ← Agent Threads 列表（独立于 Dock）
 ///     └── Workspace
-///         ├── Left Dock (Project, Git)
-///         ├── Center Pane (placeholder，后续接 AgentPanel)
-///         ├── Right Dock (Collab, Outline, Debug, Agent)
-///         ├── Bottom Dock (Terminal)
+///         ├── Left Dock (Agent)
+///         ├── Center Pane (placeholder)
+///         ├── Right Dock (Project, Git, Collab, Outline)
+///         ├── Bottom Dock (Terminal, Debug)
 ///         └── StatusBar (PanelButtons + 普通项 + Sidebar toggle)
 ///     └── [Sidebar?]
 /// ```
@@ -29,7 +29,7 @@ pub struct AppShell {
 }
 
 impl AppShell {
-    pub fn new(cx: &mut Context<Self>) -> Self {
+    pub fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
         let _working_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
         let title_bar = cx.new(|cx| TitleBar::new("AAgent", cx));
         let workspace = cx.new(|cx| Workspace::new(cx));
@@ -56,12 +56,10 @@ impl AppShell {
             cx.notify();
         });
 
-        // 5. 创建 TerminalPanel entity 注入 Workspace 的 bottom Dock
-        // 对齐 Zed App 层 TerminalPanel::load() 注入 Workspace
-        let terminal_panel = cx.new(|cx| TerminalPanel::new(cx));
-        workspace.update(cx, |w, cx| {
-            w.add_panel::<TerminalPanel>(terminal_panel, cx);
-            cx.notify();
+        // 5. 统一初始化所有 Dock Panel（对齐 Zed initialize_panels）
+        // Workspace::new() 只创建空 Dock，面板统一在这里注入
+        workspace.update(cx, |_workspace, cx| {
+            let _ = initialize_panels(window, cx);
         });
 
         Self {

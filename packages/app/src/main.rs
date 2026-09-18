@@ -40,7 +40,7 @@ fn main() {
                     }),
                     ..Default::default()
                 },
-                |_, cx| cx.new(AppShell::new),
+                |window, cx| cx.new(|cx| AppShell::new(window, cx)),
             )
             .unwrap();
             cx.activate(true);

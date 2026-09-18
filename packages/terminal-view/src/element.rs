@@ -1,12 +1,11 @@
 use std::sync::Arc;
 
+use aa_terminal::alacritty::{AlacrittyBackend, DisplayCell, TerminalBounds};
 use alacritty_terminal::vte::ansi::Color;
 use gpui::{
     App, Bounds, Element, ElementId, GlobalElementId, InspectorElementId, IntoElement, LayoutId,
     Pixels, Rgba, SharedString, Style, TextAlign, TextRun, Window, fill, point, px, size,
 };
-
-use crate::alacritty::{AlacrittyBackend, TerminalBounds};
 
 const DEFAULT_BG: Rgba = Rgba {
     r: 0.051,
@@ -41,7 +40,7 @@ impl TerminalElement {
     fn paint_cursor(
         &self,
         bounds: Bounds<Pixels>,
-        cells: &[crate::alacritty::DisplayCell],
+        cells: &[DisplayCell],
         rows: usize,
         cols: usize,
         window: &mut Window,
@@ -57,11 +56,11 @@ impl TerminalElement {
             return;
         }
         let origin = bounds.origin;
-        let cell_width = self.bounds.cell_width;
-        let line_height = self.bounds.line_height;
-        let font_size = self.bounds.font_size;
-        let x0 = px(col as f32 * f32::from(cell_width));
-        let y0 = px(row as f32 * f32::from(line_height));
+        let cell_width = px(self.bounds.cell_width);
+        let line_height = px(self.bounds.line_height);
+        let font_size = px(self.bounds.font_size);
+        let x0 = px(col as f32 * self.bounds.cell_width);
+        let y0 = px(row as f32 * self.bounds.line_height);
 
         let cursor_color = CURSOR_COLOR;
         match cursor.shape {
@@ -172,13 +171,13 @@ impl Element for TerminalElement {
         let font = window.text_style().font();
         let font_id = text_system.resolve_font(&font);
         let cell_width = text_system
-            .advance(font_id, px(f32::from(self.bounds.font_size)), 'm')
-            .map(|size| size.width)
+            .advance(font_id, px(self.bounds.font_size), 'm')
+            .map(|size| f32::from(size.width))
             .unwrap_or(self.bounds.cell_width);
-        let line_height = px(f32::from(self.bounds.font_size) * 1.35);
+        let line_height = self.bounds.font_size * 1.35;
 
-        let width = bounds.size.width;
-        let height = bounds.size.height;
+        let width = f32::from(bounds.size.width);
+        let height = f32::from(bounds.size.height);
         let _ = cx;
 
         let new_bounds = TerminalBounds {
@@ -216,19 +215,19 @@ impl Element for TerminalElement {
         window.paint_quad(fill(bounds, DEFAULT_BG));
 
         let origin = bounds.origin;
-        let cell_width = self.bounds.cell_width;
-        let line_height = self.bounds.line_height;
-        let font_size = self.bounds.font_size;
+        let cell_width = px(self.bounds.cell_width);
+        let line_height = px(self.bounds.line_height);
+        let font_size = px(self.bounds.font_size);
 
         for row in 0..rows {
-            let row_y = px(row as f32 * f32::from(line_height));
+            let row_y = px(row as f32 * self.bounds.line_height);
             let base = row * cols;
 
             // Per-cell backgrounds where they differ from the default.
             for col in 0..cols {
                 let cell = &cells[base + col];
                 if !is_default_color(cell.bg) {
-                    let x = px(col as f32 * f32::from(cell_width));
+                    let x = px(col as f32 * self.bounds.cell_width);
                     let cell_bounds =
                         Bounds::new(origin + point(x, row_y), size(cell_width, line_height));
                     window.paint_quad(fill(cell_bounds, color_parts(cell.bg)));

@@ -1,12 +1,12 @@
 use std::path::PathBuf;
 
+use aa_terminal::alacritty::{AlacrittyBackend, TerminalBounds};
 use gpui::{
     App, Context, EventEmitter, FocusHandle, Focusable, IntoElement, KeyDownEvent, Render, Window,
-    div, prelude::*, px,
+    div, prelude::*,
 };
 use tracing::debug;
 
-use crate::alacritty::{AlacrittyBackend, TerminalBounds};
 use crate::element::TerminalElement;
 
 /// A terminal session view: owns the pty-backed backend and forwards keyboard
@@ -23,11 +23,11 @@ impl TerminalView {
         // Placeholder bounds; the element re-measures the real cell metrics on
         // first layout and replaces these via `set_bounds`.
         let bounds = TerminalBounds {
-            cell_width: px(10.0),
-            line_height: px(16.0),
-            width: px(800.0),
-            height: px(600.0),
-            font_size: px(15.0),
+            cell_width: 10.0,
+            line_height: 16.0,
+            width: 800.0,
+            height: 600.0,
+            font_size: 15.0,
         };
         let backend = match AlacrittyBackend::new(bounds, shell, working_dir) {
             Ok(b) => std::sync::Arc::new(b),
@@ -51,7 +51,6 @@ impl TerminalView {
         let mut bytes: Vec<u8> = Vec::new();
         let k = &event.keystroke;
 
-        // Handle modifying keys with to_string conventions.
         let key_str = k.key.as_str();
         let is_alt = k.modifiers.alt;
 
@@ -73,15 +72,12 @@ impl TerminalView {
             "shift" | "ctrl" | "alt" | "super" => {}
             _ => {
                 if let Some(c) = k.key.chars().next() {
-                    // Prefer an explicit `key_char` if the platform produced one.
                     let printable = k
                         .key_char
                         .as_deref()
                         .and_then(|s| s.chars().next())
                         .unwrap_or(c);
 
-                    // If a plain modifier is held (ctrl/alt) on a printable char,
-                    // send the control-ish escape instead of the text.
                     let with_ctrl = k.modifiers.control;
                     let is_letter = printable.is_ascii_alphabetic();
                     if with_ctrl && is_letter {
@@ -138,23 +134,24 @@ pub fn initial_bounds(window: &Window) -> TerminalBounds {
     let rem = window.rem_size();
     let text_style = window.text_style();
     let font_size = text_style.font_size.to_pixels(rem);
+    let font_size_f = f32::from(font_size);
 
     let text_system = window.text_system();
     let font_id = text_system.resolve_font(&text_style.font());
     let cell_width = text_system
         .advance(font_id, font_size, 'm')
-        .map(|adv| adv.width)
-        .unwrap_or(px(f32::from(font_size) * 0.66));
+        .map(|adv| f32::from(adv.width))
+        .unwrap_or(font_size_f * 0.66);
 
-    // Default terminal line-height multiplier; matches zed’s base value.
+    // Default terminal line-height multiplier; matches zed's base value.
     const LINE_HEIGHT_MULTIPLIER: f32 = 1.35;
-    let line_height = px(f32::from(font_size) * LINE_HEIGHT_MULTIPLIER);
+    let line_height = font_size_f * LINE_HEIGHT_MULTIPLIER;
 
     TerminalBounds {
         cell_width,
         line_height,
-        width: rem,
-        height: rem,
-        font_size,
+        width: f32::from(rem),
+        height: f32::from(rem),
+        font_size: font_size_f,
     }
 }

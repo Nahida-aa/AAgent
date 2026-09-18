@@ -12,29 +12,31 @@ use alacritty_terminal::term::Term;
 use alacritty_terminal::term::cell::{Cell, Flags};
 use alacritty_terminal::tty::{self, Options, Shell};
 use alacritty_terminal::vte::ansi::{Color, CursorShape};
-use gpui::{Pixels, px};
 use parking_lot::Mutex;
 
 /// Dimensions handed to the alacritty emulator; drives rows/cols of the grid.
+///
+/// All values are raw pixel floats — no GPUI dependency here so this backend
+/// can be used from any renderer.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct TerminalBounds {
-    pub cell_width: Pixels,
-    pub line_height: Pixels,
-    pub width: Pixels,
-    pub height: Pixels,
-    pub font_size: Pixels,
+    pub cell_width: f32,
+    pub line_height: f32,
+    pub width: f32,
+    pub height: f32,
+    pub font_size: f32,
 }
 
 impl TerminalBounds {
     pub fn num_lines(&self) -> usize {
-        if self.line_height <= px(0.0) {
+        if self.line_height <= 0.0 {
             return 1;
         }
         (self.height / self.line_height).floor() as usize
     }
 
     pub fn num_columns(&self) -> usize {
-        if self.cell_width <= px(0.0) {
+        if self.cell_width <= 0.0 {
             return 1;
         }
         (self.width / self.cell_width).floor() as usize
@@ -44,8 +46,8 @@ impl TerminalBounds {
         WindowSize {
             num_lines: self.num_lines() as u16,
             num_cols: self.num_columns() as u16,
-            cell_width: f32::from(self.cell_width) as u16,
-            cell_height: f32::from(self.line_height) as u16,
+            cell_width: self.cell_width as u16,
+            cell_height: self.line_height as u16,
         }
     }
 }
@@ -96,9 +98,9 @@ pub struct AlacrittyBackend {
 
 /// Cached display metrics so `set_bounds(&self)` can mutate without `&mut`.
 struct TerminalMetrics {
-    cell_width: Pixels,
-    line_height: Pixels,
-    font_size: Pixels,
+    cell_width: f32,
+    line_height: f32,
+    font_size: f32,
 }
 
 impl AlacrittyBackend {
@@ -164,8 +166,8 @@ impl AlacrittyBackend {
         TerminalBounds {
             cell_width: m.cell_width,
             line_height: m.line_height,
-            width: px(term.grid().columns() as f32 * f32::from(m.cell_width)),
-            height: px(term.grid().screen_lines() as f32 * f32::from(m.line_height)),
+            width: term.grid().columns() as f32 * m.cell_width,
+            height: term.grid().screen_lines() as f32 * m.line_height,
             font_size: m.font_size,
         }
     }
@@ -248,19 +250,19 @@ fn cell_to_display(cell: &Cell) -> DisplayCell {
         flags: cell.flags,
     }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use gpui::px;
     use std::time::Duration;
 
     fn test_bounds() -> TerminalBounds {
         TerminalBounds {
-            cell_width: px(10.0),
-            line_height: px(16.0),
-            width: px(800.0),
-            height: px(600.0),
-            font_size: px(15.0),
+            cell_width: 10.0,
+            line_height: 16.0,
+            width: 800.0,
+            height: 600.0,
+            font_size: 15.0,
         }
     }
 
@@ -289,7 +291,6 @@ mod tests {
         eprintln!("terminal rows={rows} cols={cols} text={text:?}");
 
         let contains_smoke = text.contains("aaBot-smoke");
-        // On some shells the echo-back differs; accept prompt presence too.
         assert!(
             contains_smoke,
             "expected echo output in grid, got: {text:?}"

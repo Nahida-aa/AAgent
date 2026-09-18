@@ -225,15 +225,18 @@ version = "0.1.0"
 dependencies = [
  "alacritty_terminal",
  "anyhow",
- "async-channel",
- "futures",
+ "parking_lot",
+]
+
+[[package]]
+name = "aa-terminal-view"
+version = "0.1.0"
+dependencies = [
+ "aa-terminal",
+ "alacritty_terminal",
  "gpui",
  "gpui_util",
- "libc",
- "parking_lot",
- "settings-content",
  "tracing",
- "tracing-subscriber",
  "ui-gpui",
  "workspace",
 ]

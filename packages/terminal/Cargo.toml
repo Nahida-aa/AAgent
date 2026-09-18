@@ -4,18 +4,7 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
-gpui.workspace = true
-gpui_util.workspace = true
-ui-gpui.workspace = true
-workspace.workspace = true
-settings-content.workspace = true
-
-# 终端核心 — 对齐 zed crates/terminal
+# 纯 backend 层 — 零 GPUI 依赖
 alacritty_terminal.workspace = true
 parking_lot.workspace = true
-tracing = { workspace = true }
-tracing-subscriber = { workspace = true }
-futures = { workspace = true }
-libc = "0.2"
-async-channel = "2"
-anyhow = { workspace = true }
+anyhow.workspace = true

@@ -1,0 +1,13 @@
+[package]
+name = "aa-terminal-view"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+aa-terminal.workspace = true
+alacritty_terminal.workspace = true
+gpui.workspace = true
+gpui_util.workspace = true
+ui-gpui.workspace = true
+workspace.workspace = true
+tracing.workspace = true

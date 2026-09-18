@@ -12,7 +12,7 @@ members = [
     "packages/server",
     "packages/settings",
     "packages/session",
-    "packages/app", "packages/ui", "packages/workspace", "packages/settings-content", "packages/sidebar", "packages/aagent-actions", "packages/terminal",
+    "packages/app", "packages/ui", "packages/workspace", "packages/settings-content", "packages/sidebar", "packages/aagent-actions", "packages/terminal", "packages/terminal-view",
 ]
 
 [workspace.package]
@@ -68,6 +68,7 @@ aa-session = { path = "packages/session" }
 aa-server = { path = "packages/server" }
 aa-sidebar = { path = "packages/sidebar" }
 aa-terminal = { path = "packages/terminal" }
+aa-terminal-view = { path = "packages/terminal-view" }
 settings = { path = "packages/settings" }
 settings-content = { path = "packages/settings-content" }
 workspace = { path = "packages/workspace" }

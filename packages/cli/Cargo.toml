@@ -12,6 +12,7 @@ aa-extension-mcp = { path = "../extension-mcp" }
 aa-core = { path = "../core" }
 aa-llm = { path = "../llm" }
 settings = { path = "../settings" }
+settings-content = { path = "../settings-content" }
 aa-session = { path = "../session" }
 aa-server = { path = "../server" }
 axum = { workspace = true, features = ["default"] }

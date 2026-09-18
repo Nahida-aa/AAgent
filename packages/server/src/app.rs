@@ -8,7 +8,7 @@ use crate::{AppState, Registry};
 
 fn build_app(
     registry: Registry,
-    resolved: settings::ResolvedConfig,
+    resolved: settings_content::ResolvedConfig,
     mcp_count: usize,
     terminal: super::terminal::TerminalManager,
 ) -> Router {
@@ -41,7 +41,7 @@ fn build_app(
 }
 
 /// Build the kernel with built-in tool providers and optional MCP extensions.
-fn build_kernel(config: &settings::Config) -> aa_kernel::Kernel {
+fn build_kernel(config: &settings_content::Config) -> aa_kernel::Kernel {
     let mut builder = aa_kernel::Kernel::builder()
         .with_tool_provider(std::sync::Arc::new(aa_function_tools::FsToolProvider));
 
@@ -65,7 +65,7 @@ pub async fn build(
     cli_model: Option<&str>,
     cli_base_url: Option<&str>,
 ) -> anyhow::Result<(u16, tokio::net::TcpListener, Router)> {
-    let config = settings::Config::load();
+    let config = settings_content::Config::load();
     let mcp_count = config
         .mcp_servers_json()
         .and_then(|j| j.as_array().map(|a| a.len()))

@@ -37,7 +37,7 @@ pub async fn cmd_run(
         return;
     }
 
-    let cfg = settings::Config::load();
+    let cfg = settings_content::Config::load();
     let resolved = cfg.resolve(
         args.provider.as_deref(),
         args.model.as_deref(),

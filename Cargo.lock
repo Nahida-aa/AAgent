@@ -44,6 +44,7 @@ dependencies = [
  "ratatui",
  "serde_json",
  "settings",
+ "settings-content",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -185,6 +186,7 @@ dependencies = [
  "serde",
  "serde_json",
  "settings",
+ "settings-content",
  "tokio",
  "tower-http",
  "tracing",
@@ -6646,6 +6648,15 @@ dependencies = [
  "gpui",
  "json5",
  "rust-embed",
+ "serde",
+ "serde_json",
+ "tempfile",
+]
+
+[[package]]
+name = "settings-content"
+version = "0.1.0"
+dependencies = [
  "serde",
  "serde_json",
  "tempfile",

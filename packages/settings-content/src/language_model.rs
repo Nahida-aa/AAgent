@@ -1,7 +1,8 @@
-//! LLM 配置（对齐 Zed `settings/agent.json` + `language_models` 结构）。
+//! LLM 设置内容（对齐 Zed `crates/settings_content/src/language_model.rs`）。
 //!
-//! 旧版 aa.json 格式的 Config 保留向后兼容 — CLI 入口直接读 aa.json，
-//! GUI 通过 SettingsStore 读 default.json + 用户覆盖。
+//! 当前是 aa.json 旧格式的 Config 兼容层 — CLI 入口直接读 aa.json。
+//! 后续将迁移到 Zed `AllLanguageModelSettingsContent` 结构
+//! （`language_models.anthropic.api_url` / `language_models.ollama.api_key` 等）。
 
 use serde::Deserialize;
 use std::collections::HashMap;

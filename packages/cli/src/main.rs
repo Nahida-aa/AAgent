@@ -122,7 +122,7 @@ fn main() {
         Some(Command::Run(ref run_args)) => {
             let rt = tokio::runtime::Runtime::new().expect("tokio rt");
             rt.block_on(async {
-                let cfg = settings::Config::load();
+                let cfg = settings_content::Config::load();
                 let kernel = build_kernel(&cfg);
                 let registry = build_registry(&kernel, working_dir);
                 run::cmd_run(run_args, &kernel, &registry).await;
@@ -202,7 +202,7 @@ fn spawn_tui(attach_url: Option<&str>, _working_dir: &str) -> Option<i32> {
 }
 
 async fn cmd_tool(args: &ToolArgs) {
-    let cfg = settings::Config::load();
+    let cfg = settings_content::Config::load();
     let kernel = build_kernel(&cfg);
     let registry = build_registry(&kernel, ".");
 
@@ -231,7 +231,7 @@ async fn cmd_tool(args: &ToolArgs) {
     }
 }
 
-pub(crate) fn build_kernel(config: &settings::Config) -> aa_kernel::Kernel {
+pub(crate) fn build_kernel(config: &settings_content::Config) -> aa_kernel::Kernel {
     let mut builder = aa_kernel::Kernel::builder()
         .with_tool_provider(Arc::new(aa_function_tools::FsToolProvider));
 

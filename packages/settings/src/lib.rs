@@ -1,20 +1,17 @@
 //! AAgent 设置系统（对齐 Zed `crates/settings`，极简版）。
 //!
-//! 两层加载模型：
-//!   1. RustEmbed 内嵌的 `settings/default.json`（兜底）
-//!   2. 用户 `~/.config/aa/settings.json`（覆盖 —— 后续接入）
+//! 基础设施层 — 负责 RustEmbed + SettingsStore Global。
+//! Setting struct 在 `settings-content` crate（language_model / agent / editor ...）。
 //!
-//! 模块：
-//! - `settings_store` — SettingsStore struct（gpui Global，持有 JSON Value 树）
-//! - `llm` — LLM 配置（Config/ProviderConfig/McpConfig，aa.json 旧格式兼容）
+//! 加载模型：
+//!   1. RustEmbed 内嵌的 `settings/default.json`（兜底）
+//!   2. `~/.config/aa/settings.json`（用户覆盖）
 
-pub mod llm;
 pub mod settings_store;
 
-use std::borrow::Cow;
-
-pub use llm::{Config, McpConfig, McpServerDef, ProviderConfig, ResolvedConfig};
 pub use settings_store::SettingsStore;
+
+use std::borrow::Cow;
 
 use rust_embed::RustEmbed;
 

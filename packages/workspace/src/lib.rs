@@ -76,6 +76,17 @@ impl Workspace {
             }
         }
 
+        // 3. 默认打开有面板的 Dock（Zed: Project Panel 在右默认打开；Agent 在左默认打开；Bottom 默认关）
+        if !right_dock.panel_entries().is_empty() {
+            right_dock.set_open(true);
+            right_dock.activate_panel(0); // Project 是第一个
+        }
+        if !left_dock.panel_entries().is_empty() {
+            left_dock.set_open(true);
+            left_dock.activate_panel(0); // Agent 是第一个
+        }
+        // Bottom 默认关闭（Terminal 不自动弹出）
+
         let left_dock = cx.new(|cx| left_dock);
         let bottom_dock = cx.new(|cx| bottom_dock);
         let right_dock = cx.new(|cx| right_dock);
@@ -138,6 +149,9 @@ impl Workspace {
             bar
         });
 
+        // 订阅 status_bar — Sidebar toggle 改变 sidebar.open 时需要重渲染
+        cx.observe(&status_bar, |_, _, cx| cx.notify()).detach();
+
         Self {
             left_dock,
             bottom_dock,
@@ -160,6 +174,31 @@ impl Render for Workspace {
         let right_open = self.right_dock.read(cx).is_open();
         let bottom_open = self.bottom_dock.read(cx).is_open();
 
+        // 读取 sidebar 状态（StatusBar 里的 SidebarStatus）
+        let sidebar = self.status_bar.read(cx).sidebar();
+        let sidebar_left = sidebar.open && sidebar.side == DockPosition::Left;
+        let sidebar_right = sidebar.open && sidebar.side == DockPosition::Right;
+
+        // Sidebar 占位内容（后续换成文件树）
+        let sidebar_content = |pos: DockPosition| {
+            div()
+                .w(px(220.0))
+                .h_full()
+                .flex()
+                .items_center()
+                .justify_center()
+                .bg(colors.panel_background)
+                .border_color(colors.border)
+                .text_size(px(13.0))
+                .text_color(hsla(0.0, 0.0, 0.5, 1.0))
+                .map(|el| match pos {
+                    DockPosition::Left => el.border_r_1(),
+                    DockPosition::Right => el.border_l_1(),
+                    _ => el,
+                })
+                .child(format!("Sidebar ({:?})", pos))
+        };
+
         div()
             .flex()
             .flex_col()
@@ -175,7 +214,7 @@ impl Render for Workspace {
                     .size_full()
                     .bg(colors.background)
                     .overflow_hidden()
-                    // 上半部分：flex_row（左 dock | 中心 | 右 dock）
+                    // 上半部分：flex_row（sidebar-left | left dock | center | right dock | sidebar-right）
                     .child(
                         div()
                             .flex_1()
@@ -183,6 +222,10 @@ impl Render for Workspace {
                             .flex_row()
                             .size_full()
                             .overflow_hidden()
+                            // Sidebar（左侧，在 Left Dock 左边）
+                            .when(sidebar_left, |el| {
+                                el.child(sidebar_content(DockPosition::Left))
+                            })
                             // Left Dock（打开时才占空间）
                             .when(left_open, |el| {
                                 el.child(div().w(px(280.0)).h_full().child(self.left_dock.clone()))
@@ -201,6 +244,10 @@ impl Render for Workspace {
                             // Right Dock（打开时才占空间）
                             .when(right_open, |el| {
                                 el.child(div().w(px(280.0)).h_full().child(self.right_dock.clone()))
+                            })
+                            // Sidebar（右侧，在 Right Dock 右边）
+                            .when(sidebar_right, |el| {
+                                el.child(sidebar_content(DockPosition::Right))
                             }),
                     )
                     // Bottom Dock（打开时才占空间，叠在底部）

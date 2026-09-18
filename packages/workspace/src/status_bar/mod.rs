@@ -113,6 +113,11 @@ impl StatusBar {
         self.hidden_items.insert(item_type);
     }
 
+    /// 读取当前 sidebar 状态（Workspace Render 需要）。
+    pub fn sidebar(&self) -> SidebarStatus {
+        self.sidebar
+    }
+
     /// 切换 workspace 侧栏的展开/折叠（对齐 zed `ToggleWorkspaceSidebar`）。
     /// 单 sidebar 模型：如果当前 sidebar 就在这侧则切换 open，
     /// 否则把 sidebar 移到这侧并展开。

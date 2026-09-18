@@ -4,7 +4,7 @@
 //! ItemSettings + PreviewTabsSettings + TabContentParams 等。
 //!
 //! AAgent 拆分成子模块：
-//! - [handle] — ItemHandle trait（dyn object）+ Item trait（强类型）
+//! - [handle] — ItemHandle（强引用）+ WeakItemHandle（弱引用）+ Item（强类型）
 //! - [settings] — ItemSettings / PreviewTabsSettings / ClosePosition 等
 //! - [tab] — TabContentParams / TabTooltipContent / ItemBufferKind
 
@@ -12,7 +12,7 @@ pub mod handle;
 pub mod settings;
 pub mod tab;
 
-pub use handle::{Item, ItemHandle};
+pub use handle::{Item, ItemHandle, WeakItemHandle};
 pub use settings::{
     ActivateOnClose, ClosePosition, ItemSettings, PreviewTabsSettings, ShowCloseButton,
     ShowDiagnostics,

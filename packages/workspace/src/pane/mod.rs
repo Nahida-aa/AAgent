@@ -1,16 +1,22 @@
 //! Pane — Tab 容器，持有多个 Item + 一个激活项。
 //!
 //! 对齐 zed `crates/workspace/src/pane.rs` 的核心子集。
+//!
+//! 子模块：
+//! - [activate_item] — ActivateItem action（带字段的 action 单独放）
 
 use gpui::{
-    App, Context, Entity, EventEmitter, FocusHandle, Focusable, InteractiveElement, IntoElement,
-    ParentElement, Render, StatefulInteractiveElement, Styled, Window, actions, div, prelude::*,
-    px,
+    App, Context, Entity, EventEmitter, FocusHandle, Focusable, IntoElement, Render, Window,
+    actions, div, prelude::*, px,
 };
 use ui_gpui::IconName;
 use ui_gpui::theme::ActiveTheme;
 
 use crate::item::{Item, ItemHandle};
+
+pub mod activate_item;
+
+pub use activate_item::ActivateItem;
 
 /// Pane 内部事件。
 #[derive(Debug, Clone)]
@@ -28,12 +34,6 @@ actions!(
         ClosePane
     ]
 );
-
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, serde::Deserialize, schemars::JsonSchema, gpui::Action,
-)]
-#[action(namespace = pane)]
-pub struct ActivateItem(pub usize);
 
 /// Tab 容器 — 装多个 Item，顶部 tab bar 切换。
 pub struct Pane {

@@ -200,25 +200,12 @@ impl Render for Dock {
         let colors = cx.theme().colors();
         let position = self.position;
 
-        // 显示 active panel 的 persistent_name（后续换成真实 Panel entity 渲染）
-        let active_name = self
+        // 渲染 active panel 的 entity（对齐 zed dock.rs:1360）
+        let content = self
             .active_panel_index
             .and_then(|i| self.panels.get(i))
-            .map(|p| p.persistent_name());
-
-        let content = div()
-            .flex_1()
-            .flex()
-            .items_center()
-            .justify_center()
-            .w_full()
-            .h_full()
-            .text_size(px(16.0))
-            .text_color(hsla(0.0, 0.0, 0.5, 1.0))
-            .child(format!(
-                "{} (placeholder)",
-                active_name.unwrap_or("unnamed")
-            ));
+            .map(|p| p.to_any().into_any_element())
+            .unwrap_or_else(|| div().into_any_element());
 
         // Resize handle — 对齐 zed dock.rs `create_resize_handle()`
         let resize_handle = {

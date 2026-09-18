@@ -53,8 +53,10 @@ pub trait PanelHandle: Send + Sync {
     fn supports_flexible_size(&self, cx: &App) -> bool;
     fn icon(&self, cx: &App) -> IconName;
     fn icon_tooltip(&self, cx: &App) -> &'static str;
-    /// 用于 downcast 回 Entity<T>（Zed 用 AnyView::downcast）。
-    fn as_any(&self) -> &dyn Any;
+    /// 转为 AnyView 让 Dock::render 能渲染。对齐 zed `PanelHandle::to_any()`。
+    fn to_any(&self) -> gpui::AnyView;
+    /// 用于 downcast 回 Entity<T>（Dock::panel() 方法）。
+    fn as_any(&self) -> &dyn std::any::Any;
 }
 
 impl<T: Panel> PanelHandle for Entity<T> {
@@ -86,8 +88,11 @@ impl<T: Panel> PanelHandle for Entity<T> {
     fn icon_tooltip(&self, cx: &App) -> &'static str {
         self.read(cx).icon_tooltip(cx)
     }
-    fn as_any(&self) -> &dyn Any {
-        self as &dyn Any
+    fn to_any(&self) -> gpui::AnyView {
+        self.clone().into()
+    }
+    fn as_any(&self) -> &dyn std::any::Any {
+        self as &dyn std::any::Any
     }
 }
 

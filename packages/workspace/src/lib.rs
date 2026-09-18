@@ -99,6 +99,9 @@ pub struct Workspace {
     /// Zed 用 `Vec<Box<dyn Fn(Div, ...) -> Div>>` 在 render 顶层 div 上应用。
     /// 我们简化为 `Vec<Box<dyn ActionCallback>>`，render 时 chain on_action。
     workspace_actions: Vec<Box<dyn ActionCallback>>,
+    /// 可选的窗口装饰（TitleBar）— 由外部 crate（title-bar）创建后注入。
+    /// 对齐 zed `workspace.rs:1598 titlebar_item: Option<AnyView>`。
+    titlebar_item: Option<gpui::AnyView>,
 }
 
 /// 类型擦除的 action callback — 包装 `impl Fn(&mut Self, &A, ...)`。
@@ -210,11 +213,23 @@ impl Workspace {
             status_bar,
             bounds: Bounds::default(),
             workspace_actions: Vec::new(),
+            titlebar_item: None,
         }
     }
 
     pub fn status_bar(&self) -> &Entity<StatusBar> {
         &self.status_bar
+    }
+
+    /// 注入窗口装饰（TitleBar）— 由外部 app 层在 observe_new 里调。
+    /// 对齐 zed `Workspace::set_titlebar_item`。
+    pub fn set_titlebar_item(&mut self, item: gpui::AnyView, cx: &mut Context<Self>) {
+        self.titlebar_item = Some(item);
+        cx.notify();
+    }
+
+    pub fn titlebar_item(&self) -> Option<gpui::AnyView> {
+        self.titlebar_item.clone()
     }
 
     /// 注册 action handler — 外部 crate（terminal-view 等）在 observe_new 里调用。
@@ -617,6 +632,9 @@ impl Render for Workspace {
                     }
                 },
             ))
+            // TitleBar — 对齐 zed workspace.rs:L9612 `.when_some(self.titlebar_item)`
+            // 由外部 app 层创建后注入；TitleBar entity 自己根据 window_decorations 决定是否渲染内容
+            .when_some(self.titlebar_item.clone(), |root, item| root.child(item))
             .child(main_area)
             // StatusBar
             .child(self.status_bar.clone());

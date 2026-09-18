@@ -6,7 +6,7 @@
 
 use aa_terminal_view::TerminalPanel;
 use anyhow::Result;
-use gpui::{AppContext, Context, Task, Window};
+use gpui::{AppContext, Entity, Task, Window};
 use workspace::Workspace;
 use workspace::dock::panel::{
     AgentPanel, CollabPanel, DebugPanel, GitPanel, OutlinePanel, ProjectPanel,
@@ -25,10 +25,12 @@ use workspace::dock::panel::{
 /// Zed 对应：`zed.rs:776 initialize_panels` — 用 `futures::join!` 并行 async load，
 /// 因为每个 Panel::load() 要恢复持久化状态（KV store）。
 /// AAgent 当前无持久化，`cx.new()` 是同步的，所以直接创建 + 同步 add_panel。
-pub fn initialize_panels(_window: &mut Window, cx: &mut Context<Workspace>) -> Task<Result<()>> {
-    let workspace_entity = cx.entity();
-
-    cx.update_entity(&workspace_entity, |workspace, cx| {
+pub fn initialize_panels(
+    _window: &mut Window,
+    workspace: &Entity<Workspace>,
+    cx: &mut gpui::App,
+) -> Task<Result<()>> {
+    cx.update_entity(workspace, |workspace, cx| {
         // —— Left Dock ——
         let agent = cx.new(|_| AgentPanel);
         workspace.add_panel::<AgentPanel>(agent, cx);

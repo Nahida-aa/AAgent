@@ -7,7 +7,7 @@ publish = false
 description = "AAgent Sidebar entity (Agent Threads list + bottom bar)"
 
 [dependencies]
-workspace = { path = "../workspace" }
-settings-content = { path = "../settings-content" }
+workspace.workspace = true
+settings-content.workspace = true
 gpui.workspace = true
-ui-gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui-gpui" }
+ui-gpui.workspace = true

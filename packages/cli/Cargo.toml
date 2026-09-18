@@ -6,15 +6,15 @@ license.workspace = true
 description = "AAgent CLI entry point"
 
 [dependencies]
-aa-kernel = { path = "../kernel" }
-aa-function-tools = { path = "../function-tools" }
-aa-extension-mcp = { path = "../extension-mcp" }
-aa-core = { path = "../core" }
-aa-llm = { path = "../llm" }
-settings = { path = "../settings" }
-settings-content = { path = "../settings-content" }
-aa-session = { path = "../session" }
-aa-server = { path = "../server" }
+aa-kernel.workspace = true
+aa-function-tools.workspace = true
+aa-extension-mcp.workspace = true
+aa-core.workspace = true
+aa-llm.workspace = true
+settings.workspace = true
+settings-content.workspace = true
+aa-session.workspace = true
+aa-server.workspace = true
 axum = { workspace = true, features = ["default"] }
 clap = { workspace = true }
 tokio = { workspace = true, features = ["full"] }

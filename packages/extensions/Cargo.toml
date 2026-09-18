@@ -6,9 +6,9 @@ license.workspace = true
 description = "AAgent Extension loader and runtime manager"
 
 [dependencies]
-aa-core = { path = "../core" }
-aa-kernel = { path = "../kernel" }
-aa-extension-sdk = { path = "../extension-sdk" }
+aa-core.workspace = true
+aa-kernel.workspace = true
+aa-extension-sdk.workspace = true
 tokio = { workspace = true, features = ["sync", "time", "rt"] }
 tokio-util = { workspace = true }
 serde = { workspace = true }

@@ -15,10 +15,10 @@ name = "aa-app"
 path = "src/main.rs"
 
 [dependencies]
-workspace = { path = "../workspace" }
-aa-sidebar = { path = "../sidebar" }
-aa-terminal = { path = "../terminal" }
-settings = { path = "../settings" }
+workspace.workspace = true
+aa-sidebar.workspace = true
+aa-terminal.workspace = true
+settings.workspace = true
 gpui.workspace = true
 gpui_util.workspace = true
 serde = { workspace = true }
@@ -31,8 +31,8 @@ chrono = { workspace = true }
 parking_lot = { workspace = true }
 # gpui_learn 共享库:内嵌 zed 图标/字体/主题的 assets + 自研 ui 库。
 # 开发期 path 依赖;后续可切换成 git 源。
-aa-gpui-kit-assets = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/assets" }
-ui-gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui-gpui" }
+aa-gpui-kit-assets.workspace = true
+ui-gpui.workspace = true
 
 [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
 gpui_platform = { workspace = true, features = ["font-kit", "wayland", "x11"] }

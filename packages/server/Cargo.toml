@@ -6,15 +6,15 @@ license.workspace = true
 description = "AAgent HTTP/WS API 服务"
 
 [dependencies]
-aa-kernel = { path = "../kernel" }
-aa-core = { path = "../core" }
-aa-extensions = { path = "../extensions" }
-aa-function-tools = { path = "../function-tools" }
-aa-extension-mcp = { path = "../extension-mcp" }
-aa-llm = { path = "../llm" }
-settings = { path = "../settings" }
-settings-content = { path = "../settings-content" }
-aa-session = { path = "../session" }
+aa-kernel.workspace = true
+aa-core.workspace = true
+aa-extensions.workspace = true
+aa-function-tools.workspace = true
+aa-extension-mcp.workspace = true
+aa-llm.workspace = true
+settings.workspace = true
+settings-content.workspace = true
+aa-session.workspace = true
 axum = { workspace = true, features = ["default", "ws"] }
 nix = { version = "0.29", features = ["fs", "term"] }
 libc = "0.2"

@@ -6,8 +6,8 @@ license.workspace = true
 description = "AAgent Extension SDK: 扩展开发的公共 API"
 
 [dependencies]
-aa-core = { path = "../core" }
-aa-kernel = { path = "../kernel" }
+aa-core.workspace = true
+aa-kernel.workspace = true
 serde = { workspace = true }
 serde_json = { workspace = true }
 async-trait = { workspace = true }

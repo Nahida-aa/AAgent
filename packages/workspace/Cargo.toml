@@ -6,6 +6,6 @@ license.workspace = true
 
 [dependencies]
 gpui.workspace = true
-ui-gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui-gpui" }
-settings = { path = "../settings" }
-settings-content = { path = "../settings-content" }
+ui-gpui.workspace = true
+settings.workspace = true
+settings-content.workspace = true

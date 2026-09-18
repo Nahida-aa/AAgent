@@ -128,6 +128,10 @@ impl Panel for ProjectPanel {
     fn icon_tooltip(&self, _cx: &App) -> &'static str {
         "Project Panel"
     }
+    /// 对齐 Zed ProjectPanel — settings 默认 starts_open: true。
+    fn starts_open(&self, _cx: &App) -> bool {
+        true
+    }
 }
 
 // ---------- Git Panel ----------

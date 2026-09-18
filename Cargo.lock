@@ -6694,6 +6694,7 @@ name = "settings"
 version = "0.1.0"
 dependencies = [
  "gpui",
+ "inventory",
  "json5",
  "rust-embed",
  "serde",
@@ -6713,6 +6714,10 @@ dependencies = [
 [[package]]
 name = "settings-macros"
 version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn 2.0.119",
+]
 
 [[package]]
 name = "sha1"

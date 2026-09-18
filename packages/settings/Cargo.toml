@@ -11,6 +11,7 @@ serde_json = { workspace = true }
 rust-embed = { version = "8", features = ["include-exclude"] }
 json5 = "0.4"
 gpui.workspace = true
+inventory.workspace = true
 
 [dev-dependencies]
 tempfile = { workspace = true }

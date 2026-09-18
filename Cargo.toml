@@ -51,6 +51,7 @@ regex = "1"
 reqwest = { version = "0.12", default-features = false, features = ["json", "stream"] }
 glob = "0.3"
 tempfile = "3"
+inventory = "0.3"
 
 # Terminal
 alacritty_terminal = { git = "https://github.com/zed-industries/alacritty", rev = "4c129667ce56611becdc82de6e28218c80e2e88f" }

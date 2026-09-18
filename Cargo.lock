@@ -220,6 +220,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "aa-task"
+version = "0.1.0"
+
+[[package]]
 name = "aa-terminal"
 version = "0.1.0"
 dependencies = [
@@ -9592,6 +9596,7 @@ dependencies = [
 name = "workspace"
 version = "0.1.0"
 dependencies = [
+ "aa-task",
  "gpui",
  "schemars",
  "serde",

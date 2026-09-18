@@ -11,3 +11,4 @@ settings.workspace = true
 settings-content.workspace = true
 serde.workspace = true
 schemars = { workspace = true, features = ["derive"] }
+aa-task.workspace = true

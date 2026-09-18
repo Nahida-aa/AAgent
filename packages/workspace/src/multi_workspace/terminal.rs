@@ -8,20 +8,8 @@
 
 use std::process::ExitStatus;
 
+use aa_task::SpawnInTerminal;
 use gpui::{App, Task, Window};
-
-/// 启动终端时需要的参数。
-///
-/// Zed 用 `task::SpawnInTerminal`（对齐 `crates/task/src/task.rs:42`），
-/// 包含 command、working_directory、env、shell 等完整信息。
-/// AAgent 现阶段只暴露核心字段，后续对齐 Zed 再补。
-#[derive(Debug, Clone, Default)]
-pub struct SpawnInTerminal {
-    /// Shell 命令。None = 启动交互式 shell。
-    pub command: Option<String>,
-    /// 工作目录。
-    pub working_directory: std::path::PathBuf,
-}
 
 /// 由终端面板实现的 trait — 抽象终端创建逻辑。
 ///

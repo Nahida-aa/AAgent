@@ -459,12 +459,6 @@ impl Render for Workspace {
 
         // 主区域 — 4 种布局树（对齐 zed workspace.rs:L9748-L9982）
         let main_area = match bottom_layout {
-            // ┌──────┬──────────┬──────┐
-            // │ Left │  Center  │Right │
-            // │ Dock │  ┌──────┐│ Dock │
-            // │      │  │Bottom││      │
-            // │      │  └──────┘│      │
-            // └──────┴──────────┴──────┘
             BottomDockLayout::Contained => div()
                 .flex()
                 .flex_row()
@@ -475,20 +469,16 @@ impl Render for Workspace {
                         .flex()
                         .flex_col()
                         .flex_1()
-                        .h_full()
                         .overflow_hidden()
-                        .child(center)
+                        .child(
+                            // Zed: h_flex().flex_1() 包装 center — 让 center 填满 bottom dock 上方空间
+                            div().flex_row().flex_1().overflow_hidden().child(center),
+                        )
                         .child(bottom_dock),
                 )
                 .child(right_dock)
                 .into_any_element(),
 
-            // ┌──────────────────────────┐
-            // │ Left  │   Center   │Right │
-            // │ Dock  │            │ Dock  │
-            // ├───────┴────────────┴──────┤
-            // │     Bottom Dock (全宽)     │
-            // └──────────────────────────┘
             BottomDockLayout::Full => div()
                 .flex()
                 .flex_col()
@@ -506,19 +496,13 @@ impl Render for Workspace {
                                 .flex_col()
                                 .flex_1()
                                 .overflow_hidden()
-                                .child(center),
+                                .child(div().flex_row().flex_1().child(center)),
                         )
                         .child(right_dock),
                 )
                 .child(bottom_dock)
                 .into_any_element(),
 
-            // ┌──────┬─────────────────────┐
-            // │ Left │      Center         │
-            // │ Dock │  ┌──────────────┐   │
-            // │      │  │   Bottom     │   │
-            // │      │  └──────────────┘   │
-            // └──────┴─────────────────────┘
             BottomDockLayout::LeftAligned => div()
                 .flex()
                 .flex_row()
@@ -542,7 +526,7 @@ impl Render for Workspace {
                                         .flex_col()
                                         .flex_1()
                                         .overflow_hidden()
-                                        .child(center),
+                                        .child(div().flex_row().flex_1().child(center)),
                                 ),
                         )
                         .child(bottom_dock),
@@ -550,12 +534,6 @@ impl Render for Workspace {
                 .child(right_dock)
                 .into_any_element(),
 
-            // ┌─────────────────────┬──────┐
-            // │      Center         │Right │
-            // │  ┌──────────────┐   │ Dock │
-            // │  │   Bottom     │   │      │
-            // │  └──────────────┘   │      │
-            // └─────────────────────┴──────┘
             BottomDockLayout::RightAligned => div()
                 .flex()
                 .flex_row()
@@ -578,7 +556,7 @@ impl Render for Workspace {
                                         .flex_col()
                                         .flex_1()
                                         .overflow_hidden()
-                                        .child(center),
+                                        .child(div().flex_row().flex_1().child(center)),
                                 )
                                 .child(right_dock),
                         )

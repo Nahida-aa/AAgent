@@ -15,7 +15,7 @@ pub mod sidebar_render_state;
 
 pub use sidebar::Sidebar;
 pub use sidebar_handle::SidebarHandle;
-pub use sidebar_render_state::{SidebarRenderState, SidebarStatus};
+pub use sidebar_render_state::SidebarRenderState;
 
 use gpui::{
     App, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, prelude::*, px,
@@ -77,13 +77,6 @@ impl MultiWorkspace {
 
     pub fn sidebar_side(&self, _cx: &App) -> SidebarSide {
         self.sidebar_side
-    }
-
-    pub fn sidebar_status(&self, _cx: &App) -> SidebarStatus {
-        SidebarStatus {
-            open: self.sidebar_open,
-            side: self.sidebar_side,
-        }
     }
 
     /// 只读渲染状态 — 对齐 zed L334-L338。

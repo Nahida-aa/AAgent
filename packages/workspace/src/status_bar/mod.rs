@@ -12,6 +12,7 @@
 //! - [`StatusBar`]：容器，左侧/右侧各渲染一条 `h_flex`。
 
 pub mod items;
+mod sidebar_status;
 
 use std::any::TypeId;
 use std::collections::HashSet;
@@ -27,7 +28,6 @@ use ui_gpui::{
 };
 
 use crate::dock::panel_buttons::PanelButtons;
-use crate::multi_workspace::SidebarStatus;
 use settings_content::SidebarSide;
 
 /// 状态栏项（对齐 zed `StatusItemView`）。
@@ -66,10 +66,7 @@ pub struct StatusBar {
     left_items: Vec<Box<dyn StatusItemViewHandle>>,
     right_items: Vec<Box<dyn StatusItemViewHandle>>,
     hidden_items: HashSet<TypeId>,
-    /// 缓存的 sidebar 状态（同步自 MultiWorkspace）。
-    sidebar: SidebarStatus,
-    /// MultiWorkspace 弱引用 — toggle 时通过它中转。
-    /// 不再直接引用 Sidebar entity（Sidebar entity 独立后会循环）。
+    /// MultiWorkspace 弱引用 — sidebar toggle 时调它；render 时 SidebarStatus::query() 查它。
     multi_workspace: Option<WeakEntity<crate::multi_workspace::MultiWorkspace>>,
 }
 
@@ -79,7 +76,6 @@ impl StatusBar {
             left_items: Vec::new(),
             right_items: Vec::new(),
             hidden_items: HashSet::new(),
-            sidebar: SidebarStatus::default(),
             multi_workspace: None,
         }
     }
@@ -87,11 +83,6 @@ impl StatusBar {
     /// 设置 MultiWorkspace 弱引用 — App 层创建后通过 Workspace 传入。
     pub fn set_multi_workspace(&mut self, mw: Entity<crate::multi_workspace::MultiWorkspace>) {
         self.multi_workspace = Some(mw.downgrade());
-    }
-
-    /// 同步 sidebar 状态 — MultiWorkspace 变化时调。
-    pub fn sync_sidebar_status(&mut self, status: SidebarStatus) {
-        self.sidebar = status;
     }
 
     pub fn add_left_item<T: StatusItemView>(&mut self, item: Entity<T>) {
@@ -113,15 +104,6 @@ impl StatusBar {
         self.hidden_items.insert(item_type);
     }
 
-    pub fn sidebar(&self) -> SidebarStatus {
-        self.sidebar
-    }
-
-    /// MultiWorkspace observe sidebar 后调用，保持 StatusBar 状态同步。
-    pub fn set_sidebar(&mut self, status: SidebarStatus) {
-        self.sidebar = status;
-    }
-
     // ---- 渲染 ----
 
     fn visible_left_items(&self) -> impl Iterator<Item = &Box<dyn StatusItemViewHandle>> {
@@ -138,8 +120,13 @@ impl StatusBar {
 
     /// sidebar toggle 按钮（sidebar 关闭时在 StatusBar 显示打开按钮）。
     /// 对齐 zed StatusBar::render_sidebar_toggle。
-    fn render_sidebar_toggle(&self, on_right: bool, cx: &mut Context<Self>) -> gpui::AnyElement {
-        let current_side = self.sidebar.side;
+    fn render_sidebar_toggle(
+        &self,
+        on_right: bool,
+        sidebar: sidebar_status::SidebarStatus,
+        cx: &mut Context<Self>,
+    ) -> gpui::AnyElement {
+        let current_side = sidebar.side;
         let bar = cx.entity();
         let divider = || Divider::vertical().color(DividerColor::Border);
 
@@ -226,10 +213,17 @@ impl StatusBar {
     }
 
     /// 左组：[sidebar-toggle?] + Dock PanelButtons + 普通项。
-    fn render_left_tools(&self, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render_left_tools(
+        &self,
+        sidebar: sidebar_status::SidebarStatus,
+        cx: &mut Context<Self>,
+    ) -> impl IntoElement {
         let mut children = Vec::new();
-        if !self.sidebar.open && self.sidebar.side == SidebarSide::Left {
-            children.push(self.render_sidebar_toggle(false, cx).into_any_element());
+        if !sidebar.open && sidebar.side == SidebarSide::Left {
+            children.push(
+                self.render_sidebar_toggle(false, sidebar, cx)
+                    .into_any_element(),
+            );
         }
         for (ix, item) in self.visible_left_items().enumerate() {
             if item.item_type() == TypeId::of::<PanelButtons>() {
@@ -262,7 +256,11 @@ impl StatusBar {
     }
 
     /// 右组：普通项 + Dock PanelButtons + [sidebar-toggle?]，反序渲染所以显示时 toggle 在最右。
-    fn render_right_tools(&self, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render_right_tools(
+        &self,
+        sidebar: sidebar_status::SidebarStatus,
+        cx: &mut Context<Self>,
+    ) -> impl IntoElement {
         let mut children = Vec::new();
         for (ix, item) in self.visible_right_items().enumerate() {
             if item.item_type() == TypeId::of::<PanelButtons>() {
@@ -284,8 +282,11 @@ impl StatusBar {
                 children.push(hideable.into_any_element());
             }
         }
-        if !self.sidebar.open && self.sidebar.side == SidebarSide::Right {
-            children.push(self.render_sidebar_toggle(true, cx).into_any_element());
+        if !sidebar.open && sidebar.side == SidebarSide::Right {
+            children.push(
+                self.render_sidebar_toggle(true, sidebar, cx)
+                    .into_any_element(),
+            );
         }
         div()
             .flex()
@@ -298,38 +299,32 @@ impl StatusBar {
 
     /// toggle sidebar — 通过 MultiWorkspace 中转（Sidebar 独立后 StatusBar
     /// 不能直接依赖 Sidebar entity，循环依赖）。
+    /// MultiWorkspace.notify() 会触发渲染链重绘，StatusBar 下次 render 时
+    /// SidebarStatus::query() 会拿到最新状态。
     pub fn toggle_sidebar(&mut self, side: SidebarSide, cx: &mut Context<Self>) {
-        // 先更新缓存（乐观更新）
-        if self.sidebar.side == side {
-            self.sidebar.open = !self.sidebar.open;
-        } else {
-            self.sidebar.side = side;
-            self.sidebar.open = true;
-        }
-        // 通知 MultiWorkspace 更新真实状态
         if let Some(weak) = self.multi_workspace.as_ref() {
-            if let Some(mut entity) = weak.upgrade() {
+            if let Some(entity) = weak.upgrade() {
                 entity.update(cx, |mw, cx| mw.toggle_sidebar(side, cx));
             }
         }
-        cx.notify();
     }
 
     pub fn set_side(&mut self, side: SidebarSide, cx: &mut Context<Self>) {
-        self.sidebar.side = side;
-        self.sidebar.open = true;
         if let Some(weak) = self.multi_workspace.as_ref() {
-            if let Some(mut entity) = weak.upgrade() {
+            if let Some(entity) = weak.upgrade() {
                 entity.update(cx, |mw, cx| mw.set_sidebar_side(side, cx));
             }
         }
-        cx.notify();
     }
 }
 
 impl Render for StatusBar {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let colors = cx.theme().colors();
+
+        // 每帧查询 MultiWorkspace 的 sidebar 状态 — 对齐 zed L117。
+        // 不缓存，MultiWorkspace.notify() 触发重渲染时自动拿到最新值。
+        let sidebar = sidebar_status::SidebarStatus::query(&self.multi_workspace, cx);
 
         div()
             .id("status-bar")
@@ -344,7 +339,7 @@ impl Render for StatusBar {
             .bg(colors.surface_background)
             .border_t_1()
             .border_color(colors.border_variant)
-            .child(self.render_left_tools(cx))
-            .child(self.render_right_tools(cx))
+            .child(self.render_left_tools(sidebar, cx))
+            .child(self.render_right_tools(sidebar, cx))
     }
 }

@@ -23,7 +23,7 @@ pub mod dock;
 pub mod multi_workspace;
 pub mod status_bar;
 
-pub use multi_workspace::{MultiWorkspace, SidebarHandle, SidebarRenderState, SidebarStatus};
+pub use multi_workspace::{MultiWorkspace, SidebarHandle, SidebarRenderState};
 pub use settings_content::DockPosition;
 
 use std::collections::HashMap;
@@ -223,14 +223,6 @@ impl Workspace {
     ) {
         self.status_bar.update(cx, |bar, cx| {
             bar.set_multi_workspace(mw.clone());
-            cx.notify();
-        });
-    }
-
-    /// 同步 sidebar 状态 — MultiWorkspace toggle 后调。
-    pub fn sync_sidebar_status(&mut self, status: SidebarStatus, cx: &mut Context<Self>) {
-        self.status_bar.update(cx, |bar, cx| {
-            bar.sync_sidebar_status(status);
             cx.notify();
         });
     }

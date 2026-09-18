@@ -6,8 +6,6 @@ use gpui::{
 use ui_gpui::theme::ActiveTheme;
 use ui_gpui::{Editor, EditorEvent};
 
-use crate::terminal::TerminalView;
-
 /// A minimal clone of zed's `Agent` enum (zed: crates/agent_ui/src/agent_ui.rs:425).
 /// Placeholder agents are listed in the new-thread menu; only `Terminal` has a
 /// working implementation so far.
@@ -39,7 +37,6 @@ pub struct AgentPanel {
     pub focus_handle: FocusHandle,
     pub surface: VisibleSurface,
     pub selected_agent: Agent,
-    pub terminal: Entity<TerminalView>,
     pub new_thread_menu_open: bool,
     pub composer: Entity<Editor>,
     /// Subscriptions must live as long as the entity (Editor events).
@@ -49,9 +46,8 @@ pub struct AgentPanel {
 const EXTERNAL_AGENT_PLACEHOLDERS: &[&str] = &["opencode"];
 
 impl AgentPanel {
-    pub fn new(cx: &mut Context<Self>, working_dir: std::path::PathBuf) -> Self {
+    pub fn new(cx: &mut Context<Self>, _working_dir: std::path::PathBuf) -> Self {
         let focus_handle = cx.focus_handle();
-        let terminal = cx.new(|cx| TerminalView::new(None, working_dir, cx));
 
         let composer = cx.new(|cx| {
             let colors = cx.theme().colors();
@@ -77,7 +73,6 @@ impl AgentPanel {
             focus_handle,
             surface: VisibleSurface::AgentThread,
             selected_agent: Agent::AAgent,
-            terminal,
             new_thread_menu_open: false,
             composer,
             _subscriptions: vec![subscription],
@@ -264,13 +259,8 @@ impl AgentPanel {
     }
 
     fn render_surface(&self, cx: &mut Context<Self>) -> impl IntoElement {
-        match self.surface {
-            VisibleSurface::Terminal => gpui::div()
-                .size_full()
-                .child(self.terminal.clone())
-                .into_any_element(),
-            VisibleSurface::AgentThread => self.render_conversation(cx).into_any_element(),
-        }
+        // Terminal 已独立为 Dock Panel，AgentPanel 不再嵌入 TerminalView。
+        self.render_conversation(cx).into_any_element()
     }
 
     fn render_conversation(&self, cx: &mut Context<Self>) -> impl IntoElement {

@@ -1,6 +1,3 @@
-pub mod alacritty;
-pub mod element;
-
 use std::path::PathBuf;
 
 use gpui::{
@@ -9,7 +6,8 @@ use gpui::{
 };
 use tracing::debug;
 
-use crate::terminal::alacritty::{AlacrittyBackend, TerminalBounds};
+use crate::alacritty::{AlacrittyBackend, TerminalBounds};
+use crate::element::TerminalElement;
 
 /// A terminal session view: owns the pty-backed backend and forwards keyboard
 /// input into it. Renders via [`element::TerminalElement`].
@@ -124,10 +122,7 @@ impl Render for TerminalView {
             .track_focus(&self.focus_handle)
             .key_context("terminal")
             .on_key_down(cx.listener(Self::on_key))
-            .child(element::TerminalElement::new(
-                self.backend.clone(),
-                self.bounds,
-            ))
+            .child(TerminalElement::new(self.backend.clone(), self.bounds))
     }
 }
 

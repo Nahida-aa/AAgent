@@ -8,7 +8,7 @@ version = "0.1.0"
 dependencies = [
  "aa-gpui-kit-assets",
  "aa-sidebar",
- "alacritty_terminal",
+ "aa-terminal",
  "anyhow",
  "chrono",
  "futures",
@@ -215,6 +215,25 @@ version = "0.1.0"
 dependencies = [
  "gpui",
  "settings-content",
+ "ui-gpui",
+ "workspace",
+]
+
+[[package]]
+name = "aa-terminal"
+version = "0.1.0"
+dependencies = [
+ "alacritty_terminal",
+ "anyhow",
+ "async-channel",
+ "futures",
+ "gpui",
+ "gpui_util",
+ "libc",
+ "parking_lot",
+ "settings-content",
+ "tracing",
+ "tracing-subscriber",
  "ui-gpui",
  "workspace",
 ]

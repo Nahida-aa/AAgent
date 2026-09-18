@@ -6,7 +6,7 @@ use gpui::{
     Pixels, Rgba, SharedString, Style, TextAlign, TextRun, Window, fill, point, px, size,
 };
 
-use crate::terminal::alacritty::{AlacrittyBackend, TerminalBounds};
+use crate::alacritty::{AlacrittyBackend, TerminalBounds};
 
 const DEFAULT_BG: Rgba = Rgba {
     r: 0.051,
@@ -41,7 +41,7 @@ impl TerminalElement {
     fn paint_cursor(
         &self,
         bounds: Bounds<Pixels>,
-        cells: &[crate::terminal::alacritty::DisplayCell],
+        cells: &[crate::alacritty::DisplayCell],
         rows: usize,
         cols: usize,
         window: &mut Window,

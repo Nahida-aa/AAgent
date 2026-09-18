@@ -49,10 +49,10 @@ impl WindowControlKind {
     /// Icon in the shared `assets` crate (zed's `generic_*.svg`).
     fn icon(&self) -> IconName {
         match self {
-            Self::Minimize => IconName::Minimize,
-            Self::Maximize => IconName::Maximize,
-            Self::Restore => IconName::Restore,
-            Self::Close => IconName::Close,
+            Self::Minimize => IconName::GenericMinimize,
+            Self::Maximize => IconName::GenericMaximize,
+            Self::Restore => IconName::GenericRestore,
+            Self::Close => IconName::GenericClose,
         }
     }
 

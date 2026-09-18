@@ -31,6 +31,11 @@ pub trait Panel: Render + Sized {
     }
     fn icon(&self, cx: &App) -> IconName;
     fn icon_tooltip(&self, cx: &App) -> &'static str;
+    /// 启动时是否自动打开该面板所在 Dock。对齐 zed `Panel::starts_open()`。
+    /// Zed: ProjectPanel 默认 true，TerminalPanel 默认 false（settings 可配）。
+    fn starts_open(&self, _cx: &App) -> bool {
+        false
+    }
 }
 
 // ---------- PanelHandle trait ----------
@@ -256,6 +261,10 @@ impl Panel for AgentPanel {
     }
     fn icon_tooltip(&self, _cx: &App) -> &'static str {
         "Agent Panel"
+    }
+    /// 对齐 Zed ProjectPanel — 启动时自动打开（左 Dock 主面板）。
+    fn starts_open(&self, _cx: &App) -> bool {
+        true
     }
 }
 

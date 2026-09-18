@@ -251,10 +251,12 @@ impl Workspace {
     // Workspace 不需要知道具体类型 — 通过泛型 T: Panel 抽象。
 
     /// 按 Panel 默认位置注入到对应 Dock。
-    /// 对齐 zed `Workspace::add_panel::<T>`。
+    /// 对齐 zed `Workspace::add_panel::<T>` — Zed 在 Dock::add_panel 内部
+    /// 调 `panel.read(cx).starts_open()` 决定是否自动打开。
     pub fn add_panel<T: Panel>(&mut self, panel: Entity<T>, cx: &mut Context<Self>) {
         use std::sync::Arc;
         let position = panel.read(cx).default_position(cx);
+        let starts_open = panel.read(cx).starts_open(cx);
         let panel_handle = Arc::new(panel) as Arc<dyn PanelHandle>;
 
         let dock_entity = match position {
@@ -265,6 +267,9 @@ impl Workspace {
 
         dock_entity.update(cx, |dock, cx| {
             dock.add_panel(panel_handle);
+            if starts_open {
+                dock.set_open(true);
+            }
             cx.notify();
         });
     }

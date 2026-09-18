@@ -8,3 +8,4 @@ license.workspace = true
 gpui.workspace = true
 ui-gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui-gpui" }
 settings = { path = "../settings" }
+settings-content = { path = "../settings-content" }

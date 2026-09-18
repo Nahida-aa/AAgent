@@ -20,24 +20,23 @@
 //!   顶层 div 监听 `on_drag_move<DraggedDock>` 接收所有 Dock resize 拖拽事件
 
 pub mod dock;
-pub mod dock_position;
 pub mod multi_workspace;
 pub mod panel;
 pub mod panel_buttons;
 pub mod status_bar;
 
 pub use multi_workspace::MultiWorkspace;
+pub use settings_content::DockPosition;
 
 use std::collections::HashMap;
 
 use gpui::{
-    App, Bounds, Context, DragMoveEvent, Entity, IntoElement, ParentElement, Render, Styled,
+    App, Axis, Bounds, Context, DragMoveEvent, Entity, IntoElement, ParentElement, Render, Styled,
     Window, canvas, div, hsla, prelude::*, px,
 };
 use ui_gpui::theme::ActiveTheme;
 
 use dock::{Dock, DraggedDock};
-use dock_position::DockPosition;
 use panel::{PanelEntry, PanelKind};
 use panel_buttons::PanelButtons;
 use status_bar::StatusBar;
@@ -256,7 +255,7 @@ impl Workspace {
         let mut container = div().id(id).overflow_hidden().child(dock.clone());
 
         if is_open {
-            if is_flexible && position.axis() == gpui::Axis::Horizontal {
+            if is_flexible && matches!(position, DockPosition::Left | DockPosition::Right) {
                 // Flexible sizing — 和 Center 1:1 等宽（对齐 zed workspace.rs:L8682-L8708）
                 container = container.flex_grow(1.0).flex_shrink(1.0);
             } else {

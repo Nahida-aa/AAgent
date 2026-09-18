@@ -4,9 +4,9 @@ use gpui::{
     Context, IntoElement, MouseButton, MouseDownEvent, MouseUpEvent, ParentElement, Render, Styled,
     Window, deferred, div, hsla, prelude::*, px,
 };
+use settings_content::DockPosition;
 use ui_gpui::theme::ActiveTheme;
 
-use crate::dock_position::DockPosition;
 use crate::panel::PanelEntry;
 
 /// Resize handle 的大小（对齐 zed dock.rs `RESIZE_HANDLE_SIZE = px(6.)`）。
@@ -256,9 +256,11 @@ impl Render for Dock {
             .bg(colors.panel_background)
             .border_color(colors.border)
             .overflow_hidden()
-            .map(|el| match position.axis() {
-                gpui::Axis::Horizontal => el.flex_col(),
-                gpui::Axis::Vertical => el.flex_row(),
+            .map(|el| match position {
+                // 左侧/右侧 Dock 的面板横向排列（面板里的 Pane 纵向堆叠）
+                DockPosition::Left | DockPosition::Right => el.flex_col(),
+                // 底部 Dock 纵向排列（面板横向堆叠）
+                DockPosition::Bottom => el.flex_row(),
             })
             .map(|el| match position {
                 DockPosition::Left => el.border_r_1(),

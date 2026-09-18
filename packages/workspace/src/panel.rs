@@ -3,7 +3,7 @@
 use gpui::App;
 use ui_gpui::IconName;
 
-use crate::dock_position::DockPosition;
+use settings_content::DockPosition;
 
 // ---------- PanelKind ----------
 

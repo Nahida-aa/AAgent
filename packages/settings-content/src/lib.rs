@@ -7,6 +7,8 @@
 //! 负责 RustEmbed + SettingsStore Global；
 //! settings_content 是**内容层**，只放数据结构。
 
+pub mod dock;
 pub mod language_model;
 
+pub use dock::DockPosition;
 pub use language_model::{Config, McpConfig, McpServerDef, ProviderConfig, ResolvedConfig};

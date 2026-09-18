@@ -16,8 +16,8 @@ use gpui::{
 use ui_gpui::theme::ActiveTheme;
 
 use crate::Workspace;
-use crate::dock_position::DockPosition;
 use crate::status_bar::SidebarStatus;
+use settings_content::DockPosition;
 
 /// 顶层 MultiWorkspace entity。
 pub struct MultiWorkspace {

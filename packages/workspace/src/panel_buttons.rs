@@ -21,8 +21,8 @@ use ui_gpui::component::tooltip::Tooltip;
 use ui_gpui::{IconButton, right_click_menu};
 
 use crate::dock::Dock;
-use crate::dock_position::DockPosition;
 use crate::status_bar::StatusItemView;
+use settings_content::DockPosition;
 
 /// 状态栏上的一排面板按钮。关联一个 Dock entity，读它的 panel_entries 渲染。
 /// 同时持有所有 3 个 Dock 的引用（用于右键菜单搬面板）。

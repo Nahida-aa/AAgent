@@ -144,6 +144,12 @@ impl PanelKind {
             PanelKind::Debug => (320.0, 320.0),
         }
     }
+
+    /// 是否支持 flexible sizing（和 Center 等宽）。
+    /// 对齐 zed `PanelHandle::has_flexible_size` — Agent 面板的 default.json 有 `"flexible": true`。
+    pub fn supports_flexible_size(self) -> bool {
+        matches!(self, PanelKind::Agent)
+    }
 }
 
 // ---------- PanelEntry ----------

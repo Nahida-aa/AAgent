@@ -141,6 +141,11 @@ impl Dock {
         }
     }
 
+    /// 是否有用户设置的固定尺寸覆盖（有则不能 flexible sizing）。
+    pub fn has_size_override(&self) -> bool {
+        self.size_override.is_some()
+    }
+
     /// 用户 resize 后设置新尺寸（对齐 zed `set_dock_size`）。
     pub fn set_size(&mut self, size: f32) {
         // 限制范围：最小 80px，最大窗口一半（简化）

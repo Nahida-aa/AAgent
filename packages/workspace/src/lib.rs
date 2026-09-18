@@ -220,11 +220,29 @@ impl Workspace {
     ///
     /// 关键点：即使 Dock 关闭也返回容器（flex_none 不占空间），
     /// 保证 focus handle 始终挂载（否则 toggle_panel_focus 无法聚焦关闭的面板）。
-    /// 尺寸只在 dock 打开时应用。
+    ///
+    /// 当 Dock 的 active panel 支持 flexible sizing（Agent 面板）且没有用户覆盖的固定尺寸时，
+    /// 用 flex_grow(1.0) 让它和 Center 等宽（对齐 zed `default_dock_flex` 返回 1.0）。
     fn render_dock(dock: &Entity<Dock>, position: DockPosition, cx: &App) -> impl IntoElement {
         let dock_ref = dock.read(cx);
         let is_open = dock_ref.is_open();
         let size = dock_ref.current_size();
+
+        // 判断是否 flexible sizing：
+        // - 只有 Left/Right Dock 才支持（Bottom Dock 固定高度）
+        // - 有用户 size_override → 固定尺寸
+        // - 没有 size_override 且 active panel 是 Agent（默认 flexible=true）→ flexible
+        let is_flexible = match position {
+            DockPosition::Left | DockPosition::Right => {
+                !dock_ref.has_size_override()
+                    && dock_ref
+                        .active_panel_index()
+                        .and_then(|i| dock_ref.panel_entries().get(i))
+                        .map(|e| e.kind.supports_flexible_size())
+                        .unwrap_or(false)
+            }
+            DockPosition::Bottom => false,
+        };
 
         let id = match position {
             DockPosition::Left => "left-dock",
@@ -232,21 +250,25 @@ impl Workspace {
             DockPosition::Bottom => "bottom-dock",
         };
 
-        let mut container = div()
-            .id(id)
-            .flex_none()
-            .overflow_hidden()
-            .child(dock.clone());
+        let mut container = div().id(id).overflow_hidden().child(dock.clone());
 
         if is_open {
-            match position {
-                DockPosition::Left | DockPosition::Right => {
-                    container = container.w(px(size));
-                }
-                DockPosition::Bottom => {
-                    container = container.h(px(size));
+            if is_flexible && position.axis() == gpui::Axis::Horizontal {
+                // Flexible sizing — 和 Center 1:1 等宽（对齐 zed workspace.rs:L8682-L8708）
+                container = container.flex_grow(1.0).flex_shrink(1.0);
+            } else {
+                // 固定尺寸
+                match position {
+                    DockPosition::Left | DockPosition::Right => {
+                        container = container.w(px(size)).flex_shrink(1.0);
+                    }
+                    DockPosition::Bottom => {
+                        container = container.h(px(size));
+                    }
                 }
             }
+        } else {
+            container = container.flex_none();
         }
 
         container
@@ -416,6 +438,28 @@ impl Render for Workspace {
         };
 
         let this = cx.entity();
+        let sidebar_state = self.status_bar.read(cx).sidebar();
+        let has_left_sidebar = sidebar_state.open && sidebar_state.side == DockPosition::Left;
+        let has_right_sidebar = sidebar_state.open && sidebar_state.side == DockPosition::Right;
+
+        // Zed 的 sidebar 是 MultiWorkspace 层独立渲染的，在 Dock 外面
+        // （crates/sidebar/src/sidebar.rs — Agent Threads 列表 + Recent Projects）
+        // AAgent 还没有真正的 Sidebar entity，先渲染占位容器
+        let render_sidebar = |side: DockPosition| {
+            let id = match side {
+                DockPosition::Left => "workspace-sidebar-left",
+                DockPosition::Right => "workspace-sidebar-right",
+                DockPosition::Bottom => unreachable!(),
+            };
+            div()
+                .id(id)
+                .flex_none()
+                .w(px(200.))
+                .h_full()
+                .bg(colors.surface_background)
+                .border_r_1()
+                .border_color(colors.border_variant)
+        };
 
         div()
             .flex()
@@ -460,7 +504,22 @@ impl Render for Workspace {
                     }
                 },
             ))
-            .child(main_area)
+            // Sidebar + 主布局（sidebar 独立于 dock，在最外层 flex 里）
+            // Zed MultiWorkspace 渲染顺序: [sidebar?] Workspace(main_area) [sidebar?]
+            .child(
+                div()
+                    .flex()
+                    .flex_row()
+                    .flex_1()
+                    .h_full()
+                    .when(has_left_sidebar, |el| {
+                        el.child(render_sidebar(DockPosition::Left))
+                    })
+                    .child(main_area)
+                    .when(has_right_sidebar, |el| {
+                        el.child(render_sidebar(DockPosition::Right))
+                    }),
+            )
             // StatusBar
             .child(self.status_bar.clone())
     }

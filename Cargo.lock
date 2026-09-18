@@ -9593,6 +9593,8 @@ name = "workspace"
 version = "0.1.0"
 dependencies = [
  "gpui",
+ "schemars",
+ "serde",
  "settings",
  "settings-content",
  "ui-gpui",

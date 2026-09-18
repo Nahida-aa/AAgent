@@ -27,6 +27,9 @@ pub use multi_workspace::{MultiWorkspace, SidebarHandle, SidebarRenderState};
 pub use settings_content::DockPosition;
 
 use std::collections::HashMap;
+use std::path::PathBuf;
+
+use gpui::Action;
 
 use gpui::{
     App, Axis, Bounds, Context, DragMoveEvent, Entity, IntoElement, ParentElement, Render, Styled,
@@ -522,4 +525,19 @@ impl Render for Workspace {
             // StatusBar
             .child(self.status_bar.clone())
     }
+}
+
+// ============================================================
+// workspace Actions — 对齐 zed `crates/workspace/src/workspace.rs`
+// ============================================================
+
+/// Opens a new terminal with the specified working directory.
+#[derive(Debug, Default, Clone, serde::Deserialize, PartialEq, schemars::JsonSchema, Action)]
+#[action(namespace = workspace)]
+#[serde(deny_unknown_fields)]
+pub struct OpenTerminal {
+    pub working_directory: PathBuf,
+    /// If true, creates a local terminal even in remote projects.
+    #[serde(default)]
+    pub local: bool,
 }

@@ -26,7 +26,7 @@ pub mod terminal;
 
 pub use multi_workspace::{MultiWorkspace, SidebarHandle, SidebarRenderState};
 pub use settings_content::DockPosition;
-pub use terminal::{OpenTerminal, TerminalProvider};
+pub use terminal::{NewCenterTerminal, NewTerminal, OpenTerminal, TerminalProvider};
 
 use std::collections::HashMap;
 

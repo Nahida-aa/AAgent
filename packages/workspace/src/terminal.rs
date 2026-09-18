@@ -41,3 +41,23 @@ pub struct OpenTerminal {
     #[serde(default)]
     pub local: bool,
 }
+
+/// Opens a new terminal in the center.
+#[derive(Default, PartialEq, Eq, Clone, serde::Deserialize, schemars::JsonSchema, Action)]
+#[action(namespace = workspace)]
+#[serde(deny_unknown_fields)]
+pub struct NewCenterTerminal {
+    /// If true, creates a local terminal even in remote projects.
+    #[serde(default)]
+    pub local: bool,
+}
+
+/// Opens a new terminal.
+#[derive(Default, PartialEq, Eq, Clone, serde::Deserialize, schemars::JsonSchema, Action)]
+#[action(namespace = workspace)]
+#[serde(deny_unknown_fields)]
+pub struct NewTerminal {
+    /// If true, creates a local terminal even in remote projects.
+    #[serde(default)]
+    pub local: bool,
+}

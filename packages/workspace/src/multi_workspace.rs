@@ -7,8 +7,7 @@
 //!
 //! AAgent 现阶段：
 //! - 单 Workspace（不需要多窗口）
-//! - Sidebar 是占位容器（200px 宽，等后续实现真正的 Threads 列表）
-//! - Sidebar 状态由 StatusBar 持有（toggle_sidebar 改 StatusBar 的 SidebarStatus）
+//! - 单 Sidebar entity（open/close/toggle 由 MultiWorkspace 统一管理）
 
 use gpui::{
     App, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, prelude::*, px,
@@ -16,57 +15,66 @@ use gpui::{
 use ui_gpui::theme::ActiveTheme;
 
 use crate::Workspace;
-use crate::status_bar::SidebarStatus;
+use crate::sidebar::{Sidebar, SidebarStatus};
 use settings_content::DockPosition;
 
 /// 顶层 MultiWorkspace entity。
 pub struct MultiWorkspace {
     workspace: Entity<Workspace>,
+    sidebar: Entity<Sidebar>,
 }
 
 impl MultiWorkspace {
     pub fn new(workspace: Entity<Workspace>, cx: &mut Context<Self>) -> Self {
-        // 订阅 workspace — StatusBar sidebar toggle 改变状态时触发 MultiWorkspace 重渲染
-        cx.observe(&workspace, |_, _, cx| cx.notify()).detach();
+        let sidebar = cx.new(|cx| Sidebar::new(cx));
+        // 让 Sidebar 反向引用 MultiWorkspace（close_sidebar 需要）
+        let this_entity = cx.entity();
+        sidebar.update(cx, |s, cx| {
+            s.set_multi_workspace(this_entity.clone());
+        });
 
-        Self { workspace }
+        // 订阅 workspace — 重渲染
+        cx.observe(&workspace, |_, _, cx| cx.notify()).detach();
+        // 订阅 sidebar — sidebar open/close/toggle 时重渲染
+        cx.observe(&sidebar, |_, _, cx| cx.notify()).detach();
+
+        Self { workspace, sidebar }
     }
 
     pub fn workspace(&self) -> &Entity<Workspace> {
         &self.workspace
     }
 
-    /// 读取 sidebar 状态 — 来自 StatusBar（Zed 里是 MultiWorkspace 自己持有）。
-    /// AAgent 简化：StatusBar 负责 sidebar toggle，MultiWorkspace 负责渲染。
-    fn sidebar_state(&self, cx: &App) -> SidebarStatus {
-        self.workspace.read(cx).status_bar().read(cx).sidebar()
+    pub fn sidebar(&self) -> &Entity<Sidebar> {
+        &self.sidebar
+    }
+
+    pub fn sidebar_status(&self, cx: &App) -> SidebarStatus {
+        self.sidebar.read(cx).status()
+    }
+
+    /// 对外 API — 切换 sidebar 开关（对齐 zed `ToggleWorkspaceSidebar`）。
+    pub fn toggle_sidebar(&mut self, side: DockPosition, cx: &mut Context<Self>) {
+        self.sidebar.update(cx, |s, cx| s.toggle(side, cx));
+    }
+
+    /// 对外 API — 关闭 sidebar（对齐 zed `CloseWorkspaceSidebar`）。
+    pub fn close_sidebar(&mut self, cx: &mut Context<Self>) {
+        self.sidebar.update(cx, |s, cx| s.close(cx));
     }
 }
 
 impl Render for MultiWorkspace {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let colors = cx.theme().colors();
-        let sidebar = self.sidebar_state(cx);
+        let sidebar = self.sidebar.read(cx).status();
         let has_left_sidebar = sidebar.open && sidebar.side == DockPosition::Left;
         let has_right_sidebar = sidebar.open && sidebar.side == DockPosition::Right;
 
         // Zed MultiWorkspace 渲染顺序: [sidebar?] Workspace [sidebar?]
         // Sidebar 独立于 Dock（属于 MultiWorkspace 层，crates/sidebar/src/sidebar.rs）
-        let render_sidebar = |side: DockPosition| {
-            let id = match side {
-                DockPosition::Left => "workspace-sidebar-left",
-                DockPosition::Right => "workspace-sidebar-right",
-                DockPosition::Bottom => unreachable!(),
-            };
-            div()
-                .id(id)
-                .flex_none()
-                .w(px(200.))
-                .h_full()
-                .bg(colors.surface_background)
-                .border_r_1()
-                .border_color(colors.border_variant)
-        };
+        // Sidebar 有自己的 entity — 渲染完整的 Sidebar（thread list + bottom bar）
+        let sidebar_entity = self.sidebar.clone();
 
         div()
             .id("multi-workspace")
@@ -75,11 +83,25 @@ impl Render for MultiWorkspace {
             .size_full()
             .bg(colors.panel_background)
             .when(has_left_sidebar, |el| {
-                el.child(render_sidebar(DockPosition::Left))
+                el.child(
+                    div()
+                        .id("workspace-sidebar-left")
+                        .flex_none()
+                        .w(px(200.))
+                        .h_full()
+                        .child(sidebar_entity.clone()),
+                )
             })
             .child(self.workspace.clone())
             .when(has_right_sidebar, |el| {
-                el.child(render_sidebar(DockPosition::Right))
+                el.child(
+                    div()
+                        .id("workspace-sidebar-right")
+                        .flex_none()
+                        .w(px(200.))
+                        .h_full()
+                        .child(sidebar_entity.clone()),
+                )
             })
     }
 }

@@ -21,10 +21,12 @@
 
 pub mod dock;
 pub mod multi_workspace;
+pub mod sidebar;
 pub mod status_bar;
 
 pub use multi_workspace::MultiWorkspace;
 pub use settings_content::DockPosition;
+pub use sidebar::{Sidebar, SidebarStatus};
 
 use std::collections::HashMap;
 

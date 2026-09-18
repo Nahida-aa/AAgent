@@ -20,11 +20,17 @@
 //!   顶层 div 监听 `on_drag_move<DraggedDock>` 接收所有 Dock resize 拖拽事件
 
 pub mod dock;
+pub mod item;
 pub mod multi_workspace;
+pub mod pane;
+pub mod pane_group;
 pub mod status_bar;
 pub mod terminal;
 
+pub use item::{Item, ItemHandle};
 pub use multi_workspace::{MultiWorkspace, SidebarHandle, SidebarRenderState};
+pub use pane::{Event as PaneEvent, Pane};
+pub use pane_group::{Member, PaneGroup};
 pub use settings_content::DockPosition;
 pub use terminal::{NewCenterTerminal, NewTerminal, OpenTerminal, TerminalProvider};
 
@@ -82,6 +88,8 @@ pub struct Workspace {
     left_dock: Entity<Dock>,
     bottom_dock: Entity<Dock>,
     right_dock: Entity<Dock>,
+    /// 中心 PaneGroup — 递归 split 树，装 Pane（每个 Pane 装 items）。
+    center: PaneGroup,
     /// 状态栏（含 PanelButtons + 普通状态项）。
     status_bar: Entity<StatusBar>,
     /// Workspace 边界 — 用于 resize 计算右 dock / 底 dock 的尺寸。
@@ -203,10 +211,15 @@ impl Workspace {
         // 订阅 status_bar — Sidebar toggle 改变 sidebar.open 时需要重渲染
         cx.observe(&status_bar, |_, _, cx| cx.notify()).detach();
 
+        // 7. 创建初始 center PaneGroup（一个空 Pane）
+        let initial_pane = cx.new(Pane::new);
+        let center = PaneGroup::new(initial_pane);
+
         Self {
             left_dock,
             bottom_dock,
             right_dock,
+            center,
             status_bar,
             bounds: Bounds::default(),
         }
@@ -331,16 +344,7 @@ impl Render for Workspace {
         let right_dock = Self::render_dock(&self.right_dock, DockPosition::Right, cx);
         let bottom_dock = Self::render_dock(&self.bottom_dock, DockPosition::Bottom, cx);
 
-        // Center placeholder — 后续换成真实 Pane/PaneGroup
-        let center = div()
-            .flex_1()
-            .flex()
-            .items_center()
-            .justify_center()
-            .overflow_hidden()
-            .text_size(px(14.0))
-            .text_color(hsla(0.0, 0.0, 0.5, 1.0))
-            .child("AAgent Center (placeholder)");
+        let center = self.center.render();
 
         // 读取 bottom dock 布局
         let bottom_layout = Self::read_bottom_dock_layout(cx);

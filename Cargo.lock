@@ -6711,6 +6711,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "settings-macros"
+version = "0.1.0"
+
+[[package]]
 name = "sha1"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7351,6 +7355,10 @@ dependencies = [
  "wezterm-input-types",
  "winapi",
 ]
+
+[[package]]
+name = "theme-settings"
+version = "0.1.0"
 
 [[package]]
 name = "thiserror"

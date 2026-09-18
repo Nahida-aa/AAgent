@@ -267,9 +267,9 @@ impl Panel for AgentPanel {
     fn icon_tooltip(&self, _cx: &App) -> &'static str {
         "Agent Panel"
     }
-    /// 对齐 Zed ProjectPanel — 启动时自动打开（左 Dock 主面板）。
+    /// 非 ProjectPanel 一律默认 false，由 settings 配置开启。
     fn starts_open(&self, _cx: &App) -> bool {
-        true
+        false
     }
 }
 

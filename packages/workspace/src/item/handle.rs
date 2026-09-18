@@ -3,23 +3,26 @@
 //! 对齐 Zed `WeakItemHandle` + `ItemHandle` 的核心子集。
 //!
 //! Zed:
-//! - `WeakItemHandle: Send + Sync` — 弱引用，upgrade 回 ItemHandle
+//! - `WeakItemHandle: Send + Sync` — 弱引用，Arc<Mutex<...>>
 //! - `ItemHandle` — 强引用 trait，~20 方法（telemetry/save/preview/find 等）
 //!
 //! AAgent:
-//! - `WeakItemHandle` — 用 `WeakEntity<T>` 实现，不加 Send/Sync（GPUI 主线程）
-//! - `ItemHandle` — 简化为 tab + render 核心方法
+//! - `WeakItemHandle: Send + Sync` — GPUI WeakEntity<T> 自动满足
+//!   （AnyWeakEntity 内含 Weak<RwLock<...>>，都是 Send+Sync）
+//! - `ItemHandle` — 简化为 tab + render + downgrade 核心方法
 //! - `Item` — 强类型小 trait，Entity<T> 自动获得 ItemHandle + downgrade
 
 use gpui::{AnyElement, App, Entity, EntityId, FocusHandle, IntoElement, SharedString, WeakEntity};
 use ui_gpui::IconName;
 
-/// 弱引用 item — 对齐 Zed `WeakItemHandle`。
+/// 弱引用 item — 对齐 Zed `WeakItemHandle: Send + Sync`。
 ///
 /// Zed: `Arc<Mutex<Option<Entity<Item>>>> + Send + Sync`
-/// AAgent: 用 GPUI 原生 `WeakEntity<T>` 实现，不加 Send/Sync（主线程）。
+/// AAgent: GPUI 原生 `WeakEntity<T>` 实现。WeakEntity<T> 自动 Send+Sync
+/// 因为 AnyWeakEntity 内含 Weak<RwLock<EntityRefCounts>>，都是 Send+Sync。
+///
 /// upgrade 不需要 cx — GPUI 的 WeakEntity 用原子引用计数，不碰 context。
-pub trait WeakItemHandle {
+pub trait WeakItemHandle: Send + Sync {
     fn id(&self) -> EntityId;
     fn boxed_clone(&self) -> Box<dyn WeakItemHandle>;
     /// 尝试 upgrade 回强引用 ItemHandle。item 被销毁时返回 None。

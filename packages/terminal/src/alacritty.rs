@@ -173,6 +173,11 @@ impl AlacrittyBackend {
     }
 
     pub fn set_bounds(&self, bounds: TerminalBounds) {
+        // 跳过无效尺寸 — Dock 第一次 layout 时可能还没拿到真实尺寸，
+        // alacritty resize 收到 0 cols/rows 会 panic（subtract overflow）。
+        if bounds.num_columns() == 0 || bounds.num_lines() == 0 {
+            return;
+        }
         *self.metrics.lock() = TerminalMetrics {
             cell_width: bounds.cell_width,
             line_height: bounds.line_height,

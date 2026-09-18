@@ -238,18 +238,21 @@ impl Element for TerminalElement {
             // shaping doesn't waste work), picking the fg color from the first
             // cell in the row as a coarse approximation.
             let mut text = String::with_capacity(cols);
-            let mut last_non_space = 0usize;
+            let mut last_non_space_col = 0usize;
             for col in 0..cols {
                 let c = cells[base + col].c;
                 if !c.is_whitespace() {
-                    last_non_space = col + 1;
+                    last_non_space_col = col + 1;
                 }
                 text.push(c);
             }
-            if last_non_space == 0 {
+            if last_non_space_col == 0 {
                 continue;
             }
-            text.truncate(last_non_space);
+            // 按 **字符数** 截断（不是字节数），避免 UTF-8 多字节字符中间截断。
+            // `last_non_space_col` 是终端 grid 列数，等于 char 数（我们的 cell
+            // 简化版不处理 CJK 宽字符，先假设 1 cell = 1 char）。
+            text = text.chars().take(last_non_space_col).collect();
 
             let fg = color_parts(cells[base].fg);
             let run = TextRun {

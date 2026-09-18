@@ -95,6 +95,8 @@ pub struct Workspace {
     /// Workspace 边界 — 用于 resize 计算右 dock / 底 dock 的尺寸。
     /// 通过 canvas element 更新（对齐 zed workspace.rs:L9669-L9706）。
     bounds: Bounds<gpui::Pixels>,
+    /// 对齐 zed `previous_dock_drag_coordinates` — 坐标去重, 避免相同位置重复触发 resize。
+    previous_dock_drag_coordinates: Option<gpui::Point<gpui::Pixels>>,
     /// 外部注册的 action callback 收集器。
     /// Zed 用 `Vec<Box<dyn Fn(Div, ...) -> Div>>` 在 render 顶层 div 上应用。
     /// 我们简化为 `Vec<Box<dyn ActionCallback>>`，render 时 chain on_action。
@@ -212,6 +214,7 @@ impl Workspace {
             center,
             status_bar,
             bounds: Bounds::default(),
+            previous_dock_drag_coordinates: None,
             workspace_actions: Vec::new(),
             titlebar_item: None,
         }
@@ -358,10 +361,8 @@ impl Workspace {
     /// 对齐 zed `resize_left_dock` — 调整左 dock 宽度。
     /// 关键 clamp: 不能把右 dock 挤没（对齐 zed workspace.rs:L8969-8980）。
     fn resize_left_dock(&mut self, new_size: f32, cx: &mut Context<Self>) {
-        let ws_width = self.bounds.size.width.as_f32();
-        let right_size = self.right_dock.read(cx).current_size(cx);
-        let max_size = ws_width - right_size - RESIZE_HANDLE_SIZE;
-        let size = new_size.min(max_size);
+        let workspace_width = self.bounds.right().as_f32() - self.bounds.left().as_f32();
+        let size = new_size.min(workspace_width - RESIZE_HANDLE_SIZE);
         self.left_dock.update(cx, |dock, cx| {
             dock.set_size(size);
             cx.notify();
@@ -371,10 +372,8 @@ impl Workspace {
     /// 对齐 zed `resize_right_dock` — 调整右 dock 宽度。
     /// 关键 clamp: 不能把左 dock 挤没（对齐 zed workspace.rs:L8988-8998）。
     fn resize_right_dock(&mut self, new_size: f32, cx: &mut Context<Self>) {
-        let ws_width = self.bounds.size.width.as_f32();
-        let left_size = self.left_dock.read(cx).current_size(cx);
-        let max_size = ws_width - left_size - RESIZE_HANDLE_SIZE;
-        let size = new_size.min(max_size);
+        let workspace_width = self.bounds.right().as_f32() - self.bounds.left().as_f32();
+        let size = new_size.min(workspace_width - RESIZE_HANDLE_SIZE);
         self.right_dock.update(cx, |dock, cx| {
             dock.set_size(size);
             cx.notify();
@@ -382,10 +381,12 @@ impl Workspace {
     }
 
     /// 对齐 zed `resize_bottom_dock` — 调整底部 dock 高度。
-    /// 关键 clamp: 上限 = bounds.height - RESIZE_HANDLE_SIZE（对齐 zed workspace.rs:L9006）。
+    /// bounds 现在是 main_area 的 bounds (不含 titlebar/statusbar), 所以
+    /// `bounds.bottom() - RESIZE_HANDLE - bounds.top()` 即 `bounds.height - RESIZE_HANDLE`。
     fn resize_bottom_dock(&mut self, new_size: f32, cx: &mut Context<Self>) {
-        let max_size = self.bounds.size.height.as_f32() - RESIZE_HANDLE_SIZE;
-        let size = new_size.min(max_size);
+        let size = new_size.min(
+            self.bounds.bottom().as_f32() - RESIZE_HANDLE_SIZE - self.bounds.top().as_f32(),
+        );
         self.bottom_dock.update(cx, |dock, cx| {
             dock.set_size(size);
             cx.notify();
@@ -605,32 +606,71 @@ impl Render for Workspace {
                 .into_any_element(),
         };
 
-        let this = cx.entity();
-
         let mut root = div()
             .flex()
             .flex_col()
             .size_full()
             .bg(colors.panel_background)
             .overflow_hidden()
-            // canvas — 每帧更新 bounds，但只在实际变化时才 update（对齐 zed observe_window_bounds
-            // 而非 canvas 每帧 update — canvas 每帧 update 会导致 drag lag + dock 回弹）
+            // TitleBar — 对齐 zed workspace.rs:L9612 `.when_some(self.titlebar_item)`
+            .when_some(self.titlebar_item.clone(), |root, item| root.child(item))
+            // 对齐 zed workspace.rs:L9647-L9706 — canvas 在 flex_1 容器内, bounds = main_area bounds
+            // (不包括 titlebar 和 statusbar), 这样 resize_bottom_dock 的 max height 才正确
             .child(
-                canvas(
-                    move |bounds, _, cx| {
-                        this.update(cx, |workspace, cx| {
-                            // 只有 bounds 真正变了才 update — 避免每帧重渲染循环
-                            if workspace.bounds != bounds {
-                                workspace.bounds = bounds;
-                                cx.notify();
-                            }
-                        });
-                    },
-                    |_, _, _, _| {},
-                )
-                .absolute()
-                .size_full(),
+                div()
+                    .size_full()
+                    .relative()
+                    .flex_1()
+                    .flex()
+                    .flex_col()
+                    .child(
+                        div()
+                            .id("workspace")
+                            .bg(colors.panel_background)
+                            .relative()
+                            .flex_1()
+                            .w_full()
+                            .flex()
+                            .flex_col()
+                            .overflow_hidden()
+                            .child({
+                                let this = cx.entity();
+                                canvas(
+                                    move |bounds, _window, cx| {
+                                        this.update(cx, |workspace, cx| {
+                                            let bounds_changed = workspace.bounds != bounds;
+                                            workspace.bounds = bounds;
+
+                                            // 对齐 zed — 只在 bounds_changed 时 clamp dock panel sizes
+                                            if bounds_changed {
+                                                workspace.left_dock.update(cx, |dock, cx| {
+                                                    dock.clamp_panel_size(
+                                                        bounds.size.width.as_f32(),
+                                                    );
+                                                });
+                                                workspace.right_dock.update(cx, |dock, cx| {
+                                                    dock.clamp_panel_size(
+                                                        bounds.size.width.as_f32(),
+                                                    );
+                                                });
+                                                workspace.bottom_dock.update(cx, |dock, cx| {
+                                                    dock.clamp_panel_size(
+                                                        bounds.size.height.as_f32(),
+                                                    );
+                                                });
+                                            }
+                                        })
+                                    },
+                                    |_, _, _, _| {},
+                                )
+                                .absolute()
+                                .size_full()
+                            })
+                            .child(main_area),
+                    ),
             )
+            // StatusBar
+            .child(self.status_bar.clone())
             // 顶层 on_drag_move listener — 接收所有 Dock resize 拖拽事件
             // 对齐 zed workspace.rs:L9707-L9740
             .on_drag_move::<DraggedDock>(cx.listener(
@@ -638,29 +678,34 @@ impl Render for Workspace {
                       e: &DragMoveEvent<DraggedDock>,
                       _window: &mut Window,
                       cx| {
-                    let bounds = workspace.bounds;
-                    let pos = e.event.position;
-                    match e.drag(cx).0 {
-                        DockPosition::Left => {
-                            workspace.resize_left_dock(pos.x.as_f32() - bounds.left().as_f32(), cx);
-                        }
-                        DockPosition::Right => {
-                            workspace
-                                .resize_right_dock(bounds.right().as_f32() - pos.x.as_f32(), cx);
-                        }
-                        DockPosition::Bottom => {
-                            workspace
-                                .resize_bottom_dock(bounds.bottom().as_f32() - pos.y.as_f32(), cx);
+                    // 对齐 zed L9710 — 坐标去重, 避免相同位置重复触发 resize
+                    if workspace.previous_dock_drag_coordinates != Some(e.event.position) {
+                        workspace.previous_dock_drag_coordinates = Some(e.event.position);
+                        let bounds = workspace.bounds;
+                        let pos = e.event.position;
+                        match e.drag(cx).0 {
+                            DockPosition::Left => {
+                                workspace.resize_left_dock(
+                                    pos.x.as_f32() - bounds.left().as_f32(),
+                                    cx,
+                                );
+                            }
+                            DockPosition::Right => {
+                                workspace.resize_right_dock(
+                                    bounds.right().as_f32() - pos.x.as_f32(),
+                                    cx,
+                                );
+                            }
+                            DockPosition::Bottom => {
+                                workspace.resize_bottom_dock(
+                                    bounds.bottom().as_f32() - pos.y.as_f32(),
+                                    cx,
+                                );
+                            }
                         }
                     }
                 },
-            ))
-            // TitleBar — 对齐 zed workspace.rs:L9612 `.when_some(self.titlebar_item)`
-            // 由外部 app 层创建后注入；TitleBar entity 自己根据 window_decorations 决定是否渲染内容
-            .when_some(self.titlebar_item.clone(), |root, item| root.child(item))
-            .child(main_area)
-            // StatusBar
-            .child(self.status_bar.clone());
+            ));
 
         // 外部注册的 workspace action — 逐个 chain on_action
         for action_cb in self.workspace_actions.iter() {

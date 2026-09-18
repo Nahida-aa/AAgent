@@ -147,6 +147,18 @@ impl Dock {
         self.size_override = None;
     }
 
+    /// 对齐 zed `Dock::clamp_panel_size` — 窗口 resize 时, 如果 dock size > main_area 可用空间,
+    /// 把 size_override 夹到 max_size。
+    /// Zed: clamp_panel_size(max_size, window, cx) → size > max_size 时夹到 max_size.max(RESIZE_HANDLE)
+    pub fn clamp_panel_size(&mut self, max_size: f32) {
+        let max_size = (max_size - RESIZE_HANDLE_SIZE).abs();
+        if let Some(size) = self.size_override {
+            if size > max_size {
+                self.size_override = Some(max_size.max(RESIZE_HANDLE_SIZE));
+            }
+        }
+    }
+
     // ---------- 泛型查找（对齐 Zed dock.rs `panel_index_for_type` / `panel::<T>`）----------
 
     /// 按 Panel 类型查找 index — 用 T::panel_key() 和 PanelHandle::panel_key() 比对。

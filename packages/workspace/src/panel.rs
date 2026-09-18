@@ -1,5 +1,6 @@
 //! Panel 定义 + PanelKind 枚举 + PanelEntry。
 
+use gpui::App;
 use ui_gpui::IconName;
 
 use crate::dock_position::DockPosition;
@@ -55,13 +56,32 @@ impl PanelKind {
         }
     }
 
-    /// 默认 dock 位置，对齐 zed default.json。
+    /// 默认 dock 位置。
     ///
-    /// Zed classic 布局:
-    /// - Project / Git / Collab / Outline → Right（右侧 dock）
-    /// - Agent → Left（左侧 dock）
-    /// - Terminal / Debug → Bottom（底部 dock）
-    pub fn default_position(self) -> DockPosition {
+    /// 有 App 上下文时从 SettingsStore 读取（对应 default.json 里的
+    /// `project_panel.dock` / `git_panel.dock` / `agent.dock` 等 key）；
+    /// 没有 App 上下文时 fallback 硬编码默认值（对齐 Zed classic 布局）。
+    ///
+    /// Zed classic 布局 (default.json):
+    /// - Project / Git / Collab / Outline → Right
+    /// - Agent → Left
+    /// - Terminal / Debug → Bottom
+    pub fn default_position(self, cx: Option<&App>) -> DockPosition {
+        // 尝试从 SettingsStore 读取 default.json + 用户覆盖
+        if let Some(cx) = cx {
+            if let Some(store) = cx.try_global::<settings::SettingsStore>() {
+                let name = self.persistent_name();
+                let path: [&str; 2] = [name, "dock"];
+                if let Ok(dock_str) = store.try_get_path::<String>(&path) {
+                    return parse_dock_position(&dock_str);
+                }
+            }
+        }
+        // Fallback: 硬编码默认值
+        self.hardcoded_default()
+    }
+
+    fn hardcoded_default(self) -> DockPosition {
         match self {
             PanelKind::Project | PanelKind::Git | PanelKind::Collab | PanelKind::Outline => {
                 DockPosition::Right
@@ -113,7 +133,17 @@ impl PanelEntry {
         self.kind.aria_label()
     }
 
-    pub fn default_position(&self) -> DockPosition {
-        self.kind.default_position()
+    pub fn default_position(&self, cx: Option<&App>) -> DockPosition {
+        self.kind.default_position(cx)
+    }
+}
+
+/// 从 settings JSON 的 dock 字符串解析 DockPosition。
+fn parse_dock_position(s: &str) -> DockPosition {
+    match s.to_ascii_lowercase().as_str() {
+        "left" => DockPosition::Left,
+        "right" => DockPosition::Right,
+        "bottom" => DockPosition::Bottom,
+        _ => DockPosition::Right, // 默认右侧
     }
 }

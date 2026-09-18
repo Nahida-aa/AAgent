@@ -69,7 +69,7 @@ impl Workspace {
             PanelKind::Agent,
         ] {
             let entry = PanelEntry::new(kind);
-            match entry.default_position() {
+            match entry.default_position(Some(cx)) {
                 DockPosition::Left => left_dock.add_panel(entry),
                 DockPosition::Bottom => bottom_dock.add_panel(entry),
                 DockPosition::Right => right_dock.add_panel(entry),

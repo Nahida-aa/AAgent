@@ -4,6 +4,8 @@
 //! 运行时可叠加用户 settings.json 覆盖。
 //! 各 Setting struct 通过 `SettingsStore::get_path` / `get_raw` 读取。
 
+use std::path::PathBuf;
+
 use gpui::{App, Global};
 use serde::de::DeserializeOwned;
 use serde_json::Value;
@@ -22,11 +24,55 @@ impl SettingsStore {
     pub fn init(cx: &mut App) {
         let defaults: Value = json5::from_str(&crate::embedded_default_json())
             .expect("default.json must be valid JSON5");
-        let store = Self {
+        let mut store = Self {
             defaults,
             overrides: Value::Object(serde_json::Map::new()),
         };
+        // 尝试加载用户 settings.json（没有就跳过）
+        store.try_load_user_settings();
         cx.set_global(store);
+    }
+
+    /// 尝试从 `~/.config/aa/settings.json` 加载用户覆盖。
+    /// 文件不存在或解析失败 → 静默忽略（default.json 兜底）。
+    fn try_load_user_settings(&mut self) {
+        let path = user_settings_path();
+        let content = match std::fs::read_to_string(&path) {
+            Ok(c) => c,
+            Err(_) => return, // 文件不存在，跳过
+        };
+        let user_value: Value = match json5::from_str(&content) {
+            Ok(v) => v,
+            Err(e) => {
+                eprintln!("settings: user settings parse error ({path:?}): {e}");
+                return;
+            }
+        };
+        self.overrides = merge_values(self.overrides.clone(), user_value);
+    }
+
+    /// 递归设置 overrides 中的一个值（key 不存在则创建中间路径）。
+    pub fn set_override(&mut self, path: &[&str], value: Value) {
+        let mut current = &mut self.overrides;
+        for &key in &path[..path.len() - 1] {
+            if !current.is_object() {
+                *current = Value::Object(serde_json::Map::new());
+            }
+            current = current
+                .as_object_mut()
+                .unwrap()
+                .entry(key.to_string())
+                .or_insert_with(|| Value::Object(serde_json::Map::new()));
+        }
+        if let Some(last) = path.last() {
+            if !current.is_object() {
+                *current = Value::Object(serde_json::Map::new());
+            }
+            current
+                .as_object_mut()
+                .unwrap()
+                .insert(last.to_string(), value);
+        }
     }
 
     /// 合并后的设置值树（overrides 优先覆盖 defaults）。
@@ -40,26 +86,34 @@ impl SettingsStore {
     }
 
     /// 从 merged 设置里按路径取一个字段。
-    /// 例如 `store.get_path::<f64>(["ui", "ui_font_size"])`。
     /// 路径上任何一环缺失 → panic（和 Zed Settings::from_settings 行为一致）。
     pub fn get_path<T>(&self, path: &[&str]) -> T
+    where
+        T: DeserializeOwned,
+    {
+        self.try_get_path::<T>(path)
+            .unwrap_or_else(|e| panic!("settings path `{}`: {e}", path.join(".")))
+    }
+
+    /// 非 panic 版本的 get_path。路径缺失或反序列化失败 → Err。
+    pub fn try_get_path<T>(&self, path: &[&str]) -> Result<T, String>
     where
         T: DeserializeOwned,
     {
         let merged = self.merged();
         let mut current = &merged;
         for (i, key) in path.iter().enumerate() {
-            let next = current.get(*key).unwrap_or_else(|| {
-                panic!(
-                    "settings path `{}` missing key `{key}`",
-                    path[..i].join(".")
-                )
-            });
-            current = next;
+            match current.get(*key) {
+                Some(next) => current = next,
+                None => {
+                    return Err(format!(
+                        "missing key `{key}` at path `{}`",
+                        path[..i].join(".")
+                    ));
+                }
+            }
         }
-        serde_json::from_value(current.clone()).unwrap_or_else(|e| {
-            panic!("settings path `{}` deserialize failed: {e}", path.join("."))
-        })
+        serde_json::from_value(current.clone()).map_err(|e| format!("deserialize failed: {e}"))
     }
 
     /// 从 merged 设置里反序列化整个 Value 树为 T。
@@ -90,4 +144,14 @@ fn merge_values(target: Value, source: Value) -> Value {
         }
         (_, source) => source,
     }
+}
+
+/// 用户 settings.json 路径：`$HOME/.config/aa/settings.json`。
+/// Zed 对应 `~/.config/zed/settings.json`。
+fn user_settings_path() -> PathBuf {
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/".to_string());
+    PathBuf::from(home)
+        .join(".config")
+        .join("aa")
+        .join("settings.json")
 }

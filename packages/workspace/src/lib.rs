@@ -21,9 +21,12 @@
 
 pub mod dock;
 pub mod dock_position;
+pub mod multi_workspace;
 pub mod panel;
 pub mod panel_buttons;
 pub mod status_bar;
+
+pub use multi_workspace::MultiWorkspace;
 
 use std::collections::HashMap;
 
@@ -438,28 +441,6 @@ impl Render for Workspace {
         };
 
         let this = cx.entity();
-        let sidebar_state = self.status_bar.read(cx).sidebar();
-        let has_left_sidebar = sidebar_state.open && sidebar_state.side == DockPosition::Left;
-        let has_right_sidebar = sidebar_state.open && sidebar_state.side == DockPosition::Right;
-
-        // Zed 的 sidebar 是 MultiWorkspace 层独立渲染的，在 Dock 外面
-        // （crates/sidebar/src/sidebar.rs — Agent Threads 列表 + Recent Projects）
-        // AAgent 还没有真正的 Sidebar entity，先渲染占位容器
-        let render_sidebar = |side: DockPosition| {
-            let id = match side {
-                DockPosition::Left => "workspace-sidebar-left",
-                DockPosition::Right => "workspace-sidebar-right",
-                DockPosition::Bottom => unreachable!(),
-            };
-            div()
-                .id(id)
-                .flex_none()
-                .w(px(200.))
-                .h_full()
-                .bg(colors.surface_background)
-                .border_r_1()
-                .border_color(colors.border_variant)
-        };
 
         div()
             .flex()
@@ -504,22 +485,7 @@ impl Render for Workspace {
                     }
                 },
             ))
-            // Sidebar + 主布局（sidebar 独立于 dock，在最外层 flex 里）
-            // Zed MultiWorkspace 渲染顺序: [sidebar?] Workspace(main_area) [sidebar?]
-            .child(
-                div()
-                    .flex()
-                    .flex_row()
-                    .flex_1()
-                    .h_full()
-                    .when(has_left_sidebar, |el| {
-                        el.child(render_sidebar(DockPosition::Left))
-                    })
-                    .child(main_area)
-                    .when(has_right_sidebar, |el| {
-                        el.child(render_sidebar(DockPosition::Right))
-                    }),
-            )
+            .child(main_area)
             // StatusBar
             .child(self.status_bar.clone())
     }

@@ -3,24 +3,27 @@ use std::path::PathBuf;
 use crate::title_bar::TitleBar;
 use gpui::{Context, Decorations, Entity, ParentElement, Render, Styled, prelude::*};
 use ui_gpui::theme::ActiveTheme;
-use workspace::Workspace;
+use workspace::{MultiWorkspace, Workspace};
 
-/// AAgent desktop app shell。对齐 zed 的 App → Workspace → Dock/StatusBar 组装方式。
+/// AAgent desktop app shell。对齐 zed 的 App → MultiWorkspace → Workspace → Dock/StatusBar 组装方式。
 ///
 /// 层级：
 /// ```
 /// AppShell
 /// ├── TitleBar (CSD/SSD 条件渲染)
-/// └── Workspace
-///     ├── Left Dock (Project, Git)
-///     ├── Center Pane (placeholder，后续接 AgentPanel)
-///     ├── Right Dock (Collab, Outline, Debug, Agent)
-///     ├── Bottom Dock (Terminal)
-///     └── StatusBar (PanelButtons + 19 普通项)
+/// └── MultiWorkspace
+///     ├── [Sidebar?] ← Agent Threads 列表（独立于 Dock）
+///     └── Workspace
+///         ├── Left Dock (Project, Git)
+///         ├── Center Pane (placeholder，后续接 AgentPanel)
+///         ├── Right Dock (Collab, Outline, Debug, Agent)
+///         ├── Bottom Dock (Terminal)
+///         └── StatusBar (PanelButtons + 普通项 + Sidebar toggle)
+///     └── [Sidebar?]
 /// ```
 pub struct AppShell {
     title_bar: Entity<TitleBar>,
-    workspace: Entity<Workspace>,
+    multi_workspace: Entity<MultiWorkspace>,
 }
 
 impl AppShell {
@@ -28,9 +31,10 @@ impl AppShell {
         let _working_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
         let title_bar = cx.new(|cx| TitleBar::new("AAgent", cx));
         let workspace = cx.new(|cx| Workspace::new(cx));
+        let multi_workspace = cx.new(|cx| MultiWorkspace::new(workspace, cx));
         Self {
             title_bar,
-            workspace,
+            multi_workspace,
         }
     }
 }
@@ -51,6 +55,6 @@ impl Render for AppShell {
             .size_full()
             .bg(cx.theme().colors().panel_background)
             .when(show_titlebar, |root| root.child(self.title_bar.clone()))
-            .child(self.workspace.clone())
+            .child(self.multi_workspace.clone())
     }
 }

@@ -253,38 +253,9 @@ impl Panel for AgentPanel {
 }
 
 // ---------- Terminal Panel ----------
-
-pub struct TerminalPanel;
-
-impl Render for TerminalPanel {
-    fn render(&mut self, _w: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        placeholder("terminal")
-    }
-}
-
-impl Panel for TerminalPanel {
-    fn panel_key() -> &'static str {
-        "terminal"
-    }
-    fn persistent_name() -> &'static str {
-        "terminal"
-    }
-    fn default_position(&self, _cx: &App) -> DockPosition {
-        DockPosition::Bottom
-    }
-    fn position_is_valid(&self, _p: DockPosition) -> bool {
-        true
-    }
-    fn default_size(&self, _cx: &App) -> Pixels {
-        px(320.0)
-    }
-    fn icon(&self, _cx: &App) -> IconName {
-        IconName::TerminalAlt
-    }
-    fn icon_tooltip(&self, _cx: &App) -> &'static str {
-        "Terminal Panel"
-    }
-}
+// TerminalPanel 已移到 aa-terminal-view crate。
+// 原来的 placeholder 在 panel.rs 是一个空 struct + placeholder render。
+// 现在由 terminal-view/src/panel.rs 提供真正的实现（持有 active_pane + new_terminal）。
 
 // ---------- Debug Panel ----------
 

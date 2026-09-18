@@ -1,3 +1,7 @@
+//! TerminalView entity — PTY 渲染层。
+
+pub mod item;
+
 use std::path::PathBuf;
 
 use aa_terminal::alacritty::{AlacrittyBackend, TerminalBounds};

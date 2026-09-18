@@ -44,7 +44,6 @@ use ui_gpui::theme::ActiveTheme;
 
 use dock::panel::{
     AgentPanel, CollabPanel, DebugPanel, GitPanel, OutlinePanel, PanelHandle, ProjectPanel,
-    TerminalPanel,
 };
 use dock::panel_buttons::PanelButtons;
 use dock::{Dock, DraggedDock};
@@ -134,10 +133,9 @@ impl Workspace {
         let outline = Arc::new(cx.new(|_| OutlinePanel)) as Arc<dyn PanelHandle>;
         add_panel_to_dock(&mut right_dock, outline);
 
-        // Bottom Dock — Terminal, Debug
-        let terminal = Arc::new(cx.new(|_| TerminalPanel)) as Arc<dyn PanelHandle>;
-        add_panel_to_dock(&mut bottom_dock, terminal);
-
+        // Bottom Dock — TerminalPanel 在 aa-terminal-view crate，
+        // 由 App 层创建并注入（避免 workspace→terminal-view 循环依赖）。
+        // 这里先放 DebugPanel 占位，TerminalPanel 由 App 层后续 add_panel 进来。
         let debug = Arc::new(cx.new(|_| DebugPanel)) as Arc<dyn PanelHandle>;
         add_panel_to_dock(&mut bottom_dock, debug);
 

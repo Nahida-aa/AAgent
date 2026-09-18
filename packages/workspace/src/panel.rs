@@ -20,6 +20,21 @@ pub enum PanelKind {
 }
 
 impl PanelKind {
+    /// Zed default.json 里的 settings key（用于 SettingsStore 读取）。
+    /// Zed 里 dock 位置的 key: project_panel, git_panel, outline_panel,
+    /// collab_panel, agent, terminal, debug（不完全一致，有的带 _panel 有的不带）。
+    pub fn settings_key(self) -> &'static str {
+        match self {
+            PanelKind::Project => "project_panel",
+            PanelKind::Git => "git_panel",
+            PanelKind::Collab => "collab_panel",
+            PanelKind::Outline => "outline_panel",
+            PanelKind::Terminal => "terminal",
+            PanelKind::Debug => "debug",
+            PanelKind::Agent => "agent",
+        }
+    }
+
     pub fn persistent_name(self) -> &'static str {
         match self {
             PanelKind::Project => "project",
@@ -70,7 +85,7 @@ impl PanelKind {
         // 尝试从 SettingsStore 读取 default.json + 用户覆盖
         if let Some(cx) = cx {
             if let Some(store) = cx.try_global::<settings::SettingsStore>() {
-                let name = self.persistent_name();
+                let name = self.settings_key();
                 let path: [&str; 2] = [name, "dock"];
                 if let Ok(dock_str) = store.try_get_path::<String>(&path) {
                     return parse_dock_position(&dock_str);

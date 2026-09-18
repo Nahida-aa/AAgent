@@ -9,6 +9,8 @@
 //! - 单 Workspace（不需要多窗口）
 //! - 单 Sidebar entity（open/close/toggle 由 MultiWorkspace 统一管理）
 
+pub mod sidebar_render_state;
+
 use gpui::{
     App, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, prelude::*, px,
 };
@@ -17,6 +19,8 @@ use ui_gpui::theme::ActiveTheme;
 use crate::Workspace;
 use crate::sidebar::{Sidebar, SidebarStatus};
 use settings_content::SidebarSide;
+
+pub use sidebar_render_state::SidebarRenderState;
 
 /// 顶层 MultiWorkspace entity。
 pub struct MultiWorkspace {
@@ -58,6 +62,12 @@ impl MultiWorkspace {
         self.sidebar.read(cx).status()
     }
 
+    /// 只读渲染状态 — 对齐 zed `MultiWorkspace::sidebar_render_state()`（L334）。
+    /// PlatformTitleBar 等上层通过此方法读 sidebar 状态，避免直接依赖 Sidebar entity。
+    pub fn sidebar_render_state(&self, cx: &App) -> SidebarRenderState {
+        self.sidebar.read(cx).status().into()
+    }
+
     /// 对外 API — 切换 sidebar 开关（对齐 zed `ToggleWorkspaceSidebar`）。
     pub fn toggle_sidebar(&mut self, side: SidebarSide, cx: &mut Context<Self>) {
         self.sidebar.update(cx, |s, cx| s.toggle(side, cx));
@@ -72,7 +82,7 @@ impl MultiWorkspace {
 impl Render for MultiWorkspace {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let colors = cx.theme().colors();
-        let sidebar = self.sidebar.read(cx).status();
+        let sidebar: SidebarRenderState = self.sidebar.read(cx).status().into();
         let has_left_sidebar = sidebar.open && sidebar.side == SidebarSide::Left;
         let has_right_sidebar = sidebar.open && sidebar.side == SidebarSide::Right;
 

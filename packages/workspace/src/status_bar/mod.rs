@@ -28,7 +28,7 @@ use ui_gpui::{
 
 use crate::dock::panel_buttons::PanelButtons;
 use crate::sidebar::SidebarStatus;
-use settings_content::DockPosition;
+use settings_content::SidebarSide;
 
 /// 状态栏项（对齐 zed `StatusItemView`）。
 pub trait StatusItemView: Render {
@@ -171,9 +171,9 @@ impl StatusBar {
                 .tooltip_attach(gpui::Anchor::TopLeft)
                 .on_click(move |_event, _window, cx| {
                     let side = if on_right {
-                        DockPosition::Right
+                        SidebarSide::Right
                     } else {
-                        DockPosition::Left
+                        SidebarSide::Left
                     };
                     bar.update(cx, |bar, cx| {
                         bar.toggle_sidebar(side, cx);
@@ -185,8 +185,8 @@ impl StatusBar {
                 let bar = bar_for_menu.clone();
                 ContextMenu::build(cx, move |menu, _| {
                     let current = current_side;
-                    let positions: [(DockPosition, &str); 2] =
-                        [(DockPosition::Left, "Left"), (DockPosition::Right, "Right")];
+                    let positions: [(SidebarSide, &str); 2] =
+                        [(SidebarSide::Left, "Left"), (SidebarSide::Right, "Right")];
                     let mut m = menu;
                     for (pos, label) in positions {
                         let bar = bar.clone();
@@ -222,7 +222,7 @@ impl StatusBar {
     /// 左组：[sidebar-toggle?] + Dock PanelButtons + 普通项。
     fn render_left_tools(&self, cx: &mut Context<Self>) -> impl IntoElement {
         let mut children = Vec::new();
-        if !self.sidebar.open && self.sidebar.side == DockPosition::Left {
+        if !self.sidebar.open && self.sidebar.side == SidebarSide::Left {
             children.push(self.render_sidebar_toggle(false, cx).into_any_element());
         }
         for (ix, item) in self.visible_left_items().enumerate() {
@@ -278,7 +278,7 @@ impl StatusBar {
                 children.push(hideable.into_any_element());
             }
         }
-        if !self.sidebar.open && self.sidebar.side == DockPosition::Right {
+        if !self.sidebar.open && self.sidebar.side == SidebarSide::Right {
             children.push(self.render_sidebar_toggle(true, cx).into_any_element());
         }
         div()
@@ -292,10 +292,7 @@ impl StatusBar {
 
     /// toggle sidebar — 直接调 Sidebar entity（通过弱引用升级）。
     /// Sidebar entity 改变后 MultiWorkspace 重渲染 sidebar。
-    pub fn toggle_sidebar(&mut self, side: DockPosition, cx: &mut Context<Self>) {
-        if side == DockPosition::Bottom {
-            return;
-        }
+    pub fn toggle_sidebar(&mut self, side: SidebarSide, cx: &mut Context<Self>) {
         // 先更新缓存
         if self.sidebar.side == side {
             self.sidebar.open = !self.sidebar.open;
@@ -314,10 +311,7 @@ impl StatusBar {
         cx.notify();
     }
 
-    pub fn set_side(&mut self, side: DockPosition, cx: &mut Context<Self>) {
-        if side == DockPosition::Bottom {
-            return;
-        }
+    pub fn set_side(&mut self, side: SidebarSide, cx: &mut Context<Self>) {
         self.sidebar.side = side;
         self.sidebar.open = true;
         if let Some(weak) = self.sidebar_entity.as_ref() {

@@ -17,7 +17,7 @@ use gpui::{
     App, Context, Entity, EntityId, IntoElement, ParentElement, Render, Styled, WeakEntity, Window,
     div, prelude::*, px,
 };
-use settings_content::DockPosition;
+use settings_content::SidebarSide;
 use ui_gpui::IconName;
 use ui_gpui::component::tooltip::Tooltip;
 use ui_gpui::theme::ActiveTheme;
@@ -25,19 +25,18 @@ use ui_gpui::{ButtonRadius, IconButton};
 
 use crate::multi_workspace::MultiWorkspace;
 
-/// Sidebar 开关状态（对齐 zed，但 Zed 用 SidebarSide enum）。
-/// AAgent 简化：open + side(DockPosition::Left/Right)。
+/// Sidebar 开关状态（对齐 zed `SidebarStatus{open, side: SidebarSide}`）。
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct SidebarStatus {
     pub open: bool,
-    pub side: DockPosition,
+    pub side: SidebarSide,
 }
 
 impl Default for SidebarStatus {
     fn default() -> Self {
         Self {
             open: false,
-            side: DockPosition::Left,
+            side: SidebarSide::Left,
         }
     }
 }
@@ -69,7 +68,7 @@ impl Sidebar {
         self.status
     }
 
-    pub fn open(&mut self, side: DockPosition, cx: &mut Context<Self>) {
+    pub fn open(&mut self, side: SidebarSide, cx: &mut Context<Self>) {
         self.status.open = true;
         self.status.side = side;
         cx.notify();
@@ -80,7 +79,7 @@ impl Sidebar {
         cx.notify();
     }
 
-    pub fn toggle(&mut self, side: DockPosition, cx: &mut Context<Self>) {
+    pub fn toggle(&mut self, side: SidebarSide, cx: &mut Context<Self>) {
         if self.status.open && self.status.side == side {
             self.status.open = false;
         } else {
@@ -90,11 +89,9 @@ impl Sidebar {
         cx.notify();
     }
 
-    pub fn set_side(&mut self, side: DockPosition, cx: &mut Context<Self>) {
-        if side != DockPosition::Bottom {
-            self.status.side = side;
-            cx.notify();
-        }
+    pub fn set_side(&mut self, side: SidebarSide, cx: &mut Context<Self>) {
+        self.status.side = side;
+        cx.notify();
     }
 
     fn toggle_archive(&mut self, cx: &mut Context<Self>) {
@@ -111,7 +108,7 @@ impl Sidebar {
     /// ```
     fn render_bottom_bar(&mut self, cx: &mut Context<Self>) -> gpui::AnyElement {
         let is_archive = self.show_archive;
-        let on_right = self.status.side == DockPosition::Right;
+        let on_right = self.status.side == SidebarSide::Right;
         let mw = self.multi_workspace.clone();
 
         let colors = cx.theme().colors();
@@ -223,10 +220,8 @@ impl Render for Sidebar {
             .flex_col()
             .size_full()
             .bg(colors.surface_background)
-            .when(self.status.side == DockPosition::Left, |el| el.border_r_1())
-            .when(self.status.side == DockPosition::Right, |el| {
-                el.border_l_1()
-            })
+            .when(self.status.side == SidebarSide::Left, |el| el.border_r_1())
+            .when(self.status.side == SidebarSide::Right, |el| el.border_l_1())
             .border_color(colors.border)
             // Thread list (placeholder)
             .child(placeholder_list)

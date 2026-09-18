@@ -16,7 +16,7 @@ use ui_gpui::theme::ActiveTheme;
 
 use crate::Workspace;
 use crate::sidebar::{Sidebar, SidebarStatus};
-use settings_content::DockPosition;
+use settings_content::SidebarSide;
 
 /// 顶层 MultiWorkspace entity。
 pub struct MultiWorkspace {
@@ -59,7 +59,7 @@ impl MultiWorkspace {
     }
 
     /// 对外 API — 切换 sidebar 开关（对齐 zed `ToggleWorkspaceSidebar`）。
-    pub fn toggle_sidebar(&mut self, side: DockPosition, cx: &mut Context<Self>) {
+    pub fn toggle_sidebar(&mut self, side: SidebarSide, cx: &mut Context<Self>) {
         self.sidebar.update(cx, |s, cx| s.toggle(side, cx));
     }
 
@@ -73,8 +73,8 @@ impl Render for MultiWorkspace {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let colors = cx.theme().colors();
         let sidebar = self.sidebar.read(cx).status();
-        let has_left_sidebar = sidebar.open && sidebar.side == DockPosition::Left;
-        let has_right_sidebar = sidebar.open && sidebar.side == DockPosition::Right;
+        let has_left_sidebar = sidebar.open && sidebar.side == SidebarSide::Left;
+        let has_right_sidebar = sidebar.open && sidebar.side == SidebarSide::Right;
 
         // Zed MultiWorkspace 渲染顺序: [sidebar?] Workspace [sidebar?]
         // Sidebar 独立于 Dock（属于 MultiWorkspace 层，crates/sidebar/src/sidebar.rs）

@@ -471,8 +471,8 @@ impl Render for Workspace {
                         .flex_1()
                         .overflow_hidden()
                         .child(
-                            // Zed: h_flex().flex_1() 包装 center — 让 center 填满 bottom dock 上方空间
-                            div().flex_row().flex_1().overflow_hidden().child(center),
+                            // Zed: h_flex().flex_1() — flex() 不能少！display:flex 才有 flex item 效果
+                            div().flex().flex_row().flex_1().overflow_hidden().child(center),
                         )
                         .child(bottom_dock),
                 )
@@ -496,7 +496,7 @@ impl Render for Workspace {
                                 .flex_col()
                                 .flex_1()
                                 .overflow_hidden()
-                                .child(div().flex_row().flex_1().child(center)),
+                                .child(div().flex().flex_row().flex_1().child(center)),
                         )
                         .child(right_dock),
                 )
@@ -526,7 +526,7 @@ impl Render for Workspace {
                                         .flex_col()
                                         .flex_1()
                                         .overflow_hidden()
-                                        .child(div().flex_row().flex_1().child(center)),
+                                        .child(div().flex().flex_row().flex_1().child(center)),
                                 ),
                         )
                         .child(bottom_dock),
@@ -556,7 +556,7 @@ impl Render for Workspace {
                                         .flex_col()
                                         .flex_1()
                                         .overflow_hidden()
-                                        .child(div().flex_row().flex_1().child(center)),
+                                        .child(div().flex().flex_row().flex_1().child(center)),
                                 )
                                 .child(right_dock),
                         )
@@ -637,7 +637,27 @@ impl Render for Workspace {
                                             Some(e.event.position);
                                         let bounds = workspace.bounds;
                                         let pos = e.event.position;
+                                        let event_bounds = e.bounds;
                                         match e.drag(cx).0 {
+                                            DockPosition::Bottom => {
+                                                let raw = bounds.bottom().as_f32()
+                                                    - pos.y.as_f32();
+                                                eprintln!(
+                                                    "[resize_bottom] ws_bounds={:.1}x{:.1} top={:.1} bottom={:.1} | ev.bounds=({:.1},{:.1})-({:.1},{:.1}) | pos.y={:.1} | raw={:.1} | cur_size={}",
+                                                    bounds.size.width.as_f32(),
+                                                    bounds.size.height.as_f32(),
+                                                    bounds.top().as_f32(),
+                                                    bounds.bottom().as_f32(),
+                                                    event_bounds.left().as_f32(),
+                                                    event_bounds.top().as_f32(),
+                                                    event_bounds.right().as_f32(),
+                                                    event_bounds.bottom().as_f32(),
+                                                    pos.y.as_f32(),
+                                                    raw,
+                                                    workspace.bottom_dock.read(cx).current_size(cx),
+                                                );
+                                                workspace.resize_bottom_dock(raw, cx);
+                                            }
                                             DockPosition::Left => {
                                                 workspace.resize_left_dock(
                                                     pos.x.as_f32()
@@ -649,13 +669,6 @@ impl Render for Workspace {
                                                 workspace.resize_right_dock(
                                                     bounds.right().as_f32()
                                                         - pos.x.as_f32(),
-                                                    cx,
-                                                );
-                                            }
-                                            DockPosition::Bottom => {
-                                                workspace.resize_bottom_dock(
-                                                    bounds.bottom().as_f32()
-                                                        - pos.y.as_f32(),
                                                     cx,
                                                 );
                                             }

@@ -11,6 +11,6 @@ pub mod agent;
 pub mod dock;
 pub mod language_model;
 
-pub use agent::SidebarSide;
+pub use agent::{SidebarDockPosition, SidebarSide};
 pub use dock::DockPosition;
 pub use language_model::{Config, McpConfig, McpServerDef, ProviderConfig, ResolvedConfig};

@@ -29,7 +29,7 @@ pub mod terminal;
 
 pub use item::{Item, ItemHandle};
 pub use multi_workspace::{MultiWorkspace, SidebarHandle, SidebarRenderState};
-pub use pane::{Event as PaneEvent, Pane};
+pub use pane::{DraggedSelection, DraggedTab, Event as PaneEvent, Pane};
 pub use pane_group::{Member, PaneGroup};
 pub use settings_content::DockPosition;
 pub use terminal::{NewCenterTerminal, NewTerminal, OpenTerminal, TerminalProvider};

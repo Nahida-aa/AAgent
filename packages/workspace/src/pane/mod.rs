@@ -15,8 +15,10 @@ use ui_gpui::theme::ActiveTheme;
 use crate::item::{Item, ItemHandle};
 
 pub mod activate_item;
+pub mod dragged;
 
 pub use activate_item::ActivateItem;
+pub use dragged::{DraggedSelection, DraggedTab};
 
 /// Pane 内部事件。
 #[derive(Debug, Clone)]

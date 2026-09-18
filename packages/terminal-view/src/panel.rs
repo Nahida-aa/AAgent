@@ -37,11 +37,21 @@ impl EventEmitter<()> for TerminalPanel {}
 impl TerminalPanel {
     pub fn new(cx: &mut Context<Self>) -> Self {
         let active_pane = cx.new(Pane::new);
-        Self { active_pane }
+        let mut panel = Self { active_pane };
+
+        // 对齐 Zed finish_restoration — 没有持久化时 spawn 默认 shell
+        // 简化：直接在 new() 里创建一个默认 TerminalView
+        panel.spawn_default_terminal(cx);
+
+        panel
     }
 
     /// 创建一个新的 TerminalView 加进 active_pane。
     pub fn new_terminal(&mut self, cx: &mut Context<Self>) {
+        self.spawn_default_terminal(cx);
+    }
+
+    fn spawn_default_terminal(&mut self, cx: &mut Context<Self>) {
         let working_dir = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
         let terminal = cx.new(|cx| TerminalView::new(None, working_dir, cx));
         self.active_pane.update(cx, |pane, cx| {

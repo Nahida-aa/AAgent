@@ -1,13 +1,15 @@
 //! Dock 面板容器，对齐 zed `dock.rs`。
 
+use std::sync::Arc;
+
 use gpui::{
-    Context, IntoElement, MouseButton, MouseDownEvent, MouseUpEvent, ParentElement, Render, Styled,
-    Window, deferred, div, hsla, prelude::*, px,
+    App, Context, IntoElement, MouseButton, MouseDownEvent, MouseUpEvent, ParentElement, Render,
+    Styled, Window, deferred, div, hsla, prelude::*, px,
 };
 use settings_content::DockPosition;
 use ui_gpui::theme::ActiveTheme;
 
-use crate::panel::PanelEntry;
+use crate::panel::PanelHandle;
 
 /// Resize handle 的大小（对齐 zed dock.rs `RESIZE_HANDLE_SIZE = px(6.)`）。
 pub(crate) const RESIZE_HANDLE_SIZE: f32 = 6.0;
@@ -24,9 +26,12 @@ impl Render for DraggedDock {
 }
 
 /// 面板容器（对齐 zed `pub struct Dock` dock.rs:L283-L295）。
+///
+/// Zed: `panels: Vec<PanelEntry>` 其中 `PanelEntry { panel: Arc<dyn PanelHandle>, ... }`
+/// AAgent: `panels: Vec<Arc<dyn PanelHandle>>` — 简化，PanelSizeState 后续加
 pub struct Dock {
     position: DockPosition,
-    panel_entries: Vec<PanelEntry>,
+    panels: Vec<Arc<dyn PanelHandle>>,
     is_open: bool,
     active_panel_index: Option<usize>,
     /// 用户调整后的尺寸（覆盖 active panel 的 default_size）。
@@ -38,7 +43,7 @@ impl Dock {
     pub fn new(position: DockPosition) -> Self {
         Self {
             position,
-            panel_entries: Vec::new(),
+            panels: Vec::new(),
             is_open: false,
             active_panel_index: None,
             size_override: None,
@@ -57,12 +62,12 @@ impl Dock {
         self.active_panel_index
     }
 
-    pub fn panel_entries(&self) -> &[PanelEntry] {
-        &self.panel_entries
+    pub fn panels(&self) -> &[Arc<dyn PanelHandle>] {
+        &self.panels
     }
 
-    pub fn add_panel(&mut self, entry: PanelEntry) {
-        self.panel_entries.push(entry);
+    pub fn add_panel(&mut self, panel: Arc<dyn PanelHandle>) {
+        self.panels.push(panel);
         if self.active_panel_index.is_none() {
             self.active_panel_index = Some(0);
         }
@@ -77,37 +82,32 @@ impl Dock {
             self.is_open = false;
         } else {
             self.is_open = true;
-            if self.active_panel_index.is_none() && !self.panel_entries.is_empty() {
+            if self.active_panel_index.is_none() && !self.panels.is_empty() {
                 self.active_panel_index = Some(0);
             }
         }
     }
 
     pub fn activate_panel(&mut self, index: usize) {
-        if index < self.panel_entries.len() {
+        if index < self.panels.len() {
             self.active_panel_index = Some(index);
         }
     }
 
     /// 移除并返回 index 的面板（用于跨 Dock 移动）。
-    pub fn remove_panel(&mut self, index: usize) -> Option<PanelEntry> {
-        if index < self.panel_entries.len() {
-            let removed = self.panel_entries.remove(index);
-            // 修正 active_panel_index
+    pub fn remove_panel(&mut self, index: usize) -> Option<Arc<dyn PanelHandle>> {
+        if index < self.panels.len() {
+            let removed = self.panels.remove(index);
             match self.active_panel_index {
                 Some(ai) if ai == index => {
-                    self.active_panel_index = self
-                        .panel_entries
-                        .get(ai)
-                        .map(|_| ai)
-                        .or(self.panel_entries.first().map(|_| 0));
+                    self.active_panel_index = self.panels.first().map(|_| 0);
                 }
                 Some(ai) if ai > index => {
                     self.active_panel_index = Some(ai - 1);
                 }
                 _ => {}
             }
-            if self.panel_entries.is_empty() {
+            if self.panels.is_empty() {
                 self.active_panel_index = None;
             }
             Some(removed)
@@ -117,26 +117,13 @@ impl Dock {
     }
 
     /// 当前 Dock 的实际尺寸（对齐 zed workspace.rs `dock_size`）。
-    /// - Left/Right Dock → width (px)
-    /// - Bottom Dock → height (px)
-    ///
-    /// 优先用 size_override（用户 resize 过），否则用 active panel 的 default_size。
-    pub fn current_size(&self) -> f32 {
+    pub fn current_size(&self, cx: &App) -> f32 {
         if let Some(override_size) = self.size_override {
             return override_size;
         }
-        let active = self
-            .active_panel_index
-            .and_then(|i| self.panel_entries.get(i))
-            .map(|e| e.kind);
+        let active = self.active_panel_index.and_then(|i| self.panels.get(i));
         match active {
-            Some(kind) => {
-                let (w, h) = kind.default_size();
-                match self.position {
-                    DockPosition::Left | DockPosition::Right => w,
-                    DockPosition::Bottom => h,
-                }
-            }
+            Some(panel) => panel.default_size(cx).as_f32(),
             None => 280.0, // fallback
         }
     }
@@ -148,12 +135,11 @@ impl Dock {
 
     /// 用户 resize 后设置新尺寸（对齐 zed `set_dock_size`）。
     pub fn set_size(&mut self, size: f32) {
-        // 限制范围：最小 80px，最大窗口一半（简化）
         let clamped = size.clamp(RESIZE_HANDLE_SIZE + 74.0, 1200.0);
         self.size_override = Some(clamped);
     }
 
-    /// 重置为 active panel 的 default_size（用户调乱了想恢复）。
+    /// 重置为 active panel 的 default_size。
     pub fn reset_size(&mut self) {
         self.size_override = None;
     }
@@ -161,36 +147,34 @@ impl Dock {
 
 impl Render for Dock {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> gpui::AnyElement {
-        if !self.is_open || self.panel_entries.is_empty() {
+        if !self.is_open || self.panels.is_empty() {
             return div().into_any_element();
         }
 
         let colors = cx.theme().colors();
         let position = self.position;
 
-        // Active panel content — 占位（后续换成真实 Panel entity 渲染）
-        // Zed Dock Render 没有 tab bar —— 激活的 Panel 自己渲染自己的 UI。
-        let active_kind = self
+        // 显示 active panel 的 persistent_name（后续换成真实 Panel entity 渲染）
+        let active_name = self
             .active_panel_index
-            .and_then(|i| self.panel_entries.get(i))
-            .map(|e| e.kind);
+            .and_then(|i| self.panels.get(i))
+            .map(|p| p.persistent_name());
 
-        let content = match active_kind {
-            Some(kind) => div()
-                .flex_1()
-                .flex()
-                .items_center()
-                .justify_center()
-                .w_full()
-                .h_full()
-                .text_size(px(16.0))
-                .text_color(hsla(0.0, 0.0, 0.5, 1.0))
-                .child(format!("{} (placeholder)", kind.aria_label())),
-            None => div(),
-        };
+        let content = div()
+            .flex_1()
+            .flex()
+            .items_center()
+            .justify_center()
+            .w_full()
+            .h_full()
+            .text_size(px(16.0))
+            .text_color(hsla(0.0, 0.0, 0.5, 1.0))
+            .child(format!(
+                "{} (placeholder)",
+                active_name.unwrap_or("unnamed")
+            ));
 
-        // Resize handle — 对齐 zed dock.rs `create_resize_handle()`。
-        // 用 deferred + absolute 定位在 Dock 边缘，一半在 dock 内一半在 dock 外。
+        // Resize handle — 对齐 zed dock.rs `create_resize_handle()`
         let resize_handle = {
             let pos = self.position;
             let handle = div()
@@ -257,9 +241,7 @@ impl Render for Dock {
             .border_color(colors.border)
             .overflow_hidden()
             .map(|el| match position {
-                // 左侧/右侧 Dock 的面板横向排列（面板里的 Pane 纵向堆叠）
                 DockPosition::Left | DockPosition::Right => el.flex_col(),
-                // 底部 Dock 纵向排列（面板横向堆叠）
                 DockPosition::Bottom => el.flex_row(),
             })
             .map(|el| match position {

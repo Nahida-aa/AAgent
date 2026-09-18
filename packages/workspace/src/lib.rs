@@ -37,7 +37,10 @@ use gpui::{
 use ui_gpui::theme::ActiveTheme;
 
 use dock::{Dock, DraggedDock};
-use panel::{PanelEntry, PanelKind};
+use panel::{
+    AgentPanel, CollabPanel, DebugPanel, GitPanel, OutlinePanel, PanelHandle, ProjectPanel,
+    TerminalPanel,
+};
 use panel_buttons::PanelButtons;
 use status_bar::StatusBar;
 
@@ -88,28 +91,47 @@ pub struct Workspace {
 
 impl Workspace {
     pub fn new(cx: &mut Context<Self>) -> Self {
+        use std::sync::Arc;
+
         // 1. 创建 3 个 Dock（对齐 zed workspace.rs:L1970-L1972）
         let mut left_dock = Dock::new(DockPosition::Left);
         let mut bottom_dock = Dock::new(DockPosition::Bottom);
         let mut right_dock = Dock::new(DockPosition::Right);
 
-        // 2. 注册面板到对应 Dock（PanelKind 自带 default_position）
-        for kind in [
-            PanelKind::Project,
-            PanelKind::Git,
-            PanelKind::Collab,
-            PanelKind::Outline,
-            PanelKind::Terminal,
-            PanelKind::Debug,
-            PanelKind::Agent,
-        ] {
-            let entry = PanelEntry::new(kind);
-            match entry.default_position(Some(cx)) {
-                DockPosition::Left => left_dock.add_panel(entry),
-                DockPosition::Bottom => bottom_dock.add_panel(entry),
-                DockPosition::Right => right_dock.add_panel(entry),
-            }
-        }
+        // 2. 创建 7 个 Panel Entity（每个是独立的 GPUI entity），
+        //    按各自默认位置注册到对应 Dock。
+        //
+        // Zed default.json 布局:
+        // - Project/Git/Collab/Outline → Right
+        // - Agent → Left
+        // - Terminal/Debug → Bottom
+        let mut add_panel_to_dock = |dock: &mut Dock, panel: Arc<dyn PanelHandle>| {
+            dock.add_panel(panel);
+        };
+
+        // Left Dock — Agent
+        let agent = Arc::new(cx.new(|_| AgentPanel)) as Arc<dyn PanelHandle>;
+        add_panel_to_dock(&mut left_dock, agent);
+
+        // Right Dock — Project, Git, Collab, Outline
+        let project = Arc::new(cx.new(|_| ProjectPanel)) as Arc<dyn PanelHandle>;
+        add_panel_to_dock(&mut right_dock, project);
+
+        let git = Arc::new(cx.new(|_| GitPanel)) as Arc<dyn PanelHandle>;
+        add_panel_to_dock(&mut right_dock, git);
+
+        let collab = Arc::new(cx.new(|_| CollabPanel)) as Arc<dyn PanelHandle>;
+        add_panel_to_dock(&mut right_dock, collab);
+
+        let outline = Arc::new(cx.new(|_| OutlinePanel)) as Arc<dyn PanelHandle>;
+        add_panel_to_dock(&mut right_dock, outline);
+
+        // Bottom Dock — Terminal, Debug
+        let terminal = Arc::new(cx.new(|_| TerminalPanel)) as Arc<dyn PanelHandle>;
+        add_panel_to_dock(&mut bottom_dock, terminal);
+
+        let debug = Arc::new(cx.new(|_| DebugPanel)) as Arc<dyn PanelHandle>;
+        add_panel_to_dock(&mut bottom_dock, debug);
 
         // 3. Dock 默认全关（对齐 Zed Dock::new 硬编码 is_open: false）。
         // Zed 没有 default.json 里的 open 字段 — 首次启动全关，
@@ -221,26 +243,23 @@ impl Workspace {
     /// 对齐 zed `render_dock` — 返回 Dock 容器。
     ///
     /// 关键点：即使 Dock 关闭也返回容器（flex_none 不占空间），
-    /// 保证 focus handle 始终挂载（否则 toggle_panel_focus 无法聚焦关闭的面板）。
+    /// 保证 focus handle 始终挂载。
     ///
     /// 当 Dock 的 active panel 支持 flexible sizing（Agent 面板）且没有用户覆盖的固定尺寸时，
     /// 用 flex_grow(1.0) 让它和 Center 等宽（对齐 zed `default_dock_flex` 返回 1.0）。
     fn render_dock(dock: &Entity<Dock>, position: DockPosition, cx: &App) -> impl IntoElement {
         let dock_ref = dock.read(cx);
         let is_open = dock_ref.is_open();
-        let size = dock_ref.current_size();
+        let size = dock_ref.current_size(cx);
 
         // 判断是否 flexible sizing：
-        // - 只有 Left/Right Dock 才支持（Bottom Dock 固定高度）
-        // - 有用户 size_override → 固定尺寸
-        // - 没有 size_override 且 active panel 是 Agent（默认 flexible=true）→ flexible
         let is_flexible = match position {
             DockPosition::Left | DockPosition::Right => {
                 !dock_ref.has_size_override()
                     && dock_ref
                         .active_panel_index()
-                        .and_then(|i| dock_ref.panel_entries().get(i))
-                        .map(|e| e.kind.supports_flexible_size())
+                        .and_then(|i| dock_ref.panels().get(i))
+                        .map(|p| p.supports_flexible_size(cx))
                         .unwrap_or(false)
             }
             DockPosition::Bottom => false,
@@ -256,10 +275,9 @@ impl Workspace {
 
         if is_open {
             if is_flexible && matches!(position, DockPosition::Left | DockPosition::Right) {
-                // Flexible sizing — 和 Center 1:1 等宽（对齐 zed workspace.rs:L8682-L8708）
+                // Flexible sizing — 和 Center 1:1 等宽
                 container = container.flex_grow(1.0).flex_shrink(1.0);
             } else {
-                // 固定尺寸
                 match position {
                     DockPosition::Left | DockPosition::Right => {
                         container = container.w(px(size)).flex_shrink(1.0);

@@ -4,16 +4,15 @@
 //! Zed 的 PanelButtons 本身就是一个 StatusBar item（实现 `StatusItemView`），
 //! 它关联一个 Dock entity，渲染成一排图标按钮。
 //!
-//! 每个按钮对应 Dock 里的一个面板：
+//! 每个按钮对应 Dock 里的一个 Panel（Arc<dyn PanelHandle>）：
 //! - 点击已激活面板 → 关闭 dock
 //! - 点击其他面板 → 打开 dock 并切 tab
-//! - 按钮高亮 = dock 打开 + 该面板是 active_panel_index（用 IconButton::selected）
-//! - 右键 → Dock Left / Right / Bottom 切换（把面板搬到目标 Dock）
+//! - 按钮高亮 = dock 打开 + 该面板是 active_panel_index
 
 use std::collections::HashMap;
 
 use gpui::{
-    Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, prelude::*, px,
+    App, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, prelude::*, px,
 };
 use ui_gpui::component::context_menu::ContextMenuEntry;
 use ui_gpui::component::divider::{Divider, DividerColor};
@@ -24,12 +23,20 @@ use crate::dock::Dock;
 use crate::status_bar::StatusItemView;
 use settings_content::DockPosition;
 
-/// 状态栏上的一排面板按钮。关联一个 Dock entity，读它的 panel_entries 渲染。
-/// 同时持有所有 3 个 Dock 的引用（用于右键菜单搬面板）。
+/// DockPosition 显示名称（对齐 zed `DockPosition::label()`，在 workspace 层）。
+fn dock_label(p: DockPosition) -> &'static str {
+    match p {
+        DockPosition::Left => "Left",
+        DockPosition::Bottom => "Bottom",
+        DockPosition::Right => "Right",
+    }
+}
+
+/// 状态栏上的一排面板按钮。关联一个 Dock entity，读它的 panels() 渲染。
 pub struct PanelButtons {
-    /// 自己的 dock（读 panel_entries 渲染按钮）
+    /// 自己的 dock
     dock: Entity<Dock>,
-    /// 所有 dock，按 position 索引（用于跨 Dock 搬面板）
+    /// 所有 dock，按 position 索引
     all_docks: HashMap<DockPosition, Entity<Dock>>,
 }
 
@@ -39,9 +46,7 @@ impl PanelButtons {
         all_docks: HashMap<DockPosition, Entity<Dock>>,
         cx: &mut Context<Self>,
     ) -> Self {
-        // 订阅 dock 变化（面板增删、active 切换、开关）→ 自动重新渲染
         cx.observe(&dock, |_, _, cx| cx.notify()).detach();
-        // 也要订阅其他 dock（面板搬进来时需要刷新）
         for d in all_docks.values() {
             if d != &dock {
                 let d = d.clone();
@@ -67,123 +72,40 @@ impl Render for PanelButtons {
         let dock_entity = self.dock.clone();
         let all_docks = self.all_docks.clone();
 
-        // 每个面板按钮：click → 开关；right-click → 搬 Dock
+        // 每个面板按钮：click → 开关
+        // 右键菜单的跨 Dock 搬面板暂时简化（PanelHandle::position_is_valid 需要 App 上下文）
         let mut buttons: Vec<gpui::AnyElement> = dock
-            .panel_entries()
+            .panels()
             .iter()
             .enumerate()
-            .map(|(i, entry)| {
+            .map(|(i, panel)| {
                 let is_active = dock_open && active_index == Some(i);
-                let icon = entry.icon();
-                let label = entry.icon_tooltip();
-                let entry_label = label.clone();
-
+                let icon = panel.icon(cx);
+                let tooltip = panel.icon_tooltip(cx);
                 let dock_for_click = dock_entity.clone();
+                let persistent_name = panel.persistent_name();
+                let button_id: gpui::SharedString =
+                    format!("panel-btn-{dock_position:?}-{i}").into();
 
-                // 右键菜单：Dock Left / Right / Bottom 切换
-                let entry_for_menu = entry.clone();
-                let current_pos = dock_position;
-                let docks_for_menu = all_docks.clone();
-
-                // Zed dock.rs:L1397 — 根据 dock 位置选择菜单锚点
-                // Left dock: 按钮组左对齐，菜单从按钮上方弹出
-                // Right/Bottom: 按钮组右对齐
-                let (menu_anchor, menu_attach) = match dock_position {
-                    DockPosition::Left => (gpui::Anchor::BottomLeft, gpui::Anchor::TopLeft),
-                    DockPosition::Bottom | DockPosition::Right => {
-                        (gpui::Anchor::BottomRight, gpui::Anchor::TopRight)
-                    }
-                };
-
-                let menu_id: gpui::SharedString =
-                    format!("panel-btn-menu-{dock_position:?}-{i}").into();
-
-                right_click_menu::<ui_gpui::ContextMenu>(menu_id)
-                    .anchor(menu_anchor)
-                    .attach(menu_attach)
-                    .trigger(move |_is_active, _window, _cx| {
-                        IconButton::new(format!("panel-btn-{dock_position:?}-{i}"), icon)
-                            .size(px(22.0))
-                            .icon_size(px(14.0))
-                            .radius(ui_gpui::ButtonRadius::Medium)
-                            .aria_label(label)
-                            .selected(is_active)
-                            .tooltip(Tooltip::text(entry_label.to_string()))
-                            // 状态栏按钮 tooltip 在上方弹出（状态栏在底部，默认向下会出屏）
-                            .tooltip_anchor(gpui::Anchor::BottomLeft)
-                            .tooltip_attach(gpui::Anchor::TopLeft)
-                            .on_click(move |_ev, _window, cx| {
-                                dock_for_click.update(cx, |dock, cx| {
-                                    if dock.is_open() && dock.active_panel_index() == Some(i) {
-                                        dock.set_open(false);
-                                    } else {
-                                        dock.set_open(true);
-                                        dock.activate_panel(i);
-                                    }
-                                    cx.notify();
-                                });
-                            })
-                            .into_any_element()
-                    })
-                    .menu(move |_window, cx| {
-                        let entry = entry_for_menu.clone();
-                        let pos = current_pos;
-                        let docks = docks_for_menu.clone();
-                        let entry_kind = entry_for_menu.kind;
-
-                        let positions: [DockPosition; 3] = [
-                            DockPosition::Left,
-                            DockPosition::Right,
-                            DockPosition::Bottom,
-                        ];
-
-                        ui_gpui::ContextMenu::build(cx, move |menu, _| {
-                            let mut menu = menu;
-                            for target in positions {
-                                // Zed dock.rs:L1453 — position_is_valid 过滤
-                                if !entry_kind.position_is_valid(target) {
-                                    continue;
-                                }
-                                let is_current = target == pos;
-                                let entry = entry_for_menu.clone();
-                                let docks = docks.clone();
-                                menu = menu.item(
-                                    ContextMenuEntry::new(format!("Dock {}", target.label()))
-                                        .checked(is_current)
-                                        .on_click(move |_window, cx| {
-                                            if is_current {
-                                                return;
-                                            }
-                                            // 从当前 dock 移除，加到目标 dock
-                                            let entry = entry.clone();
-                                            let from_pos = pos;
-                                            let docks = docks.clone();
-                                            if let (Some(target), Some(current)) =
-                                                (docks.get(&target), docks.get(&from_pos))
-                                            {
-                                                current.update(cx, |dock, cx| {
-                                                    let idx = dock
-                                                        .panel_entries()
-                                                        .iter()
-                                                        .position(|e| e.kind == entry.kind);
-                                                    if let Some(idx) = idx {
-                                                        let removed = dock.remove_panel(idx);
-                                                        if let Some(e) = removed {
-                                                            target.clone().update(cx, |td, cx| {
-                                                                td.add_panel(e);
-                                                                td.set_open(true);
-                                                                cx.notify();
-                                                            });
-                                                        }
-                                                    }
-                                                    cx.notify();
-                                                });
-                                            }
-                                        }),
-                                );
+                IconButton::new(button_id.clone(), icon)
+                    .size(px(22.0))
+                    .icon_size(px(14.0))
+                    .radius(ui_gpui::ButtonRadius::Medium)
+                    .aria_label(tooltip)
+                    .selected(is_active)
+                    .tooltip(Tooltip::text(tooltip.to_string()))
+                    .tooltip_anchor(gpui::Anchor::BottomLeft)
+                    .tooltip_attach(gpui::Anchor::TopLeft)
+                    .on_click(move |_ev, _window, cx| {
+                        dock_for_click.update(cx, |dock, cx| {
+                            if dock.is_open() && dock.active_panel_index() == Some(i) {
+                                dock.set_open(false);
+                            } else {
+                                dock.set_open(true);
+                                dock.activate_panel(i);
                             }
-                            menu
-                        })
+                            cx.notify();
+                        });
                     })
                     .into_any_element()
             })
@@ -196,9 +118,6 @@ impl Render for PanelButtons {
 
         let has_buttons = !buttons.is_empty();
 
-        // Zed dock.rs:L1572-L1583 — 按钮组前后加 Divider
-        // Right / Bottom dock: Divider 在左侧（按钮组前面）
-        // Left dock: Divider 在右侧（按钮组后面）
         div()
             .flex()
             .flex_row()

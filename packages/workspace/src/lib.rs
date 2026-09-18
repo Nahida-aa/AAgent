@@ -148,27 +148,60 @@ impl Workspace {
 
 impl Render for Workspace {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        // Zed workspace 的渲染是 center_pane + dock(left/bottom/right) + status_bar
-        // AAgent 简化：用 flex_col，center + status_bar 各占一行
-        // Dock 打开时 center 区域需要让位——这一步后续处理
-
         let colors = cx.theme().colors();
+
+        // 读取三个 dock 的开/关状态（决定是否占空间）
+        let left_open = self.left_dock.read(cx).is_open();
+        let right_open = self.right_dock.read(cx).is_open();
+        let bottom_open = self.bottom_dock.read(cx).is_open();
 
         div()
             .flex()
             .flex_col()
             .size_full()
             .bg(colors.panel_background)
-            // Center 区域（暂为空，后续接入 AgentPanel）
+            .overflow_hidden()
+            // 主区域（flex_1 占满剩余空间）
             .child(
                 div()
+                    .flex_1()
                     .flex()
+                    .flex_col()
                     .size_full()
-                    .items_center()
-                    .justify_center()
-                    .text_size(px(14.0))
-                    .text_color(hsla(0.0, 0.0, 0.5, 1.0))
-                    .child("AAgent Center (placeholder)"),
+                    .bg(colors.background)
+                    .overflow_hidden()
+                    // 上半部分：flex_row（左 dock | 中心 | 右 dock）
+                    .child(
+                        div()
+                            .flex_1()
+                            .flex()
+                            .flex_row()
+                            .size_full()
+                            .overflow_hidden()
+                            // Left Dock（打开时才占空间）
+                            .when(left_open, |el| {
+                                el.child(div().w(px(280.0)).h_full().child(self.left_dock.clone()))
+                            })
+                            // Center placeholder
+                            .child(
+                                div()
+                                    .flex_1()
+                                    .flex()
+                                    .items_center()
+                                    .justify_center()
+                                    .text_size(px(14.0))
+                                    .text_color(hsla(0.0, 0.0, 0.5, 1.0))
+                                    .child("AAgent Center (placeholder)"),
+                            )
+                            // Right Dock（打开时才占空间）
+                            .when(right_open, |el| {
+                                el.child(div().w(px(280.0)).h_full().child(self.right_dock.clone()))
+                            }),
+                    )
+                    // Bottom Dock（打开时才占空间，叠在底部）
+                    .when(bottom_open, |el| {
+                        el.child(div().w_full().h(px(240.0)).child(self.bottom_dock.clone()))
+                    }),
             )
             // StatusBar
             .child(self.status_bar.clone())

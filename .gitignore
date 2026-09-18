@@ -9,3 +9,5 @@ node_modules/
 # TanStack Router generated
 .tanstack/
 **/.tanstack/
+
+/tmp/

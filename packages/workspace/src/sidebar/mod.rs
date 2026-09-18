@@ -236,7 +236,7 @@ impl Render for Sidebar {
 // 对齐 zed: Sidebar entity 实现 workspace::Sidebar trait
 // 将来 Sidebar 独立到 packages/sidebar/ crate 后，MultiWorkspace
 // 会通过 Box<dyn SidebarHandle> 持有（解耦循环依赖）
-impl crate::multi_workspace::sidebar_handle::SidebarTrait for Sidebar {
+impl crate::multi_workspace::sidebar::Sidebar for Sidebar {
     fn width(&self, _cx: &App) -> gpui::Pixels {
         self.width
     }

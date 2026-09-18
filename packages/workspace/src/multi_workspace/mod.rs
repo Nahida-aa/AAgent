@@ -9,10 +9,14 @@
 //! - 单 Workspace（不需要多窗口）
 //! - 单 Sidebar entity（open/close/toggle 由 MultiWorkspace 统一管理）
 
+pub mod sidebar;
 pub mod sidebar_handle;
 pub mod sidebar_render_state;
 
-pub use sidebar_handle::SidebarTrait;
+// 不 pub use Sidebar trait — 和 crate::sidebar::Sidebar (entity struct) 冲突。
+// 内部用完整路径 crate::multi_workspace::sidebar::Sidebar (trait) vs
+// crate::sidebar::Sidebar (entity struct) 区分。
+pub use sidebar_handle::SidebarHandle;
 pub use sidebar_render_state::SidebarRenderState;
 
 use gpui::{

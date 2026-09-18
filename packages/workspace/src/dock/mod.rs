@@ -1,6 +1,7 @@
 //! Dock 面板容器，对齐 zed `dock.rs`。
 
 pub mod panel;
+pub mod panel_buttons;
 
 use std::sync::Arc;
 

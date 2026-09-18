@@ -24,7 +24,7 @@ use ui_gpui::{
     Tooltip, right_click_menu,
 };
 
-use crate::panel_buttons::PanelButtons;
+use crate::dock::panel_buttons::PanelButtons;
 use settings_content::DockPosition;
 
 /// 状态栏项（对齐 zed `StatusItemView`）。

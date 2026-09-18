@@ -21,7 +21,6 @@
 
 pub mod dock;
 pub mod multi_workspace;
-pub mod panel_buttons;
 pub mod status_bar;
 
 pub use multi_workspace::MultiWorkspace;
@@ -39,8 +38,8 @@ use dock::panel::{
     AgentPanel, CollabPanel, DebugPanel, GitPanel, OutlinePanel, PanelHandle, ProjectPanel,
     TerminalPanel,
 };
+use dock::panel_buttons::PanelButtons;
 use dock::{Dock, DraggedDock};
-use panel_buttons::PanelButtons;
 use status_bar::StatusBar;
 
 /// Bottom dock 布局（对齐 zed `settings_content/src/workspace.rs`）。

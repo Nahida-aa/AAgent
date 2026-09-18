@@ -74,6 +74,8 @@ aa-terminal-view = { path = "packages/terminal-view" }
 aa-task = { path = "packages/task" }
 settings = { path = "packages/settings" }
 settings-content = { path = "packages/settings-content" }
+settings-macros = { path = "packages/settings-macros" }
+theme-settings = { path = "packages/theme-settings" }
 workspace = { path = "packages/workspace" }
 # 外部 gpui_learn 共享库（绝对 path，开发期引用）
 aa-gpui-kit-assets = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/assets" }

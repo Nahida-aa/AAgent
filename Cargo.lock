@@ -7364,6 +7364,12 @@ dependencies = [
 [[package]]
 name = "theme-settings"
 version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "settings",
+ "settings-macros",
+]
 
 [[package]]
 name = "thiserror"

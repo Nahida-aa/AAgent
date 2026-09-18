@@ -1,0 +1,76 @@
+//! ThemeSettings — UI + theme 相关设置。
+//!
+//! 对齐 Zed `settings_content::ThemeSettingsContent` 的极简版。
+//! 用 `#[derive(RegisterSetting)]` 注册到 `settings::SettingsStore`。
+//!
+//! 字段对应 default.json 里的顶层 key：
+//! - `theme` / `icon_theme` / `ui_font_size` / `buffer_font_size` / ...
+
+use serde::Deserialize;
+use serde_json::Value;
+use settings_macros::RegisterSetting;
+
+/// Customizable settings for the UI and theme system.
+#[derive(Clone, PartialEq, Debug, Deserialize, RegisterSetting)]
+#[serde(default)]
+pub struct ThemeSettings {
+    /// Theme selection. 可以是字符串（静态）或 `{ mode, light, dark }` 对象（动态）。
+    /// Zed 完整类型是 `ThemeSelection`，这里简化为直接存 JSON Value。
+    pub theme: Value,
+
+    /// Icon theme 名称（字符串）。
+    pub icon_theme: Option<String>,
+
+    /// UI 字体大小（像素）。
+    pub ui_font_size: Option<f32>,
+
+    /// UI 字体族名称。
+    pub ui_font_family: Option<String>,
+
+    /// UI 字体粗细（CSS 单位 100-900）。
+    pub ui_font_weight: Option<f32>,
+
+    /// 编辑器字体大小（像素）。
+    pub buffer_font_size: Option<f32>,
+
+    /// 编辑器字体族名称。
+    pub buffer_font_family: Option<String>,
+
+    /// 编辑器字体粗细（CSS 单位 100-900）。
+    pub buffer_font_weight: Option<f32>,
+
+    /// 编辑器行高 — `"comfortable"` / `"standard"` / `{ "custom": <f32> }`。
+    pub buffer_line_height: Option<Value>,
+}
+
+impl Default for ThemeSettings {
+    fn default() -> Self {
+        Self {
+            theme: Value::Object({
+                let mut m = serde_json::Map::new();
+                m.insert("mode".into(), Value::String("system".into()));
+                m.insert("light".into(), Value::String("One Light".into()));
+                m.insert("dark".into(), Value::String("One Dark".into()));
+                m
+            }),
+            icon_theme: None,
+            ui_font_size: None,
+            ui_font_family: None,
+            ui_font_weight: None,
+            buffer_font_size: None,
+            buffer_font_family: None,
+            buffer_font_weight: None,
+            buffer_line_height: None,
+        }
+    }
+}
+
+impl settings::Settings for ThemeSettings {
+    fn from_settings(content: &settings::SettingsContent) -> Self {
+        // 直接从整个 SettingsContent（即合并后的 default.json + user settings 树）反序列化。
+        // 字段缺失时 `Option` 自动为 None，`theme` Value 会拿到 JSON 默认值。
+        content
+            .deserialize::<Self>()
+            .expect("ThemeSettings 必须能从 default.json 反序列化")
+    }
+}

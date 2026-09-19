@@ -130,3 +130,31 @@ pub mod dev {
         ]
     );
 }
+
+// ============================================================
+// reveal — UI 展示位置（task、terminal 共用）
+// 对齐 zed_actions::RevealTarget (zed_actions/src/lib.rs:725)
+// ============================================================
+
+/// Where to reveal the task output in the UI.
+///
+/// 被 task::SpawnInTerminal.reveal_target 和 workspace::OpenTerminal 等使用。
+#[derive(
+    Default,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    serde::Serialize,
+    serde::Deserialize,
+    schemars::JsonSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum RevealTarget {
+    /// In the central pane group, "main" editor area.
+    Center,
+    /// In the terminal dock, "regular" terminal items' place.
+    #[default]
+    Dock,
+}

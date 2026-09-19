@@ -137,10 +137,10 @@ impl Dock {
     }
 
     /// 用户 resize 后设置新尺寸（对齐 zed dock.rs `resize_active_panel`）。
-    /// Zed: `size.max(RESIZE_HANDLE_SIZE).round()` — 只 clamp 最小值, 不设上限
-    /// 上限由 Workspace::resize_*_dock 的 clamp_panel_size 处理。
+    /// Zed dock.rs:L414 — 只 clamp 最小值为 RESIZE_HANDLE_SIZE, 不设上限。
+    /// 上限由 Workspace::resize_*_dock 的 bounds clamp 处理。
     pub fn set_size(&mut self, size: f32) {
-        let clamped = size.max(RESIZE_HANDLE_SIZE + 74.0);
+        let clamped = size.max(RESIZE_HANDLE_SIZE);
         self.size_override = Some(clamped);
     }
 

@@ -5,9 +5,9 @@
 
 pub mod entity;
 
-// Fs trait + RealFs + MockFs 定义在独立 `fs` crate（对齐 Zed `crates/fs`）。
-// re-export 方便下游用 `project::Fs`、`project::MockFs` 等。
-pub use fs::{Fs, Metadata, MockFs, RealFs};
+// Fs trait + RealFs + FakeFs 定义在独立 `fs` crate（对齐 Zed `crates/fs`）。
+// re-export 方便下游用 `project::Fs`、`project::FakeFs` 等。
+pub use fs::{FakeFs, Fs, Metadata, RealFs};
 
 pub use entity::{
     OpenProjectOptions, OpenWorktreeStrategy, Project, ProjectPath, WorktreeEntry, WorktreeId,

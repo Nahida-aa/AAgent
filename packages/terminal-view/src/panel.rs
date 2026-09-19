@@ -73,9 +73,14 @@ impl TerminalPanel {
             // 对齐 Zed terminal_panel.rs:L438-445 — 最后一个 pane → emit Close
             // 我们简化为：一个 pane 变空 → 关闭整个 TerminalPanel Dock
             PaneEvent::Empty => {
+                // 必须 defer! 当前 TerminalPanel entity 正在被 update
+                // (subscribe callback), 直接 close_panel → Dock.set_open → panel.set_active
+                // 会尝试再 update TerminalPanel → GPUI panic "already being updated"
                 if let Some(workspace) = self.workspace.upgrade() {
-                    workspace.update(cx, |workspace, cx| {
-                        workspace.close_panel::<Self>(cx);
+                    cx.defer(move |cx| {
+                        workspace.update(cx, |workspace, cx| {
+                            workspace.close_panel::<Self>(cx);
+                        });
                     });
                 }
             }

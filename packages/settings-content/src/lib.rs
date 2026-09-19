@@ -10,7 +10,13 @@
 pub mod agent;
 pub mod dock;
 pub mod language_model;
+pub mod theme;
 
 pub use agent::{SidebarDockPosition, SidebarSide};
 pub use dock::DockPosition;
 pub use language_model::{Config, McpConfig, McpServerDef, ProviderConfig, ResolvedConfig};
+pub use theme::{
+    BufferLineHeight, DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME, FontFamilyName, FontSize,
+    FontWeightContent, IconThemeName, IconThemeSelection, ThemeAppearanceMode, ThemeName,
+    ThemeSelection, ThemeSettingsContent, UiDensity,
+};

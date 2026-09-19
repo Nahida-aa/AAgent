@@ -1,9 +1,10 @@
 //! Shell 检测 + quoting + 命令构造。
 //!
-//! 对齐 Zed `crates/util/src/shell.rs`，但把 `Shell` 数据类型移到了
-//! `settings_content::terminal::Shell`（那个是 serde 数据类型，settings-content 层）。
+//! 对齐 Zed `crates/util/src/shell.rs`。
 //!
-//! 本模块只留运行时：ShellKind 类型 + 系统 shell 检测 + quoting + args_for_shell。
+//! 注意：Zed 在 settings_content 里还有一份同名 Shell enum（纯 serde 数据类型），
+//! 本模块这份是 runtime 用的——带 Hash + runtime 方法。两份类型相同，
+//! 但分开定义避免 util ↔ settings-content 循环依赖。
 
 use std::borrow::Cow;
 use std::fmt;
@@ -14,6 +15,48 @@ use std::path::PathBuf;
 use std::sync::LazyLock;
 
 use serde::{Deserialize, Serialize};
+
+// ---------- Shell ----------
+
+/// Runtime shell configuration. 与 settings_content::Shell 同构但带 runtime 方法 + Hash。
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[serde(rename_all = "snake_case")]
+pub enum Shell {
+    #[default]
+    System,
+    Program(String),
+    WithArguments {
+        program: String,
+        args: Vec<String>,
+        title_override: Option<String>,
+    },
+}
+
+impl Shell {
+    pub fn program(&self) -> String {
+        match self {
+            Shell::Program(program) => program.clone(),
+            Shell::WithArguments { program, .. } => program.clone(),
+            Shell::System => get_system_shell(),
+        }
+    }
+
+    pub fn program_and_args(&self) -> (String, &[String]) {
+        match self {
+            Shell::Program(program) => (program.clone(), &[]),
+            Shell::WithArguments { program, args, .. } => (program.clone(), args),
+            Shell::System => (get_system_shell(), &[]),
+        }
+    }
+
+    pub fn shell_kind(&self, is_windows: bool) -> ShellKind {
+        match self {
+            Shell::Program(program) => ShellKind::new(program, is_windows),
+            Shell::WithArguments { program, .. } => ShellKind::new(program, is_windows),
+            Shell::System => ShellKind::system(),
+        }
+    }
+}
 
 // ---------- ShellKind ----------
 

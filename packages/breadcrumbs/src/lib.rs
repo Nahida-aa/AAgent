@@ -2,6 +2,7 @@
 use gpui::{
     AnyElement, App, Context, EventEmitter, Font, Global, IntoElement, Render, Subscription, Window,
 };
+use language::HighlightedText;
 use workspace::{
     // ToolbarItemEvent, ToolbarItemLocation, ToolbarItemView,
     item::{ItemEvent, ItemHandle},

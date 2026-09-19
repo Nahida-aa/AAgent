@@ -140,7 +140,7 @@ dependencies = [
 [[package]]
 name = "aa-gpui-kit-assets"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2b16c7d5be80535d3523417004ebffce5e2a2c5b#2b16c7d5be80535d3523417004ebffce5e2a2c5b"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=dd307ccec9717332a4b96b1bc357884893baaee8#dd307ccec9717332a4b96b1bc357884893baaee8"
 dependencies = [
  "anyhow",
  "gpui",
@@ -150,7 +150,7 @@ dependencies = [
 [[package]]
 name = "aa-gpui-kit-theme"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2b16c7d5be80535d3523417004ebffce5e2a2c5b#2b16c7d5be80535d3523417004ebffce5e2a2c5b"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=dd307ccec9717332a4b96b1bc357884893baaee8#dd307ccec9717332a4b96b1bc357884893baaee8"
 dependencies = [
  "anyhow",
  "gpui",
@@ -167,7 +167,7 @@ dependencies = [
 [[package]]
 name = "aa-gpui-kit-ui"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2b16c7d5be80535d3523417004ebffce5e2a2c5b#2b16c7d5be80535d3523417004ebffce5e2a2c5b"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=dd307ccec9717332a4b96b1bc357884893baaee8#dd307ccec9717332a4b96b1bc357884893baaee8"
 dependencies = [
  "aa-gpui-kit-assets",
  "aa-gpui-kit-theme",
@@ -1183,6 +1183,7 @@ version = "0.1.0"
 dependencies = [
  "aa-gpui-kit-ui",
  "gpui",
+ "language",
  "workspace",
 ]
 
@@ -2424,7 +2425,7 @@ checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
 [[package]]
 name = "editor"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2b16c7d5be80535d3523417004ebffce5e2a2c5b#2b16c7d5be80535d3523417004ebffce5e2a2c5b"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=dd307ccec9717332a4b96b1bc357884893baaee8#dd307ccec9717332a4b96b1bc357884893baaee8"
 dependencies = [
  "aa-gpui-kit-theme",
  "gpui",

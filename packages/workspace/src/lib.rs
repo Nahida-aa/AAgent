@@ -25,6 +25,7 @@ pub mod multi_workspace;
 pub mod pane;
 pub mod status_bar;
 pub mod terminal;
+pub mod toolbar;
 
 pub use item::{Item, ItemEvent, ItemHandle, WeakItemHandle};
 pub use multi_workspace::{MultiWorkspace, SidebarHandle, SidebarRenderState};
@@ -32,6 +33,7 @@ pub use pane::group::{Member, PaneGroup};
 pub use pane::{DraggedSelection, DraggedTab, Event as PaneEvent, Pane};
 pub use settings_content::DockPosition;
 pub use terminal::{NewCenterTerminal, NewTerminal, OpenTerminal, TerminalProvider};
+pub use toolbar::{Toolbar, ToolbarItemEvent, ToolbarItemLocation, ToolbarItemView};
 
 use std::collections::HashMap;
 use std::sync::Arc;

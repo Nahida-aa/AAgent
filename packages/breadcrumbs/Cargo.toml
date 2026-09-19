@@ -8,6 +8,7 @@ license.workspace = true
 gpui.workspace = true
 aa-gpui-kit-ui.workspace = true
 workspace.workspace = true
+language.workspace = true
 
 [dev-dependencies]
 gpui = { workspace = true, features = ["test-support"] }

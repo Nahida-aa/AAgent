@@ -41,6 +41,10 @@ pub trait ItemHandle {
     fn boxed_clone(&self) -> Box<dyn ItemHandle>;
     /// 降级为弱引用 — 对齐 Zed `ItemHandle::downgrade_item`。
     fn downgrade_item(&self) -> Box<dyn WeakItemHandle>;
+    /// 当前 item 是否要显示 Toolbar（默认 true）。
+    fn show_toolbar(&self, _cx: &App) -> bool {
+        true
+    }
 }
 
 /// 每种 item 类型实现此小 trait，Entity<T> 自动获得 ItemHandle + WeakItemHandle。

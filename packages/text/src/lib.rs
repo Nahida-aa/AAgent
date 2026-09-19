@@ -1,14 +1,7 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+//! Text crate — 文本处理工具（行尾、坐标系统、Rope 集成等）。
+//!
+//! 对齐 Zed `crates/text`，精简版：先做基础类型。
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub mod line_ending;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use line_ending::LineEnding;

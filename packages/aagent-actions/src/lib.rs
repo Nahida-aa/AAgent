@@ -14,6 +14,8 @@
 //! - `#[serde(deny_unknown_fields)]` — 带字段的 action 严格反序列化
 
 use gpui::{Action, actions};
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
 /// 空初始化函数 — 防止 Rust 优化掉 action 注册（对齐 zed L6-L13）。
 /// 必须在 main.rs 里被调用一次。
@@ -70,7 +72,7 @@ pub mod agents_sidebar {
 // ============================================================
 
 pub mod assistant {
-    use gpui::actions;
+    use gpui::{Action, actions};
 
     actions!(
         assistant,
@@ -83,6 +85,16 @@ pub mod assistant {
             FocusAgent,
         ]
     );
+
+    /// Deploys the inline assistant interface with the specified prompt.
+    /// 对齐 zed_actions::assistant::InlineAssist
+    #[derive(Clone, Default, serde::Deserialize, PartialEq, schemars::JsonSchema, Action)]
+    #[action(namespace = assistant)]
+    #[serde(deny_unknown_fields)]
+    pub struct InlineAssist {
+        #[serde(default)]
+        pub prompt: Option<String>,
+    }
 }
 
 // ============================================================
@@ -139,17 +151,7 @@ pub mod dev {
 /// Where to reveal the task output in the UI.
 ///
 /// 被 task::SpawnInTerminal.reveal_target 和 workspace::OpenTerminal 等使用。
-#[derive(
-    Default,
-    Clone,
-    Copy,
-    Debug,
-    PartialEq,
-    Eq,
-    serde::Serialize,
-    serde::Deserialize,
-    schemars::JsonSchema,
-)]
+#[derive(Default, Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum RevealTarget {
     /// In the central pane group, "main" editor area.

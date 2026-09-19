@@ -1,11 +1,11 @@
 use std::sync::Arc;
 
-use aa_terminal::alacritty::{AlacrittyBackend, DisplayCell, TerminalBounds};
 use alacritty_terminal::vte::ansi::Color;
 use gpui::{
     App, Bounds, Element, ElementId, GlobalElementId, InspectorElementId, IntoElement, LayoutId,
     Pixels, Rgba, SharedString, Style, TextAlign, TextRun, Window, fill, point, px, size,
 };
+use terminal::alacritty::{AlacrittyBackend, DisplayCell, TerminalBounds};
 
 const DEFAULT_BG: Rgba = Rgba {
     r: 0.051,

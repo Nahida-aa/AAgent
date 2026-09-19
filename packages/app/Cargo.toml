@@ -16,10 +16,10 @@ path = "src/main.rs"
 
 [dependencies]
 workspace.workspace = true
-aa-sidebar.workspace = true
-aa-terminal.workspace = true
-aa-terminal-view.workspace = true
-aa-title-bar.workspace = true
+sidebar.workspace = true
+terminal.workspace = true
+terminal_view.workspace = true
+title_bar.workspace = true
 settings.workspace = true
 gpui.workspace = true
 gpui_util.workspace = true
@@ -33,10 +33,10 @@ chrono = { workspace = true }
 parking_lot = { workspace = true }
 # gpui_learn 共享库:内嵌 zed 图标/字体/主题的 assets + 自研 ui 库。
 # 开发期 path 依赖;后续可切换成 git 源。
-aa-gpui-kit-assets.workspace = true
-aa-gpui-kit-theme.workspace = true
-theme-settings.workspace = true
-aa-gpui-kit-ui.workspace = true
+aa_gpui_kit_assets.workspace = true
+aa_gpui_kit_theme.workspace = true
+theme_settings.workspace = true
+aa_gpui_kit_ui.workspace = true
 editor.workspace = true
 
 [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]

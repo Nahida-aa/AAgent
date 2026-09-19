@@ -12,7 +12,7 @@ members = [
     "packages/server",
     "packages/settings",
     "packages/session",
-    "packages/app", "packages/ui", "packages/workspace", "packages/settings-content", "packages/sidebar", "packages/aagent-actions", "packages/terminal", "packages/terminal-view", "packages/task", "packages/theme-settings", "packages/settings-macros", "packages/title-bar", "packages/agent-ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language",
+    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aagent_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language",
 ]
 
 [workspace.package]
@@ -73,15 +73,15 @@ aa-extension-mcp = { path = "packages/extension-mcp" }
 aa-llm = { path = "packages/llm" }
 aa-session = { path = "packages/session" }
 aa-server = { path = "packages/server" }
-aa-sidebar = { path = "packages/sidebar" }
-aa-terminal = { path = "packages/terminal" }
-aa-terminal-view = { path = "packages/terminal-view" }
-aa-task = { path = "packages/task" }
-aa-title-bar = { path = "packages/title-bar" }
+sidebar = { path = "packages/sidebar" }
+terminal = { path = "packages/terminal" }
+terminal_view = { path = "packages/terminal_view" }
+task = { path = "packages/task" }
+title_bar = { path = "packages/title_bar" }
 settings = { path = "packages/settings" }
-settings-content = { path = "packages/settings-content" }
-settings-macros = { path = "packages/settings-macros" }
-theme-settings = { path = "packages/theme-settings" }
+settings_content = { path = "packages/settings_content" }
+settings_macros = { path = "packages/settings_macros" }
+theme_settings = { path = "packages/theme_settings" }
 util = { path = "packages/util" }
 workspace = { path = "packages/workspace" }
 fs = { path = "packages/fs" }
@@ -91,10 +91,10 @@ text = { path = "packages/text" }
 breadcrumbs = { path = "packages/breadcrumbs" }
 language = { path = "packages/language" }
 # 外部 gpui_learn 共享库（GitHub git 依赖，稳定可复现）
-aa-gpui-kit-assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "dd307ccec9717332a4b96b1bc357884893baaee8" }
-aa-gpui-kit-theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "dd307ccec9717332a4b96b1bc357884893baaee8" }
-aa-gpui-kit-ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "dd307ccec9717332a4b96b1bc357884893baaee8" }
-editor = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "dd307ccec9717332a4b96b1bc357884893baaee8" }
+aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "95c42cc7833e545f7ffd0ff77aadd4bd31da1594" }
+aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "95c42cc7833e545f7ffd0ff77aadd4bd31da1594" }
+aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "95c42cc7833e545f7ffd0ff77aadd4bd31da1594" }
+editor = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "95c42cc7833e545f7ffd0ff77aadd4bd31da1594" }
 
 [patch.crates-io]
 gpui = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f", version = "=0.2.2" }

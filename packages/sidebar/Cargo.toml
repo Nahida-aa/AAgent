@@ -1,5 +1,5 @@
 [package]
-name = "aa-sidebar"
+name = "sidebar"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -8,7 +8,7 @@ description = "AAgent Sidebar entity (Agent Threads list + bottom bar)"
 
 [dependencies]
 workspace.workspace = true
-settings-content.workspace = true
+settings_content.workspace = true
 gpui.workspace = true
-aa-gpui-kit-theme.workspace = true
-aa-gpui-kit-ui.workspace = true
+aa_gpui_kit_theme.workspace = true
+aa_gpui_kit_ui.workspace = true

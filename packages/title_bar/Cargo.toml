@@ -1,5 +1,5 @@
 [package]
-name = "aa-title-bar"
+name = "title_bar"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -8,9 +8,9 @@ description = "GPUI 桌面自绘标题栏（CSD/SSD）"
 
 [dependencies]
 gpui.workspace = true
-aa-gpui-kit-assets.workspace = true
-aa-gpui-kit-theme.workspace = true
-aa-gpui-kit-ui.workspace = true
+aa_gpui_kit_assets.workspace = true
+aa_gpui_kit_theme.workspace = true
+aa_gpui_kit_ui.workspace = true
 workspace.workspace = true
 
 [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]

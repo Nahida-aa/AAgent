@@ -8,10 +8,10 @@
 
 pub mod sidebar;
 
-pub use aa_task::SpawnInTerminal;
 pub use sidebar::Sidebar;
 pub use sidebar::handle::SidebarHandle;
 pub use sidebar::render_state::SidebarRenderState;
+pub use task::SpawnInTerminal;
 
 use aa_gpui_kit_theme::ActiveTheme;
 use gpui::{

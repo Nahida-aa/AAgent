@@ -6,7 +6,7 @@ license.workspace = true
 
 [dependencies]
 gpui.workspace = true
-aa-gpui-kit-ui.workspace = true
+aa_gpui_kit_ui.workspace = true
 workspace.workspace = true
 language.workspace = true
 

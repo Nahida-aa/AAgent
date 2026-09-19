@@ -21,7 +21,7 @@ fn main() {
             settings::SettingsStore::init(cx);
 
             // TerminalPanel action handler 注册（对齐 Zed terminal_view::init(cx)）
-            aa_terminal_view::TerminalPanel::init(cx);
+            terminal_view::TerminalPanel::init(cx);
 
             let bounds = Bounds::centered(None, size(1100.0.into(), px(720.0)), cx);
             cx.open_window(
@@ -51,7 +51,7 @@ fn main() {
                         aa_app_lib::initialize::panels::initialize_panels(window, &workspace, cx);
 
                     // —— 创建 Sidebar + 注入 MultiWorkspace ——
-                    let sidebar = cx.new(|cx| aa_sidebar::Sidebar::new(cx));
+                    let sidebar = cx.new(|cx| sidebar::Sidebar::new(cx));
                     sidebar.update(cx, |s, cx| {
                         s.set_multi_workspace(mw.clone());
                         cx.notify();
@@ -69,7 +69,7 @@ fn main() {
                     // —— 创建 TitleBar + 注入 Workspace ——
                     // 对齐 Zed title_bar::init → workspace.set_titlebar_item
                     let titlebar =
-                        cx.new(|cx| aa_title_bar::TitleBar::new("AAgent", workspace.clone(), cx));
+                        cx.new(|cx| title_bar::TitleBar::new("AAgent", workspace.clone(), cx));
                     workspace.update(cx, |w, cx| {
                         w.set_titlebar_item(titlebar.into(), cx);
                     });

@@ -4,9 +4,9 @@
 //! Zed 版用 async 加载 + 持久化恢复；AAgent 简化为同步创建，
 //! 但保持 `Task<anyhow::Result<()>>` 签名以便后续扩展（持久化/异步加载）。
 
-use aa_terminal_view::TerminalPanel;
 use anyhow::Result;
 use gpui::{AppContext, Entity, Task, Window};
+use terminal_view::TerminalPanel;
 use workspace::Workspace;
 use workspace::dock::panel::{
     AgentPanel, CollabPanel, DebugPanel, GitPanel, OutlinePanel, ProjectPanel,

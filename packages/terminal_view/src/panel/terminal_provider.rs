@@ -11,8 +11,8 @@
 use std::path::PathBuf;
 use std::process::ExitStatus;
 
-use aa_task::SpawnInTerminal;
 use gpui::{App, AppContext, Entity, Task, WeakEntity, Window};
+use task::SpawnInTerminal;
 use workspace::TerminalProvider;
 
 use super::TerminalPanel;

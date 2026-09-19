@@ -1,5 +1,5 @@
 [package]
-name = "aa-terminal"
+name = "terminal"
 version = "0.1.0"
 edition.workspace = true
 
@@ -10,4 +10,4 @@ parking_lot.workspace = true
 anyhow.workspace = true
 
 # settings 数据类型（Shell + TerminalSettingsContent 等）
-settings-content.workspace = true
+settings_content.workspace = true

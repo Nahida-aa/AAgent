@@ -4,11 +4,11 @@ pub mod item;
 
 use std::path::PathBuf;
 
-use aa_terminal::alacritty::{AlacrittyBackend, TerminalBounds};
 use gpui::{
     App, Context, EventEmitter, FocusHandle, Focusable, IntoElement, KeyDownEvent, Render, Window,
     div, prelude::*,
 };
+use terminal::alacritty::{AlacrittyBackend, TerminalBounds};
 use tracing::debug;
 
 use crate::element::TerminalElement;

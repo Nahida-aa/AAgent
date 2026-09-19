@@ -9,8 +9,8 @@
 use std::path::PathBuf;
 use std::process::ExitStatus;
 
-use aa_task::SpawnInTerminal;
 use gpui::{Action, App, Task, Window};
+use task::SpawnInTerminal;
 
 /// 由终端面板实现的 trait — 抽象终端创建逻辑。
 ///

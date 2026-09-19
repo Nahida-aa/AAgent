@@ -1,15 +1,15 @@
 [package]
-name = "theme-settings"
+name = "theme_settings"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 description = "AAgent Theme + UI settings struct + 主题系统初始化（对齐 Zed crates/theme_settings）"
 
 [dependencies]
-aa-gpui-kit-theme.workspace = true
+aa_gpui_kit_theme.workspace = true
 gpui.workspace = true
 inventory.workspace = true
 settings = { workspace = true }
-settings-macros.workspace = true
+settings_macros.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true

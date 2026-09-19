@@ -1,0 +1,11 @@
+[package]
+name = "util"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+shlex = "1"
+which = "7"
+log = "0.4"

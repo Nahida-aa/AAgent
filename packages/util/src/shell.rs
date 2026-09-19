@@ -1,11 +1,9 @@
 //! Shell 检测 + quoting + 命令构造。
 //!
-//! 对齐 Zed `crates/util/src/shell.rs`，但去掉了 `schemars::JsonSchema`、
-//! `gpui_util`（Windows shell 检测）、`brush-parser` 相关引用。
+//! 对齐 Zed `crates/util/src/shell.rs`，但把 `Shell` 数据类型移到了
+//! `settings_content::terminal::Shell`（那个是 serde 数据类型，settings-content 层）。
 //!
-//! 核心类型：
-//! - [`Shell`] — 用户 settings 里配置的 shell（System / Program / WithArguments）
-//! - [`ShellKind`] — 识别出的 shell 类型（Posix/Fish/PowerShell/Pwsh/Cmd/Nushell/...）
+//! 本模块只留运行时：ShellKind 类型 + 系统 shell 检测 + quoting + args_for_shell。
 
 use std::borrow::Cow;
 use std::fmt;
@@ -16,58 +14,6 @@ use std::path::PathBuf;
 use std::sync::LazyLock;
 
 use serde::{Deserialize, Serialize};
-use settings_macros::MergeFrom;
-
-// ---------- Shell ----------
-
-/// Shell configuration — 用户 settings 里用来指定用哪个 shell 打开 terminal。
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, MergeFrom)]
-#[serde(rename_all = "snake_case")]
-pub enum Shell {
-    /// 用系统默认（读取 $SHELL 或 Windows 注册表）。
-    #[default]
-    System,
-    /// 用指定 program，不带参数。
-    Program(String),
-    /// 用指定 program + arguments。
-    WithArguments {
-        /// 程序路径 / 名字。
-        program: String,
-        /// 传给程序的参数。
-        args: Vec<String>,
-        /// 可选的 terminal tab title override。
-        title_override: Option<String>,
-    },
-}
-
-impl Shell {
-    /// 返回要执行的 program（System 时走系统检测）。
-    pub fn program(&self) -> String {
-        match self {
-            Shell::Program(program) => program.clone(),
-            Shell::WithArguments { program, .. } => program.clone(),
-            Shell::System => get_system_shell(),
-        }
-    }
-
-    /// 返回 `(program, args)` — System 时 args 是空 slice。
-    pub fn program_and_args(&self) -> (String, &[String]) {
-        match self {
-            Shell::Program(program) => (program.clone(), &[]),
-            Shell::WithArguments { program, args, .. } => (program.clone(), args),
-            Shell::System => (get_system_shell(), &[]),
-        }
-    }
-
-    /// 识别 shell 类型（Posix / PowerShell / Cmd / Nushell / ...）。
-    pub fn shell_kind(&self, is_windows: bool) -> ShellKind {
-        match self {
-            Shell::Program(program) => ShellKind::new(program, is_windows),
-            Shell::WithArguments { program, .. } => ShellKind::new(program, is_windows),
-            Shell::System => ShellKind::system(),
-        }
-    }
-}
 
 // ---------- ShellKind ----------
 
@@ -371,7 +317,6 @@ impl ShellKind {
         }
     }
 
-    /// Windows CMD/PowerShell 通用的 CRT 级 quoting（处理反斜杠 + 引号规则）。
     fn quote_windows(arg: &str, enclose: bool) -> Cow<'_, str> {
         if arg.is_empty() {
             return Cow::Borrowed("\"\"");
@@ -662,18 +607,6 @@ mod tests {
     }
 
     #[test]
-    fn test_shell_kind_detection_windows() {
-        // 注意：在 Unix 平台上 file_stem 会把 \\ 当作普通字符，
-        // 所以只用 program 名测试跨平台路径
-        assert_eq!(ShellKind::new("cmd.exe", true), ShellKind::Cmd);
-        assert_eq!(
-            ShellKind::new("powershell.exe", true),
-            ShellKind::PowerShell
-        );
-        assert_eq!(ShellKind::new("pwsh.exe", true), ShellKind::Pwsh);
-    }
-
-    #[test]
     fn test_to_shell_variable() {
         assert_eq!(
             ShellKind::PowerShell.to_shell_variable("${FOO}"),
@@ -684,7 +617,6 @@ mod tests {
         assert_eq!(ShellKind::Nushell.to_shell_variable("${FOO}"), "$env.FOO");
         assert_eq!(ShellKind::Posix.to_shell_variable("${FOO}"), "${FOO}");
         assert_eq!(ShellKind::PowerShell.to_shell_variable("$FOO"), "$env:FOO");
-        // malformed — passthrough
         assert_eq!(
             ShellKind::PowerShell.to_shell_variable("${FOO:-bar}"),
             "${FOO:-bar}"
@@ -693,22 +625,18 @@ mod tests {
 
     #[test]
     fn test_args_for_shell() {
-        // PowerShell/Pwsh
         assert_eq!(
             ShellKind::PowerShell.args_for_shell(false, "echo hi".to_string()),
             vec!["-C", "echo hi"]
         );
-        // Cmd
         assert_eq!(
             ShellKind::Cmd.args_for_shell(false, "echo hi".to_string()),
             vec!["/S", "/C", "\"echo hi\""]
         );
-        // Posix non-interactive
         assert_eq!(
             ShellKind::Posix.args_for_shell(false, "echo hi".to_string()),
             vec!["-c", "echo hi"]
         );
-        // Posix interactive
         assert_eq!(
             ShellKind::Posix.args_for_shell(true, "echo hi".to_string()),
             vec!["-i", "-c", "echo hi"]
@@ -733,7 +661,6 @@ mod tests {
 
     #[test]
     fn test_posix_quoting() {
-        // "hello world" — 单引号 quoting，shlex 拆出一个 token
         let quoted = ShellKind::Posix.try_quote("hello world").unwrap();
         assert_eq!(shlex::split(&quoted), Some(vec!["hello world".to_string()]));
         let quoted = ShellKind::Posix.try_quote("O'Brien").unwrap();

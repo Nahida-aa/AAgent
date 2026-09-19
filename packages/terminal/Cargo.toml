@@ -9,9 +9,5 @@ alacritty_terminal.workspace = true
 parking_lot.workspace = true
 anyhow.workspace = true
 
-# settings 数据层
-serde = { workspace = true, features = ["derive"] }
-serde_json.workspace = true
-settings-macros.workspace = true
+# settings 数据类型（Shell + TerminalSettingsContent 等）
 settings-content.workspace = true
-util.workspace = true

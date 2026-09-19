@@ -245,6 +245,10 @@ dependencies = [
 [[package]]
 name = "aa-task"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "util",
+]
 
 [[package]]
 name = "aa-terminal"

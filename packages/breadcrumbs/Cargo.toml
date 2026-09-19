@@ -1,0 +1,14 @@
+[package]
+name = "breadcrumbs"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+gpui.workspace = true
+aa-gpui-kit-ui.workspace = true
+workspace.workspace = true
+
+[dev-dependencies]
+gpui = { workspace = true, features = ["test-support"] }
+# workspace = { workspace = true, features = ["test-support"] }

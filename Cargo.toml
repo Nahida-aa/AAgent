@@ -12,7 +12,7 @@ members = [
     "packages/server",
     "packages/settings",
     "packages/session",
-    "packages/app", "packages/ui", "packages/workspace", "packages/settings-content", "packages/sidebar", "packages/aagent-actions", "packages/terminal", "packages/terminal-view", "packages/task", "packages/theme-settings", "packages/settings-macros", "packages/title-bar", "packages/agent-ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text",
+    "packages/app", "packages/ui", "packages/workspace", "packages/settings-content", "packages/sidebar", "packages/aagent-actions", "packages/terminal", "packages/terminal-view", "packages/task", "packages/theme-settings", "packages/settings-macros", "packages/title-bar", "packages/agent-ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language",
 ]
 
 [workspace.package]

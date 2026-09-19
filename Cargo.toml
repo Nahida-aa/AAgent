@@ -78,9 +78,9 @@ settings-content = { path = "packages/settings-content" }
 settings-macros = { path = "packages/settings-macros" }
 theme-settings = { path = "packages/theme-settings" }
 workspace = { path = "packages/workspace" }
-# 外部 gpui_learn 共享库（绝对 path，开发期引用）
-aa-gpui-kit-assets = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/assets" }
-ui-gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui-gpui" }
+# 外部 gpui_learn 共享库（GitHub git 依赖，稳定可复现）
+aa-gpui-kit-assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "090ed5d" }
+ui-gpui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "090ed5d" }
 
 [patch.crates-io]
 gpui = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f", version = "=0.2.2" }

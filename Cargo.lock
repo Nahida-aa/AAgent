@@ -137,6 +137,7 @@ dependencies = [
 [[package]]
 name = "aa-gpui-kit-assets"
 version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=090ed5d#090ed5d01b853f74711a32096db3734d3abb3e7a"
 dependencies = [
  "anyhow",
  "gpui",
@@ -7881,6 +7882,7 @@ version = "0.1.0"
 [[package]]
 name = "ui-gpui"
 version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=090ed5d#090ed5d01b853f74711a32096db3734d3abb3e7a"
 dependencies = [
  "aa-gpui-kit-assets",
  "gpui",

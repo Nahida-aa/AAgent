@@ -334,3 +334,5 @@ mod tests {
         assert!(!fs.path_exists(Path::new("/a.txt")));
     }
 }
+
+pub mod watcher;

@@ -99,10 +99,10 @@ impl Render for PanelButtons {
                     .on_click(move |_ev, _window, cx| {
                         dock_for_click.update(cx, |dock, cx| {
                             if dock.is_open() && dock.active_panel_index() == Some(i) {
-                                dock.set_open(false);
+                                dock.set_open(false, cx);
                             } else {
-                                dock.set_open(true);
-                                dock.activate_panel(i);
+                                dock.set_open(true, cx);
+                                dock.activate_panel(i, cx);
                             }
                             cx.notify();
                         });

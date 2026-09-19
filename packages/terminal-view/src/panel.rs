@@ -31,6 +31,9 @@ actions!(terminal_panel, [Toggle, ToggleFocus]);
 pub struct TerminalPanel {
     active_pane: Entity<Pane>,
     workspace: WeakEntity<Workspace>,
+    /// 对齐 zed TerminalPanel::active — Dock 打开/关闭时由 Dock 调用 set_active 设置。
+    /// true 时如果 pane 为空 → spawn 默认 terminal。
+    active: bool,
 }
 
 impl EventEmitter<()> for TerminalPanel {}
@@ -47,12 +50,17 @@ impl TerminalPanel {
         let mut panel = Self {
             active_pane,
             workspace: workspace.downgrade(),
+            active: false,
         };
 
         // 对齐 Zed finish_restoration — 没有持久化时 spawn 默认 shell
         panel.spawn_default_terminal(cx);
 
         panel
+    }
+
+    fn has_no_terminals(&self, cx: &App) -> bool {
+        self.active_pane.read(cx).items().is_empty()
     }
 
     fn handle_pane_event(
@@ -160,6 +168,14 @@ impl Panel for TerminalPanel {
 
     fn icon_tooltip(&self, _cx: &App) -> &'static str {
         "Terminal Panel"
+    }
+
+    /// 对齐 zed terminal_panel.rs:L1745-1761 — active 且 pane 空 → spawn 默认 shell
+    fn set_active(&mut self, active: bool, cx: &mut Context<Self>) {
+        self.active = active;
+        if active && self.has_no_terminals(cx) {
+            self.spawn_default_terminal(cx);
+        }
     }
 
     /// 对齐 Zed TerminalPanel — 从 settings 读，默认 false。

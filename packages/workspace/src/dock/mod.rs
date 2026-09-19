@@ -76,24 +76,54 @@ impl Dock {
         }
     }
 
-    pub fn set_open(&mut self, open: bool) {
-        self.is_open = open;
+    pub fn set_open(&mut self, open: bool, cx: &mut App) {
+        if open != self.is_open {
+            self.is_open = open;
+            if open {
+                // 打开 Dock → 激活当前 active panel（对齐 zed dock.rs:L586-593）
+                if let Some(ix) = self.active_panel_index {
+                    if let Some(panel) = self.panels.get(ix) {
+                        panel.set_active(true, cx);
+                    }
+                }
+            } else {
+                // 关闭 Dock → deactivate 当前 active panel
+                if let Some(ix) = self.active_panel_index {
+                    if let Some(panel) = self.panels.get(ix) {
+                        panel.set_active(false, cx);
+                    }
+                }
+            }
+        }
     }
 
-    pub fn toggle(&mut self) {
+    pub fn toggle(&mut self, cx: &mut App) {
         if self.is_open {
-            self.is_open = false;
+            self.set_open(false, cx);
         } else {
-            self.is_open = true;
+            self.set_open(true, cx);
             if self.active_panel_index.is_none() && !self.panels.is_empty() {
                 self.active_panel_index = Some(0);
             }
         }
     }
 
-    pub fn activate_panel(&mut self, index: usize) {
+    pub fn activate_panel(&mut self, index: usize, cx: &mut App) {
         if index < self.panels.len() {
+            // 先 deactivate 旧的，再 activate 新的（对齐 zed dock.rs:L950-962）
+            if let Some(old_ix) = self.active_panel_index {
+                if old_ix != index {
+                    if let Some(old) = self.panels.get(old_ix) {
+                        old.set_active(false, cx);
+                    }
+                }
+            }
             self.active_panel_index = Some(index);
+            if self.is_open {
+                if let Some(panel) = self.panels.get(index) {
+                    panel.set_active(true, cx);
+                }
+            }
         }
     }
 
@@ -190,17 +220,17 @@ impl Dock {
     }
 
     /// 让 Dock 打开并激活指定类型的 panel。
-    pub fn open_panel<T: Panel>(&mut self) {
+    pub fn open_panel<T: Panel>(&mut self, cx: &mut App) {
         if let Some(index) = self.panel_index_for_type::<T>() {
-            self.is_open = true;
-            self.active_panel_index = Some(index);
+            self.set_open(true, cx);
+            self.activate_panel(index, cx);
         }
     }
 
     /// 让 Dock 关闭（如果里面有这个类型的 panel）。
-    pub fn close_panel<T: Panel>(&mut self) {
+    pub fn close_panel<T: Panel>(&mut self, cx: &mut App) {
         if self.panel_index_for_type::<T>().is_some() {
-            self.is_open = false;
+            self.set_open(false, cx);
         }
     }
 }

@@ -36,6 +36,9 @@ pub trait Panel: Render + Sized {
     fn starts_open(&self, _cx: &App) -> bool {
         false
     }
+    /// Dock 开/关 或 active panel 切换时调用。对齐 zed dock.rs:L586-593。
+    /// 默认空实现 — 有需要的 panel（如 TerminalPanel）覆盖来 spawn 默认内容。
+    fn set_active(&mut self, _active: bool, _cx: &mut Context<Self>) {}
 }
 
 // ---------- PanelHandle trait ----------
@@ -57,6 +60,8 @@ pub trait PanelHandle: Send + Sync {
     fn to_any(&self) -> gpui::AnyView;
     /// 用于 downcast 回 Entity<T>（Dock::panel() 方法）。
     fn as_any(&self) -> &dyn std::any::Any;
+    /// Dock 开/关 或 active panel 切换时调用 set_active。对齐 zed dock.rs:L586-593。
+    fn set_active(&self, active: bool, cx: &mut App);
 }
 
 impl<T: Panel> PanelHandle for Entity<T> {
@@ -93,6 +98,9 @@ impl<T: Panel> PanelHandle for Entity<T> {
     }
     fn as_any(&self) -> &dyn std::any::Any {
         self as &dyn std::any::Any
+    }
+    fn set_active(&self, active: bool, cx: &mut App) {
+        self.update(cx, |panel, cx| panel.set_active(active, cx));
     }
 }
 

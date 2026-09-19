@@ -271,7 +271,7 @@ impl Workspace {
         dock_entity.update(cx, |dock, cx| {
             dock.add_panel(panel_handle);
             if starts_open {
-                dock.set_open(true);
+                dock.set_open(true, cx);
             }
             cx.notify();
         });
@@ -286,9 +286,9 @@ impl Workspace {
         if let Some(dock_entity) = dock_entity {
             dock_entity.update(cx, |dock, cx| {
                 if was_open {
-                    dock.set_open(false);
+                    dock.set_open(false, cx);
                 } else {
-                    dock.open_panel::<T>();
+                    dock.open_panel::<T>(cx);
                 }
                 cx.notify();
             });
@@ -301,7 +301,7 @@ impl Workspace {
     pub fn open_panel<T: Panel>(&mut self, cx: &mut Context<Self>) {
         if let Some(dock_entity) = self.find_dock_entity::<T>(cx) {
             dock_entity.update(cx, |dock, cx| {
-                dock.open_panel::<T>();
+                dock.open_panel::<T>(cx);
                 cx.notify();
             });
         }
@@ -311,7 +311,7 @@ impl Workspace {
     pub fn close_panel<T: Panel>(&self, cx: &mut Context<Self>) {
         if let Some(dock_entity) = self.find_dock_entity::<T>(cx) {
             dock_entity.update(cx, |dock, cx| {
-                dock.close_panel::<T>();
+                dock.close_panel::<T>(cx);
                 cx.notify();
             });
         }

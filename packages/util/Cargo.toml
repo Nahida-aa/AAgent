@@ -9,3 +9,5 @@ serde = { workspace = true, features = ["derive"] }
 shlex = "1"
 which = "7"
 log = "0.4"
+settings-content.workspace = true
+settings-macros.workspace = true

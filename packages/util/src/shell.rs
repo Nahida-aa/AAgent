@@ -16,11 +16,12 @@ use std::path::PathBuf;
 use std::sync::LazyLock;
 
 use serde::{Deserialize, Serialize};
+use settings_macros::MergeFrom;
 
 // ---------- Shell ----------
 
 /// Shell configuration — 用户 settings 里用来指定用哪个 shell 打开 terminal。
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, MergeFrom)]
 #[serde(rename_all = "snake_case")]
 pub enum Shell {
     /// 用系统默认（读取 $SHELL 或 Windows 注册表）。

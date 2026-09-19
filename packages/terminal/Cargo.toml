@@ -8,3 +8,10 @@ edition.workspace = true
 alacritty_terminal.workspace = true
 parking_lot.workspace = true
 anyhow.workspace = true
+
+# settings 数据层
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+settings-macros.workspace = true
+settings-content.workspace = true
+util.workspace = true

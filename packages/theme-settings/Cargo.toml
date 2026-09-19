@@ -8,6 +8,7 @@ description = "AAgent Theme + UI settings struct + 主题系统初始化（对�
 [dependencies]
 aa-gpui-kit-theme.workspace = true
 gpui.workspace = true
+inventory.workspace = true
 settings = { workspace = true }
 settings-macros.workspace = true
 serde = { workspace = true, features = ["derive"] }

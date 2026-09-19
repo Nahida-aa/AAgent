@@ -7412,6 +7412,7 @@ version = "0.1.0"
 dependencies = [
  "aa-gpui-kit-theme",
  "gpui",
+ "inventory",
  "serde",
  "serde_json",
  "settings",

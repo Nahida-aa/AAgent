@@ -13,3 +13,4 @@ settings_content.workspace = true
 serde.workspace = true
 schemars = { workspace = true, features = ["derive"] }
 task.workspace = true
+language.workspace = true

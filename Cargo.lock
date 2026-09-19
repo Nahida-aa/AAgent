@@ -208,7 +208,7 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_assets"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=95c42cc7833e545f7ffd0ff77aadd4bd31da1594#95c42cc7833e545f7ffd0ff77aadd4bd31da1594"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=d9afdb14259de6801fe96367cf4c64ff9830500c#d9afdb14259de6801fe96367cf4c64ff9830500c"
 dependencies = [
  "anyhow",
  "gpui",
@@ -216,9 +216,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "aa_gpui_kit_component"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=d9afdb14259de6801fe96367cf4c64ff9830500c#d9afdb14259de6801fe96367cf4c64ff9830500c"
+dependencies = [
+ "aa_gpui_kit_theme",
+ "gpui",
+ "inventory",
+ "parking_lot",
+ "strum 0.27.2",
+]
+
+[[package]]
 name = "aa_gpui_kit_theme"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=95c42cc7833e545f7ffd0ff77aadd4bd31da1594#95c42cc7833e545f7ffd0ff77aadd4bd31da1594"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=d9afdb14259de6801fe96367cf4c64ff9830500c#d9afdb14259de6801fe96367cf4c64ff9830500c"
 dependencies = [
  "anyhow",
  "gpui",
@@ -235,16 +247,19 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_ui"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=95c42cc7833e545f7ffd0ff77aadd4bd31da1594#95c42cc7833e545f7ffd0ff77aadd4bd31da1594"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=d9afdb14259de6801fe96367cf4c64ff9830500c#d9afdb14259de6801fe96367cf4c64ff9830500c"
 dependencies = [
  "aa_gpui_kit_assets",
+ "aa_gpui_kit_component",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui_macros",
+ "documented",
  "editor",
  "gpui",
  "gpui_macros",
  "serde",
  "serde_json",
+ "smallvec",
  "tracing",
  "unicode-segmentation",
 ]
@@ -252,7 +267,7 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_ui_macros"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=95c42cc7833e545f7ffd0ff77aadd4bd31da1594#95c42cc7833e545f7ffd0ff77aadd4bd31da1594"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=d9afdb14259de6801fe96367cf4c64ff9830500c#d9afdb14259de6801fe96367cf4c64ff9830500c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2346,6 +2361,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "documented"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c278cf01d971a2ce2e4a97f2af1c13706e111c2c05636a88f93520b61c75b3cb"
+dependencies = [
+ "documented-macros",
+ "phf 0.13.1",
+ "thiserror 2.0.20",
+]
+
+[[package]]
+name = "documented-macros"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3605d4f0b4326a3a1909b6d258b47478c0d47bb668ad2cb7d4a6e2d22e852f5c"
+dependencies = [
+ "convert_case 0.11.0",
+ "itertools 0.15.0",
+ "optfield",
+ "proc-macro2",
+ "quote",
+ "strum 0.28.0",
+ "syn 2.0.119",
+]
+
+[[package]]
 name = "downcast-rs"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2378,7 +2419,7 @@ checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
 [[package]]
 name = "editor"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=95c42cc7833e545f7ffd0ff77aadd4bd31da1594#95c42cc7833e545f7ffd0ff77aadd4bd31da1594"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=d9afdb14259de6801fe96367cf4c64ff9830500c#d9afdb14259de6801fe96367cf4c64ff9830500c"
 dependencies = [
  "aa_gpui_kit_theme",
  "gpui",
@@ -3194,7 +3235,7 @@ dependencies = [
  "slotmap",
  "smallvec",
  "spin 0.10.1",
- "strum",
+ "strum 0.28.0",
  "sum_tree",
  "taffy",
  "thiserror 2.0.20",
@@ -3264,7 +3305,7 @@ dependencies = [
  "raw-window-handle",
  "smallvec",
  "smol",
- "strum",
+ "strum 0.28.0",
  "url",
  "uuid",
  "wayland-backend",
@@ -3322,7 +3363,7 @@ dependencies = [
  "raw-window-handle",
  "semver",
  "smallvec",
- "strum",
+ "strum 0.28.0",
  "uuid",
  "zed-font-kit",
 ]
@@ -4079,6 +4120,15 @@ name = "itertools"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b4baf93f58d4425749ca49a51c50ebab072c5df6994d08fed93541c331481dc"
 dependencies = [
  "either",
 ]
@@ -5367,6 +5417,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "optfield"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "969ccca8ffc4fb105bd131a228107d5c9dd89d9d627edf3295cbe979156f9712"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
 name = "option-ext"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6188,7 +6249,7 @@ dependencies = [
  "lru",
  "palette",
  "serde",
- "strum",
+ "strum 0.28.0",
  "thiserror 2.0.20",
  "unicode-segmentation",
  "unicode-truncate",
@@ -6252,7 +6313,7 @@ dependencies = [
  "line-clipping",
  "ratatui-core",
  "serde",
- "strum",
+ "strum 0.28.0",
  "time",
  "unicode-segmentation",
  "unicode-width",
@@ -7275,11 +7336,32 @@ checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
 
 [[package]]
 name = "strum"
+version = "0.27.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "af23d6f6c1a224baef9d3f61e287d2761385a5b88fdab4eb4c6f11aeb54c4bcf"
+dependencies = [
+ "strum_macros 0.27.2",
+]
+
+[[package]]
+name = "strum"
 version = "0.28.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9628de9b8791db39ceda2b119bbe13134770b56c138ec1d3af810d045c04f9bd"
 dependencies = [
- "strum_macros",
+ "strum_macros 0.28.0",
+]
+
+[[package]]
+name = "strum_macros"
+version = "0.27.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7695ce3845ea4b33927c055a39dc438a45b059f7c1b3d91d38d10355fb8cbca7"
+dependencies = [
+ "heck 0.5.0",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
 ]
 
 [[package]]
@@ -9973,6 +10055,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "gpui",
+ "language",
  "schemars",
  "serde",
  "settings",

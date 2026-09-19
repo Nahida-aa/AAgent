@@ -91,10 +91,10 @@ text = { path = "packages/text" }
 breadcrumbs = { path = "packages/breadcrumbs" }
 language = { path = "packages/language" }
 # 外部 gpui_learn 共享库（GitHub git 依赖，稳定可复现）
-aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "95c42cc7833e545f7ffd0ff77aadd4bd31da1594" }
-aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "95c42cc7833e545f7ffd0ff77aadd4bd31da1594" }
-aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "95c42cc7833e545f7ffd0ff77aadd4bd31da1594" }
-editor = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "95c42cc7833e545f7ffd0ff77aadd4bd31da1594" }
+aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "d9afdb14259de6801fe96367cf4c64ff9830500c" }
+aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "d9afdb14259de6801fe96367cf4c64ff9830500c" }
+aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "d9afdb14259de6801fe96367cf4c64ff9830500c" }
+editor = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "d9afdb14259de6801fe96367cf4c64ff9830500c" }
 
 [patch.crates-io]
 gpui = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f", version = "=0.2.2" }

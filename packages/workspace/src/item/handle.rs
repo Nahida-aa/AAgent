@@ -1,27 +1,19 @@
 //! ItemHandle trait — Pane 里装的东西统一接口。
 //!
-//! 对齐 Zed `WeakItemHandle` + `ItemHandle` 的核心子集。
-//!
-//! Zed:
-//! - `WeakItemHandle: Send + Sync` — 弱引用，Arc<Mutex<...>>
-//! - `ItemHandle` — 强引用 trait，~20 方法（telemetry/save/preview/find 等）
-//!
-//! AAgent:
-//! - `WeakItemHandle: Send + Sync` — GPUI WeakEntity<T> 自动满足
-//!   （AnyWeakEntity 内含 Weak<RwLock<...>>，都是 Send+Sync）
-//! - `ItemHandle` — 简化为 tab + render + downgrade 核心方法
-//! - `Item` — 强类型小 trait，Entity<T> 自动获得 ItemHandle + downgrade
+//! 对齐 Zed `crates/workspace/src/item.rs`。
 
 use aa_gpui_kit_ui::IconName;
-use gpui::{AnyElement, App, Entity, EntityId, FocusHandle, IntoElement, SharedString, WeakEntity};
+use gpui::{
+    AnyElement, AnyView, App, Entity, EntityId, EventEmitter, FocusHandle, Font, IntoElement,
+    SharedString, Subscription, WeakEntity,
+};
+use language::HighlightedText;
+
+use crate::{ItemEvent, ToolbarItemLocation};
+
+// ─── WeakItemHandle ─────────────────────────────────────────────────────
 
 /// 弱引用 item — 对齐 Zed `WeakItemHandle: Send + Sync`。
-///
-/// Zed: `Arc<Mutex<Option<Entity<Item>>>> + Send + Sync`
-/// AAgent: GPUI 原生 `WeakEntity<T>` 实现。WeakEntity<T> 自动 Send+Sync
-/// 因为 AnyWeakEntity 内含 Weak<RwLock<EntityRefCounts>>，都是 Send+Sync。
-///
-/// upgrade 不需要 cx — GPUI 的 WeakEntity 用原子引用计数，不碰 context。
 pub trait WeakItemHandle: Send + Sync {
     fn id(&self) -> EntityId;
     fn boxed_clone(&self) -> Box<dyn WeakItemHandle>;
@@ -29,9 +21,11 @@ pub trait WeakItemHandle: Send + Sync {
     fn upgrade(&self) -> Option<Box<dyn ItemHandle>>;
 }
 
+// ─── ItemHandle ────────────────────────────────────────────────────────
+
 /// Pane 里装的 item 的统一接口（dyn object）。
 ///
-/// 对齐 Zed `ItemHandle` trait，AAgent 简化为 tab + render + downgrade。
+/// 对齐 Zed `ItemHandle` trait。AAgent 逐步补齐 Zed 的方法集。
 pub trait ItemHandle {
     fn tab_label(&self, cx: &App) -> SharedString;
     fn tab_icon(&self, cx: &App) -> IconName;
@@ -41,16 +35,73 @@ pub trait ItemHandle {
     fn boxed_clone(&self) -> Box<dyn ItemHandle>;
     /// 降级为弱引用 — 对齐 Zed `ItemHandle::downgrade_item`。
     fn downgrade_item(&self) -> Box<dyn WeakItemHandle>;
+
+    // ── Toolbar / Breadcrumbs ──
+
     /// 当前 item 是否要显示 Toolbar（默认 true）。
     fn show_toolbar(&self, _cx: &App) -> bool {
         true
     }
+
+    /// Breadcrumbs 在 Toolbar 的位置（默认 Hidden — 只有实现了 breadcrumbs 的 item 才显示）。
+    fn breadcrumb_location(&self, _cx: &App) -> ToolbarItemLocation {
+        ToolbarItemLocation::Hidden
+    }
+
+    /// 返回 breadcrumbs 分段文字 + 可选字体。
+    fn breadcrumbs(&self, _cx: &App) -> Option<(Vec<HighlightedText>, Option<Font>)> {
+        None
+    }
+
+    /// Breadcrumbs 左边的可选前缀元素（如 git 分支图标）。
+    fn breadcrumb_prefix(&self, _window: &mut gpui::Window, _cx: &mut App) -> Option<AnyElement> {
+        None
+    }
+
+    /// 订阅 item 发出的 ItemEvent。
+    fn subscribe_to_item_events(
+        &self,
+        window: &mut gpui::Window,
+        cx: &mut App,
+        handler: Box<dyn Fn(ItemEvent, &mut gpui::Window, &mut App)>,
+    ) -> Subscription;
 }
 
+// ─── Item (强类型小 trait) ──────────────────────────────────────────────
+
 /// 每种 item 类型实现此小 trait，Entity<T> 自动获得 ItemHandle + WeakItemHandle。
-pub trait Item: 'static + gpui::Render + gpui::Focusable {
+///
+/// 对齐 Zed `Item: Focusable + EventEmitter<Self::Event> + Render + Sized`。
+/// 简化：直接 emit ItemEvent（去掉 Zed 的 to_item_events 中间层）。
+pub trait Item: 'static + gpui::Render + gpui::Focusable + EventEmitter<ItemEvent> {
     fn tab_label(&self, cx: &App) -> SharedString;
     fn tab_icon(&self, cx: &App) -> IconName;
+
+    // ── Toolbar / Breadcrumbs 默认实现 ──
+
+    /// 当前 item 是否要显示 Toolbar（默认 true）。
+    fn show_toolbar(&self, _cx: &App) -> bool {
+        true
+    }
+
+    /// Breadcrumbs 在 Toolbar 的位置（默认 Hidden）。
+    fn breadcrumb_location(&self, _cx: &App) -> ToolbarItemLocation {
+        ToolbarItemLocation::Hidden
+    }
+
+    /// 返回 breadcrumbs 分段文字 + 可选字体。默认 None（不显示 breadcrumbs）。
+    fn breadcrumbs(&self, _cx: &App) -> Option<(Vec<HighlightedText>, Option<Font>)> {
+        None
+    }
+
+    /// Breadcrumbs 左边的可选前缀元素（如 git 分支图标）。
+    fn breadcrumb_prefix(
+        &self,
+        _window: &mut gpui::Window,
+        _cx: &mut gpui::Context<Self>,
+    ) -> Option<AnyElement> {
+        None
+    }
 }
 
 // ─── WeakEntity<T> → WeakItemHandle ──────────────────────────────────────
@@ -92,5 +143,26 @@ impl<T: Item> ItemHandle for Entity<T> {
     }
     fn downgrade_item(&self) -> Box<dyn WeakItemHandle> {
         Box::new(self.downgrade())
+    }
+
+    fn breadcrumb_location(&self, cx: &App) -> ToolbarItemLocation {
+        self.read(cx).breadcrumb_location(cx)
+    }
+    fn breadcrumbs(&self, cx: &App) -> Option<(Vec<HighlightedText>, Option<Font>)> {
+        self.read(cx).breadcrumbs(cx)
+    }
+    fn breadcrumb_prefix(&self, window: &mut gpui::Window, cx: &mut App) -> Option<AnyElement> {
+        self.update(cx, |item, cx| item.breadcrumb_prefix(window, cx))
+    }
+
+    fn subscribe_to_item_events(
+        &self,
+        window: &mut gpui::Window,
+        cx: &mut App,
+        handler: Box<dyn Fn(ItemEvent, &mut gpui::Window, &mut App)>,
+    ) -> Subscription {
+        window.subscribe(self, cx, move |_, event, window, cx| {
+            handler(*event, window, cx);
+        })
     }
 }

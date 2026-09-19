@@ -58,6 +58,9 @@ alacritty_terminal = { git = "https://github.com/zed-industries/alacritty", rev 
 libc = "0.2"
 async-channel = "2"
 
+# Zed crates (统一 git rev)
+sum_tree = { git = "https://github.com/zed-industries/zed.git", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
+
 # --- Workspace-internal path deps (统一管理，子 crate 用 .workspace = true) ---
 aa-kernel = { path = "packages/kernel" }
 aa-core = { path = "packages/core" }

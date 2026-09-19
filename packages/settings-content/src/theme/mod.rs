@@ -6,16 +6,32 @@
 //! 运行时主题类型（`Theme`, `ThemeStyles`, `ActiveTheme` ...）在
 //! `aa-gpui-kit-theme` crate（gpui_learn）。
 //!
-//! 子模块拆分：
+//! ## 子模块
+//!
+//! 依赖方向（由下至上）：
+//! ```text
+//! font.rs ←───── highlight_style.rs ───┐
+//!                                      ↓
+//! theme_color.rs (ThemeColor + Colors) ←── theme_style.rs
+//!                                      ↑
+//!               status_colors.rs ─────┘
+//! ```
+//!
 //! - [`font`] — FontSize / FontFamilyName / FontWeightContent / BufferLineHeight / FontStyleContent
+//! - [`theme_color`] — ThemeColor / ThemeColorsContent（最底层，无内部依赖）
 //! - [`theme_selection`] — ThemeName / ThemeSelection / ThemeAppearanceMode / UiDensity + DEFAULT_*_THEME
-//! - [`theme_color`] — ThemeColor / ThemeColorsContent / ThemeStyleContent / StatusColorsContent
+//! - [`highlight_style`] — HighlightStyleContent（依赖 theme_color + font）
+//! - [`status_colors`] — StatusColorsContent（只依赖 ThemeColor）
+//! - [`theme_style`] — ThemeStyleContent（聚合顶层入口，依赖上面所有）
 //!
 //! `ThemeSettingsContent` 聚合所有子模块的类型，作为用户 settings.json 的入口。
 
 pub mod font;
+pub mod highlight_style;
+pub mod status_colors;
 pub mod theme_color;
 pub mod theme_selection;
+pub mod theme_style;
 
 // ---------- 常量 re-export ----------
 
@@ -24,12 +40,19 @@ pub use theme_selection::{DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME};
 // ---------- 子类型 re-export ----------
 
 pub use font::{BufferLineHeight, FontFamilyName, FontSize, FontStyleContent, FontWeightContent};
-pub use theme_color::{
-    AccentContent, HighlightStyleContent, PlayerColorContent, StatusColorsContent, ThemeColor,
-    ThemeColorsContent, ThemeStyleContent, WindowBackgroundContent,
-};
+
+pub use theme_color::{ThemeColor, ThemeColorsContent};
+
 pub use theme_selection::{
     IconThemeName, IconThemeSelection, ThemeAppearanceMode, ThemeName, ThemeSelection, UiDensity,
+};
+
+pub use highlight_style::HighlightStyleContent;
+
+pub use status_colors::StatusColorsContent;
+
+pub use theme_style::{
+    AccentContent, PlayerColorContent, ThemeStyleContent, WindowBackgroundContent,
 };
 
 use serde::{Deserialize, Serialize};

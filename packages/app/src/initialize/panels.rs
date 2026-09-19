@@ -30,30 +30,30 @@ pub fn initialize_panels(
     workspace: &Entity<Workspace>,
     cx: &mut gpui::App,
 ) -> Task<Result<()>> {
-    cx.update_entity(workspace, |workspace, cx| {
+    cx.update_entity(workspace, |ws, cx| {
         // —— Left Dock ——
         let agent = cx.new(|_| AgentPanel);
-        workspace.add_panel::<AgentPanel>(agent, cx);
+        ws.add_panel::<AgentPanel>(agent, cx);
 
         // —— Right Dock ——
         let project = cx.new(|_| ProjectPanel);
-        workspace.add_panel::<ProjectPanel>(project, cx);
+        ws.add_panel::<ProjectPanel>(project, cx);
 
         let git = cx.new(|_| GitPanel);
-        workspace.add_panel::<GitPanel>(git, cx);
+        ws.add_panel::<GitPanel>(git, cx);
 
         let collab = cx.new(|_| CollabPanel);
-        workspace.add_panel::<CollabPanel>(collab, cx);
+        ws.add_panel::<CollabPanel>(collab, cx);
 
         let outline = cx.new(|_| OutlinePanel);
-        workspace.add_panel::<OutlinePanel>(outline, cx);
+        ws.add_panel::<OutlinePanel>(outline, cx);
 
         // —— Bottom Dock ——
-        let terminal = cx.new(|cx| TerminalPanel::new(cx));
-        workspace.add_panel::<TerminalPanel>(terminal, cx);
+        let terminal = cx.new(|cx| TerminalPanel::new(workspace, cx));
+        ws.add_panel::<TerminalPanel>(terminal, cx);
 
         let debug = cx.new(|_| DebugPanel);
-        workspace.add_panel::<DebugPanel>(debug, cx);
+        ws.add_panel::<DebugPanel>(debug, cx);
 
         cx.notify();
     });

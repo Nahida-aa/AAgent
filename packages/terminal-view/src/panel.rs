@@ -5,12 +5,12 @@
 //! AAgent 最小版：一个 active_pane，每次 new_terminal() 创建 TerminalView 加进去。
 
 use gpui::{
-    App, AppContext, Context, Entity, EventEmitter, IntoElement, Render, Window, actions, px,
+    App, AppContext, Context, Entity, EventEmitter, IntoElement, Render, WeakEntity, Window,
+    actions, px,
 };
 use ui_gpui::IconName;
-use workspace::DockPosition;
-use workspace::Pane;
 use workspace::dock::panel::Panel;
+use workspace::{DockPosition, Pane, PaneEvent, Workspace};
 
 use crate::view::TerminalView;
 
@@ -30,20 +30,49 @@ actions!(terminal_panel, [Toggle, ToggleFocus]);
 /// ```
 pub struct TerminalPanel {
     active_pane: Entity<Pane>,
+    workspace: WeakEntity<Workspace>,
 }
 
 impl EventEmitter<()> for TerminalPanel {}
 
 impl TerminalPanel {
-    pub fn new(cx: &mut Context<Self>) -> Self {
+    pub fn new(workspace: &Entity<Workspace>, cx: &mut Context<Self>) -> Self {
         let active_pane = cx.new(Pane::new);
-        let mut panel = Self { active_pane };
+
+        // 订阅 Pane 事件 — 当最后一个 tab 被关闭 (Event::Empty) 时关闭 Dock
+        // 对齐 Zed terminal_panel.rs:L438-445 — 监听 pane::Event::Remove
+        cx.subscribe(&active_pane, &TerminalPanel::handle_pane_event)
+            .detach();
+
+        let mut panel = Self {
+            active_pane,
+            workspace: workspace.downgrade(),
+        };
 
         // 对齐 Zed finish_restoration — 没有持久化时 spawn 默认 shell
-        // 简化：直接在 new() 里创建一个默认 TerminalView
         panel.spawn_default_terminal(cx);
 
         panel
+    }
+
+    fn handle_pane_event(
+        &mut self,
+        _pane: Entity<Pane>,
+        event: &PaneEvent,
+        cx: &mut Context<Self>,
+    ) {
+        match event {
+            // 对齐 Zed terminal_panel.rs:L438-445 — 最后一个 pane → emit Close
+            // 我们简化为：一个 pane 变空 → 关闭整个 TerminalPanel Dock
+            PaneEvent::Empty => {
+                if let Some(workspace) = self.workspace.upgrade() {
+                    workspace.update(cx, |workspace, cx| {
+                        workspace.close_panel::<Self>(cx);
+                    });
+                }
+            }
+            _ => {}
+        }
     }
 
     /// 创建一个新的 TerminalView 加进 active_pane。

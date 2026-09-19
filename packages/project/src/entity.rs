@@ -13,9 +13,8 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use fs::{Fs, RealFs};
 use serde::{Deserialize, Serialize};
-
-use crate::fs::{Fs, RealFs};
 
 /// Worktree 标识（等价于 Zed 的 WorktreeId）。
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

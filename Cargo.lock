@@ -2171,10 +2171,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be1e0bca6c3637f992fc1cc7cbc52a78c1ef6db076dbf1059c4323d6a2048376"
 
 [[package]]
-name = "db"
-version = "0.1.0"
-
-[[package]]
 name = "debugid"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2788,6 +2784,13 @@ dependencies = [
  "cc",
  "libc",
  "pkg-config",
+]
+
+[[package]]
+name = "fs"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
 ]
 
 [[package]]
@@ -5768,6 +5771,16 @@ checksum = "4488a4a36b9a4ba6b9334a32a39971f77c1436ec82c38707bce707699cc3bbcb"
 dependencies = [
  "quote",
  "syn 2.0.119",
+]
+
+[[package]]
+name = "project"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "fs",
+ "serde",
+ "tempfile",
 ]
 
 [[package]]
@@ -9715,6 +9728,10 @@ dependencies = [
  "settings-content",
  "ui-gpui",
 ]
+
+[[package]]
+name = "worktree"
+version = "0.1.0"
 
 [[package]]
 name = "writeable"

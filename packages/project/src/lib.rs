@@ -4,9 +4,11 @@
 //! 完整的 Project runtime 等有 GPUI 绑定了再升级成 Entity。
 
 pub mod entity;
-pub mod fs;
+
+// Fs trait + RealFs + MockFs 定义在独立 `fs` crate（对齐 Zed `crates/fs`）。
+// re-export 方便下游用 `project::Fs`、`project::MockFs` 等。
+pub use fs::{Fs, Metadata, MockFs, RealFs};
 
 pub use entity::{
     OpenProjectOptions, OpenWorktreeStrategy, Project, ProjectPath, WorktreeEntry, WorktreeId,
 };
-pub use fs::{Fs, Metadata, MockFs, RealFs};

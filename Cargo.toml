@@ -12,7 +12,7 @@ members = [
     "packages/server",
     "packages/settings",
     "packages/session",
-    "packages/app", "packages/ui", "packages/workspace", "packages/settings-content", "packages/sidebar", "packages/aagent-actions", "packages/terminal", "packages/terminal-view", "packages/task", "packages/theme-settings", "packages/settings-macros", "packages/title-bar", "packages/agent-ui", "packages/audio", "packages/util",
+    "packages/app", "packages/ui", "packages/workspace", "packages/settings-content", "packages/sidebar", "packages/aagent-actions", "packages/terminal", "packages/terminal-view", "packages/task", "packages/theme-settings", "packages/settings-macros", "packages/title-bar", "packages/agent-ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs",
 ]
 
 [workspace.package]
@@ -79,6 +79,8 @@ settings-macros = { path = "packages/settings-macros" }
 theme-settings = { path = "packages/theme-settings" }
 util = { path = "packages/util" }
 workspace = { path = "packages/workspace" }
+fs = { path = "packages/fs" }
+project = { path = "packages/project" }
 # 外部 gpui_learn 共享库（GitHub git 依赖，稳定可复现）
 aa-gpui-kit-assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d" }
 aa-gpui-kit-theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d" }

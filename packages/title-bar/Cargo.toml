@@ -9,6 +9,7 @@ description = "GPUI 桌面自绘标题栏（CSD/SSD）"
 [dependencies]
 gpui.workspace = true
 aa-gpui-kit-assets.workspace = true
+aa-gpui-kit-theme.workspace = true
 ui-gpui.workspace = true
 workspace.workspace = true
 

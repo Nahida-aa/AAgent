@@ -13,11 +13,11 @@ pub use sidebar::Sidebar;
 pub use sidebar::handle::SidebarHandle;
 pub use sidebar::render_state::SidebarRenderState;
 
+use aa_gpui_kit_theme::ActiveTheme;
 use gpui::{
     App, Context, DragMoveEvent, Entity, IntoElement, MouseButton, ParentElement, Render, Styled,
     Window, div, prelude::*, px,
 };
-use ui_gpui::theme::ActiveTheme;
 
 use crate::Workspace;
 use settings_content::SidebarSide;

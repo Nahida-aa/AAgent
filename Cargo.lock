@@ -7,6 +7,7 @@ name = "aa-app"
 version = "0.1.0"
 dependencies = [
  "aa-gpui-kit-assets",
+ "aa-gpui-kit-theme",
  "aa-sidebar",
  "aa-terminal",
  "aa-terminal-view",
@@ -21,6 +22,7 @@ dependencies = [
  "serde",
  "serde_json",
  "settings",
+ "theme-settings",
  "tracing",
  "tracing-subscriber",
  "ui-gpui",
@@ -137,11 +139,28 @@ dependencies = [
 [[package]]
 name = "aa-gpui-kit-assets"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=daa18a1#daa18a1fb29f10edb28bcc6d04dc828adb6679b9"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=93850aa#93850aa57d1c22405eb35d5ed51fdfd8069ce0b2"
 dependencies = [
  "anyhow",
  "gpui",
  "rust-embed",
+]
+
+[[package]]
+name = "aa-gpui-kit-theme"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=93850aa#93850aa57d1c22405eb35d5ed51fdfd8069ce0b2"
+dependencies = [
+ "anyhow",
+ "gpui",
+ "palette",
+ "parking_lot",
+ "refineable",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.20",
+ "tracing",
+ "uuid",
 ]
 
 [[package]]
@@ -216,6 +235,7 @@ dependencies = [
 name = "aa-sidebar"
 version = "0.1.0"
 dependencies = [
+ "aa-gpui-kit-theme",
  "gpui",
  "settings-content",
  "ui-gpui",
@@ -239,6 +259,7 @@ dependencies = [
 name = "aa-terminal-view"
 version = "0.1.0"
 dependencies = [
+ "aa-gpui-kit-theme",
  "aa-terminal",
  "alacritty_terminal",
  "gpui",
@@ -253,6 +274,7 @@ name = "aa-title-bar"
 version = "0.1.0"
 dependencies = [
  "aa-gpui-kit-assets",
+ "aa-gpui-kit-theme",
  "gpui",
  "gpui_platform",
  "ui-gpui",
@@ -7386,11 +7408,13 @@ dependencies = [
 [[package]]
 name = "theme-settings"
 version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=93850aa#93850aa57d1c22405eb35d5ed51fdfd8069ce0b2"
 dependencies = [
+ "aa-gpui-kit-theme",
+ "gpui",
  "serde",
  "serde_json",
- "settings",
- "settings-macros",
+ "tracing",
 ]
 
 [[package]]
@@ -7882,9 +7906,10 @@ version = "0.1.0"
 [[package]]
 name = "ui-gpui"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=daa18a1#daa18a1fb29f10edb28bcc6d04dc828adb6679b9"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=93850aa#93850aa57d1c22405eb35d5ed51fdfd8069ce0b2"
 dependencies = [
  "aa-gpui-kit-assets",
+ "aa-gpui-kit-theme",
  "gpui",
  "gpui_macros",
  "serde",
@@ -9638,6 +9663,7 @@ dependencies = [
 name = "workspace"
 version = "0.1.0"
 dependencies = [
+ "aa-gpui-kit-theme",
  "aa-task",
  "gpui",
  "schemars",

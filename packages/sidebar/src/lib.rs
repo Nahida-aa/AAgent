@@ -15,6 +15,7 @@
 //! ]
 //! ```
 
+use aa_gpui_kit_theme::ActiveTheme;
 use gpui::{
     App, Context, Entity, IntoElement, ParentElement, Render, Styled, WeakEntity, Window, div,
     prelude::*, px,
@@ -22,7 +23,6 @@ use gpui::{
 use settings_content::SidebarSide;
 use ui_gpui::IconName;
 use ui_gpui::component::tooltip::Tooltip;
-use ui_gpui::theme::ActiveTheme;
 use ui_gpui::{ButtonRadius, IconButton};
 
 use workspace::MultiWorkspace;

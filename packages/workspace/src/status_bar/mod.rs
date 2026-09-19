@@ -17,11 +17,11 @@ mod sidebar_status;
 use std::any::TypeId;
 use std::collections::HashSet;
 
+use aa_gpui_kit_theme::ActiveTheme;
 use gpui::{
     AnyView, Context, Entity, IntoElement, ParentElement, Render, Styled, WeakEntity, Window, div,
     prelude::*, px,
 };
-use ui_gpui::theme::ActiveTheme;
 use ui_gpui::{
     ButtonRadius, ContextMenu, ContextMenuEntry, Divider, DividerColor, IconButton, IconName,
     Tooltip, right_click_menu,

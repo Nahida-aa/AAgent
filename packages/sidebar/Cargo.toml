@@ -10,4 +10,5 @@ description = "AAgent Sidebar entity (Agent Threads list + bottom bar)"
 workspace.workspace = true
 settings-content.workspace = true
 gpui.workspace = true
+aa-gpui-kit-theme.workspace = true
 ui-gpui.workspace = true

@@ -5,12 +5,12 @@ pub mod panel_buttons;
 
 use std::sync::Arc;
 
+use aa_gpui_kit_theme::ActiveTheme;
 use gpui::{
     App, Context, Entity, IntoElement, MouseButton, MouseDownEvent, MouseUpEvent, ParentElement,
     Render, Styled, Window, deferred, div, hsla, prelude::*, px,
 };
 use settings_content::DockPosition;
-use ui_gpui::theme::ActiveTheme;
 
 use self::panel::{Panel, PanelHandle};
 

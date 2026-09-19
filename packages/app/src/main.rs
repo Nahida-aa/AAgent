@@ -13,7 +13,7 @@ fn main() {
             aa_gpui_kit_assets::Assets
                 .load_fonts(cx)
                 .expect("failed to load embedded fonts");
-            ui_gpui::theme::init_theme(cx);
+            theme_settings::init_theme(cx);
             ui_gpui::bind_input_keys(cx);
             ui_gpui::base::input::editor::bind_editor_keys(cx);
 

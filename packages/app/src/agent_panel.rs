@@ -1,9 +1,9 @@
+use aa_gpui_kit_theme::ActiveTheme;
 use gpui::{
     App, AppContext, Context, ElementId, Entity, FocusHandle, Focusable, InteractiveElement,
     IntoElement, ParentElement, Render, SharedString, StatefulInteractiveElement, Styled,
     Subscription, Window,
 };
-use ui_gpui::theme::ActiveTheme;
 use ui_gpui::{Editor, EditorEvent};
 
 /// A minimal clone of zed's `Agent` enum (zed: crates/agent_ui/src/agent_ui.rs:425).
@@ -104,7 +104,7 @@ impl AgentPanel {
     }
 
     fn render_toolbar(&self, cx: &mut Context<Self>) -> impl IntoElement {
-        use ui_gpui::theme::ActiveTheme;
+        use aa_gpui_kit_theme::ActiveTheme;
         let colors = cx.theme().colors();
         let hover_bg = colors.ghost_element_hover;
         let active_bg = colors.ghost_element_active;
@@ -192,7 +192,7 @@ impl AgentPanel {
     }
 
     fn render_new_thread_menu(&self, cx: &mut Context<Self>) -> impl IntoElement {
-        use ui_gpui::theme::ActiveTheme;
+        use aa_gpui_kit_theme::ActiveTheme;
         let colors = cx.theme().colors();
         let hover_bg = colors.element_hover;
         let accent = colors.text_accent;
@@ -275,7 +275,7 @@ impl AgentPanel {
     /// Placeholder message list. Mirrors the flex-1 scrollable region that
     /// zed's thread view reserves above the composer.
     fn render_message_region(&self, cx: &mut Context<Self>) -> impl IntoElement {
-        use ui_gpui::theme::ActiveTheme;
+        use aa_gpui_kit_theme::ActiveTheme;
         let colors = cx.theme().colors();
         let title_muted = colors.text_muted;
         let subtitle = colors.text_placeholder;
@@ -324,7 +324,7 @@ impl AgentPanel {
     /// Bottom composer mirroring zed's `render_message_editor`:
     /// a `ui-gpui` Editor input + a footer row with add-context/thinking + mode/model/send.
     fn render_composer(&self, cx: &mut Context<Self>) -> impl IntoElement {
-        use ui_gpui::theme::ActiveTheme;
+        use aa_gpui_kit_theme::ActiveTheme;
         let colors = cx.theme().colors();
         let border_variant = colors.border_variant;
         let element_bg = colors.element_background;
@@ -403,7 +403,7 @@ impl AgentPanel {
     }
 
     fn render_footer_button(&self, label: &str, cx: &Context<Self>) -> impl IntoElement {
-        use ui_gpui::theme::ActiveTheme;
+        use aa_gpui_kit_theme::ActiveTheme;
         let colors = cx.theme().colors();
         let hover_bg = colors.ghost_element_hover;
         let text_muted = colors.text_muted;
@@ -424,7 +424,7 @@ impl AgentPanel {
 
 impl Render for AgentPanel {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        use ui_gpui::theme::ActiveTheme;
+        use aa_gpui_kit_theme::ActiveTheme;
         let colors = cx.theme().colors();
         let panel_bg = colors.panel_background;
 

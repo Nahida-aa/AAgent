@@ -36,12 +36,12 @@ pub use terminal::{NewCenterTerminal, NewTerminal, OpenTerminal, TerminalProvide
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use aa_gpui_kit_theme::ActiveTheme;
 use gpui::{
     Action, App, Axis, Bounds, Context, DragMoveEvent, Entity, IntoElement, ParentElement, Render,
     Styled, Window, canvas, div, hsla, prelude::*, px,
 };
 use ui_gpui::StyledExt;
-use ui_gpui::theme::ActiveTheme;
 
 use dock::panel::{
     AgentPanel, CollabPanel, DebugPanel, GitPanel, OutlinePanel, Panel, PanelHandle, ProjectPanel,

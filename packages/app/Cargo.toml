@@ -34,6 +34,8 @@ parking_lot = { workspace = true }
 # gpui_learn 共享库:内嵌 zed 图标/字体/主题的 assets + 自研 ui 库。
 # 开发期 path 依赖;后续可切换成 git 源。
 aa-gpui-kit-assets.workspace = true
+aa-gpui-kit-theme.workspace = true
+theme-settings.workspace = true
 ui-gpui.workspace = true
 
 [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]

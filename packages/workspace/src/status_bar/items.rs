@@ -37,11 +37,11 @@
 //! - 普通项（Search/Diagnostics/Encoding 等可见项）：菜单 = `Hide`，点击隐藏该项
 //!   （`StatusBar::render_hideable`）。
 
+use aa_gpui_kit_theme::{ActiveTheme, ThemeColors};
 use gpui::{
     Context, Div, ElementId, Empty, ParentElement, Render, SharedString, Stateful, Styled, Window,
     div, prelude::*, px,
 };
-use ui_gpui::theme::{ActiveTheme, ThemeColors};
 use ui_gpui::{ButtonRadius, Icon, IconButton, IconName};
 
 use super::StatusItemView;

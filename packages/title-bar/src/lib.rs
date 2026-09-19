@@ -25,7 +25,7 @@ use gpui::{
 #[cfg(target_os = "windows")]
 use gpui::MAX_BUTTONS_PER_SIDE;
 
-use ui_gpui::theme::ActiveTheme;
+use aa_gpui_kit_theme::ActiveTheme;
 use ui_gpui::{ButtonRadius, ButtonStyle, IconButton, IconName};
 use workspace::Workspace;
 
@@ -95,7 +95,7 @@ impl TitleBar {
     }
 
     fn title_bar_color(&self, cx: &App) -> gpui::Hsla {
-        use ui_gpui::theme::ActiveTheme;
+        use aa_gpui_kit_theme::ActiveTheme;
         cx.theme().colors().panel_background
     }
 

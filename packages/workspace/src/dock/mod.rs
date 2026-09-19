@@ -303,18 +303,15 @@ impl Render for Dock {
 
         let root = div()
             .id("dock-panel")
-            .relative() // 保留: resize handle absolute 需要定位上下文
+            .relative()
             .flex()
             .bg(colors.panel_background)
             .border_color(colors.border)
             .overflow_hidden()
             .map(|el| {
                 if dock_axis_is_horizontal {
-                    // Left/Right dock: 高度可变 (flex_row 让 panel content + handle 横向?
-                    // 不对, handle 是 absolute 的, 所以 flex 方向只影响中间的 content div)
                     el.w_full().h_full().flex_row()
                 } else {
-                    // Bottom dock
                     el.w_full().h_full().flex_col()
                 }
             })

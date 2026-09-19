@@ -41,6 +41,7 @@ use gpui::{
     Action, App, Axis, Bounds, Context, DragMoveEvent, Entity, IntoElement, ParentElement, Render,
     Styled, Window, canvas, div, hsla, prelude::*, px,
 };
+use ui_gpui::StyledExt;
 use ui_gpui::theme::ActiveTheme;
 
 use dock::panel::{
@@ -384,9 +385,8 @@ impl Workspace {
     /// bounds 现在是 main_area 的 bounds (不含 titlebar/statusbar), 所以
     /// `bounds.bottom() - RESIZE_HANDLE - bounds.top()` 即 `bounds.height - RESIZE_HANDLE`。
     fn resize_bottom_dock(&mut self, new_size: f32, cx: &mut Context<Self>) {
-        let size = new_size.min(
-            self.bounds.bottom().as_f32() - RESIZE_HANDLE_SIZE - self.bounds.top().as_f32(),
-        );
+        let size = new_size
+            .min(self.bounds.bottom().as_f32() - RESIZE_HANDLE_SIZE - self.bounds.top().as_f32());
         self.bottom_dock.update(cx, |dock, cx| {
             dock.set_size(size);
             cx.notify();
@@ -460,43 +460,35 @@ impl Render for Workspace {
         // 主区域 — 4 种布局树（对齐 zed workspace.rs:L9748-L9982）
         let main_area = match bottom_layout {
             BottomDockLayout::Contained => div()
-                .flex()
-                .flex_row()
+                .h_flex()
                 .h_full()
                 .child(left_dock)
                 .child(
                     div()
-                        .flex()
-                        .flex_col()
+                        .v_flex()
                         .flex_1()
                         .overflow_hidden()
-                        .child(
-                            // Zed: h_flex().flex_1() — flex() 不能少！display:flex 才有 flex item 效果
-                            div().flex().flex_row().flex_1().overflow_hidden().child(center),
-                        )
+                        .child(div().h_flex().flex_1().overflow_hidden().child(center))
                         .child(bottom_dock),
                 )
                 .child(right_dock)
                 .into_any_element(),
 
             BottomDockLayout::Full => div()
-                .flex()
-                .flex_col()
+                .v_flex()
                 .h_full()
                 .child(
                     div()
-                        .flex()
-                        .flex_row()
+                        .h_flex()
                         .flex_1()
                         .overflow_hidden()
                         .child(left_dock)
                         .child(
                             div()
-                                .flex()
-                                .flex_col()
+                                .v_flex()
                                 .flex_1()
                                 .overflow_hidden()
-                                .child(div().flex().flex_row().flex_1().child(center)),
+                                .child(div().h_flex().flex_1().child(center)),
                         )
                         .child(right_dock),
                 )
@@ -504,29 +496,25 @@ impl Render for Workspace {
                 .into_any_element(),
 
             BottomDockLayout::LeftAligned => div()
-                .flex()
-                .flex_row()
+                .h_flex()
                 .h_full()
                 .child(
                     div()
-                        .flex()
-                        .flex_col()
+                        .v_flex()
                         .flex_1()
                         .h_full()
                         .child(
                             div()
-                                .flex()
-                                .flex_row()
+                                .h_flex()
                                 .flex_1()
                                 .overflow_hidden()
                                 .child(left_dock)
                                 .child(
                                     div()
-                                        .flex()
-                                        .flex_col()
+                                        .v_flex()
                                         .flex_1()
                                         .overflow_hidden()
-                                        .child(div().flex().flex_row().flex_1().child(center)),
+                                        .child(div().h_flex().flex_1().child(center)),
                                 ),
                         )
                         .child(bottom_dock),
@@ -535,28 +523,24 @@ impl Render for Workspace {
                 .into_any_element(),
 
             BottomDockLayout::RightAligned => div()
-                .flex()
-                .flex_row()
+                .h_flex()
                 .h_full()
                 .child(left_dock)
                 .child(
                     div()
-                        .flex()
-                        .flex_col()
+                        .v_flex()
                         .flex_1()
                         .h_full()
                         .child(
                             div()
-                                .flex()
-                                .flex_row()
+                                .h_flex()
                                 .flex_1()
                                 .child(
                                     div()
-                                        .flex()
-                                        .flex_col()
+                                        .v_flex()
                                         .flex_1()
                                         .overflow_hidden()
-                                        .child(div().flex().flex_row().flex_1().child(center)),
+                                        .child(div().h_flex().flex_1().child(center)),
                                 )
                                 .child(right_dock),
                         )
@@ -568,8 +552,7 @@ impl Render for Workspace {
         let mut root = div()
             .relative()
             .size_full()
-            .flex()
-            .flex_col()
+            .v_flex()
             .overflow_hidden()
             // TitleBar — 对齐 zed workspace.rs:L9612 `.when_some(self.titlebar_item)`
             .when_some(self.titlebar_item.clone(), |root, item| root.child(item))
@@ -580,8 +563,7 @@ impl Render for Workspace {
                     .size_full()
                     .relative()
                     .flex_1()
-                    .flex()
-                    .flex_col()
+                    .v_flex()
                     .child(
                         div()
                             .id("workspace")
@@ -589,8 +571,7 @@ impl Render for Workspace {
                             .relative()
                             .flex_1()
                             .w_full()
-                            .flex()
-                            .flex_col()
+                            .v_flex()
                             .overflow_hidden()
                             .child({
                                 let this = cx.entity();

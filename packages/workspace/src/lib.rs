@@ -457,124 +457,139 @@ impl Render for Workspace {
         // 读取 bottom dock 布局
         let bottom_layout = Self::read_bottom_dock_layout(cx);
 
-        // 主区域 — 4 种布局树（对齐 zed workspace.rs:L9748-L9982）
-        let main_area =
-            match bottom_layout {
-                BottomDockLayout::Contained => div()
-                    .h_flex()
-                    .h_full()
-                    .child(left_dock)
-                    .child(
-                        div()
-                            .v_flex()
-                            .flex_1()
-                            .overflow_hidden()
-                            .child(
-                                div()
-                                    .h_flex()
-                                    .flex_1()
-                                    .min_h(px(1.))
-                                    .overflow_hidden()
-                                    .child(center),
-                            )
-                            .child(bottom_dock),
-                    )
-                    .child(right_dock)
-                    .into_any_element(),
-
-                BottomDockLayout::Full => div()
-                    .v_flex()
-                    .h_full()
-                    .child(
-                        div()
-                            .h_flex()
-                            .flex_1()
-                            .overflow_hidden()
-                            .child(left_dock)
-                            .child(
-                                div()
-                                    .v_flex()
-                                    .flex_1()
-                                    .overflow_hidden()
-                                    .child(div().h_flex().flex_1().min_h(px(1.)).child(center)),
-                            )
-                            .child(right_dock),
-                    )
-                    .child(bottom_dock)
-                    .into_any_element(),
-
-                BottomDockLayout::LeftAligned => div()
-                    .h_flex()
-                    .h_full()
-                    .child(
-                        div()
-                            .v_flex()
-                            .flex_1()
-                            .h_full()
-                            .child(
-                                div()
-                                    .h_flex()
-                                    .flex_1()
-                                    .overflow_hidden()
-                                    .child(left_dock)
-                                    .child(div().v_flex().flex_1().overflow_hidden().child(
-                                        div().h_flex().flex_1().min_h(px(1.)).child(center),
-                                    )),
-                            )
-                            .child(bottom_dock),
-                    )
-                    .child(right_dock)
-                    .into_any_element(),
-
-                BottomDockLayout::RightAligned => {
+        // 主区域 — 4 种布局树（逐行对齐 zed workspace.rs:L9748-L9982）
+        let main_area = match bottom_layout {
+            BottomDockLayout::Contained => div()
+                .flex()
+                .flex_row()
+                .h_full()
+                .child(left_dock)
+                .child(
                     div()
-                        .h_flex()
-                        .h_full()
+                        .flex()
+                        .flex_col()
+                        .flex_1()
+                        .overflow_hidden()
+                        .child(div().h_flex().flex_1().child(center))
+                        .child(bottom_dock),
+                )
+                .child(right_dock)
+                .into_any_element(),
+
+            BottomDockLayout::Full => div()
+                .flex()
+                .flex_col()
+                .h_full()
+                .child(
+                    div()
+                        .flex()
+                        .flex_row()
+                        .flex_1()
+                        .overflow_hidden()
                         .child(left_dock)
                         .child(
                             div()
-                                .v_flex()
+                                .flex()
+                                .flex_col()
                                 .flex_1()
-                                .h_full()
+                                .overflow_hidden()
+                                .child(div().h_flex().flex_1().child(center)),
+                        )
+                        .child(right_dock),
+                )
+                .child(bottom_dock)
+                .into_any_element(),
+
+            BottomDockLayout::LeftAligned => div()
+                .flex()
+                .flex_row()
+                .h_full()
+                .child(
+                    div()
+                        .flex()
+                        .flex_col()
+                        .flex_1()
+                        .h_full()
+                        .child(
+                            div()
+                                .flex()
+                                .flex_row()
+                                .flex_1()
+                                .overflow_hidden()
+                                .child(left_dock)
                                 .child(
                                     div()
-                                        .h_flex()
+                                        .flex()
+                                        .flex_col()
                                         .flex_1()
-                                        .child(div().v_flex().flex_1().overflow_hidden().child(
-                                            div().h_flex().flex_1().min_h(px(1.)).child(center),
-                                        ))
-                                        .child(right_dock),
-                                )
-                                .child(bottom_dock),
+                                        .overflow_hidden()
+                                        .child(div().h_flex().flex_1().child(center)),
+                                ),
                         )
-                        .into_any_element()
-                }
-            };
+                        .child(bottom_dock),
+                )
+                .child(right_dock)
+                .into_any_element(),
+
+            BottomDockLayout::RightAligned => div()
+                .flex()
+                .flex_row()
+                .h_full()
+                .child(left_dock)
+                .child(
+                    div()
+                        .flex()
+                        .flex_col()
+                        .flex_1()
+                        .h_full()
+                        .child(
+                            div()
+                                .flex()
+                                .flex_row()
+                                .flex_1()
+                                .child(
+                                    div()
+                                        .flex()
+                                        .flex_col()
+                                        .flex_1()
+                                        .overflow_hidden()
+                                        .child(div().h_flex().flex_1().child(center)),
+                                )
+                                .child(right_dock),
+                        )
+                        .child(bottom_dock),
+                )
+                .into_any_element(),
+        };
 
         let mut root = div()
             .relative()
             .size_full()
-            .v_flex()
+            .flex()
+            .flex_col()
             .overflow_hidden()
-            // TitleBar — 对齐 zed workspace.rs:L9612 `.when_some(self.titlebar_item)`
+            // zed workspace.rs:L9595 — TitleBar
             .when_some(self.titlebar_item.clone(), |root, item| root.child(item))
-            // 对齐 zed workspace.rs:L9647 — status_bar 在这个 flex_1 容器内
-            // (不是 root 的 child), 这样 #workspace 的 flex_1 高度才正确
             .child(
                 div()
                     .size_full()
                     .relative()
                     .flex_1()
-                    .v_flex()
+                    .flex()
+                    .flex_col()
                     .child(
                         div()
                             .id("workspace")
-                            .bg(colors.panel_background)
+                            .bg(colors.background)
                             .relative()
                             .flex_1()
                             .w_full()
-                            .v_flex()
+                            .flex()
+                            .flex_col()
                             .overflow_hidden()
+                            .border_t_1()
+                            .border_b_1()
+                            .border_color(colors.border)
                             .child({
                                 let this = cx.entity();
                                 canvas(
@@ -607,7 +622,7 @@ impl Render for Workspace {
                                 .absolute()
                                 .size_full()
                             })
-                            // 对齐 zed — on_drag_move 挂在 #workspace div 上 (workspace.rs:L9707-L9745)
+                            // zed workspace.rs:L9707 — on_drag_move 挂在 #workspace
                             .on_drag_move::<DraggedDock>(cx.listener(
                                 move |workspace: &mut Self,
                                       e: &DragMoveEvent<DraggedDock>,
@@ -619,31 +634,10 @@ impl Render for Workspace {
                                         workspace.previous_dock_drag_coordinates =
                                             Some(e.event.position);
                                         let bounds = workspace.bounds;
-                                        let pos = e.event.position;
-                                        let event_bounds = e.bounds;
                                         match e.drag(cx).0 {
-                                            DockPosition::Bottom => {
-                                                let raw = bounds.bottom().as_f32()
-                                                    - pos.y.as_f32();
-                                                eprintln!(
-                                                    "[resize_bottom] ws_bounds={:.1}x{:.1} top={:.1} bottom={:.1} | ev.bounds=({:.1},{:.1})-({:.1},{:.1}) | pos.y={:.1} | raw={:.1} | cur_size={}",
-                                                    bounds.size.width.as_f32(),
-                                                    bounds.size.height.as_f32(),
-                                                    bounds.top().as_f32(),
-                                                    bounds.bottom().as_f32(),
-                                                    event_bounds.left().as_f32(),
-                                                    event_bounds.top().as_f32(),
-                                                    event_bounds.right().as_f32(),
-                                                    event_bounds.bottom().as_f32(),
-                                                    pos.y.as_f32(),
-                                                    raw,
-                                                    workspace.bottom_dock.read(cx).current_size(cx),
-                                                );
-                                                workspace.resize_bottom_dock(raw, cx);
-                                            }
                                             DockPosition::Left => {
                                                 workspace.resize_left_dock(
-                                                    pos.x.as_f32()
+                                                    e.event.position.x.as_f32()
                                                         - bounds.left().as_f32(),
                                                     cx,
                                                 );
@@ -651,7 +645,14 @@ impl Render for Workspace {
                                             DockPosition::Right => {
                                                 workspace.resize_right_dock(
                                                     bounds.right().as_f32()
-                                                        - pos.x.as_f32(),
+                                                        - e.event.position.x.as_f32(),
+                                                    cx,
+                                                );
+                                            }
+                                            DockPosition::Bottom => {
+                                                workspace.resize_bottom_dock(
+                                                    bounds.bottom().as_f32()
+                                                        - e.event.position.y.as_f32(),
                                                     cx,
                                                 );
                                             }
@@ -661,7 +662,7 @@ impl Render for Workspace {
                             ))
                             .child(main_area),
                     )
-                    // StatusBar — 在 flex_1 容器内 (和 #workspace 同级), 对齐 zed workspace.rs:L10009
+                    // zed workspace.rs:L10009 — status_bar 和 #workspace 同级
                     .child(self.status_bar.clone()),
             );
 

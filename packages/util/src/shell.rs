@@ -360,6 +360,43 @@ impl ShellKind {
         }
     }
 
+    /// 带命令前缀感知的 quoting——PowerShell/Nushell 有 `&` / `^` 前缀。
+    ///
+    /// 如果 arg 以 command_prefix 开头（PowerShell `&cmd`、Nushell `^cmd`），
+    /// 先剥前缀 + 剥可能存在的外层引号，quote 后重新加引号和前缀。
+    /// 没前缀就直接走 `try_quote`。
+    pub fn try_quote_prefix_aware<'a>(&self, arg: &'a str) -> Option<Cow<'a, str>> {
+        if let Some(char) = self.command_prefix() {
+            if let Some(arg) = arg.strip_prefix(char) {
+                // 命令带前缀
+                for quote in ['\'', '"'] {
+                    if let Some(arg) = arg
+                        .strip_prefix(quote)
+                        .and_then(|arg| arg.strip_suffix(quote))
+                    {
+                        // 前缀 + 外层引号：剥引号 → quote → 重新套引号 + 加前缀
+                        let quoted = self.try_quote(arg)?;
+                        return Some(if quoted.starts_with(['\'', '"']) {
+                            Cow::Owned(self.prepend_command_prefix(&quoted).into_owned())
+                        } else {
+                            Cow::Owned(
+                                self.prepend_command_prefix(&format!("{quote}{quoted}{quote}"))
+                                    .into_owned(),
+                            )
+                        });
+                    }
+                }
+                return self
+                    .try_quote(arg)
+                    .map(|quoted| Cow::Owned(self.prepend_command_prefix(&quoted).into_owned()));
+            }
+        }
+        self.try_quote(arg).map(|quoted| match quoted {
+            unquoted @ Cow::Borrowed(_) => unquoted,
+            Cow::Owned(quoted) => Cow::Owned(self.prepend_command_prefix(&quoted).into_owned()),
+        })
+    }
+
     fn quote_windows(arg: &str, enclose: bool) -> Cow<'_, str> {
         if arg.is_empty() {
             return Cow::Borrowed("\"\"");

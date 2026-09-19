@@ -5,11 +5,12 @@
 use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
+use settings_macros::MergeFrom;
 
 // ---------- FontSize ----------
 
 /// 字体大小（像素）。
-#[derive(Clone, Copy, Debug, Default, PartialEq, PartialOrd, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, PartialOrd, Serialize, Deserialize, MergeFrom)]
 #[serde(transparent)]
 pub struct FontSize(pub f32);
 
@@ -28,7 +29,7 @@ impl From<FontSize> for f32 {
 // ---------- FontFamilyName ----------
 
 /// 字体族名称（包 `Arc<str>`）。
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, MergeFrom)]
 #[serde(transparent)]
 pub struct FontFamilyName(pub Arc<str>);
 
@@ -47,7 +48,7 @@ impl From<&str> for FontFamilyName {
 // ---------- FontWeightContent ----------
 
 /// 字体粗细（CSS 单位 100-900）。
-#[derive(Clone, Copy, Debug, Default, PartialEq, PartialOrd, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, PartialOrd, Serialize, Deserialize, MergeFrom)]
 #[serde(transparent)]
 pub struct FontWeightContent(pub f32);
 
@@ -66,7 +67,7 @@ impl FontWeightContent {
 // ---------- FontStyleContent ----------
 
 /// 字体样式（serif / italic / oblique）。
-#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize, MergeFrom)]
 #[serde(rename_all = "snake_case")]
 pub enum FontStyleContent {
     Normal,
@@ -77,7 +78,7 @@ pub enum FontStyleContent {
 // ---------- BufferLineHeight ----------
 
 /// 编辑器行高。
-#[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize, MergeFrom)]
 #[serde(rename_all = "snake_case")]
 pub enum BufferLineHeight {
     #[default]

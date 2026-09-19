@@ -5,6 +5,7 @@
 use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
+use settings_macros::MergeFrom;
 
 // ---------- 常量 ----------
 
@@ -14,7 +15,7 @@ pub const DEFAULT_DARK_THEME: &str = "One Dark";
 // ---------- ThemeName ----------
 
 /// Theme 名称（transparent newtype，包 `Arc<str>`）。
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, MergeFrom)]
 #[serde(transparent)]
 pub struct ThemeName(pub Arc<str>);
 
@@ -33,7 +34,7 @@ impl From<&str> for ThemeName {
 // ---------- IconThemeName ----------
 
 /// Icon theme 名称。
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, MergeFrom)]
 #[serde(transparent)]
 pub struct IconThemeName(pub Arc<str>);
 
@@ -55,7 +56,7 @@ impl From<&str> for IconThemeName {
 ///
 /// - `Light` / `Dark` — 固定选对应主题
 /// - `System` — 跟随系统明暗
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, MergeFrom)]
 #[serde(rename_all = "snake_case")]
 pub enum ThemeAppearanceMode {
     Light,
@@ -71,12 +72,10 @@ pub enum ThemeAppearanceMode {
 /// JSON 格式：
 /// - 静态：`"theme": "One Dark"`
 /// - 动态：`"theme": { "mode": "system", "light": "One Light", "dark": "One Dark" }`
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, MergeFrom)]
 #[serde(untagged)]
 pub enum ThemeSelection {
-    /// 静态主题选择。
     Static(ThemeName),
-    /// 动态主题选择（按 mode 切换 light / dark）。
     Dynamic {
         #[serde(default)]
         mode: ThemeAppearanceMode,
@@ -96,7 +95,7 @@ impl Default for ThemeSelection {
 }
 
 /// 图标主题选择 — 同 ThemeSelection 形状。
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, MergeFrom)]
 #[serde(untagged)]
 pub enum IconThemeSelection {
     Static(IconThemeName),
@@ -117,7 +116,9 @@ impl Default for IconThemeSelection {
 // ---------- UiDensity ----------
 
 /// UI 密度（实验性）。
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(
+    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, MergeFrom,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum UiDensity {
     #[serde(alias = "compact")]

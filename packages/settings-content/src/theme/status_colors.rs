@@ -5,10 +5,12 @@
 //! 每个 status 有三组：单色 + `.background` + `.border`。
 
 use serde::{Deserialize, Serialize};
+use settings_macros::{MergeFrom, with_fallible_options};
 
 use crate::theme::theme_color::ThemeColor;
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[with_fallible_options]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, MergeFrom)]
 #[serde(default)]
 pub struct StatusColorsContent {
     #[serde(rename = "conflict")]

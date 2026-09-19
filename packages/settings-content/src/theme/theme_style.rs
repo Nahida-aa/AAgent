@@ -8,6 +8,7 @@
 use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
+use settings_macros::{MergeFrom, with_fallible_options};
 
 use crate::theme::highlight_style::HighlightStyleContent;
 use crate::theme::status_colors::StatusColorsContent;
@@ -16,7 +17,7 @@ use crate::theme::theme_color::{ThemeColor, ThemeColorsContent};
 // ---------- WindowBackgroundContent ----------
 
 /// 窗口背景外观。
-#[derive(Debug, PartialEq, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Copy, Serialize, Deserialize, MergeFrom)]
 #[serde(rename_all = "snake_case")]
 pub enum WindowBackgroundContent {
     Opaque,
@@ -27,11 +28,12 @@ pub enum WindowBackgroundContent {
 // ---------- AccentContent / PlayerColorContent ----------
 
 /// accent 颜色条目（可空）。
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, MergeFrom)]
 pub struct AccentContent(pub Option<ThemeColor>);
 
 /// 多人光标颜色。
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[with_fallible_options]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, MergeFrom)]
 pub struct PlayerColorContent {
     pub cursor: Option<ThemeColor>,
     pub background: Option<ThemeColor>,
@@ -44,7 +46,8 @@ pub struct PlayerColorContent {
 ///
 /// 用于从主题 JSON 文件一次性解析出所有颜色 + 状态 + syntax + accent + players。
 /// `colors` 和 `status` 用 `#[serde(flatten)]` 内联，使 JSON 结构扁平（所有 `border` / `editor.*` / `conflict` 等都在顶层）。
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[with_fallible_options]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, MergeFrom)]
 #[serde(default)]
 pub struct ThemeStyleContent {
     #[serde(rename = "background.appearance")]

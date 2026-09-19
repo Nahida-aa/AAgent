@@ -56,6 +56,7 @@ pub use theme_style::{
 };
 
 use serde::{Deserialize, Serialize};
+use settings_macros::{MergeFrom, with_fallible_options};
 
 // ---------- ThemeSettingsContent ----------
 
@@ -66,7 +67,8 @@ use serde::{Deserialize, Serialize};
 ///
 /// 所有字段都是 `Option<_>`，None 表示用默认值
 /// （由 `theme-settings` crate 的 Default impl 或 gpui_learn ThemeRegistry 提供）。
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[with_fallible_options]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, MergeFrom)]
 #[serde(default)]
 pub struct ThemeSettingsContent {
     /// UI 字体大小。

@@ -7,16 +7,28 @@
 //! 负责 RustEmbed + SettingsStore Global；
 //! settings_content 是**内容层**，只放数据结构。
 
+pub mod fallible_options;
+pub mod merge_from;
+
 pub mod agent;
 pub mod dock;
 pub mod language_model;
 pub mod theme;
 
+// ---------- 通用工具 re-export ----------
+
+pub use fallible_options::{FallibleOption, deserialize as deserialize_fallible};
+pub use merge_from::MergeFrom;
+
+// ---------- 各子模块 re-export ----------
+
 pub use agent::{SidebarDockPosition, SidebarSide};
 pub use dock::DockPosition;
 pub use language_model::{Config, McpConfig, McpServerDef, ProviderConfig, ResolvedConfig};
 pub use theme::{
-    BufferLineHeight, DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME, FontFamilyName, FontSize,
-    FontWeightContent, IconThemeName, IconThemeSelection, ThemeAppearanceMode, ThemeName,
-    ThemeSelection, ThemeSettingsContent, UiDensity,
+    AccentContent, BufferLineHeight, DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME, FontFamilyName,
+    FontSize, FontStyleContent, FontWeightContent, HighlightStyleContent, IconThemeName,
+    IconThemeSelection, PlayerColorContent, StatusColorsContent, ThemeAppearanceMode, ThemeColor,
+    ThemeColorsContent, ThemeName, ThemeSelection, ThemeSettingsContent, ThemeStyleContent,
+    UiDensity, WindowBackgroundContent,
 };

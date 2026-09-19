@@ -7,13 +7,14 @@ use std::fmt::{self, Display, Formatter};
 use std::ops::Deref;
 
 use serde::{Deserialize, Serialize};
+use settings_macros::{MergeFrom, with_fallible_options};
 
 // ---------- ThemeColor ----------
 
 /// 单个主题颜色值（transparent String，serde 校验 hex 格式）。
 ///
-/// 对齐 Zed `ThemeColor`，但去掉了 JsonSchema / MergeFrom / gpui::Rgba 依赖。
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+/// 对齐 Zed `ThemeColor`。
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, MergeFrom)]
 #[serde(transparent)]
 pub struct ThemeColor(String);
 
@@ -61,7 +62,8 @@ impl ThemeColor {
 ///
 /// 字段和 serde rename **完全对齐 Zed** `settings_content::ThemeColorsContent`。
 /// 所有字段都是 `Option<ThemeColor>`，None 表示使用内建默认。
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+#[with_fallible_options]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, MergeFrom)]
 #[serde(default)]
 pub struct ThemeColorsContent {
     // ---- border ----
@@ -200,7 +202,6 @@ pub struct ThemeColorsContent {
     // ---- scrollbar ----
     /// 已废弃：`scrollbar_thumb.background`。
     #[serde(rename = "scrollbar_thumb.background", skip_serializing)]
-    #[serde(default)]
     pub deprecated_scrollbar_thumb_background: Option<ThemeColor>,
     #[serde(rename = "scrollbar.thumb.background")]
     pub scrollbar_thumb_background: Option<ThemeColor>,

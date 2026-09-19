@@ -5,13 +5,17 @@
 //! - 持有项目根路径 + 所有 worktree
 //! - 管理 per-project settings（`.aa/settings.json`）
 //! - 持有子系统 store（git、lsp、buffers、terminals ...）
+//! - 通过 `fs: Arc<dyn Fs>` 做所有文件操作（可测试）
 //!
 //! 注意：当前版本是**纯数据骨架**，不依赖 GPUI。
 //! 升级为 GPUI Entity 时（像 Zed 那样）再把 Entity 字段加进来。
 
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
+
+use crate::fs::{Fs, RealFs};
 
 /// Worktree 标识（等价于 Zed 的 WorktreeId）。
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -29,9 +33,49 @@ pub enum OpenWorktreeStrategy {
 }
 
 /// Project 初始化参数。
-#[derive(Clone, Debug, Default)]
 pub struct OpenProjectOptions {
     pub worktree_strategy: OpenWorktreeStrategy,
+    /// 文件系统实现——生产用 RealFs::new()，测试用 MockFs::new_arc()。
+    /// None 时默认 RealFs。
+    pub fs: Option<Arc<dyn Fs>>,
+}
+
+impl Clone for OpenProjectOptions {
+    fn clone(&self) -> Self {
+        Self {
+            worktree_strategy: self.worktree_strategy.clone(),
+            fs: self.fs.clone(),
+        }
+    }
+}
+
+impl std::fmt::Debug for OpenProjectOptions {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("OpenProjectOptions")
+            .field("worktree_strategy", &self.worktree_strategy)
+            .field("fs", &self.fs.as_ref().map(|_| "<dyn Fs>"))
+            .finish()
+    }
+}
+
+impl Default for OpenProjectOptions {
+    fn default() -> Self {
+        Self {
+            worktree_strategy: OpenWorktreeStrategy::None,
+            fs: None,
+        }
+    }
+}
+
+impl OpenProjectOptions {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn with_fs(mut self, fs: Arc<dyn Fs>) -> Self {
+        self.fs = Some(fs);
+        self
+    }
 }
 
 /// Semantics-aware entity that is relevant to one or more worktrees with the files.
@@ -42,6 +86,10 @@ pub struct OpenProjectOptions {
 /// 对齐 Zed `crates/project/src/project.rs::Project`。
 /// 当前版本为纯数据层（无 GPUI 依赖），runtime 方法做 stub。
 pub struct Project {
+    /// 文件系统实现——所有文件操作（读 settings、git worktree 扫描）都走它。
+    /// Zed 对应 `fs: Arc<dyn Fs>`。
+    fs: Arc<dyn Fs>,
+
     /// 项目根路径（worktree_id = 0 的 worktree 路径）。
     root_path: PathBuf,
 
@@ -66,8 +114,10 @@ pub struct WorktreeEntry {
 impl Project {
     /// 打开一个项目——用根路径初始化，不加载 worktrees。
     /// 完整逻辑（git worktree 发现、LSP 启动、Git store 初始化）在 runtime 层。
-    pub fn open(root_path: impl Into<PathBuf>, _options: OpenProjectOptions) -> Self {
+    pub fn open(root_path: impl Into<PathBuf>, options: OpenProjectOptions) -> Self {
         let root_path = root_path.into();
+        let fs = options.fs.clone().unwrap_or_else(RealFs::new);
+
         let mut worktrees = vec![WorktreeEntry {
             id: WorktreeId(0),
             path: root_path.clone(),
@@ -76,15 +126,21 @@ impl Project {
 
         // 扫描 git worktrees（同步、简短）。
         // Zed 异步做这个；我们先同步 stub。
-        if let Some(git_wt) = Self::discover_git_worktrees(&root_path) {
+        if let Some(git_wt) = Self::discover_git_worktrees(&fs, &root_path) {
             worktrees.extend(git_wt);
         }
 
         Self {
+            fs,
             root_path: root_path.clone(),
             worktrees,
             settings_path: root_path.join(".aa").join("settings.json"),
         }
+    }
+
+    /// 文件系统实现。
+    pub fn fs(&self) -> &Arc<dyn Fs> {
+        &self.fs
     }
 
     /// 项目根路径。
@@ -129,9 +185,9 @@ impl Project {
 
     // ---------- git worktree discovery ----------
 
-    fn discover_git_worktrees(root: &Path) -> Option<Vec<WorktreeEntry>> {
+    fn discover_git_worktrees(fs: &Arc<dyn Fs>, root: &Path) -> Option<Vec<WorktreeEntry>> {
         let git_dir = root.join(".git");
-        if !git_dir.is_file() && !git_dir.is_dir() {
+        if !fs.path_exists(&git_dir) {
             return None;
         }
         // 调 `git worktree list --porcelain`

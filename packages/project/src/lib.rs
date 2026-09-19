@@ -4,7 +4,9 @@
 //! 完整的 Project runtime 等有 GPUI 绑定了再升级成 Entity。
 
 pub mod entity;
+pub mod fs;
 
 pub use entity::{
     OpenProjectOptions, OpenWorktreeStrategy, Project, ProjectPath, WorktreeEntry, WorktreeId,
 };
+pub use fs::{Fs, Metadata, MockFs, RealFs};

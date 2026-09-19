@@ -10,12 +10,12 @@
 
 use std::sync::Arc;
 
+use aa_gpui_kit_ui::IconName;
 use gpui::{
     App, Context, Entity, EntityId, IntoElement, ParentElement, Pixels, Render, Styled, Window,
     div, prelude::*, px,
 };
 use settings_content::DockPosition;
-use ui_gpui::IconName;
 
 // ---------- Panel trait ----------
 

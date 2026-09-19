@@ -26,7 +26,7 @@ use gpui::{
 use gpui::MAX_BUTTONS_PER_SIDE;
 
 use aa_gpui_kit_theme::ActiveTheme;
-use ui_gpui::{ButtonRadius, ButtonStyle, IconButton, IconName};
+use aa_gpui_kit_ui::{ButtonRadius, ButtonStyle, IconButton, IconName};
 use workspace::Workspace;
 
 /// Platform-appropriate title bar height.

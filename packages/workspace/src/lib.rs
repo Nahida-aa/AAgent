@@ -37,11 +37,11 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use aa_gpui_kit_theme::ActiveTheme;
+use aa_gpui_kit_ui::StyledExt;
 use gpui::{
     Action, App, Axis, Bounds, Context, DragMoveEvent, Entity, IntoElement, ParentElement, Render,
     Styled, Window, canvas, div, hsla, prelude::*, px,
 };
-use ui_gpui::StyledExt;
 
 use dock::panel::{
     AgentPanel, CollabPanel, DebugPanel, GitPanel, OutlinePanel, Panel, PanelHandle, ProjectPanel,

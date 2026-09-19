@@ -16,14 +16,12 @@
 //! ```
 
 use aa_gpui_kit_theme::ActiveTheme;
+use aa_gpui_kit_ui::{ButtonRadius, IconButton, IconName, Tooltip};
 use gpui::{
     App, Context, Entity, IntoElement, ParentElement, Render, Styled, WeakEntity, Window, div,
     prelude::*, px,
 };
 use settings_content::SidebarSide;
-use ui_gpui::IconName;
-use ui_gpui::component::tooltip::Tooltip;
-use ui_gpui::{ButtonRadius, IconButton};
 
 use workspace::MultiWorkspace;
 use workspace::multi_workspace::sidebar::Sidebar as SidebarTrait;

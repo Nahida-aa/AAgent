@@ -8,12 +8,14 @@ version = "0.1.0"
 dependencies = [
  "aa-gpui-kit-assets",
  "aa-gpui-kit-theme",
+ "aa-gpui-kit-ui",
  "aa-sidebar",
  "aa-terminal",
  "aa-terminal-view",
  "aa-title-bar",
  "anyhow",
  "chrono",
+ "editor",
  "futures",
  "gpui",
  "gpui_platform",
@@ -25,7 +27,6 @@ dependencies = [
  "theme-settings",
  "tracing",
  "tracing-subscriber",
- "ui-gpui",
  "wasm-bindgen",
  "workspace",
 ]
@@ -139,7 +140,7 @@ dependencies = [
 [[package]]
 name = "aa-gpui-kit-assets"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d#4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2b16c7d5be80535d3523417004ebffce5e2a2c5b#2b16c7d5be80535d3523417004ebffce5e2a2c5b"
 dependencies = [
  "anyhow",
  "gpui",
@@ -149,7 +150,7 @@ dependencies = [
 [[package]]
 name = "aa-gpui-kit-theme"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d#4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2b16c7d5be80535d3523417004ebffce5e2a2c5b#2b16c7d5be80535d3523417004ebffce5e2a2c5b"
 dependencies = [
  "anyhow",
  "gpui",
@@ -161,6 +162,22 @@ dependencies = [
  "thiserror 2.0.20",
  "tracing",
  "uuid",
+]
+
+[[package]]
+name = "aa-gpui-kit-ui"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2b16c7d5be80535d3523417004ebffce5e2a2c5b#2b16c7d5be80535d3523417004ebffce5e2a2c5b"
+dependencies = [
+ "aa-gpui-kit-assets",
+ "aa-gpui-kit-theme",
+ "editor",
+ "gpui",
+ "gpui_macros",
+ "serde",
+ "serde_json",
+ "tracing",
+ "unicode-segmentation",
 ]
 
 [[package]]
@@ -236,9 +253,9 @@ name = "aa-sidebar"
 version = "0.1.0"
 dependencies = [
  "aa-gpui-kit-theme",
+ "aa-gpui-kit-ui",
  "gpui",
  "settings-content",
- "ui-gpui",
  "workspace",
 ]
 
@@ -267,13 +284,13 @@ name = "aa-terminal-view"
 version = "0.1.0"
 dependencies = [
  "aa-gpui-kit-theme",
+ "aa-gpui-kit-ui",
  "aa-task",
  "aa-terminal",
  "alacritty_terminal",
  "gpui",
  "gpui_util",
  "tracing",
- "ui-gpui",
  "workspace",
 ]
 
@@ -283,9 +300,9 @@ version = "0.1.0"
 dependencies = [
  "aa-gpui-kit-assets",
  "aa-gpui-kit-theme",
+ "aa-gpui-kit-ui",
  "gpui",
  "gpui_platform",
- "ui-gpui",
  "workspace",
 ]
 
@@ -2370,6 +2387,18 @@ name = "dyn-clone"
 version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
+
+[[package]]
+name = "editor"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2b16c7d5be80535d3523417004ebffce5e2a2c5b#2b16c7d5be80535d3523417004ebffce5e2a2c5b"
+dependencies = [
+ "aa-gpui-kit-theme",
+ "gpui",
+ "sum_tree",
+ "tracing",
+ "unicode-segmentation",
+]
 
 [[package]]
 name = "either"
@@ -8044,22 +8073,6 @@ name = "ui"
 version = "0.1.0"
 
 [[package]]
-name = "ui-gpui"
-version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d#4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d"
-dependencies = [
- "aa-gpui-kit-assets",
- "aa-gpui-kit-theme",
- "gpui",
- "gpui_macros",
- "serde",
- "serde_json",
- "sum_tree",
- "tracing",
- "unicode-segmentation",
-]
-
-[[package]]
 name = "unicase"
 version = "2.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9832,13 +9845,13 @@ name = "workspace"
 version = "0.1.0"
 dependencies = [
  "aa-gpui-kit-theme",
+ "aa-gpui-kit-ui",
  "aa-task",
  "gpui",
  "schemars",
  "serde",
  "settings",
  "settings-content",
- "ui-gpui",
 ]
 
 [[package]]

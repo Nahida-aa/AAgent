@@ -12,8 +12,8 @@
 //! - `ItemHandle` — 简化为 tab + render + downgrade 核心方法
 //! - `Item` — 强类型小 trait，Entity<T> 自动获得 ItemHandle + downgrade
 
+use aa_gpui_kit_ui::IconName;
 use gpui::{AnyElement, App, Entity, EntityId, FocusHandle, IntoElement, SharedString, WeakEntity};
-use ui_gpui::IconName;
 
 /// 弱引用 item — 对齐 Zed `WeakItemHandle: Send + Sync`。
 ///

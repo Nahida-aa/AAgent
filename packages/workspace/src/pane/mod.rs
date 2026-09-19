@@ -10,11 +10,11 @@
 //! - [dragged] — DraggedTab / DraggedSelection drag marker
 
 use aa_gpui_kit_theme::ActiveTheme;
+use aa_gpui_kit_ui::IconName;
 use gpui::{
     App, Context, Entity, EntityId, EventEmitter, FocusHandle, Focusable, IntoElement, Render,
     Window, actions, div, prelude::*, px,
 };
-use ui_gpui::IconName;
 
 use crate::item::{Item, ItemHandle};
 
@@ -287,7 +287,7 @@ impl Pane {
                     } else {
                         colors.surface_background
                     })
-                    .child(ui_gpui::base::icon::Icon::new(icon).size(px(14.0)))
+                    .child(aa_gpui_kit_ui::base::icon::Icon::new(icon).size(px(14.0)))
                     .child(label)
                     .on_click(cx.listener(move |this: &mut Self, _, _, cx| {
                         this.activate_item(i, cx);
@@ -300,7 +300,10 @@ impl Pane {
                             .on_click(cx.listener(move |this: &mut Self, _, _, cx| {
                                 this.close_item(i, cx);
                             }))
-                            .child(ui_gpui::base::icon::Icon::new(IconName::Close).size(px(12.0))),
+                            .child(
+                                aa_gpui_kit_ui::base::icon::Icon::new(IconName::Close)
+                                    .size(px(12.0)),
+                            ),
                     ),
             );
         }

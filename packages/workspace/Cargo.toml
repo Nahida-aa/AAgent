@@ -7,7 +7,7 @@ license.workspace = true
 [dependencies]
 gpui.workspace = true
 aa-gpui-kit-theme.workspace = true
-ui-gpui.workspace = true
+aa-gpui-kit-ui.workspace = true
 settings.workspace = true
 settings-content.workspace = true
 serde.workspace = true

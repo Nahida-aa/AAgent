@@ -10,6 +10,6 @@ alacritty_terminal.workspace = true
 gpui.workspace = true
 gpui_util.workspace = true
 aa-gpui-kit-theme.workspace = true
-ui-gpui.workspace = true
+aa-gpui-kit-ui.workspace = true
 workspace.workspace = true
 tracing.workspace = true

@@ -14,8 +14,8 @@ fn main() {
                 .load_fonts(cx)
                 .expect("failed to load embedded fonts");
             theme_settings::init(cx);
-            ui_gpui::bind_input_keys(cx);
-            ui_gpui::base::input::editor::bind_editor_keys(cx);
+            aa_gpui_kit_ui::bind_input_keys(cx);
+            editor::bind_editor_keys(cx);
 
             // 设置系统（RustEmbed default.json → gpui Global SettingsStore）
             settings::SettingsStore::init(cx);

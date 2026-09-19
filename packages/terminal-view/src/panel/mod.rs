@@ -7,11 +7,11 @@
 pub mod inline_assist_tab_bar_button;
 pub mod terminal_provider;
 
+use aa_gpui_kit_ui::IconName;
 use gpui::{
     App, AppContext, Context, Entity, EventEmitter, IntoElement, Render, WeakEntity, Window,
     actions, px,
 };
-use ui_gpui::IconName;
 use workspace::dock::panel::Panel;
 use workspace::{DockPosition, Pane, PaneEvent, Workspace};
 

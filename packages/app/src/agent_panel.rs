@@ -1,10 +1,10 @@
 use aa_gpui_kit_theme::ActiveTheme;
+use editor::{Editor, EditorEvent};
 use gpui::{
     App, AppContext, Context, ElementId, Entity, FocusHandle, Focusable, InteractiveElement,
     IntoElement, ParentElement, Render, SharedString, StatefulInteractiveElement, Styled,
     Subscription, Window,
 };
-use ui_gpui::{Editor, EditorEvent};
 
 /// A minimal clone of zed's `Agent` enum (zed: crates/agent_ui/src/agent_ui.rs:425).
 /// Placeholder agents are listed in the new-thread menu; only `Terminal` has a

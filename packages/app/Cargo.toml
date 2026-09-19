@@ -36,7 +36,8 @@ parking_lot = { workspace = true }
 aa-gpui-kit-assets.workspace = true
 aa-gpui-kit-theme.workspace = true
 theme-settings.workspace = true
-ui-gpui.workspace = true
+aa-gpui-kit-ui.workspace = true
+editor.workspace = true
 
 [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
 gpui_platform = { workspace = true, features = ["font-kit", "wayland", "x11"] }

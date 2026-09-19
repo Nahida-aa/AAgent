@@ -11,4 +11,4 @@ workspace.workspace = true
 settings-content.workspace = true
 gpui.workspace = true
 aa-gpui-kit-theme.workspace = true
-ui-gpui.workspace = true
+aa-gpui-kit-ui.workspace = true

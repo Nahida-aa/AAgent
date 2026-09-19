@@ -11,13 +11,12 @@
 
 use std::collections::HashMap;
 
+use aa_gpui_kit_ui::{
+    ContextMenuEntry, Divider, DividerColor, IconButton, Tooltip, right_click_menu,
+};
 use gpui::{
     App, Context, Entity, IntoElement, ParentElement, Render, Styled, Window, div, prelude::*, px,
 };
-use ui_gpui::component::context_menu::ContextMenuEntry;
-use ui_gpui::component::divider::{Divider, DividerColor};
-use ui_gpui::component::tooltip::Tooltip;
-use ui_gpui::{IconButton, right_click_menu};
 
 use crate::dock::Dock;
 use crate::status_bar::StatusItemView;
@@ -90,7 +89,7 @@ impl Render for PanelButtons {
                 IconButton::new(button_id.clone(), icon)
                     .size(px(22.0))
                     .icon_size(px(14.0))
-                    .radius(ui_gpui::ButtonRadius::Medium)
+                    .radius(aa_gpui_kit_ui::ButtonRadius::Medium)
                     .aria_label(tooltip)
                     .selected(is_active)
                     .tooltip(Tooltip::text(tooltip.to_string()))

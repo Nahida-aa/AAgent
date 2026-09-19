@@ -38,11 +38,11 @@
 //!   （`StatusBar::render_hideable`）。
 
 use aa_gpui_kit_theme::{ActiveTheme, ThemeColors};
+use aa_gpui_kit_ui::{ButtonRadius, Icon, IconButton, IconName};
 use gpui::{
     Context, Div, ElementId, Empty, ParentElement, Render, SharedString, Stateful, Styled, Window,
     div, prelude::*, px,
 };
-use ui_gpui::{ButtonRadius, Icon, IconButton, IconName};
 
 use super::StatusItemView;
 

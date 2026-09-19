@@ -87,9 +87,10 @@ workspace = { path = "packages/workspace" }
 fs = { path = "packages/fs" }
 project = { path = "packages/project" }
 # 外部 gpui_learn 共享库（GitHub git 依赖，稳定可复现）
-aa-gpui-kit-assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d" }
-aa-gpui-kit-theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d" }
-ui-gpui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d" }
+aa-gpui-kit-assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2b16c7d5be80535d3523417004ebffce5e2a2c5b" }
+aa-gpui-kit-theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2b16c7d5be80535d3523417004ebffce5e2a2c5b" }
+aa-gpui-kit-ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2b16c7d5be80535d3523417004ebffce5e2a2c5b" }
+editor = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2b16c7d5be80535d3523417004ebffce5e2a2c5b" }
 
 [patch.crates-io]
 gpui = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f", version = "=0.2.2" }

@@ -5,222 +5,44 @@
 //! 这里放**从 JSON 反序列化的数据结构**（settings_content 层），
 //! 运行时主题类型（`Theme`, `ThemeStyles`, `ActiveTheme` ...）在
 //! `aa-gpui-kit-theme` crate（gpui_learn）。
+//!
+//! 子模块拆分：
+//! - [`font`] — FontSize / FontFamilyName / FontWeightContent / BufferLineHeight / FontStyleContent
+//! - [`theme_selection`] — ThemeName / ThemeSelection / ThemeAppearanceMode / UiDensity + DEFAULT_*_THEME
+//! - [`theme_color`] — ThemeColor / ThemeColorsContent / ThemeStyleContent / StatusColorsContent
+//!
+//! `ThemeSettingsContent` 聚合所有子模块的类型，作为用户 settings.json 的入口。
 
-use std::sync::Arc;
+pub mod font;
+pub mod theme_color;
+pub mod theme_selection;
+
+// ---------- 常量 re-export ----------
+
+pub use theme_selection::{DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME};
+
+// ---------- 子类型 re-export ----------
+
+pub use font::{BufferLineHeight, FontFamilyName, FontSize, FontStyleContent, FontWeightContent};
+pub use theme_color::{
+    AccentContent, HighlightStyleContent, PlayerColorContent, StatusColorsContent, ThemeColor,
+    ThemeColorsContent, ThemeStyleContent, WindowBackgroundContent,
+};
+pub use theme_selection::{
+    IconThemeName, IconThemeSelection, ThemeAppearanceMode, ThemeName, ThemeSelection, UiDensity,
+};
 
 use serde::{Deserialize, Serialize};
-
-// ---------- 常量 ----------
-
-pub const DEFAULT_LIGHT_THEME: &str = "One Light";
-pub const DEFAULT_DARK_THEME: &str = "One Dark";
-
-// ---------- ThemeName ----------
-
-/// Theme 名称（transparent newtype，包 `Arc<str>`）。
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct ThemeName(pub Arc<str>);
-
-impl From<String> for ThemeName {
-    fn from(s: String) -> Self {
-        Self(Arc::from(s))
-    }
-}
-
-impl From<&str> for ThemeName {
-    fn from(s: &str) -> Self {
-        Self(Arc::from(s))
-    }
-}
-
-// ---------- IconThemeName ----------
-
-/// Icon theme 名称。
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct IconThemeName(pub Arc<str>);
-
-impl From<String> for IconThemeName {
-    fn from(s: String) -> Self {
-        Self(Arc::from(s))
-    }
-}
-
-impl From<&str> for IconThemeName {
-    fn from(s: &str) -> Self {
-        Self(Arc::from(s))
-    }
-}
-
-// ---------- ThemeAppearanceMode ----------
-
-/// 选择主题时用的模式。
-///
-/// - `Light` / `Dark` — 固定选对应主题
-/// - `System` — 跟随系统明暗
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum ThemeAppearanceMode {
-    Light,
-    Dark,
-    #[default]
-    System,
-}
-
-// ---------- ThemeSelection ----------
-
-/// 主题选择 — 可以是静态（单个主题）或动态（按明暗切换）。
-///
-/// JSON 格式：
-/// - 静态：`"theme": "One Dark"`
-/// - 动态：`"theme": { "mode": "system", "light": "One Light", "dark": "One Dark" }`
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
-#[serde(untagged)]
-pub enum ThemeSelection {
-    /// 静态主题选择。
-    Static(ThemeName),
-    /// 动态主题选择（按 mode 切换 light / dark）。
-    Dynamic {
-        #[serde(default)]
-        mode: ThemeAppearanceMode,
-        light: ThemeName,
-        dark: ThemeName,
-    },
-}
-
-impl Default for ThemeSelection {
-    fn default() -> Self {
-        Self::Dynamic {
-            mode: ThemeAppearanceMode::default(),
-            light: ThemeName::from(DEFAULT_LIGHT_THEME),
-            dark: ThemeName::from(DEFAULT_DARK_THEME),
-        }
-    }
-}
-
-/// 图标主题选择 — 同 ThemeSelection 形状。
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
-#[serde(untagged)]
-pub enum IconThemeSelection {
-    Static(IconThemeName),
-    Dynamic {
-        #[serde(default)]
-        mode: ThemeAppearanceMode,
-        light: IconThemeName,
-        dark: IconThemeName,
-    },
-}
-
-impl Default for IconThemeSelection {
-    fn default() -> Self {
-        Self::Static(IconThemeName::default())
-    }
-}
-
-// ---------- FontSize ----------
-
-/// 字体大小（像素）。
-#[derive(Clone, Copy, Debug, Default, PartialEq, PartialOrd, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct FontSize(pub f32);
-
-impl From<f32> for FontSize {
-    fn from(v: f32) -> Self {
-        Self(v)
-    }
-}
-
-impl From<FontSize> for f32 {
-    fn from(v: FontSize) -> Self {
-        v.0
-    }
-}
-
-// ---------- FontFamilyName ----------
-
-/// 字体族名称（包 `Arc<str>`）。
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct FontFamilyName(pub Arc<str>);
-
-impl From<String> for FontFamilyName {
-    fn from(s: String) -> Self {
-        Self(Arc::from(s))
-    }
-}
-
-impl From<&str> for FontFamilyName {
-    fn from(s: &str) -> Self {
-        Self(Arc::from(s))
-    }
-}
-
-// ---------- FontWeightContent ----------
-
-/// 字体粗细（CSS 单位 100-900）。
-#[derive(Clone, Copy, Debug, Default, PartialEq, PartialOrd, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct FontWeightContent(pub f32);
-
-impl FontWeightContent {
-    pub const THIN: Self = Self(100.0);
-    pub const EXTRA_LIGHT: Self = Self(200.0);
-    pub const LIGHT: Self = Self(300.0);
-    pub const NORMAL: Self = Self(400.0);
-    pub const MEDIUM: Self = Self(500.0);
-    pub const SEMIBOLD: Self = Self(600.0);
-    pub const BOLD: Self = Self(700.0);
-    pub const EXTRA_BOLD: Self = Self(800.0);
-    pub const BLACK: Self = Self(900.0);
-}
-
-// ---------- BufferLineHeight ----------
-
-/// 编辑器行高。
-#[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum BufferLineHeight {
-    #[default]
-    Comfortable,
-    Standard,
-    Custom(f32),
-}
-
-// ---------- UiDensity ----------
-
-/// UI 密度（实验性）。
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum UiDensity {
-    #[serde(alias = "compact")]
-    Compact,
-    #[default]
-    #[serde(alias = "default")]
-    Default,
-    #[serde(alias = "comfortable")]
-    Comfortable,
-}
-
-impl UiDensity {
-    pub fn spacing_ratio(self) -> f32 {
-        match self {
-            Self::Compact => 0.75,
-            Self::Default => 1.0,
-            Self::Comfortable => 1.25,
-        }
-    }
-}
 
 // ---------- ThemeSettingsContent ----------
 
 /// Theme 相关的所有 settings 字段。
 ///
 /// 对齐 Zed `settings_content::ThemeSettingsContent` 的核心子集。
-/// 完整字段列表见 Zed 源码，这里先放 AAgent 需要的。
+/// Zed 还包含 FontFeatures / TextLayout 等，按需添加。
 ///
-/// 所有字段都是 `Option<_>`，None 表示用默认值（由 `theme-settings` crate 的 Default impl 或
-/// gpui_learn 的 ThemeRegistry 提供）。
+/// 所有字段都是 `Option<_>`，None 表示用默认值
+/// （由 `theme-settings` crate 的 Default impl 或 gpui_learn ThemeRegistry 提供）。
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ThemeSettingsContent {
@@ -277,5 +99,52 @@ mod tests {
         let s: ThemeSettingsContent = serde_json::from_value(json!({})).unwrap();
         assert!(s.theme.is_none());
         assert!(s.buffer_font_size.is_none());
+    }
+
+    #[test]
+    fn test_theme_color_hex() {
+        let s: ThemeColor = serde_json::from_value(json!("#ff5733")).unwrap();
+        assert_eq!(s.as_str(), "#ff5733");
+    }
+
+    #[test]
+    fn test_theme_colors_content_minimal() {
+        let s: ThemeColorsContent = serde_json::from_value(json!({
+            "background": "#1e1e1e",
+            "editor.background": "#2d2d2d",
+            "editor.foreground": "#d4d4d4"
+        }))
+        .unwrap();
+        assert_eq!(s.background.as_deref(), Some("#1e1e1e"));
+        assert_eq!(s.editor_background.as_deref(), Some("#2d2d2d"));
+        assert_eq!(s.editor_foreground.as_deref(), Some("#d4d4d4"));
+    }
+
+    #[test]
+    fn test_theme_style_content_flatten() {
+        let s: ThemeStyleContent = serde_json::from_value(json!({
+            "background": "#1e1e1e",
+            "error": "#f44747",
+            "error.background": "rgba(244,71,71,0.15)",
+            "syntax": {
+                "keyword": { "color": "#569cd6" },
+                "string": { "color": "#ce9178" }
+            }
+        }))
+        .unwrap();
+        // colors 部分（flatten 进来）
+        assert_eq!(s.colors.background.as_deref(), Some("#1e1e1e"));
+        // status 部分（flatten 进来）
+        assert_eq!(s.status.error.as_deref(), Some("#f44747"));
+        assert_eq!(
+            s.status.error_background.as_deref(),
+            Some("rgba(244,71,71,0.15)")
+        );
+        // syntax
+        assert_eq!(s.syntax.len(), 2);
+        assert_eq!(
+            s.syntax.get("keyword").unwrap().color.as_deref(),
+            Some("#569cd6")
+        );
     }
 }

@@ -7,7 +7,7 @@ use std::ops::Deref;
 
 use serde::{Deserialize, Serialize};
 
-use crate::theme::font::FontStyleContent;
+use crate::theme::font::{FontStyleContent, FontWeightContent};
 
 // ---------- ThemeColor ----------
 
@@ -88,12 +88,12 @@ pub struct PlayerColorContent {
 #[serde(default)]
 pub struct HighlightStyleContent {
     pub color: Option<ThemeColor>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none", default)]
     pub background_color: Option<ThemeColor>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none", default)]
     pub font_style: Option<FontStyleContent>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub font_weight: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    pub font_weight: Option<FontWeightContent>,
 }
 
 impl HighlightStyleContent {

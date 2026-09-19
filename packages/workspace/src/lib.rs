@@ -458,96 +458,98 @@ impl Render for Workspace {
         let bottom_layout = Self::read_bottom_dock_layout(cx);
 
         // 主区域 — 4 种布局树（对齐 zed workspace.rs:L9748-L9982）
-        let main_area = match bottom_layout {
-            BottomDockLayout::Contained => div()
-                .h_flex()
-                .h_full()
-                .child(left_dock)
-                .child(
-                    div()
-                        .v_flex()
-                        .flex_1()
-                        .overflow_hidden()
-                        .child(div().h_flex().flex_1().overflow_hidden().child(center))
-                        .child(bottom_dock),
-                )
-                .child(right_dock)
-                .into_any_element(),
+        let main_area =
+            match bottom_layout {
+                BottomDockLayout::Contained => div()
+                    .h_flex()
+                    .h_full()
+                    .child(left_dock)
+                    .child(
+                        div()
+                            .v_flex()
+                            .flex_1()
+                            .overflow_hidden()
+                            .child(
+                                div()
+                                    .h_flex()
+                                    .flex_1()
+                                    .min_h(px(1.))
+                                    .overflow_hidden()
+                                    .child(center),
+                            )
+                            .child(bottom_dock),
+                    )
+                    .child(right_dock)
+                    .into_any_element(),
 
-            BottomDockLayout::Full => div()
-                .v_flex()
-                .h_full()
-                .child(
+                BottomDockLayout::Full => div()
+                    .v_flex()
+                    .h_full()
+                    .child(
+                        div()
+                            .h_flex()
+                            .flex_1()
+                            .overflow_hidden()
+                            .child(left_dock)
+                            .child(
+                                div()
+                                    .v_flex()
+                                    .flex_1()
+                                    .overflow_hidden()
+                                    .child(div().h_flex().flex_1().min_h(px(1.)).child(center)),
+                            )
+                            .child(right_dock),
+                    )
+                    .child(bottom_dock)
+                    .into_any_element(),
+
+                BottomDockLayout::LeftAligned => div()
+                    .h_flex()
+                    .h_full()
+                    .child(
+                        div()
+                            .v_flex()
+                            .flex_1()
+                            .h_full()
+                            .child(
+                                div()
+                                    .h_flex()
+                                    .flex_1()
+                                    .overflow_hidden()
+                                    .child(left_dock)
+                                    .child(div().v_flex().flex_1().overflow_hidden().child(
+                                        div().h_flex().flex_1().min_h(px(1.)).child(center),
+                                    )),
+                            )
+                            .child(bottom_dock),
+                    )
+                    .child(right_dock)
+                    .into_any_element(),
+
+                BottomDockLayout::RightAligned => {
                     div()
                         .h_flex()
-                        .flex_1()
-                        .overflow_hidden()
+                        .h_full()
                         .child(left_dock)
                         .child(
                             div()
                                 .v_flex()
                                 .flex_1()
-                                .overflow_hidden()
-                                .child(div().h_flex().flex_1().child(center)),
-                        )
-                        .child(right_dock),
-                )
-                .child(bottom_dock)
-                .into_any_element(),
-
-            BottomDockLayout::LeftAligned => div()
-                .h_flex()
-                .h_full()
-                .child(
-                    div()
-                        .v_flex()
-                        .flex_1()
-                        .h_full()
-                        .child(
-                            div()
-                                .h_flex()
-                                .flex_1()
-                                .overflow_hidden()
-                                .child(left_dock)
+                                .h_full()
                                 .child(
                                     div()
-                                        .v_flex()
+                                        .h_flex()
                                         .flex_1()
-                                        .overflow_hidden()
-                                        .child(div().h_flex().flex_1().child(center)),
-                                ),
-                        )
-                        .child(bottom_dock),
-                )
-                .child(right_dock)
-                .into_any_element(),
-
-            BottomDockLayout::RightAligned => div()
-                .h_flex()
-                .h_full()
-                .child(left_dock)
-                .child(
-                    div()
-                        .v_flex()
-                        .flex_1()
-                        .h_full()
-                        .child(
-                            div()
-                                .h_flex()
-                                .flex_1()
-                                .child(
-                                    div()
-                                        .v_flex()
-                                        .flex_1()
-                                        .overflow_hidden()
-                                        .child(div().h_flex().flex_1().child(center)),
+                                        .child(div().v_flex().flex_1().overflow_hidden().child(
+                                            div().h_flex().flex_1().min_h(px(1.)).child(center),
+                                        ))
+                                        .child(right_dock),
                                 )
-                                .child(right_dock),
+                                .child(bottom_dock),
                         )
-                        .child(bottom_dock),
-                )
-                .into_any_element(),
-        };
+                        .into_any_element()
+                }
+            };
 
         let mut root = div()
             .relative()

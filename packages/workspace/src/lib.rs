@@ -469,6 +469,7 @@ impl Render for Workspace {
                         .flex()
                         .flex_col()
                         .flex_1()
+                        .min_h(px(0.))
                         .overflow_hidden()
                         .child(div().h_flex().flex_1().child(center))
                         .child(bottom_dock),
@@ -485,6 +486,7 @@ impl Render for Workspace {
                         .flex()
                         .flex_row()
                         .flex_1()
+                        .min_h(px(0.))
                         .overflow_hidden()
                         .child(left_dock)
                         .child(
@@ -492,6 +494,7 @@ impl Render for Workspace {
                                 .flex()
                                 .flex_col()
                                 .flex_1()
+                                .min_h(px(0.))
                                 .overflow_hidden()
                                 .child(div().h_flex().flex_1().child(center)),
                         )
@@ -509,12 +512,14 @@ impl Render for Workspace {
                         .flex()
                         .flex_col()
                         .flex_1()
+                        .min_h(px(0.))
                         .h_full()
                         .child(
                             div()
                                 .flex()
                                 .flex_row()
                                 .flex_1()
+                                .min_h(px(0.))
                                 .overflow_hidden()
                                 .child(left_dock)
                                 .child(
@@ -522,6 +527,7 @@ impl Render for Workspace {
                                         .flex()
                                         .flex_col()
                                         .flex_1()
+                                        .min_h(px(0.))
                                         .overflow_hidden()
                                         .child(div().h_flex().flex_1().child(center)),
                                 ),
@@ -541,17 +547,20 @@ impl Render for Workspace {
                         .flex()
                         .flex_col()
                         .flex_1()
+                        .min_h(px(0.))
                         .h_full()
                         .child(
                             div()
                                 .flex()
                                 .flex_row()
                                 .flex_1()
+                                .min_h(px(0.))
                                 .child(
                                     div()
                                         .flex()
                                         .flex_col()
                                         .flex_1()
+                                        .min_h(px(0.))
                                         .overflow_hidden()
                                         .child(div().h_flex().flex_1().child(center)),
                                 )
@@ -575,6 +584,7 @@ impl Render for Workspace {
                     .size_full()
                     .relative()
                     .flex_1()
+                    .min_h(px(0.))
                     .flex()
                     .flex_col()
                     .child(
@@ -583,6 +593,7 @@ impl Render for Workspace {
                             .bg(colors.background)
                             .relative()
                             .flex_1()
+                            .min_h(px(0.))
                             .w_full()
                             .flex()
                             .flex_col()

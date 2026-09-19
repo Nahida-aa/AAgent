@@ -11,8 +11,6 @@ use gpui::{
 use terminal::alacritty::{AlacrittyBackend, TerminalBounds};
 use tracing::debug;
 
-use workspace::ItemEvent;
-
 use crate::element::TerminalElement;
 
 /// A terminal session view: owns the pty-backed backend and forwards keyboard
@@ -110,7 +108,6 @@ impl TerminalView {
 }
 
 impl EventEmitter<()> for TerminalView {}
-impl EventEmitter<ItemEvent> for TerminalView {}
 
 impl Focusable for TerminalView {
     fn focus_handle(&self, _: &App) -> FocusHandle {

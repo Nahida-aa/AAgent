@@ -25,7 +25,7 @@ pub trait WeakItemHandle: Send + Sync {
 
 /// Pane 里装的 item 的统一接口（dyn object）。
 ///
-/// 对齐 Zed `ItemHandle` trait。AAgent 逐步补齐 Zed 的方法集。
+/// 对齐 Zed `ItemHandle` trait。
 pub trait ItemHandle {
     fn tab_label(&self, cx: &App) -> SharedString;
     fn tab_icon(&self, cx: &App) -> IconName;
@@ -67,15 +67,29 @@ pub trait ItemHandle {
     ) -> Subscription;
 }
 
-// ─── Item (强类型小 trait) ──────────────────────────────────────────────
+// ─── Item (强类型 trait) ────────────────────────────────────────────────
 
-/// 每种 item 类型实现此小 trait，Entity<T> 自动获得 ItemHandle + WeakItemHandle。
+/// 每种 item 类型实现此 trait，Entity<T> 自动获得 ItemHandle + WeakItemHandle。
 ///
-/// 对齐 Zed `Item: Focusable + EventEmitter<Self::Event> + Render + Sized`。
-/// 简化：直接 emit ItemEvent（去掉 Zed 的 to_item_events 中间层）。
-pub trait Item: 'static + gpui::Render + gpui::Focusable + EventEmitter<ItemEvent> {
+/// 完全对齐 Zed `Item: Focusable + EventEmitter<Self::Event> + Render + Sized`。
+/// Self::Event 是 item 自定义事件类型（如 EditorEvent、TerminalEvent），
+/// 通过 `to_item_events` 桥接成通用的 `ItemEvent`。
+pub trait Item:
+    'static + gpui::Render + gpui::Focusable + EventEmitter<Self::Event> + Sized
+{
+    /// item 自定义事件类型（如 `editor::EditorEvent`、`terminal::TerminalEvent`）。
+    type Event;
+
     fn tab_label(&self, cx: &App) -> SharedString;
     fn tab_icon(&self, cx: &App) -> IconName;
+
+    // ── 事件桥接 ──
+
+    /// 把自定义 `Self::Event` 转换成通用 `ItemEvent`。
+    /// 默认空实现（不产生任何 ItemEvent）。
+    ///
+    /// 对齐 Zed `Item::to_item_events` (item.rs:214)。
+    fn to_item_events(_event: &Self::Event, _f: &mut dyn FnMut(ItemEvent)) {}
 
     // ── Toolbar / Breadcrumbs 默认实现 ──
 
@@ -162,7 +176,7 @@ impl<T: Item> ItemHandle for Entity<T> {
         handler: Box<dyn Fn(ItemEvent, &mut gpui::Window, &mut App)>,
     ) -> Subscription {
         window.subscribe(self, cx, move |_, event, window, cx| {
-            handler(*event, window, cx);
+            T::to_item_events(event, &mut |item_event| handler(item_event, window, cx));
         })
     }
 }

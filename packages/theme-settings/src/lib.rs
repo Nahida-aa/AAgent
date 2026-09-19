@@ -32,7 +32,7 @@ impl AssetSource for GlobalAssets {
 /// 对齐 Zed `theme_settings::init` (crates/theme_settings/src/theme_settings.rs L71) —
 /// Zed 先调 `theme::init` 做基础装配，再装 settings provider，再 observe settings 变化。
 /// 这里先实现 `theme::init` 那部分（gpui_learn 的 init_theme 逻辑简化版）。
-pub fn init_theme(cx: &mut App) {
+pub fn init(cx: &mut App) {
     // 1. 用 app 的 asset_source 构造注册表（gpui_learn ThemeRegistry::new 自带 Catppuccin 内置主题）
     let assets: Box<dyn AssetSource> = Box::new(GlobalAssets(cx.asset_source().clone()));
     ThemeRegistry::set_global(assets, cx);

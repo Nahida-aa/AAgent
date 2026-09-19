@@ -139,7 +139,7 @@ dependencies = [
 [[package]]
 name = "aa-gpui-kit-assets"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=93850aa#93850aa57d1c22405eb35d5ed51fdfd8069ce0b2"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d#4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d"
 dependencies = [
  "anyhow",
  "gpui",
@@ -149,7 +149,7 @@ dependencies = [
 [[package]]
 name = "aa-gpui-kit-theme"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=93850aa#93850aa57d1c22405eb35d5ed51fdfd8069ce0b2"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d#4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d"
 dependencies = [
  "anyhow",
  "gpui",
@@ -7908,7 +7908,7 @@ version = "0.1.0"
 [[package]]
 name = "ui-gpui"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=93850aa#93850aa57d1c22405eb35d5ed51fdfd8069ce0b2"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d#4f47b3867f68ae46a5ec6b8aba3b6ac98e8cfd4d"
 dependencies = [
  "aa-gpui-kit-assets",
  "aa-gpui-kit-theme",

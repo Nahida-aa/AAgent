@@ -26,7 +26,7 @@ pub mod pane;
 pub mod status_bar;
 pub mod terminal;
 
-pub use item::{Item, ItemHandle, WeakItemHandle};
+pub use item::{Item, ItemEvent, ItemHandle, WeakItemHandle};
 pub use multi_workspace::{MultiWorkspace, SidebarHandle, SidebarRenderState};
 pub use pane::group::{Member, PaneGroup};
 pub use pane::{DraggedSelection, DraggedTab, Event as PaneEvent, Pane};

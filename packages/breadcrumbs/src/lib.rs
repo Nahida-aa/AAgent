@@ -4,7 +4,7 @@ use gpui::{
 };
 use workspace::{
     // ToolbarItemEvent, ToolbarItemLocation, ToolbarItemView,
-    item::{HighlightedText, ItemEvent, ItemHandle},
+    item::{ItemEvent, ItemHandle},
 };
 
 // type RenderBreadcrumbTextFn = fn(

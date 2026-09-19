@@ -18,3 +18,16 @@ pub use settings::{
     ShowDiagnostics,
 };
 pub use tab::{ItemBufferKind, TabContentParams, TabTooltipContent};
+
+// ---------- ItemEvent ----------
+
+/// Item 发出的事件 — 供 Pane / Tab bar / Breadcrumbs 订阅。
+///
+/// 对齐 Zed `crates/workspace/src/item.rs:121`。
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
+pub enum ItemEvent {
+    CloseItem,
+    UpdateTab,
+    UpdateBreadcrumbs,
+    Edit,
+}

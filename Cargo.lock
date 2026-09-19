@@ -7408,13 +7408,13 @@ dependencies = [
 [[package]]
 name = "theme-settings"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=93850aa#93850aa57d1c22405eb35d5ed51fdfd8069ce0b2"
 dependencies = [
  "aa-gpui-kit-theme",
  "gpui",
  "serde",
  "serde_json",
- "tracing",
+ "settings",
+ "settings-macros",
 ]
 
 [[package]]

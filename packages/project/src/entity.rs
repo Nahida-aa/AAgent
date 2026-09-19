@@ -186,7 +186,7 @@ impl Project {
 
     fn discover_git_worktrees(fs: &Arc<dyn Fs>, root: &Path) -> Option<Vec<WorktreeEntry>> {
         let git_dir = root.join(".git");
-        if !fs.path_exists(&git_dir) {
+        if !futures::executor::block_on(fs.path_exists(&git_dir)) {
             return None;
         }
         // 调 `git worktree list --porcelain`

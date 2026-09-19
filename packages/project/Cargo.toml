@@ -7,5 +7,6 @@ license.workspace = true
 [dependencies]
 anyhow = { workspace = true }
 fs = { workspace = true }
+futures = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 tempfile = { workspace = true }

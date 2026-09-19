@@ -2792,9 +2792,11 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-channel",
+ "async-trait",
  "notify",
  "serde",
  "tempfile",
+ "tokio",
 ]
 
 [[package]]
@@ -5870,6 +5872,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "fs",
+ "futures",
  "serde",
  "tempfile",
 ]

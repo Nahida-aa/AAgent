@@ -7,9 +7,7 @@ use std::time::Duration;
 
 use anyhow::Result;
 use async_channel::{Receiver, Sender};
-use notify::{
-    self, Config, Event, EventKind, EventKindMask, PollWatcher, RecommendedWatcher, RecursiveMode,
-};
+use notify::{Event, EventKind};
 
 use super::diagnostics::{DiagnosticRecorder, OsWatcherKind, WatchDiagnosticEvent};
 
@@ -37,12 +35,12 @@ pub struct PathEvent {
 ///
 /// notify::Watcher trait 有 `Self: Sized`，不能直接做 dyn。Zed 用独立 trait 包装。
 pub trait WatchBackend: Send {
-    fn watch(&mut self, path: &Path, mode: RecursiveMode) -> notify::Result<()>;
+    fn watch(&mut self, path: &Path, mode: notify::RecursiveMode) -> notify::Result<()>;
     fn unwatch(&mut self, path: &Path) -> notify::Result<()>;
 }
 
 impl<T: notify::Watcher + Send> WatchBackend for T {
-    fn watch(&mut self, path: &Path, mode: RecursiveMode) -> notify::Result<()> {
+    fn watch(&mut self, path: &Path, mode: notify::RecursiveMode) -> notify::Result<()> {
         notify::Watcher::watch(self, path, mode)
     }
     fn unwatch(&mut self, path: &Path) -> notify::Result<()> {
@@ -128,14 +126,15 @@ impl OsWatcher {
 
         let watcher: Box<dyn WatchBackend> = match self.kind {
             OsWatcherKind::Native => {
-                let config = Config::default().with_event_kinds(EventKindMask::CORE);
-                Box::new(<RecommendedWatcher as notify::Watcher>::new(
+                let config =
+                    notify::Config::default().with_event_kinds(notify::EventKindMask::CORE);
+                Box::new(<notify::RecommendedWatcher as notify::Watcher>::new(
                     event_sink, config,
                 )?)
             }
             OsWatcherKind::Poll => {
-                let config = Config::default().with_poll_interval(POLL_INTERVAL);
-                Box::new(PollWatcher::new(event_sink, config)?)
+                let config = notify::Config::default().with_poll_interval(POLL_INTERVAL);
+                Box::new(notify::PollWatcher::new(event_sink, config)?)
             }
         };
         *backend = Some(watcher);
@@ -148,9 +147,9 @@ impl OsWatcher {
     {
         self.ensure_backend()?;
         let mode = if self.recursive {
-            RecursiveMode::Recursive
+            notify::RecursiveMode::Recursive
         } else {
-            RecursiveMode::NonRecursive
+            notify::RecursiveMode::NonRecursive
         };
         {
             let mut backend = self.backend.lock().unwrap();

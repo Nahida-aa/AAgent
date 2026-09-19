@@ -4,6 +4,9 @@
 //! Zed 版持有完整 PaneGroup + 多 pane + 持久化 + action handler。
 //! AAgent 最小版：一个 active_pane，每次 new_terminal() 创建 TerminalView 加进去。
 
+pub mod inline_assist_tab_bar_button;
+pub mod terminal_provider;
+
 use gpui::{
     App, AppContext, Context, Entity, EventEmitter, IntoElement, Render, WeakEntity, Window,
     actions, px,

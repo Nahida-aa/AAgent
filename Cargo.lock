@@ -260,6 +260,7 @@ name = "aa-terminal-view"
 version = "0.1.0"
 dependencies = [
  "aa-gpui-kit-theme",
+ "aa-task",
  "aa-terminal",
  "alacritty_terminal",
  "gpui",

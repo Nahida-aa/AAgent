@@ -4,6 +4,7 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
+aa-task.workspace = true
 aa-terminal.workspace = true
 alacritty_terminal.workspace = true
 gpui.workspace = true

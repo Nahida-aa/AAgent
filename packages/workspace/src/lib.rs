@@ -23,14 +23,13 @@ pub mod dock;
 pub mod item;
 pub mod multi_workspace;
 pub mod pane;
-pub mod pane_group;
 pub mod status_bar;
 pub mod terminal;
 
 pub use item::{Item, ItemHandle, WeakItemHandle};
 pub use multi_workspace::{MultiWorkspace, SidebarHandle, SidebarRenderState};
+pub use pane::group::{Member, PaneGroup};
 pub use pane::{DraggedSelection, DraggedTab, Event as PaneEvent, Pane};
-pub use pane_group::{Member, PaneGroup};
 pub use settings_content::DockPosition;
 pub use terminal::{NewCenterTerminal, NewTerminal, OpenTerminal, TerminalProvider};
 

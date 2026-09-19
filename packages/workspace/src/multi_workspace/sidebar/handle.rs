@@ -8,7 +8,7 @@
 use gpui::{AnyView, App, Entity, EntityId, Pixels};
 use settings_content::SidebarSide;
 
-use super::sidebar::Sidebar;
+use super::Sidebar;
 
 /// dyn object trait — MultiWorkspace 通过它与 Sidebar entity 交互。
 ///

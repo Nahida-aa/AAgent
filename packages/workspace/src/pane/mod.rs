@@ -21,6 +21,7 @@ use crate::item::{Item, ItemHandle};
 pub mod activate_item;
 pub mod dragged;
 pub mod event;
+pub mod group;
 pub mod history;
 pub mod navigation;
 

@@ -5,6 +5,12 @@
 //!
 //! 详细解耦设计见 `docs/sidebar-decoupling.md`。
 
+pub mod handle;
+pub mod render_state;
+
+pub use handle::SidebarHandle;
+pub use render_state::SidebarRenderState;
+
 use gpui::{App, Context, Pixels, Render};
 use settings_content::SidebarSide;
 

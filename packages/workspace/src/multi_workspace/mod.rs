@@ -7,13 +7,11 @@
 //! - Sidebar 有 resize handle（对齐 zed L2110-L2160）
 
 pub mod sidebar;
-pub mod sidebar_handle;
-pub mod sidebar_render_state;
 
 pub use aa_task::SpawnInTerminal;
 pub use sidebar::Sidebar;
-pub use sidebar_handle::SidebarHandle;
-pub use sidebar_render_state::SidebarRenderState;
+pub use sidebar::handle::SidebarHandle;
+pub use sidebar::render_state::SidebarRenderState;
 
 use gpui::{
     App, Context, DragMoveEvent, Entity, IntoElement, MouseButton, ParentElement, Render, Styled,

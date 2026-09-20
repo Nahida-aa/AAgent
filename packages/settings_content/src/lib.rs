@@ -7,14 +7,14 @@
 //! 负责 RustEmbed + SettingsStore Global；
 //! settings_content 是**内容层**，只放数据结构。
 pub use merge_from::MergeFrom as MergeFromTrait;
+mod action;
 pub mod agent;
+
 mod contents;
 pub mod extension;
 pub mod fallible_options;
-mod language;
-use collections::{HashMap, IndexMap};
-pub use language::*;
 mod feature_flags;
+mod language;
 pub mod language_model;
 pub mod merge_from;
 mod project;
@@ -23,12 +23,19 @@ pub mod terminal;
 pub mod theme;
 mod title_bar;
 mod ui;
+pub use action::{ActionName, ActionWithArguments, CommandAliasTarget};
+use collections::{HashMap, IndexMap};
+pub use language::*;
 pub use serde_helper::{
     serialize_f32_with_two_decimal_places, serialize_optional_f32_with_two_decimal_places,
 };
 use settings_json::parse_json_with_comments;
 // ---------- 通用工具 re-export ----------
 use common::PixelSetting;
+pub use common::{
+    DelayMs, DocumentFoldingRanges, DocumentSymbols, ExtendingSet, ExtendingVec, SaturatingBool,
+    SemanticTokens, SplicingVec,
+};
 pub use fallible_options::{FallibleOption, deserialize as deserialize_fallible};
 pub use merge_from::MergeFrom;
 
@@ -53,17 +60,16 @@ pub use theme::{
     UiDensity, WindowBackgroundContent,
 };
 mod editor;
+use editor::{CenteredPaddingSettings, InactiveOpacity};
+
 pub use ui::DockPosition;
 mod common;
 mod macros;
 mod overrides;
 mod profiles;
 mod workspace;
-pub use editor::cursor::CursorShape;
-pub use workspace::folder_indicator::FolderIndicator;
-
 use crate::{
-    agent::{AgentSettingsContent, servers::AllAgentServersSettings},
+    agent::AgentSettingsContent,
     common::ParseStatus,
     contents::{
         AudioSettingsContent, BaseKeymapContent, CallHierarchySettingsContent, CallSettingsContent,
@@ -87,11 +93,14 @@ use crate::{
     ui::{HideMouseMode, LineIndicatorFormat, ReduceMotionMode},
     workspace::{
         WorkspaceSettingsContent,
-        bar::{PreviewTabsSettingsContent, StatusBarSettingsContent, TabBarSettingsContent},
+        bar::{StatusBarSettingsContent, TabBarSettingsContent},
         item::ItemSettingsContent,
         project_panel::ProjectPanelSettingsContent,
     },
 };
+pub use editor::cursor::CursorShape;
+use ui::{DockSide, ShowIndentGuides};
+pub use workspace::folder_indicator::FolderIndicator;
 
 #[with_fallible_options]
 #[derive(Debug, PartialEq, Default, Clone, Serialize, JsonSchema, MergeFrom)]

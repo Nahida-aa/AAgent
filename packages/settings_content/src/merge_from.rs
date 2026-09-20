@@ -118,6 +118,23 @@ where
     }
 }
 
+impl<K, V, S> MergeFrom for collections::IndexMap<K, V, S>
+where
+    K: Clone + std::hash::Hash + Eq,
+    V: Clone + MergeFrom,
+    S: Default,
+{
+    fn merge_from(&mut self, other: &Self) {
+        for (key, value) in other {
+            if let Some(existing) = self.get_mut(key) {
+                existing.merge_from(value);
+            } else {
+                self.insert(key.clone(), value.clone());
+            }
+        }
+    }
+}
+
 impl<K, V> MergeFrom for std::collections::BTreeMap<K, V>
 where
     K: Clone + std::hash::Hash + Eq + Ord,

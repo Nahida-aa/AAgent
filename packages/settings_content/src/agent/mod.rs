@@ -12,60 +12,31 @@ use collections::IndexMap;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use settings_macros::{MergeFrom, with_fallible_options};
-pub mod servers;
+mod agent_server;
+mod auto_compact;
+mod model_selection;
+mod notification;
+mod profile;
+mod sandbox;
+mod sidebar;
 
-use crate::{DockPosition, common::ExtendingVec};
-
-/// Settings JSON 层 — 带 serde + JsonSchema。
-/// 用于 `agent.sidebar_side` 字段的反序列化。
-/// 对齐 zed `SidebarDockPosition`（agent.rs L31）。
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum SidebarDockPosition {
-    /// Always show the sidebar on the left side.
-    #[default]
-    Left,
-    /// Always show the sidebar on the right side.
-    Right,
-}
-
-/// 运行时层 — 简化 Copy enum。
-/// 对齐 zed `SidebarSide`（agent.rs L39）。
-/// Sidebar entity / MultiWorkspace / StatusBar 内部都用这个。
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub enum SidebarSide {
-    #[default]
-    Left,
-    Right,
-}
-
-// 双向转换 — settings 层 ↔ 运行时层
-impl From<SidebarDockPosition> for SidebarSide {
-    fn from(p: SidebarDockPosition) -> Self {
-        match p {
-            SidebarDockPosition::Left => Self::Left,
-            SidebarDockPosition::Right => Self::Right,
-        }
-    }
-}
-
-impl From<SidebarSide> for SidebarDockPosition {
-    fn from(s: SidebarSide) -> Self {
-        match s {
-            SidebarSide::Left => Self::Left,
-            SidebarSide::Right => Self::Right,
-        }
-    }
-}
-
-impl SidebarSide {
-    pub fn label(self) -> &'static str {
-        match self {
-            Self::Left => "Left",
-            Self::Right => "Right",
-        }
-    }
-}
+pub use model_selection::LanguageModelSelection;
+mod thinking;
+mod tool_permissions;
+use crate::{
+    DockPosition,
+    agent::{
+        auto_compact::AutoCompactSettingsContent,
+        model_selection::LanguageModelParameters,
+        notification::{NotifyWhenAgentWaiting, PlaySoundWhenAgentDone},
+        profile::AgentProfileContent,
+        sandbox::{GrantedWritePathContent, SandboxPermissionsContent},
+        sidebar::SidebarDockPosition,
+        thinking::ThinkingBlockDisplay,
+        tool_permissions::{ToolPermissionMode, ToolPermissionsContent, ToolRegexRule},
+    },
+    common::ExtendingVec,
+};
 
 #[with_fallible_options]
 #[derive(Clone, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom, Debug, Default)]
@@ -253,17 +224,13 @@ pub struct AgentSettingsContent {
 }
 
 impl AgentSettingsContent {
-    pub fn set_dock(&mut self, dock: DockPosition) {
-        self.dock = Some(dock);
-    }
+    pub fn set_dock(&mut self, dock: DockPosition) { self.dock = Some(dock); }
 
     pub fn set_sidebar_side(&mut self, position: SidebarDockPosition) {
         self.sidebar_side = Some(position);
     }
 
-    pub fn set_flexible_size(&mut self, flexible: bool) {
-        self.flexible = Some(flexible);
-    }
+    pub fn set_flexible_size(&mut self, flexible: bool) { self.flexible = Some(flexible); }
 
     pub fn set_model(&mut self, language_model: LanguageModelSelection) {
         self.default_model = Some(language_model)
@@ -279,9 +246,7 @@ impl AgentSettingsContent {
         });
     }
 
-    pub fn set_profile(&mut self, profile_id: Arc<str>) {
-        self.default_profile = Some(profile_id);
-    }
+    pub fn set_profile(&mut self, profile_id: Arc<str>) { self.default_profile = Some(profile_id); }
 
     pub fn add_favorite_model(&mut self, model: LanguageModelSelection) {
         // Note: this is intentional to not compare using `PartialEq`here.

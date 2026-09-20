@@ -10,6 +10,38 @@ use serde::{Deserialize, Serialize};
 use settings_macros::{MergeFrom, with_fallible_options};
 use std::{path::PathBuf, sync::Arc};
 
+use crate::language_model::{
+    anthropic::{AnthropicCompatibleSettingsContent, AnthropicSettingsContent},
+    bedrock::AmazonBedrockSettingsContent,
+    deepseek::DeepseekSettingsContent,
+    google::GoogleSettingsContent,
+    llama_cpp::LlamaCppSettingsContent,
+    lmstudio::LmStudioSettingsContent,
+    mistral::MistralSettingsContent,
+    ollama::OllamaSettingsContent,
+    open_router::OpenRouterSettingsContent,
+    openai::{OpenAiCompatibleSettingsContent, OpenAiSettingsContent},
+    opencode::OpenCodeSettingsContent,
+    vercel_ai_gateway::VercelAiGatewaySettingsContent,
+    x_ai::XAiSettingsContent,
+    zed_dot_dev::ZedDotDevSettingsContent,
+};
+mod anthropic;
+mod bedrock;
+mod common;
+mod deepseek;
+mod google;
+mod llama_cpp;
+mod lmstudio;
+mod mistral;
+mod ollama;
+mod open_router;
+mod openai;
+mod opencode;
+mod vercel_ai_gateway;
+mod x_ai;
+mod zed_dot_dev;
+
 #[with_fallible_options]
 #[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct AllLanguageModelSettingsContent {
@@ -235,9 +267,7 @@ fn config_paths() -> Vec<PathBuf> {
     paths
 }
 
-fn env(key: &str) -> Option<String> {
-    std::env::var(key).ok().filter(|v| !v.is_empty())
-}
+fn env(key: &str) -> Option<String> { std::env::var(key).ok().filter(|v| !v.is_empty()) }
 
 /// 返回第一个 `Some` 值，全部为 `None` 时返回 `default`。
 fn pick(

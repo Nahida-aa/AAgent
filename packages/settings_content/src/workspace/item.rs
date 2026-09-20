@@ -31,3 +31,87 @@ pub struct ItemSettingsContent {
     /// Default: false
     pub show_close_button: Option<ShowCloseButton>,
 }
+
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    PartialEq,
+    Default,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    MergeFrom,
+    strum::VariantArray,
+    strum::VariantNames,
+)]
+#[serde(rename_all = "lowercase")]
+pub enum ClosePosition {
+    Left,
+    #[default]
+    Right,
+}
+
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    PartialEq,
+    Default,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    MergeFrom,
+    strum::VariantArray,
+    strum::VariantNames,
+)]
+#[serde(rename_all = "lowercase")]
+pub enum ShowCloseButton {
+    Always,
+    #[default]
+    Hover,
+    Hidden,
+}
+
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    MergeFrom,
+    PartialEq,
+    Eq,
+    strum::VariantArray,
+    strum::VariantNames,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ShowDiagnostics {
+    #[default]
+    Off,
+    Errors,
+    All,
+}
+
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    PartialEq,
+    Default,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    MergeFrom,
+    strum::VariantArray,
+    strum::VariantNames,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ActivateOnClose {
+    #[default]
+    History,
+    Neighbour,
+    LeftNeighbour,
+}

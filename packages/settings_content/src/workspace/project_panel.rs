@@ -2,7 +2,9 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use settings_macros::{MergeFrom, with_fallible_options};
 
-use crate::{FolderIndicator, ui::DockSide};
+use crate::{
+    DockSide, FolderIndicator, ShowIndentGuides, ShowScrollbar, workspace::item::ShowDiagnostics,
+};
 
 #[with_fallible_options]
 #[derive(Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema, MergeFrom, Debug)]
@@ -108,4 +110,170 @@ pub struct ProjectPanelSettingsContent {
     ///
     /// Default: false
     pub git_status_indicator: Option<bool>,
+}
+
+#[derive(Clone, PartialEq, Default, Serialize, Deserialize, JsonSchema, MergeFrom, Debug)]
+pub struct ProjectPanelAutoOpenSettings {
+    /// Whether to automatically open newly created files in the editor.
+    ///
+    /// Default: true
+    pub on_create: Option<bool>,
+    /// Whether to automatically open files after pasting or duplicating them.
+    ///
+    /// Default: true
+    pub on_paste: Option<bool>,
+    /// Whether to automatically open files dropped from external sources.
+    ///
+    /// Default: true
+    pub on_drop: Option<bool>,
+}
+
+/// Controls the width of the git diff hunk indicators in the gutter.
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    MergeFrom,
+    PartialEq,
+    strum::EnumDiscriminants,
+)]
+#[strum_discriminants(derive(strum::VariantArray, strum::VariantNames, strum::FromRepr))]
+#[serde(rename_all = "snake_case")]
+pub enum ProjectPanelTitleTooltipDelay {
+    /// Default is 1500ms.
+    #[default]
+    Default,
+    /// A custom offset in milliseconds for the tooltip show delay.
+    Custom(crate::DelayMs),
+    /// Disables the tooltip
+    Disabled,
+}
+
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    MergeFrom,
+    PartialEq,
+    Eq,
+    strum::VariantArray,
+    strum::VariantNames,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ProjectPanelEntrySpacing {
+    /// Comfortable spacing of entries.
+    #[default]
+    Comfortable,
+    /// The standard spacing of entries.
+    Standard,
+}
+
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    MergeFrom,
+    PartialEq,
+    Eq,
+    strum::VariantArray,
+    strum::VariantNames,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ProjectPanelSortMode {
+    /// Show directories first, then files
+    #[default]
+    DirectoriesFirst,
+    /// Mix directories and files together
+    Mixed,
+    /// Show files first, then directories
+    FilesFirst,
+}
+
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    MergeFrom,
+    PartialEq,
+    Eq,
+    strum::VariantArray,
+    strum::VariantNames,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ProjectPanelSortOrder {
+    /// Case-insensitive natural sort with lowercase preferred in ties.
+    /// Numbers in file names are compared by value (e.g., `file2` before `file10`).
+    #[default]
+    Default,
+    /// Uppercase names are grouped before lowercase names, with case-insensitive
+    /// natural sort within each group. Dot-prefixed names sort before both groups.
+    Upper,
+    /// Lowercase names are grouped before uppercase names, with case-insensitive
+    /// natural sort within each group. Dot-prefixed names sort before both groups.
+    Lower,
+    /// Pure Unicode codepoint comparison. No case folding, no natural number sorting.
+    /// Uppercase ASCII sorts before lowercase. Accented characters sort after ASCII.
+    Unicode,
+}
+
+impl From<ProjectPanelSortMode> for util::paths::SortMode {
+    fn from(mode: ProjectPanelSortMode) -> Self {
+        match mode {
+            ProjectPanelSortMode::DirectoriesFirst => Self::DirectoriesFirst,
+            ProjectPanelSortMode::Mixed => Self::Mixed,
+            ProjectPanelSortMode::FilesFirst => Self::FilesFirst,
+        }
+    }
+}
+
+impl From<ProjectPanelSortOrder> for util::paths::SortOrder {
+    fn from(order: ProjectPanelSortOrder) -> Self {
+        match order {
+            ProjectPanelSortOrder::Default => Self::Default,
+            ProjectPanelSortOrder::Upper => Self::Upper,
+            ProjectPanelSortOrder::Lower => Self::Lower,
+            ProjectPanelSortOrder::Unicode => Self::Unicode,
+        }
+    }
+}
+
+#[with_fallible_options]
+#[derive(
+    Copy, Clone, Debug, Serialize, Deserialize, JsonSchema, MergeFrom, PartialEq, Eq, Default,
+)]
+pub struct ProjectPanelScrollbarSettingsContent {
+    /// When to show the scrollbar in the project panel.
+    ///
+    /// Default: inherits editor scrollbar settings
+    pub show: Option<ShowScrollbar>,
+    /// Whether to allow horizontal scrolling in the project panel.
+    /// When false, the view is locked to the leftmost position and
+    /// long file names are clipped.
+    ///
+    /// Default: true
+    pub horizontal_scroll: Option<bool>,
+}
+
+#[with_fallible_options]
+#[derive(
+    Copy, Clone, Debug, Serialize, Deserialize, JsonSchema, MergeFrom, PartialEq, Eq, Default,
+)]
+pub struct ProjectPanelIndentGuidesSettings {
+    pub show: Option<ShowIndentGuides>,
 }

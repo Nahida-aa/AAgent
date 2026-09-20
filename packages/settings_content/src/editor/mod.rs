@@ -1,10 +1,52 @@
+use crate::{
+    CursorShape, ShowScrollbar,
+    common::DelayMs,
+    editor::{
+        code_lens::CodeLens,
+        completion::{CompletionDetailAlignment, CompletionMenuItemKind, SnippetSortOrder},
+        cursor::CursorAnimationSettingsContent,
+        diff::DiffViewStyle,
+        display::{
+            CurrentLineHighlight, DoubleClickInMultibuffer, MultiCursorModifier,
+            RelativeLineNumbers, SeedQuerySetting,
+        },
+        drag_and_drop::DragAndDropSelectionContent,
+        gutter::GutterContent,
+        jupyter::JupyterContent,
+        lsp::{
+            DocumentColorsRenderMode, GoToDefinitionFallback, GoToDefinitionScrollStrategy,
+            OpenResultsIn,
+        },
+        minimap::MinimapContent,
+        scalars::MinimumContrast,
+        scrollbar::ScrollbarContent,
+        scrolling::ScrollBeyondLastLine,
+        search::SearchSettingsContent,
+        sticky_scroll::StickyScrollContent,
+        toolbar::ToolbarContent,
+    },
+    project::DiagnosticSeverityContent,
+};
+pub use scalars::{CenteredPaddingSettings, InactiveOpacity};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use settings_macros::{MergeFrom, with_fallible_options};
-
-use crate::{CursorShape, common::DelayMs};
-
+mod code_lens;
+mod completion;
 pub mod cursor;
+mod diff;
+mod display;
+mod drag_and_drop;
+mod gutter;
+mod jupyter;
+mod lsp;
+mod minimap;
+mod scalars;
+mod scrollbar;
+mod scrolling;
+mod search;
+mod sticky_scroll;
+mod toolbar;
 #[with_fallible_options]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct EditorSettingsContent {

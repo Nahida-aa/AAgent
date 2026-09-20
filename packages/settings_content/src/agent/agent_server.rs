@@ -13,15 +13,58 @@ pub struct AllAgentServersSettings(pub HashMap<String, CustomAgentServerSettings
 impl std::ops::Deref for AllAgentServersSettings {
     type Target = HashMap<String, CustomAgentServerSettings>;
 
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
+    fn deref(&self) -> &Self::Target { &self.0 }
 }
 
 impl std::ops::DerefMut for AllAgentServersSettings {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+}
+
+/// The value of a session config option.
+///
+/// Aligns Zed `crates/settings_content/src/agent.rs:705`.
+#[derive(Deserialize, Serialize, Clone, JsonSchema, MergeFrom, Debug, PartialEq, Eq)]
+#[serde(untagged)]
+pub enum AgentConfigOptionValue {
+    ValueId(String),
+    Boolean(bool),
+}
+
+impl AgentConfigOptionValue {
+    pub fn as_value_id(&self) -> Option<&str> {
+        match self {
+            Self::ValueId(value) => Some(value),
+            Self::Boolean(_) => None,
+        }
     }
+
+    pub fn as_bool(&self) -> Option<bool> {
+        match self {
+            Self::Boolean(value) => Some(*value),
+            Self::ValueId(_) => None,
+        }
+    }
+}
+
+impl std::fmt::Display for AgentConfigOptionValue {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::ValueId(value) => formatter.write_str(value),
+            Self::Boolean(value) => value.fmt(formatter),
+        }
+    }
+}
+
+impl From<String> for AgentConfigOptionValue {
+    fn from(value: String) -> Self { Self::ValueId(value) }
+}
+
+impl From<&str> for AgentConfigOptionValue {
+    fn from(value: &str) -> Self { Self::ValueId(value.to_string()) }
+}
+
+impl From<bool> for AgentConfigOptionValue {
+    fn from(value: bool) -> Self { Self::Boolean(value) }
 }
 
 #[with_fallible_options]

@@ -1,13 +1,39 @@
+use std::num::NonZeroUsize;
+
 use collections::HashMap;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use settings_macros::{MergeFrom, with_fallible_options};
+mod active_pane;
+mod autosave;
 pub mod bar;
+mod centered_layout;
 pub mod item;
+mod pane_split;
+mod preview_tabs;
+
+mod opening;
 pub mod project_panel;
-
-use crate::DockPosition;
-
+mod semantic_tokens;
+mod text_rendering;
+mod window; // 包含打开窗口
+use crate::{
+    CommandAliasTarget, DockPosition, serialize_optional_f32_with_two_decimal_places,
+    workspace::{
+        active_pane::ActivePaneModifiers,
+        autosave::AutosaveSetting,
+        centered_layout::CenteredLayoutSettings,
+        focus_follows_mouse::FocusFollowsMouse,
+        opening::{CliDefaultOpenBehavior, DefaultOpenBehavior, RestoreOnStartupBehavior},
+        pane_split::{BottomDockLayout, PaneSplitDirectionHorizontal, PaneSplitDirectionVertical},
+        text_rendering::TextRenderingMode,
+        window::{
+            CloseWindowWhenNoItems, FullscreenMode, OnLastWindowClosed, OnNewWindow,
+            WindowDecorations,
+        },
+    },
+};
+mod focus_follows_mouse;
 pub mod folder_indicator;
 
 #[with_fallible_options]

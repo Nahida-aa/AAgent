@@ -7,156 +7,31 @@
 //!
 //! `Shell` enum 定义在 `project_terminal`，runtime 方法调 `util::shell::ShellKind`。
 
-pub mod project_terminal;
-pub use project_terminal::{
-    ActivateScript, CondaManager, PathHyperlinkRegex, ProjectTerminalSettingsContent, Shell,
-    VenvSettings, VenvSettingsResolved, WorkingDirectory,
-};
 use schemars::JsonSchema;
+mod project;
+pub use project::ProjectTerminalSettingsContent;
+
+mod display;
+mod dock;
+mod shell;
+mod toolbar;
+pub use display::ShowScrollbar;
 
 use serde::{Deserialize, Serialize};
 use settings_macros::{MergeFrom, with_fallible_options};
 
-use crate::{FontFamilyName, FontSize, FontWeightContent, theme::font::FontFeaturesContent};
-
-// ---------- TerminalLineHeight ----------
-
-/// Terminal 行高。
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, MergeFrom)]
-#[serde(rename_all = "snake_case")]
-pub enum TerminalLineHeight {
-    /// 舒适行高 1.618（黄金比例）。
-    #[default]
-    Comfortable,
-    /// 标准行高 1.3（TUIs / box characters 更准）。
-    Standard,
-    /// 自定义。
-    Custom(f32),
-}
-
-impl TerminalLineHeight {
-    pub fn value(&self) -> f32 {
-        match self {
-            TerminalLineHeight::Comfortable => 1.618,
-            TerminalLineHeight::Standard => 1.3,
-            TerminalLineHeight::Custom(v) => v.max(1.0),
-        }
-    }
-}
-
-/// Terminal scrollbar 显示策略。
-#[derive(
-    Clone,
-    Copy,
-    Debug,
-    Default,
-    PartialEq,
-    Eq,
-    Serialize,
-    Deserialize,
-    MergeFrom,
-    JsonSchema,
-    strum::VariantArray,
-    strum::VariantNames,
-)]
-#[serde(rename_all = "snake_case")]
-pub enum ShowScrollbar {
-    /// Show the scrollbar if there's important information or
-    /// follow the system's configured behavior.
-    #[default]
-    Auto,
-    /// Match the system's configured behavior.
-    System,
-    /// Always show the scrollbar.
-    Always,
-    /// Never show the scrollbar.
-    Never,
-}
-
-// ---------- CursorShapeContent ----------
-
-/// Terminal 光标形状。
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, MergeFrom)]
-#[serde(rename_all = "snake_case")]
-pub enum CursorShapeContent {
-    /// 实心方块 █
-    #[default]
-    Block,
-    /// 下划线 _
-    Underline,
-    /// 竖线 ⎸
-    Bar,
-    /// 空心方块 ▯
-    Hollow,
-}
-
-// ---------- TerminalBlink ----------
-
-/// 光标闪烁行为。
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, MergeFrom)]
-#[serde(rename_all = "snake_case")]
-pub enum TerminalBlink {
-    /// 终端控制 — 关闭为默认，但允许应用开启
-    #[default]
-    TerminalControlled,
-    Off,
-    On,
-}
-
-// ---------- AlternateScroll ----------
-
-/// Alternate Scroll mode（?1007）。
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, MergeFrom)]
-#[serde(rename_all = "snake_case")]
-pub enum AlternateScroll {
-    #[default]
-    On,
-    Off,
-}
-
-// ---------- ScrollbarSettingsContent ----------
-
-#[with_fallible_options]
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, MergeFrom)]
-pub struct ScrollbarSettingsContent {
-    pub show: Option<ShowScrollbar>,
-}
-
-// ---------- TerminalToolbarContent ----------
-
-#[with_fallible_options]
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, MergeFrom)]
-pub struct TerminalToolbarContent {
-    /// 是否在 terminal pane 内显示 breadcrumbs（需要 shell emit OSC 2 title）。
-    ///
-    /// 默认：true
-    pub breadcrumbs: Option<bool>,
-}
-
-// ---------- TerminalBell ----------
-
-/// BEL (`\a`) 行为。
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, MergeFrom)]
-#[serde(rename_all = "snake_case")]
-pub enum TerminalBell {
-    #[default]
-    System,
-    Off,
-}
-
-// ---------- TerminalDockPosition ----------
-
-/// Terminal dock 位置。
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, MergeFrom)]
-#[serde(rename_all = "snake_case")]
-pub enum TerminalDockPosition {
-    Left,
-    #[default]
-    Bottom,
-    Right,
-}
-
-// ---------- TerminalSettingsContent ----------
+use crate::{
+    FontFamilyName, FontSize, FontWeightContent,
+    terminal::{
+        display::{
+            AlternateScroll, CursorShapeContent, ScrollbarSettingsContent, TerminalBell,
+            TerminalBlink, TerminalLineHeight,
+        },
+        dock::TerminalDockPosition,
+        toolbar::TerminalToolbarContent,
+    },
+    theme::font::FontFeaturesContent,
+};
 
 /// Terminal settings 顶层 — 被 `#[serde(flatten)]` 内嵌 project 级设置。
 ///
@@ -175,6 +50,7 @@ pub struct TerminalSettingsContent {
     pub font_size: Option<FontSize>,
     pub font_family: Option<FontFamilyName>,
     /// 未设时跟随 buffer。
+    #[schemars(extend("uniqueItems" = true))]
     pub font_fallbacks: Option<Vec<FontFamilyName>>,
     /// 默认：Comfortable
     pub line_height: Option<TerminalLineHeight>,
@@ -228,7 +104,7 @@ pub struct TerminalSettingsContent {
 
     // ---- 可访问性 ----
     /// APCA 最小对比度 0-106，默认 45。
-    #[serde(default)]
+    #[serde(serialize_with = "crate::serialize_optional_f32_with_two_decimal_places")]
     pub minimum_contrast: Option<f32>,
 }
 
@@ -246,6 +122,8 @@ crate::fallible_options::flattened_deserialize!(TerminalSettingsContent {
 
 #[cfg(test)]
 mod tests {
+    use crate::terminal::shell::{CondaManager, Shell, WorkingDirectory};
+
     use super::*;
     use serde_json::json;
 

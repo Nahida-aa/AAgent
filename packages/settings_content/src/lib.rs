@@ -48,7 +48,7 @@ use serde::{Serialize, de::DeserializeOwned};
 use settings_macros::{MergeFrom, with_fallible_options};
 
 mod editor;
-use editor::{CenteredPaddingSettings, InactiveOpacity};
+use editor::CenteredPaddingSettings;
 
 mod common;
 mod macros;
@@ -65,22 +65,35 @@ pub use crate::{
         PanelSettingsContent, RemoteSettingsContent, ReplSettingsContent, TelemetrySettingsContent,
         VimSettingsContent, WhichKeySettingsContent,
     },
-    editor::EditorSettingsContent,
+    editor::{
+        CurrentLineHighlight, EditorSettingsContent, GutterContent, InactiveOpacity,
+        MinimapContent, MinimapThumb, MultiCursorModifier, RelativeLineNumbers,
+        ScrollbarAxesContent, ScrollbarContent, SearchSettingsContent, SeedQuerySetting,
+        ShowMinimap, StickyScrollContent,
+    },
     extension::ExtensionSettingsContent,
     feature_flags::FeatureFlagsMap,
     language_model::AllLanguageModelSettingsContent,
     profiles::SettingsProfile,
     project::{
-        DiagnosticsSettingsContent, GitSettings, GlobalLspSettingsContent, NodeBinarySettings,
-        SessionSettingsContent,
+        ContextServerCommand, DiagnosticsSettingsContent, GitSettings, GlobalLspSettingsContent,
+        InlineBlameSettings, NodeBinarySettings, SemanticTokenColorOverride,
+        SemanticTokenFontStyle, SemanticTokenFontWeight, SemanticTokenRule, SessionSettingsContent,
+        WorktreeSettingsContent,
     },
     title_bar::TitleBarSettingsContent,
     ui::{HideMouseMode, LineIndicatorFormat, ReduceMotionMode},
     workspace::{
+        ActivePaneModifiers, AutosaveSetting, CloseWindowWhenNoItems, FullscreenMode,
         PreviewTabsSettingsContent, WorkspaceSettingsContent,
         bar::{StatusBarSettingsContent, TabBarSettingsContent},
-        item::ItemSettingsContent,
-        project_panel::ProjectPanelSettingsContent,
+        item::{
+            ActivateOnClose, ClosePosition, ItemSettingsContent, ShowCloseButton, ShowDiagnostics,
+        },
+        project_panel::{
+            ProjectPanelScrollbarSettingsContent, ProjectPanelSettingsContent,
+            ProjectPanelSortMode, ProjectPanelSortOrder,
+        },
     },
 };
 pub use common::ParseStatus;
@@ -88,7 +101,9 @@ pub use contents::BaseKeymapContent;
 pub use editor::cursor::CursorShape;
 pub use overrides::{PlatformOverrides, ReleaseChannelOverrides};
 pub use profiles::ProfileBase;
-pub use project::{LspSettings, LspSettingsMap, ProjectSettingsContent};
+pub use project::{
+    ContextServerSettingsContent, LspSettings, LspSettingsMap, ProjectSettingsContent,
+};
 pub use terminal::{
     ActivateScript, AlternateScroll, CondaManager, CursorShapeContent, PathHyperlinkRegex,
     ProjectTerminalSettingsContent, ScrollbarSettingsContent, Shell, ShowScrollbar, TerminalBell,

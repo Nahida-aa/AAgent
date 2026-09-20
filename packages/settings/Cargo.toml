@@ -9,6 +9,7 @@ description = "AAgent 设置系统 (RustEmbed default.json → gpui Global Setti
 collections.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
+serde_json_lenient.workspace = true
 rust-embed = { workspace = true }
 json5 = { workspace = true }
 paths.workspace = true

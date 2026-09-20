@@ -12,7 +12,7 @@ use gpui::App;
 use path::rel_path::RelPath;
 use paths::{local_settings_file_relative_path, task_file_name};
 use settings_content::{
-    ExtensionsSettingsContent, ParseStatus, ProjectSettingsContent, SettingsContent,
+    ExtensionsSettingsContent, MergeFrom, ParseStatus, ProjectSettingsContent, SettingsContent,
 };
 use std::sync::Arc;
 

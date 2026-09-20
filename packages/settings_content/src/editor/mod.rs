@@ -6,31 +6,33 @@ use crate::{
         completion::{CompletionDetailAlignment, CompletionMenuItemKind, SnippetSortOrder},
         cursor::CursorAnimationSettingsContent,
         diff::DiffViewStyle,
-        display::{
-            CurrentLineHighlight, DoubleClickInMultibuffer, MultiCursorModifier,
-            RelativeLineNumbers, SeedQuerySetting,
-        },
         drag_and_drop::DragAndDropSelectionContent,
-        gutter::GutterContent,
         jupyter::JupyterContent,
         lsp::{
             DocumentColorsRenderMode, GoToDefinitionFallback, GoToDefinitionScrollStrategy,
             OpenResultsIn,
         },
-        minimap::MinimapContent,
         scalars::MinimumContrast,
-        scrollbar::ScrollbarContent,
         scrolling::ScrollBeyondLastLine,
-        search::SearchSettingsContent,
-        sticky_scroll::StickyScrollContent,
         toolbar::ToolbarContent,
     },
     project::DiagnosticSeverityContent,
 };
 pub use scalars::{CenteredPaddingSettings, InactiveOpacity};
+
+// Re-export commonly used types from editor submodules.
+pub use display::{
+    CurrentLineHighlight, DoubleClickInMultibuffer, MultiCursorModifier, RelativeLineNumbers,
+    SeedQuerySetting,
+};
+pub use gutter::GutterContent;
+pub use minimap::{MinimapContent, MinimapThumb, ShowMinimap};
 use schemars::JsonSchema;
+pub use scrollbar::{ScrollbarAxesContent, ScrollbarContent};
+pub use search::SearchSettingsContent;
 use serde::{Deserialize, Serialize};
 use settings_macros::{MergeFrom, with_fallible_options};
+pub use sticky_scroll::StickyScrollContent;
 mod code_lens;
 mod completion;
 pub mod cursor;

@@ -18,21 +18,23 @@ pub mod project_panel;
 mod semantic_tokens;
 mod text_rendering;
 mod window; // 包含打开窗口
+
+// Re-export commonly used types from private submodules.
 use crate::{
     CommandAliasTarget, DockPosition, serialize_optional_f32_with_two_decimal_places,
     workspace::{
-        active_pane::ActivePaneModifiers,
-        autosave::AutosaveSetting,
         centered_layout::CenteredLayoutSettings,
         focus_follows_mouse::FocusFollowsMouse,
         opening::{CliDefaultOpenBehavior, DefaultOpenBehavior, RestoreOnStartupBehavior},
         pane_split::{BottomDockLayout, PaneSplitDirectionHorizontal, PaneSplitDirectionVertical},
         text_rendering::TextRenderingMode,
-        window::{
-            CloseWindowWhenNoItems, FullscreenMode, OnLastWindowClosed, OnNewWindow,
-            WindowDecorations,
-        },
     },
+};
+pub use active_pane::ActivePaneModifiers;
+pub use autosave::AutosaveSetting;
+pub use item::{ActivateOnClose, ClosePosition, ShowCloseButton, ShowDiagnostics};
+pub use window::{
+    CloseWindowWhenNoItems, FullscreenMode, OnLastWindowClosed, OnNewWindow, WindowDecorations,
 };
 mod focus_follows_mouse;
 pub mod folder_indicator;

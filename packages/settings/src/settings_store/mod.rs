@@ -28,14 +28,15 @@ use crate::{ActiveSettingsProfileName, EditorconfigStore, WorktreeId};
 use anyhow::{Context as _, Result};
 use collections::{BTreeMap, HashMap, TypeIdHashMap, btree_map, hash_map};
 use fs::Fs;
-use futures::channel::mpsc;
 use futures::future::LocalBoxFuture;
+use futures::{StreamExt, channel::mpsc};
 use gpui::{App, AsyncApp, BorrowAppContext, Entity, Global, SharedString, Task};
 use path::rel_path::RelPath;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
-use settings_content::{RootUserSettings, SettingsContent};
-use settings_content::{SemanticTokenRules, UserSettingsContent};
+use settings_content::{
+    MergeFrom, RootUserSettings, SemanticTokenRules, SettingsContent, UserSettingsContent,
+};
 use std::any::{TypeId, type_name};
 use std::path::PathBuf;
 use std::rc::Rc;

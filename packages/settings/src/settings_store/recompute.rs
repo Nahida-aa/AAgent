@@ -2,12 +2,12 @@ use anyhow::{Context as _, Result};
 use gpui::{App, SharedString};
 use path::rel_path::RelPath;
 use settings_content::{
-    ParseStatus, ProfileBase, SemanticTokenRules, SettingsContent, UserSettingsContent,
+    MergeFrom, ParseStatus, ProfileBase, SemanticTokenRules, SettingsContent, UserSettingsContent,
 };
 use std::rc::Rc;
 
 use crate::{
-    WorktreeId,
+    UserSettingsContentExt, WorktreeId,
     settings_store::{
         file::SettingsFile,
         parse_result::{MigrationStatus, SettingsParseResult},

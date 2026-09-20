@@ -1,0 +1,10 @@
+[package]
+name = "a_tracing_macro"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]

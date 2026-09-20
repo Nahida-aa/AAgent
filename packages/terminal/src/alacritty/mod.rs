@@ -20,6 +20,8 @@ pub(crate) use config::{
 };
 pub(super) use hyperlinks::{HyperlinkMatch, RegexSearches};
 pub use pty::PtySender;
+
+use crate::TerminalBounds;
 mod config;
 mod hyperlinks;
 /// A snapshot of one visible cell, directly paintable by the GPUI element.

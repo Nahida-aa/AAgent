@@ -7,6 +7,7 @@ use collections::HashMap;
 use gpui::{FontFallbacks, FontFeatures, FontWeight, Pixels};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use settings::PathHyperlinkRegex;
 use settings_content::{
     AlternateScroll, FontFamilyName, ShowScrollbar, TerminalBell, TerminalBlink,
     TerminalDockPosition, TerminalLineHeight, VenvSettings, WorkingDirectory,
@@ -61,6 +62,23 @@ pub struct ScrollbarSettings {
     /// Default: inherits editor scrollbar settings
     pub show: Option<ShowScrollbar>,
 }
+
+fn settings_shell_to_task_shell(shell: settings::Shell) -> Shell {
+    match shell {
+        settings::Shell::System => Shell::System,
+        settings::Shell::Program(program) => Shell::Program(program),
+        settings::Shell::WithArguments {
+            program,
+            args,
+            title_override,
+        } => Shell::WithArguments {
+            program,
+            args,
+            title_override,
+        },
+    }
+}
+
 impl settings::Settings for TerminalSettings {
     fn from_settings(content: &settings::SettingsContent) -> Self {
         let user_content = content.terminal.clone().unwrap();

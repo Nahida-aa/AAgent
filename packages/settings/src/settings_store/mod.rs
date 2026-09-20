@@ -16,21 +16,29 @@ mod semantic_tokens;
 mod settings;
 mod updates;
 mod watcher;
+use crate::settings_store::parse_result::MigrationStatus;
 use crate::settings_store::semantic_tokens::DefaultSemanticTokenRules;
-use crate::settings_store::settings::{RegisteredSetting, Settings, SettingsLocation};
+pub use crate::settings_store::settings::RegisteredSetting;
+use crate::settings_store::settings::{Settings, SettingsLocation};
 use crate::settings_store::{file::SettingsFile, parse_result::SettingsParseResult};
 use crate::{ActiveSettingsProfileName, EditorconfigStore, WorktreeId};
 use anyhow::{Context as _, Result};
 use collections::{BTreeMap, HashMap, TypeIdHashMap, btree_map, hash_map};
-use gpui::{App, Global};
+use fs::Fs;
+use futures::channel::mpsc;
+use futures::future::LocalBoxFuture;
+use gpui::{App, AsyncApp, BorrowAppContext, Entity, Global, SharedString, Task};
 use path::rel_path::RelPath;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
-use settings_content::UserSettingsContent;
 use settings_content::{RootUserSettings, SettingsContent};
-use std::any::TypeId;
+use settings_content::{SemanticTokenRules, UserSettingsContent};
+use std::any::{TypeId, type_name};
 use std::path::PathBuf;
-use value::{AnySettingValue, RelPath, SettingValue, WorktreeId};
+use std::rc::Rc;
+use std::sync::Arc;
+use value::AnySettingValue;
+pub use value::SettingValue;
 
 /// 全局设置存储。gpui `Global` trait 让它能通过 `cx.global::<SettingsStore>()` 访问。
 pub struct SettingsStore {

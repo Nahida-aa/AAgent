@@ -32,12 +32,11 @@ pub use serde_helper::{
 };
 use settings_json::parse_json_with_comments;
 // ---------- 通用工具 re-export ----------
-use common::PixelSetting;
 pub use common::{
-    DelayMs, DocumentFoldingRanges, DocumentSymbols, ExtendingSet, ExtendingVec, SaturatingBool,
-    SemanticTokens, SplicingVec,
+    DelayMs, DocumentFoldingRanges, DocumentSymbols, ExtendingSet, ExtendingVec, PixelSetting,
+    SaturatingBool, SemanticTokens, SplicingVec,
 };
-pub use fallible_options::{FallibleOption, deserialize as deserialize_fallible};
+pub use fallible_options::{FallibleOption, deserialize as deserialize_fallible, parse_json};
 pub use merge_from::MergeFrom;
 
 // ---------- 各子模块 re-export ----------
@@ -47,19 +46,7 @@ pub use language_model::{Config, McpConfig, McpServerDef, ProviderConfig, Resolv
 use schemars::JsonSchema;
 use serde::{Serialize, de::DeserializeOwned};
 use settings_macros::{MergeFrom, with_fallible_options};
-pub use terminal::{
-    ActivateScript, AlternateScroll, CondaManager, CursorShapeContent, PathHyperlinkRegex,
-    ProjectTerminalSettingsContent, ScrollbarSettingsContent, Shell, ShowScrollbar, TerminalBell,
-    TerminalBlink, TerminalDockPosition, TerminalLineHeight, TerminalSettingsContent,
-    TerminalToolbarContent, VenvSettings, WorkingDirectory,
-};
-pub use theme::{
-    AccentContent, BufferLineHeight, DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME, FontFamilyName,
-    FontSize, FontStyleContent, FontWeightContent, HighlightStyleContent, IconThemeName,
-    IconThemeSelection, PlayerColorContent, StatusColorsContent, ThemeAppearanceMode, ThemeColor,
-    ThemeColorsContent, ThemeName, ThemeSelection, ThemeSettingsContent, ThemeStyleContent,
-    UiDensity, WindowBackgroundContent,
-};
+
 mod editor;
 use editor::{CenteredPaddingSettings, InactiveOpacity};
 
@@ -71,7 +58,7 @@ mod workspace;
 use crate::{
     agent::{AgentSettingsContent, AllAgentServersSettings},
     contents::{
-        AudioSettingsContent, BaseKeymapContent, CallHierarchySettingsContent, CallSettingsContent,
+        AudioSettingsContent, CallHierarchySettingsContent, CallSettingsContent,
         CommandPaletteSettingsContent, DebuggerSettingsContent, FileFinderSettingsContent,
         GitPanelSettingsContent, ImageViewerSettingsContent, InstrumentationSettingsContent,
         JournalSettingsContent, MarkdownPreviewSettingsContent, OutlinePanelSettingsContent,
@@ -82,7 +69,6 @@ use crate::{
     extension::ExtensionSettingsContent,
     feature_flags::FeatureFlagsMap,
     language_model::AllLanguageModelSettingsContent,
-    overrides::{PlatformOverrides, ReleaseChannelOverrides},
     profiles::SettingsProfile,
     project::{
         DiagnosticsSettingsContent, GitSettings, GlobalLspSettingsContent, NodeBinarySettings,
@@ -98,9 +84,43 @@ use crate::{
     },
 };
 pub use common::ParseStatus;
+pub use contents::BaseKeymapContent;
 pub use editor::cursor::CursorShape;
+pub use overrides::{PlatformOverrides, ReleaseChannelOverrides};
 pub use profiles::ProfileBase;
 pub use project::{LspSettings, LspSettingsMap, ProjectSettingsContent};
+pub use terminal::{
+    ActivateScript, AlternateScroll, CondaManager, CursorShapeContent, PathHyperlinkRegex,
+    ProjectTerminalSettingsContent, ScrollbarSettingsContent, Shell, ShowScrollbar, TerminalBell,
+    TerminalBlink, TerminalDockPosition, TerminalLineHeight, TerminalSettingsContent,
+    TerminalToolbarContent, VenvSettings, WorkingDirectory,
+};
+pub use theme::{
+    AccentContent,
+    BufferLineHeight,
+    DEFAULT_DARK_THEME,
+    DEFAULT_LIGHT_THEME,
+    FontFamilyName,
+    FontFeaturesContent,
+    FontSize,
+    FontStyleContent,
+    FontWeightContent,
+    HighlightStyleContent,
+    IconThemeName,
+    IconThemeSelection,
+    PlayerColorContent,
+    StatusColorsContent,
+    ThemeAppearanceMode,
+    ThemeColor,
+    ThemeColorsContent,
+    ThemeName,
+    ThemeSelection,
+    ThemeSettingsContent,
+    ThemeStyleContent,
+    UiDensity,
+    WindowBackgroundContent,
+    // font::FontSettingsContent,
+};
 pub use ui::DockPosition;
 use ui::{DockSide, ShowIndentGuides};
 pub use workspace::folder_indicator::FolderIndicator;

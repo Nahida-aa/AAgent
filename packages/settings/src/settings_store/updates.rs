@@ -1,9 +1,10 @@
-use std::sync::Arc;
-
+use anyhow::{Context as _, Result};
 use fs::Fs;
 use futures::channel::oneshot;
-use gpui::AsyncApp;
+use gpui::{App, AsyncApp};
 use settings_content::{ParseStatus, SettingsContent, UserSettingsContent};
+use settings_json::{infer_json_indent_size, update_value_in_json_text};
+use std::{ops::Range, sync::Arc};
 
 use crate::VsCodeSettings;
 

@@ -1,14 +1,20 @@
-use gpui::App;
+use std::sync::Arc;
 
+use super::SettingsStore;
 use crate::{
     WorktreeId,
     settings_store::{
         error::InvalidSettingsError,
-        file::{LocalSettingsKind, LocalSettingsPath},
+        file::{LocalSettingsKind, LocalSettingsPath, SettingsFile},
     },
 };
-
-use super::SettingsStore;
+use collections::{BTreeMap, HashMap, TypeIdHashMap, btree_map, hash_map};
+use gpui::App;
+use path::rel_path::RelPath;
+use paths::{local_settings_file_relative_path, task_file_name};
+use settings_content::{
+    ExtensionsSettingsContent, ParseStatus, ProjectSettingsContent, SettingsContent,
+};
 
 impl SettingsStore {
     /// Add or remove a set of local settings via a JSON string.

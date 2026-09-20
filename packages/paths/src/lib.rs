@@ -4,9 +4,9 @@ use std::env;
 use std::path::{Path, PathBuf};
 use std::sync::{LazyLock, OnceLock};
 
+use path::rel_path::RelPath;
 use util::paths::SanitizedPath;
 pub use util::paths::home_dir;
-use util::rel_path::RelPath;
 
 /// A default editorconfig file name to use when resolving project settings.
 pub const EDITORCONFIG_NAME: &str = ".editorconfig";

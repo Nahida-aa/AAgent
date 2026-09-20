@@ -58,7 +58,7 @@ pub use theme_style::{
 use serde::{Deserialize, Serialize};
 use settings_macros::{MergeFrom, with_fallible_options};
 
-use crate::theme::font::{CodeFade, FontFeaturesContent};
+pub use crate::theme::font::{CodeFade, FontFeaturesContent};
 
 // ---------- ThemeSettingsContent ----------
 

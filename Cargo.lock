@@ -2676,6 +2676,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
 
 [[package]]
+name = "ec4rs"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3b31a881d38439026e3d5dd938ab20328d36e23caca8fd5981c42e4b677f5842"
+
+[[package]]
 name = "editor"
 version = "0.1.0"
 source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=09916d529c25a5eeef6f53f16dbd345483784269#09916d529c25a5eeef6f53f16dbd345483784269"
@@ -5075,6 +5081,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "migrator"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "collections",
+ "convert_case 0.11.0",
+ "indoc",
+ "log",
+ "pretty_assertions",
+ "serde_json",
+ "serde_json_lenient",
+ "settings_content",
+ "settings_json",
+ "streaming-iterator",
+ "tree-sitter",
+ "tree-sitter-json",
+]
+
+[[package]]
 name = "mime"
 version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5985,6 +6010,7 @@ dependencies = [
  "const_format",
  "dirs",
  "ignore",
+ "path",
  "util",
 ]
 
@@ -7510,11 +7536,15 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "collections",
+ "ec4rs",
  "fs",
  "futures",
  "gpui",
+ "gpui_util",
  "inventory",
  "json5",
+ "log",
+ "migrator",
  "path",
  "paths",
  "rust-embed",
@@ -7524,6 +7554,7 @@ dependencies = [
  "settings_content",
  "settings_json",
  "settings_macros",
+ "smallvec",
  "strum 0.28.0",
  "tempfile",
  "util",

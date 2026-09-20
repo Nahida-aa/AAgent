@@ -1,4 +1,6 @@
-use gpui::SharedString;
+use std::rc::Rc;
+
+use gpui::{App, SharedString};
 use path::rel_path::RelPath;
 use settings_content::{
     ParseStatus, ProfileBase, SemanticTokenRules, SettingsContent, UserSettingsContent,

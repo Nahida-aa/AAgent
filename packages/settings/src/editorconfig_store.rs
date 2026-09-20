@@ -9,10 +9,10 @@ use ec4rs::{
 use fs::Fs;
 use futures::StreamExt;
 use gpui::{Context, EventEmitter, Task};
+use path::rel_path::RelPath;
 use paths::EDITORCONFIG_NAME;
 use smallvec::SmallVec;
 use std::{path::Path, str::FromStr, sync::Arc};
-use util::rel_path::RelPath;
 
 use crate::{InvalidSettingsError, LocalSettingsPath, WorktreeId, watch_config_file};
 

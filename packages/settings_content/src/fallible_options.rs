@@ -59,10 +59,6 @@ where
     (Some(value), ParseStatus::Success)
 }
 
-/// 标记可容错的类型（现在只有 Option<T>）。
-pub trait FallibleOption: Default {}
-impl<T> FallibleOption for Option<T> {}
-
 /// 容错反序列化器 —— 解析失败时返回 Default::default()。
 ///
 /// 用作 serde 的 `deserialize_with` 值：
@@ -81,6 +77,10 @@ where
         Err(_) => Ok(T::default()),
     }
 }
+
+/// 标记可容错的类型（现在只有 Option<T>）。
+pub trait FallibleOption: Default {}
+impl<T> FallibleOption for Option<T> {}
 
 macro_rules! flattened_deserialize {
     ($type_name:ty {

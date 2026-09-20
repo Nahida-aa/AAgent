@@ -1,0 +1,118 @@
+use std::{path::PathBuf, process::ExitStatus, sync::Arc};
+
+use crate::{
+    alacritty::HyperlinkMatch,
+    model::{Point, Selection, TerminalBounds},
+};
+use alacritty_terminal::vte::ansi::Rgb;
+use gpui::{
+    App, AppContext as _, BackgroundExecutor, Bounds, ClipboardItem, Context, EventEmitter, Hsla,
+    Keystroke, Modifiers, MouseButton, MouseDownEvent, MouseMoveEvent, MouseUpEvent, Pixels,
+    Point as GpuiPoint, Rgba, ScrollWheelEvent, Size, Task, TouchPhase, Window, actions, black, px,
+};
+
+///Upward flowing events, for changing the title and such
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum Event {
+    TitleChanged,
+    BreadcrumbsChanged,
+    CloseTerminal,
+    Bell,
+    Wakeup,
+    BlinkChanged(bool),
+    SelectionsChanged,
+    NewNavigationTarget(Option<MaybeNavigationTarget>),
+    Open(MaybeNavigationTarget),
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PathLikeTarget {
+    /// File system path, absolute or relative, existing or not.
+    /// Might have line and column number(s) attached as `file.rs:1:23`
+    pub maybe_path: String,
+    /// Current working directory of the terminal
+    pub working_directory: Option<PathBuf>,
+}
+
+/// A string inside terminal, potentially useful as a URI that can be opened.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum MaybeNavigationTarget {
+    /// HTTP, git, etc. string determined by the `URL_REGEX` regex.
+    Url(String),
+    /// File system path, absolute or relative, existing or not.
+    /// Might have line and column number(s) attached as `file.rs:1:23`
+    PathLike(PathLikeTarget),
+}
+
+#[derive(Clone)]
+pub enum InternalEvent {
+    Resize(TerminalBounds),
+    Clear,
+    // FocusNextMatch,
+    Scroll(Scroll),
+    ScrollToPoint(Point),
+    SetSelection(Option<Selection>),
+    UpdateSelection(GpuiPoint<Pixels>),
+    FindHyperlink(GpuiPoint<Pixels>, bool),
+    ProcessHyperlink(HyperlinkMatch, bool),
+    // Whether keep selection when copy
+    Copy(Option<bool>),
+    // Vi mode events
+    ToggleViMode,
+    ViMotion(ViMotion),
+    MoveViCursorToPoint(Point),
+}
+
+#[derive(Clone, Copy, Debug)]
+enum ViMotion {
+    Up,
+    Down,
+    Left,
+    Right,
+    First,
+    Last,
+    FirstOccupied,
+    High,
+    Middle,
+    Low,
+    WordLeft,
+    WordRight,
+    WordRightEnd,
+    Bracket,
+    ParagraphUp,
+    ParagraphDown,
+}
+
+#[derive(Clone, Copy, Debug)]
+enum Scroll {
+    Delta(i32),
+    PageUp,
+    PageDown,
+    Top,
+    Bottom,
+}
+
+#[derive(Clone)]
+pub(crate) enum TerminalBackendEvent {
+    MouseCursorDirty,
+    Title(String),
+    ResetTitle,
+    ClipboardStore(String),
+    ClipboardLoad(ClipboardFormatter),
+    ColorRequest(usize, ColorFormatter),
+    PtyWrite(String),
+    TextAreaSizeRequest(TextAreaSizeFormatter),
+    CursorBlinkingChange,
+    Wakeup,
+    Bell,
+    Exit,
+    ChildExit(ExitStatus),
+}
+
+pub enum PtyEvent {
+    Event(TerminalBackendEvent),
+}
+
+type ClipboardFormatter = Arc<dyn Fn(&str) -> String + Sync + Send + 'static>;
+type ColorFormatter = Arc<dyn Fn(Rgb) -> String + Sync + Send + 'static>;
+type TextAreaSizeFormatter = Arc<dyn Fn(TerminalBounds) -> String + Sync + Send + 'static>;

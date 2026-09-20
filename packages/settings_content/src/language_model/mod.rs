@@ -4,9 +4,34 @@
 //! 后续将迁移到 Zed `AllLanguageModelSettingsContent` 结构
 //! （`language_models.anthropic.api_url` / `language_models.ollama.api_key` 等）。
 
-use serde::Deserialize;
-use std::collections::HashMap;
-use std::path::PathBuf;
+use collections::HashMap;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+use settings_macros::{MergeFrom, with_fallible_options};
+use std::{path::PathBuf, sync::Arc};
+
+#[with_fallible_options]
+#[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
+pub struct AllLanguageModelSettingsContent {
+    pub anthropic: Option<AnthropicSettingsContent>,
+    pub anthropic_compatible: Option<HashMap<Arc<str>, AnthropicCompatibleSettingsContent>>,
+    pub bedrock: Option<AmazonBedrockSettingsContent>,
+    pub deepseek: Option<DeepseekSettingsContent>,
+    pub google: Option<GoogleSettingsContent>,
+    #[serde(rename = "llama.cpp")]
+    pub llama_cpp: Option<LlamaCppSettingsContent>,
+    pub lmstudio: Option<LmStudioSettingsContent>,
+    pub mistral: Option<MistralSettingsContent>,
+    pub ollama: Option<OllamaSettingsContent>,
+    pub opencode: Option<OpenCodeSettingsContent>,
+    pub open_router: Option<OpenRouterSettingsContent>,
+    pub openai: Option<OpenAiSettingsContent>,
+    pub openai_compatible: Option<HashMap<Arc<str>, OpenAiCompatibleSettingsContent>>,
+    pub vercel_ai_gateway: Option<VercelAiGatewaySettingsContent>,
+    pub x_ai: Option<XAiSettingsContent>,
+    #[serde(rename = "zed.dev")]
+    pub zed_dot_dev: Option<ZedDotDevSettingsContent>,
+}
 
 /// 完整的 LLM 配置（aa.json 旧格式）。
 ///

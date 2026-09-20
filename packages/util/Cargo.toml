@@ -8,4 +8,16 @@ license.workspace = true
 serde = { workspace = true, features = ["derive"] }
 shlex = "1"
 which = "7"
-log = "0.4"
+log.workspace = true
+path.workspace = true
+regex.workspace = true
+itertools.workspace = true
+globset.workspace = true
+dirs.workspace = true
+anyhow.workspace = true
+url.workspace = true
+percent-encoding.workspace = true
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+smol.workspace = true
+libc.workspace = true
+gpui_util.workspace = true

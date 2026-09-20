@@ -13,11 +13,11 @@
 //!   - `SettingsStore::init()` 时遍历 `inventory::collect!(RegisteredSetting)` 初始化
 
 use rust_embed::RustEmbed;
-use serde::de::DeserializeOwned;
+use serde::{Serialize, de::DeserializeOwned};
 use serde_json::Value;
 
 pub mod settings_store;
-
+use settings_macros::{MergeFrom, with_fallible_options};
 pub use settings_store::{
     AnySettingValue, RegisteredSetting, RelPath, SettingValue, SettingsStore, WorktreeId,
 };
@@ -27,9 +27,14 @@ pub use settings_store::{
 /// 设置内容的统一入口 — 简化版对齐 Zed `settings_json::SettingsContent`。
 /// Zed 版本有 layered content tracking（User / Default / Server / Project），
 /// AAgent 简化版就是一个 `serde_json::Value` wrapper。
-#[derive(Clone, Debug, Default)]
+#[with_fallible_options]
+#[derive(
+    Debug, PartialEq, Default, Clone, Serialize, JsonSchema, MergeFrom, Clone, Debug, Default,
+)]
 pub struct SettingsContent {
     pub value: Value,
+    /// Configuration of the terminal in Zed.
+    pub terminal: Option<TerminalSettingsContent>,
 }
 
 impl SettingsContent {

@@ -13,59 +13,15 @@ use alacritty_terminal::term::cell::{Cell, Flags};
 use alacritty_terminal::tty::{self, Options, Shell};
 use alacritty_terminal::vte::ansi::{Color, CursorShape};
 use parking_lot::Mutex;
-
-/// Dimensions handed to the alacritty emulator; drives rows/cols of the grid.
-///
-/// All values are raw pixel floats — no GPUI dependency here so this backend
-/// can be used from any renderer.
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct TerminalBounds {
-    pub cell_width: f32,
-    pub line_height: f32,
-    pub width: f32,
-    pub height: f32,
-    pub font_size: f32,
-}
-
-impl TerminalBounds {
-    pub fn num_lines(&self) -> usize {
-        if self.line_height <= 0.0 {
-            return 1;
-        }
-        (self.height / self.line_height).floor() as usize
-    }
-
-    pub fn num_columns(&self) -> usize {
-        if self.cell_width <= 0.0 {
-            return 1;
-        }
-        (self.width / self.cell_width).floor() as usize
-    }
-
-    pub fn window_size(&self) -> WindowSize {
-        WindowSize {
-            num_lines: self.num_lines() as u16,
-            num_cols: self.num_columns() as u16,
-            cell_width: self.cell_width as u16,
-            cell_height: self.line_height as u16,
-        }
-    }
-}
-
-impl grid::Dimensions for TerminalBounds {
-    fn total_lines(&self) -> usize {
-        self.num_lines()
-    }
-
-    fn screen_lines(&self) -> usize {
-        self.num_lines()
-    }
-
-    fn columns(&self) -> usize {
-        self.num_columns()
-    }
-}
-
+mod pty;
+pub(crate) use config::{
+    AlacrittyCell, AlacrittyGridIterator, AlacrittyHyperlink, AlacrittyTermConfig,
+    AlacrittyTermLock,
+};
+pub(super) use hyperlinks::{HyperlinkMatch, RegexSearches};
+pub use pty::PtySender;
+mod config;
+mod hyperlinks;
 /// A snapshot of one visible cell, directly paintable by the GPUI element.
 #[derive(Clone, Copy, Debug)]
 pub struct DisplayCell {

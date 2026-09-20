@@ -21,12 +21,16 @@ pub struct TaskId(pub String);
 pub struct SpawnInTerminal {
     /// Id of the task to use when determining task tab affinity.
     pub id: TaskId,
+    /// Full unshortened form of `label` field.
+    pub full_label: String,
     /// Human readable name of the terminal tab.
     pub label: String,
     /// Executable command to spawn. None = 启动交互式 shell。
     pub command: Option<String>,
     /// Arguments to the command.
     pub args: Vec<String>,
+    /// A human-readable label, containing command and all of its arguments, joined and substituted.
+    pub command_label: String,
     /// Current working directory to spawn the command into.
     pub cwd: Option<PathBuf>,
     /// Env overrides for the command.

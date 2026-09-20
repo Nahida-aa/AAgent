@@ -14,8 +14,50 @@
 //!           deserialize_with = "crate::fallible_options::deserialize")]
 //! ```
 
-use serde::Deserializer;
+use std::cell::RefCell;
+
 use serde::de::DeserializeOwned;
+use serde::{Deserialize, Deserializer};
+
+use crate::common::ParseStatus;
+
+thread_local! {
+    static ERRORS: RefCell<Option<Vec<anyhow::Error>>> = const { RefCell::new(None) };
+}
+pub fn parse_json<'de, T>(json: &'de str) -> (Option<T>, ParseStatus)
+where
+    T: Deserialize<'de>,
+{
+    ERRORS.with_borrow_mut(|errors| {
+        errors.replace(Vec::default());
+    });
+
+    let mut deserializer = serde_json_lenient::Deserializer::from_str(json);
+    let value = serde_path_to_error::deserialize::<_, T>(&mut deserializer);
+    let value = match value {
+        Ok(value) => value,
+        Err(error) => {
+            return (
+                None,
+                ParseStatus::Failed {
+                    error: error.into_inner().to_string(),
+                },
+            );
+        }
+    };
+
+    if let Some(errors) = ERRORS.with_borrow_mut(|errors| errors.take().filter(|e| !e.is_empty())) {
+        let error = errors
+            .into_iter()
+            .map(|e| e.to_string())
+            .flat_map(|e| ["\n".to_owned(), e])
+            .skip(1)
+            .collect::<String>();
+        return (Some(value), ParseStatus::Failed { error });
+    }
+
+    (Some(value), ParseStatus::Success)
+}
 
 /// 标记可容错的类型（现在只有 Option<T>）。
 pub trait FallibleOption: Default {}
@@ -38,6 +80,88 @@ where
         // 解析出错（比如字符串给了数字字段），降级为 None
         Err(_) => Ok(T::default()),
     }
+}
+
+macro_rules! flattened_deserialize {
+    ($type_name:ty {
+        sections: { $($section:ident),* $(,)? },
+        options: { $($option_field:ident),* $(,)? },
+        defaults: { $($default_field:ident),* $(,)? } $(,)?
+    }) => {
+        impl $type_name {
+            #[doc(hidden)]
+            pub const NAMED_DESERIALIZE_KEYS: &'static [&'static str] = &[
+                $(stringify!($option_field),)*
+                $(stringify!($default_field),)*
+            ];
+        }
+
+        impl<'de> serde::Deserialize<'de> for $type_name {
+            fn deserialize<D: serde::Deserializer<'de>>(
+                deserializer: D,
+            ) -> Result<Self, D::Error> {
+                let mut object =
+                    serde_json::Map::<String, serde_json::Value>::deserialize(deserializer)?;
+                (|| -> Result<Self, serde_json::Error> {
+                    $(
+                        let $option_field =
+                            $crate::fallible_options::take_option_field(
+                                &mut object,
+                                stringify!($option_field),
+                            )?;
+                    )*
+                    $(
+                        let $default_field =
+                            $crate::fallible_options::take_default_field(
+                                &mut object,
+                                stringify!($default_field),
+                            )?;
+                    )*
+                    let rest = serde_json::Value::Object(object);
+                    Ok(Self {
+                        $($section: $crate::fallible_options::section(&rest)?,)*
+                        $($option_field,)*
+                        $($default_field,)*
+                    })
+                })()
+                .map_err(serde::de::Error::custom)
+            }
+        }
+    };
+}
+pub(crate) use flattened_deserialize;
+
+pub(crate) fn take_option_field<T>(
+    object: &mut serde_json::Map<String, serde_json::Value>,
+    key: &str,
+) -> Result<T, serde_json::Error>
+where
+    T: serde::de::DeserializeOwned + FallibleOption,
+{
+    match object.remove(key) {
+        None => Ok(T::default()),
+        Some(value) => deserialize(&value),
+    }
+}
+
+pub(crate) fn take_default_field<T>(
+    object: &mut serde_json::Map<String, serde_json::Value>,
+    key: &str,
+) -> Result<T, serde_json::Error>
+where
+    T: serde::de::DeserializeOwned + Default,
+{
+    match object.remove(key) {
+        None => Ok(T::default()),
+        Some(value) => T::deserialize(&value),
+    }
+}
+
+pub(crate) fn section<T>(rest: &serde_json::Value) -> Result<T, serde_json::Error>
+where
+    T: serde::de::DeserializeOwned,
+{
+    T::deserialize(rest)
 }
 
 #[cfg(test)]

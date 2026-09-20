@@ -4,8 +4,9 @@
 
 use std::sync::Arc;
 
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use settings_macros::MergeFrom;
+use settings_macros::{MergeFrom, with_fallible_options};
 
 // ---------- 常量 ----------
 
@@ -15,39 +16,33 @@ pub const DEFAULT_DARK_THEME: &str = "One Dark";
 // ---------- ThemeName ----------
 
 /// Theme 名称（transparent newtype，包 `Arc<str>`）。
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, MergeFrom)]
+/// #[with_fallible_options]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, MergeFrom, JsonSchema)]
 #[serde(transparent)]
 pub struct ThemeName(pub Arc<str>);
 
 impl From<String> for ThemeName {
-    fn from(s: String) -> Self {
-        Self(Arc::from(s))
-    }
+    fn from(s: String) -> Self { Self(Arc::from(s)) }
 }
 
 impl From<&str> for ThemeName {
-    fn from(s: &str) -> Self {
-        Self(Arc::from(s))
-    }
+    fn from(s: &str) -> Self { Self(Arc::from(s)) }
 }
 
 // ---------- IconThemeName ----------
 
 /// Icon theme 名称。
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, MergeFrom)]
+#[with_fallible_options]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, MergeFrom, JsonSchema)]
 #[serde(transparent)]
 pub struct IconThemeName(pub Arc<str>);
 
 impl From<String> for IconThemeName {
-    fn from(s: String) -> Self {
-        Self(Arc::from(s))
-    }
+    fn from(s: String) -> Self { Self(Arc::from(s)) }
 }
 
 impl From<&str> for IconThemeName {
-    fn from(s: &str) -> Self {
-        Self(Arc::from(s))
-    }
+    fn from(s: &str) -> Self { Self(Arc::from(s)) }
 }
 
 // ---------- ThemeAppearanceMode ----------
@@ -56,7 +51,20 @@ impl From<&str> for IconThemeName {
 ///
 /// - `Light` / `Dark` — 固定选对应主题
 /// - `System` — 跟随系统明暗
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize, MergeFrom)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Default,
+    Serialize,
+    Deserialize,
+    MergeFrom,
+    JsonSchema,
+    strum::VariantArray,
+    strum::VariantNames,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum ThemeAppearanceMode {
     Light,
@@ -72,7 +80,17 @@ pub enum ThemeAppearanceMode {
 /// JSON 格式：
 /// - 静态：`"theme": "One Dark"`
 /// - 动态：`"theme": { "mode": "system", "light": "One Light", "dark": "One Dark" }`
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, MergeFrom)]
+#[derive(
+    Clone,
+    Debug,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    MergeFrom,
+    strum::EnumDiscriminants,
+    JsonSchema,
+)]
 #[serde(untagged)]
 pub enum ThemeSelection {
     Static(ThemeName),
@@ -95,7 +113,18 @@ impl Default for ThemeSelection {
 }
 
 /// 图标主题选择 — 同 ThemeSelection 形状。
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, MergeFrom)]
+#[derive(
+    Clone,
+    Debug,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    MergeFrom,
+    strum::EnumDiscriminants,
+    JsonSchema,
+)]
+#[strum_discriminants(derive(strum::VariantArray, strum::VariantNames, strum::FromRepr))]
 #[serde(untagged)]
 pub enum IconThemeSelection {
     Static(IconThemeName),
@@ -108,34 +137,5 @@ pub enum IconThemeSelection {
 }
 
 impl Default for IconThemeSelection {
-    fn default() -> Self {
-        Self::Static(IconThemeName::default())
-    }
-}
-
-// ---------- UiDensity ----------
-
-/// UI 密度（实验性）。
-#[derive(
-    Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, MergeFrom,
-)]
-#[serde(rename_all = "snake_case")]
-pub enum UiDensity {
-    #[serde(alias = "compact")]
-    Compact,
-    #[default]
-    #[serde(alias = "default")]
-    Default,
-    #[serde(alias = "comfortable")]
-    Comfortable,
-}
-
-impl UiDensity {
-    pub fn spacing_ratio(self) -> f32 {
-        match self {
-            Self::Compact => 0.75,
-            Self::Default => 1.0,
-            Self::Comfortable => 1.25,
-        }
-    }
+    fn default() -> Self { Self::Static(IconThemeName::default()) }
 }

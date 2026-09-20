@@ -8,6 +8,7 @@
 
 pub mod element;
 pub mod panel;
+pub mod terminal_scrollbar;
 pub mod view;
 
 pub use panel::TerminalPanel;

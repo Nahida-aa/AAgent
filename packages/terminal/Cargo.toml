@@ -8,6 +8,26 @@ edition.workspace = true
 alacritty_terminal.workspace = true
 parking_lot.workspace = true
 anyhow.workspace = true
-
+task.workspace = true
+futures.workspace = true
 # settings 数据类型（Shell + TerminalSettingsContent 等）
 settings_content.workspace = true
+async-channel.workspace = true
+log.workspace = true
+aa_gpui_kit_theme.workspace = true
+gpui.workspace = true
+vte.workspace = true
+thiserror.workspace = true
+url.workspace = true
+util.workspace = true
+percent-encoding.workspace = true
+regex.workspace = true
+settings.workspace = true
+serde.workspace = true
+schemars.workspace = true
+sysinfo.workspace = true
+collections.workspace = true
+libc.workspace = true
+gpui_util.workspace = true
+itertools.workspace = true
+settings_macros.workspace = true

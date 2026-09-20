@@ -8,16 +8,16 @@
 //! `Shell` enum 定义在 `project_terminal`，runtime 方法调 `util::shell::ShellKind`。
 
 pub mod project_terminal;
-
 pub use project_terminal::{
     ActivateScript, CondaManager, PathHyperlinkRegex, ProjectTerminalSettingsContent, Shell,
     VenvSettings, VenvSettingsResolved, WorkingDirectory,
 };
+use schemars::JsonSchema;
 
 use serde::{Deserialize, Serialize};
 use settings_macros::{MergeFrom, with_fallible_options};
 
-use crate::{FontFamilyName, FontSize, FontWeightContent};
+use crate::{FontFamilyName, FontSize, FontWeightContent, theme::font::FontFeaturesContent};
 
 // ---------- TerminalLineHeight ----------
 
@@ -42,6 +42,35 @@ impl TerminalLineHeight {
             TerminalLineHeight::Custom(v) => v.max(1.0),
         }
     }
+}
+
+/// Terminal scrollbar 显示策略。
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    Default,
+    PartialEq,
+    Eq,
+    Serialize,
+    Deserialize,
+    MergeFrom,
+    JsonSchema,
+    strum::VariantArray,
+    strum::VariantNames,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ShowScrollbar {
+    /// Show the scrollbar if there's important information or
+    /// follow the system's configured behavior.
+    #[default]
+    Auto,
+    /// Match the system's configured behavior.
+    System,
+    /// Always show the scrollbar.
+    Always,
+    /// Never show the scrollbar.
+    Never,
 }
 
 // ---------- CursorShapeContent ----------
@@ -83,20 +112,6 @@ pub enum AlternateScroll {
     #[default]
     On,
     Off,
-}
-
-// ---------- ShowScrollbar ----------
-
-/// Terminal scrollbar 显示策略。
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, MergeFrom)]
-#[serde(rename_all = "snake_case")]
-pub enum ShowScrollbar {
-    /// 继承 editor 设置
-    #[default]
-    Auto,
-    System,
-    Always,
-    Never,
 }
 
 // ---------- ScrollbarSettingsContent ----------
@@ -159,11 +174,12 @@ pub struct TerminalSettingsContent {
     /// 未设时跟随 buffer。
     pub font_size: Option<FontSize>,
     pub font_family: Option<FontFamilyName>,
-    pub font_weight: Option<FontWeightContent>,
     /// 未设时跟随 buffer。
     pub font_fallbacks: Option<Vec<FontFamilyName>>,
     /// 默认：Comfortable
     pub line_height: Option<TerminalLineHeight>,
+    pub font_features: Option<FontFeaturesContent>,
+    pub font_weight: Option<FontWeightContent>,
 
     // ---- 光标 ----
     /// 默认：Block
@@ -215,6 +231,18 @@ pub struct TerminalSettingsContent {
     #[serde(default)]
     pub minimum_contrast: Option<f32>,
 }
+
+crate::fallible_options::flattened_deserialize!(TerminalSettingsContent {
+    sections: { project },
+    options: {
+        font_size, font_family, font_fallbacks, line_height, font_features, font_weight,
+        cursor_shape, blinking, alternate_scroll, option_as_meta, copy_on_select,
+        keep_selection_on_copy, open_links_in_mouse_mode, button, dock, starts_open, flexible,
+        default_width, default_height, max_scroll_history_lines, scroll_multiplier, toolbar,
+        scrollbar, minimum_contrast, show_count_badge, bell,
+    },
+    defaults: {},
+});
 
 #[cfg(test)]
 mod tests {

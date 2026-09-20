@@ -26,37 +26,39 @@
 //!
 //! `ThemeSettingsContent` 聚合所有子模块的类型，作为用户 settings.json 的入口。
 
+pub mod buffer_line_height;
+pub mod colors;
 pub mod font;
-pub mod highlight_style;
-pub mod status_colors;
-pub mod theme_color;
 pub mod theme_selection;
 pub mod theme_style;
-
+pub mod ui_density;
+use crate::merge_from::MergeFrom as MergeFromTrait;
 // ---------- 常量 re-export ----------
 
+use collections::HashMap;
+use schemars::JsonSchema;
 pub use theme_selection::{DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME};
 
 // ---------- 子类型 re-export ----------
+pub use buffer_line_height::BufferLineHeight;
+pub use font::{FontFamilyName, FontSize, FontStyleContent, FontWeightContent};
 
-pub use font::{BufferLineHeight, FontFamilyName, FontSize, FontStyleContent, FontWeightContent};
-
-pub use theme_color::{ThemeColor, ThemeColorsContent};
+pub use colors::{ThemeColor, ThemeColorsContent};
 
 pub use theme_selection::{
-    IconThemeName, IconThemeSelection, ThemeAppearanceMode, ThemeName, ThemeSelection, UiDensity,
+    IconThemeName, IconThemeSelection, ThemeAppearanceMode, ThemeName, ThemeSelection,
 };
-
-pub use highlight_style::HighlightStyleContent;
-
-pub use status_colors::StatusColorsContent;
+pub use ui_density::UiDensity;
 
 pub use theme_style::{
-    AccentContent, PlayerColorContent, ThemeStyleContent, WindowBackgroundContent,
+    AccentContent, HighlightStyleContent, PlayerColorContent, StatusColorsContent,
+    ThemeStyleContent, WindowBackgroundContent,
 };
 
 use serde::{Deserialize, Serialize};
 use settings_macros::{MergeFrom, with_fallible_options};
+
+use crate::theme::font::{CodeFade, FontFeaturesContent};
 
 // ---------- ThemeSettingsContent ----------
 
@@ -68,24 +70,48 @@ use settings_macros::{MergeFrom, with_fallible_options};
 /// 所有字段都是 `Option<_>`，None 表示用默认值
 /// （由 `theme-settings` crate 的 Default impl 或 gpui_learn ThemeRegistry 提供）。
 #[with_fallible_options]
-#[derive(Clone, Debug, Default, Serialize, Deserialize, MergeFrom)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema, MergeFrom)]
 #[serde(default)]
 pub struct ThemeSettingsContent {
     /// UI 字体大小。
     pub ui_font_size: Option<FontSize>,
     /// UI 字体族。
     pub ui_font_family: Option<FontFamilyName>,
+    #[schemars(default = "default_font_fallbacks")]
+    #[schemars(extend("uniqueItems" = true))]
+    pub ui_font_fallbacks: Option<Vec<FontFamilyName>>,
+    /// The OpenType features to enable for text in the UI.
+    #[schemars(default = "default_font_features")]
+    pub ui_font_features: Option<FontFeaturesContent>,
     /// UI 字体粗细（100-900）。
+    #[schemars(default = "default_buffer_font_weight")]
     pub ui_font_weight: Option<FontWeightContent>,
 
     /// 编辑器字体族。
     pub buffer_font_family: Option<FontFamilyName>,
+    /// The font fallbacks to use for rendering in text buffers.
+    #[schemars(extend("uniqueItems" = true))]
+    pub buffer_font_fallbacks: Option<Vec<FontFamilyName>>,
     /// 编辑器字体大小。
     pub buffer_font_size: Option<FontSize>,
     /// 编辑器字体粗细（100-900）。
+    #[schemars(default = "default_buffer_font_weight")]
     pub buffer_font_weight: Option<FontWeightContent>,
     /// 编辑器行高。
     pub buffer_line_height: Option<BufferLineHeight>,
+    /// The OpenType features to enable for rendering in text buffers.
+    #[schemars(default = "default_font_features")]
+    pub buffer_font_features: Option<FontFeaturesContent>,
+
+    /// The name of a font to use for agent responses in the agent panel. Falls back to the UI font if unset.
+    pub agent_ui_font_family: Option<FontFamilyName>,
+    /// The font size for agent responses in the agent panel. Falls back to the UI font size if unset.
+    pub agent_ui_font_size: Option<FontSize>,
+    /// The name of a font to use for user messages in the agent panel. Falls back to the buffer font if unset.
+    pub agent_buffer_font_family: Option<FontFamilyName>,
+    /// The font size for user messages in the agent panel.
+    pub agent_buffer_font_size: Option<FontSize>,
+    pub git_commit_buffer_font_size: Option<FontSize>,
 
     /// 主题选择。
     pub theme: Option<ThemeSelection>,
@@ -95,7 +121,28 @@ pub struct ThemeSettingsContent {
     /// UI 密度（experimental）。
     #[serde(rename = "unstable.ui_density")]
     pub ui_density: Option<UiDensity>,
+
+    #[schemars(range(min = 0.0, max = 0.9))]
+    pub unnecessary_code_fade: Option<CodeFade>,
+
+    /// EXPERIMENTAL: Overrides for the current theme.
+    ///
+    /// These values will override the ones on the current theme specified in `theme`.
+    #[serde(rename = "experimental.theme_overrides")]
+    pub experimental_theme_overrides: Option<ThemeStyleContent>,
+
+    /// Overrides per theme
+    ///
+    /// These values will override the ones on the specified theme
+    #[serde(default)]
+    pub theme_overrides: HashMap<String, ThemeStyleContent>,
 }
+
+fn default_font_features() -> Option<FontFeaturesContent> { Some(FontFeaturesContent::default()) }
+
+fn default_font_fallbacks() -> Option<Vec<FontFamilyName>> { Some(Vec::new()) }
+
+fn default_buffer_font_weight() -> Option<FontWeightContent> { Some(FontWeightContent::NORMAL) }
 
 #[cfg(test)]
 mod tests {

@@ -3,9 +3,11 @@
 //! - [`ThemeColor`] — 单个颜色值（transparent String）
 //! - [`ThemeColorsContent`] — 完整颜色集合（UI + Editor + Terminal + VCS + Vim，190+ 字段）
 
+use std::borrow::Cow;
 use std::fmt::{self, Display, Formatter};
 use std::ops::Deref;
 
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use settings_macros::{MergeFrom, with_fallible_options};
 
@@ -18,52 +20,59 @@ use settings_macros::{MergeFrom, with_fallible_options};
 #[serde(transparent)]
 pub struct ThemeColor(String);
 
-impl From<String> for ThemeColor {
-    fn from(value: String) -> Self {
-        ThemeColor(value)
+impl JsonSchema for ThemeColor {
+    fn schema_name() -> Cow<'static, str> { "Color".into() }
+
+    fn json_schema(_generator: &mut schemars::SchemaGenerator) -> schemars::Schema {
+        use schemars::json_schema;
+        json_schema!({
+            "type": "string",
+            "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$",
+            "format": "color"
+        })
     }
 }
 
+impl From<String> for ThemeColor {
+    fn from(value: String) -> Self { ThemeColor(value) }
+}
+
 impl From<&str> for ThemeColor {
-    fn from(value: &str) -> Self {
-        ThemeColor(value.to_string())
-    }
+    fn from(value: &str) -> Self { ThemeColor(value.to_string()) }
 }
 
 impl Deref for ThemeColor {
     type Target = str;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
+    fn deref(&self) -> &Self::Target { &self.0 }
 }
 
 impl From<ThemeColor> for String {
-    fn from(value: ThemeColor) -> Self {
-        value.0
-    }
+    fn from(value: ThemeColor) -> Self { value.0 }
 }
 
 impl Display for ThemeColor {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result { write!(f, "{}", self.0) }
+}
+
+impl TryFrom<&ThemeColor> for gpui::Rgba {
+    type Error = anyhow::Error;
+
+    fn try_from(value: &ThemeColor) -> anyhow::Result<Self> {
+        let s: &str = &value.0;
+        gpui::Rgba::try_from(s)
     }
 }
 
 impl ThemeColor {
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
+    pub fn as_str(&self) -> &str { &self.0 }
 }
-
-// ---------- ThemeColorsContent ----------
 
 /// 主题颜色完整集合（UI + Editor + Terminal + VCS + Vim）。
 ///
 /// 字段和 serde rename **完全对齐 Zed** `settings_content::ThemeColorsContent`。
 /// 所有字段都是 `Option<ThemeColor>`，None 表示使用内建默认。
 #[with_fallible_options]
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, MergeFrom)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema, PartialEq, MergeFrom)]
 #[serde(default)]
 pub struct ThemeColorsContent {
     // ---- border ----

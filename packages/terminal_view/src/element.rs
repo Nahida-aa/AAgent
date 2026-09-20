@@ -5,7 +5,8 @@ use gpui::{
     App, Bounds, Element, ElementId, GlobalElementId, InspectorElementId, IntoElement, LayoutId,
     Pixels, Rgba, SharedString, Style, TextAlign, TextRun, Window, fill, point, px, size,
 };
-use terminal::alacritty::{AlacrittyBackend, DisplayCell, TerminalBounds};
+use terminal::TerminalBounds;
+use terminal::alacritty::{AlacrittyBackend, DisplayCell};
 
 const DEFAULT_BG: Rgba = Rgba {
     r: 0.051,

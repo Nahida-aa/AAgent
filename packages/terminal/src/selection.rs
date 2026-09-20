@@ -45,7 +45,7 @@ pub struct Selection {
 }
 
 #[derive(Clone, Copy, Debug)]
-struct SelectionAnchor {
+pub(crate) struct SelectionAnchor {
     pub(crate) point: Point,
     pub(crate) side: SelectionSide,
 }

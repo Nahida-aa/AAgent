@@ -14,6 +14,7 @@ use crate::{
     selection::{Scroll, Selection, SelectionPhase, SelectionSide, SelectionType, ViMotion},
     terminal_settings::TerminalSettings,
 };
+use alacritty_terminal::grid::Dimensions as _;
 use gpui::{
     Bounds, Context, Keystroke, Modifiers, MouseButton, MouseDownEvent, MouseMoveEvent,
     MouseUpEvent, Pixels, Point as GpuiPoint, ScrollWheelEvent, Task, TouchPhase, Window,

@@ -1,4 +1,4 @@
-use collections::HashMap;
+use std::collections::HashMap;
 use std::io;
 use std::os::fd::{AsRawFd, FromRawFd, RawFd};
 use std::sync::Arc;

@@ -18,7 +18,8 @@ path = "src/main.rs"
 workspace.workspace = true
 sidebar.workspace = true
 terminal.workspace = true
-terminal_view.workspace = true
+# TODO: terminal_view 适配新 terminal API 后恢复
+# terminal_view.workspace = true
 title_bar.workspace = true
 settings.workspace = true
 gpui.workspace = true

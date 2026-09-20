@@ -429,14 +429,7 @@ impl Workspace {
     }
 
     /// 从 SettingsStore 读取 bottom_dock_layout（默认 Contained）。
-    fn read_bottom_dock_layout(cx: &App) -> BottomDockLayout {
-        if let Some(store) = cx.try_global::<settings::SettingsStore>() {
-            if let Ok(s) = store.try_get_path::<String>(&["bottom_dock_layout"]) {
-                return BottomDockLayout::from_str(&s);
-            }
-        }
-        BottomDockLayout::default()
-    }
+    fn read_bottom_dock_layout(_cx: &App) -> BottomDockLayout { BottomDockLayout::default() }
 }
 
 impl Render for Workspace {

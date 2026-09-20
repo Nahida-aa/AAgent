@@ -41,7 +41,6 @@ dependencies = [
  "settings",
  "sidebar",
  "terminal",
- "terminal_view",
  "theme_settings",
  "title_bar",
  "tracing",

@@ -21,7 +21,8 @@ fn main() {
             settings::SettingsStore::init(cx);
 
             // TerminalPanel action handler 注册（对齐 Zed terminal_view::init(cx)）
-            terminal_view::TerminalPanel::init(cx);
+            // TODO: terminal_view 适配新 terminal API 后恢复
+            // terminal_view::TerminalPanel::init(cx);
 
             let bounds = Bounds::centered(None, size(1100.0.into(), px(720.0)), cx);
             cx.open_window(

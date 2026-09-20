@@ -60,3 +60,7 @@ pub(super) type AlacrittyTermLock = FairMutex<AlacrittyTerm>;
 pub(super) type AlacrittyCell = AlacCell;
 pub(super) type AlacrittyGridIterator<'a> = GridIterator<'a, AlacCell>;
 pub(super) type AlacrittyHyperlink = AlacHyperlink;
+
+// Backward-compat re-exports for terminal_view crate (旧 API 名字)
+pub type AlacrittyBackend = crate::Terminal;
+pub type DisplayCell = crate::cell::Cell;

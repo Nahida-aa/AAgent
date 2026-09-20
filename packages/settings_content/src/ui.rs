@@ -14,6 +14,7 @@ use crate::ShowScrollbar;
     MergeFrom,
     PartialEq,
     Eq,
+    Hash,
     strum::VariantArray,
     strum::VariantNames,
 )]

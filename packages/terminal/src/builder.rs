@@ -1,7 +1,7 @@
 #[cfg(not(windows))]
-use crate::alacritty::current_child_signal_mask;
 use crate::alacritty::{
-    display_only_term_config, new_term, pty_options, pty_term_config, spawn_event_loop,
+    current_child_signal_mask, display_only_term_config, new_term, open_pty, pty_options,
+    pty_term_config, spawn_event_loop,
 };
 use crate::bounds::normalize_terminal_bounds;
 use crate::cell::Content;
@@ -19,14 +19,14 @@ use crate::{
     TerminalError, TerminalType,
 };
 use crate::{Terminal, events::PtyEvent};
-use anyhow::{Result, bail};
+use anyhow::{Context as _, Result, bail};
 use collections::{HashMap, VecDeque};
 use futures::{
-    FutureExt,
+    FutureExt, StreamExt as _,
     channel::mpsc::{UnboundedReceiver, unbounded},
 };
 use futures_lite::future::yield_now;
-use gpui::{App, BackgroundExecutor, Context, Task, px};
+use gpui::{App, AppContext as _, BackgroundExecutor, Context, Task, px};
 use std::path::PathBuf;
 use std::process::ExitStatus;
 use std::sync::Arc;

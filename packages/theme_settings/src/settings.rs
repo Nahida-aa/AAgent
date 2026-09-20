@@ -5,6 +5,7 @@
 
 use serde::Deserialize;
 use serde_json::Value;
+use settings::IntoGpui as _;
 use settings_macros::RegisterSetting;
 
 /// Customizable settings for the UI and theme system.
@@ -63,6 +64,18 @@ impl Default for ThemeSettings {
 
 impl settings::Settings for ThemeSettings {
     fn from_settings(content: &settings::SettingsContent) -> Self {
-        content.deserialize::<Self>().unwrap_or_default()
+        let t = content.theme.as_ref();
+        let default = Self::default();
+        Self {
+            theme: default.theme,
+            icon_theme: None, // IconThemeSelection 暂不转换
+            ui_font_size: t.ui_font_size.map(|s| s.0),
+            ui_font_family: t.ui_font_family.as_ref().map(|f| f.0.to_string()),
+            ui_font_weight: t.ui_font_weight.map(|w| w.0),
+            buffer_font_size: t.buffer_font_size.map(|s| s.0),
+            buffer_font_family: t.buffer_font_family.as_ref().map(|f| f.0.to_string()),
+            buffer_font_weight: t.buffer_font_weight.map(|w| w.0),
+            buffer_line_height: default.buffer_line_height,
+        }
     }
 }

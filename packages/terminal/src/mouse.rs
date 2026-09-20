@@ -14,8 +14,9 @@ use crate::{
 };
 use gpui::{
     Bounds, Context, Modifiers, MouseButton, MouseDownEvent, MouseMoveEvent, MouseUpEvent, Pixels,
-    Point as GpuiPoint, ScrollWheelEvent, TouchPhase, Window, px,
+    Point as GpuiPoint, ReadGlobal as _, ScrollWheelEvent, TouchPhase, Window, px,
 };
+use settings::Settings as _;
 use std::{
     borrow::Cow,
     cmp::{self, min},

@@ -5,6 +5,7 @@ use std::os::fd::AsRawFd;
 
 use futures::channel::mpsc::UnboundedSender;
 use std::{borrow::Cow, sync::Arc};
+use vte::ansi::Handler;
 
 use crate::{PtyEvent, TerminalBounds, events::TerminalBackendEvent};
 

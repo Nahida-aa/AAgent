@@ -4,9 +4,7 @@ use std::time::Instant;
 
 use super::task::{TaskStatus, task_summary};
 use crate::CwdHistoryEntry;
-use crate::alacritty::{
-    AlacrittyTerm, clear_saved_screen, display_offset, last_non_empty_lines, make_content,
-};
+use crate::alacritty::{AlacrittyTerm, display_offset, last_non_empty_lines, make_content};
 use crate::bounds::normalize_terminal_bounds;
 use crate::mappings::keys::to_esc_str;
 use crate::{
@@ -22,6 +20,7 @@ use crate::{
     },
     terminal_settings::TerminalSettings,
 };
+use alacritty_terminal::grid::Dimensions as _;
 use gpui::{
     Bounds, ClipboardItem, Context, Keystroke, Modifiers, MouseButton, MouseDownEvent,
     MouseMoveEvent, MouseUpEvent, Pixels, Point as GpuiPoint, ScrollWheelEvent, Task, TouchPhase,

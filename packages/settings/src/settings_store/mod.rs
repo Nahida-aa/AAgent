@@ -77,6 +77,12 @@ impl SettingsStore {
         Self::new_with_semantic_tokens(cx, default_settings)
     }
 
+    /// 简化入口：从空配置初始化，后续可以扩展为加载 default.json
+    pub fn init(cx: &mut App) {
+        let store = Self::new(cx, "{}");
+        cx.set_global(store);
+    }
+
     pub fn new_with_semantic_tokens(cx: &mut App, default_settings: &str) -> Self {
         let default_settings = Self::parse_default_settings(default_settings).unwrap();
         Self::from_settings_content(cx, default_settings)

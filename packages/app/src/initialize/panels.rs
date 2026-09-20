@@ -6,7 +6,8 @@
 
 use anyhow::Result;
 use gpui::{AppContext, Entity, Task, Window};
-use terminal_view::TerminalPanel;
+// TODO: terminal_view 适配新 terminal API 后恢复
+// use terminal_view::TerminalPanel;
 use workspace::Workspace;
 use workspace::dock::panel::{
     AgentPanel, CollabPanel, DebugPanel, GitPanel, OutlinePanel, ProjectPanel,
@@ -49,8 +50,9 @@ pub fn initialize_panels(
         ws.add_panel::<OutlinePanel>(outline, cx);
 
         // —— Bottom Dock ——
-        let terminal = cx.new(|cx| TerminalPanel::new(workspace, cx));
-        ws.add_panel::<TerminalPanel>(terminal, cx);
+        // TODO: terminal_view 适配新 terminal API 后恢复
+        // let terminal = cx.new(|cx| TerminalPanel::new(workspace, cx));
+        // ws.add_panel::<TerminalPanel>(terminal, cx);
 
         let debug = cx.new(|_| DebugPanel);
         ws.add_panel::<DebugPanel>(debug, cx);

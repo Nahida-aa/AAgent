@@ -20,11 +20,13 @@ use crate::{
     },
     terminal_settings::TerminalSettings,
 };
+use alacritty_terminal::grid::Dimensions as _;
 use gpui::{
     Bounds, ClipboardItem, Context, Keystroke, Modifiers, MouseButton, MouseDownEvent,
-    MouseMoveEvent, MouseUpEvent, Pixels, Point as GpuiPoint, ScrollWheelEvent, Task, TouchPhase,
-    Window,
+    MouseMoveEvent, MouseUpEvent, Pixels, Point as GpuiPoint, ReadGlobal as _, ScrollWheelEvent,
+    Task, TouchPhase, Window,
 };
+use settings::Settings as _;
 use task::HideStrategy; // 如果 process_hyperlink 在另一个文件
 
 use std::{

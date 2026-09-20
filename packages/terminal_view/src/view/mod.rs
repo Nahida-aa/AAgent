@@ -8,7 +8,8 @@ use gpui::{
     App, Context, EventEmitter, FocusHandle, Focusable, IntoElement, KeyDownEvent, Render, Window,
     div, prelude::*,
 };
-use terminal::alacritty::{AlacrittyBackend, TerminalBounds};
+use terminal::TerminalBounds;
+use terminal::alacritty::AlacrittyBackend;
 use tracing::debug;
 
 use crate::element::TerminalElement;

@@ -31,10 +31,10 @@ use crate::{
 use anyhow::Context as _;
 use anyhow::{Result, bail};
 use gpui::{
-    App, Bounds, ClipboardItem, Context, Keystroke, Modifiers, MouseButton, MouseDownEvent,
-    MouseMoveEvent, MouseUpEvent, Pixels, Point as GpuiPoint, ScrollWheelEvent, Task, TouchPhase,
-    Window,
-}; // 如果 process_hyperlink 在另一个文件
+    App, AppContext as _, Bounds, ClipboardItem, Context, Keystroke, Modifiers, MouseButton,
+    MouseDownEvent, MouseMoveEvent, MouseUpEvent, Pixels, Point as GpuiPoint, ScrollWheelEvent,
+    Task, TouchPhase, Window,
+};
 
 use std::{
     borrow::Cow,

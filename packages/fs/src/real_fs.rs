@@ -11,15 +11,11 @@ use crate::{Fs, Metadata};
 pub struct RealFs;
 
 impl RealFs {
-    pub fn new() -> Arc<dyn Fs> {
-        Arc::new(Self)
-    }
+    pub fn new() -> Arc<dyn Fs> { Arc::new(Self) }
 }
 
 impl Default for RealFs {
-    fn default() -> Self {
-        Self
-    }
+    fn default() -> Self { Self }
 }
 
 #[async_trait::async_trait]
@@ -34,17 +30,11 @@ impl Fs for RealFs {
         std::fs::metadata(path).map(|m| m.is_dir()).unwrap_or(false)
     }
 
-    async fn path_exists(&self, path: &Path) -> bool {
-        path.exists()
-    }
+    async fn path_exists(&self, path: &Path) -> bool { path.exists() }
 
-    async fn load_bytes(&self, path: &Path) -> Result<Vec<u8>> {
-        Ok(std::fs::read(path)?)
-    }
+    async fn load_bytes(&self, path: &Path) -> Result<Vec<u8>> { Ok(std::fs::read(path)?) }
 
-    async fn create_dir(&self, path: &Path) -> Result<()> {
-        Ok(std::fs::create_dir_all(path)?)
-    }
+    async fn create_dir(&self, path: &Path) -> Result<()> { Ok(std::fs::create_dir_all(path)?) }
 
     async fn write(&self, path: &Path, content: &[u8]) -> Result<()> {
         if let Some(parent) = path.parent() {
@@ -55,9 +45,7 @@ impl Fs for RealFs {
         Ok(std::fs::write(path, content)?)
     }
 
-    async fn remove_file(&self, path: &Path) -> Result<()> {
-        Ok(std::fs::remove_file(path)?)
-    }
+    async fn remove_file(&self, path: &Path) -> Result<()> { Ok(std::fs::remove_file(path)?) }
 
     async fn remove_dir(&self, path: &Path, recursive: bool) -> Result<()> {
         if recursive {
@@ -67,9 +55,7 @@ impl Fs for RealFs {
         }
     }
 
-    async fn rename(&self, from: &Path, to: &Path) -> Result<()> {
-        Ok(std::fs::rename(from, to)?)
-    }
+    async fn rename(&self, from: &Path, to: &Path) -> Result<()> { Ok(std::fs::rename(from, to)?) }
 
     async fn canonicalize(&self, path: &Path) -> Result<PathBuf> {
         Ok(std::fs::canonicalize(path)?)

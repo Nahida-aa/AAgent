@@ -66,9 +66,7 @@ pub enum BottomDockLayout {
 }
 
 impl Default for BottomDockLayout {
-    fn default() -> Self {
-        Self::Contained
-    }
+    fn default() -> Self { Self::Contained }
 }
 
 impl BottomDockLayout {
@@ -222,9 +220,7 @@ impl Workspace {
         }
     }
 
-    pub fn status_bar(&self) -> &Entity<StatusBar> {
-        &self.status_bar
-    }
+    pub fn status_bar(&self) -> &Entity<StatusBar> { &self.status_bar }
 
     /// 注入窗口装饰（TitleBar）— 由外部 app 层在 observe_new 里调。
     /// 对齐 zed `Workspace::set_titlebar_item`。
@@ -233,9 +229,7 @@ impl Workspace {
         cx.notify();
     }
 
-    pub fn titlebar_item(&self) -> Option<gpui::AnyView> {
-        self.titlebar_item.clone()
-    }
+    pub fn titlebar_item(&self) -> Option<gpui::AnyView> { self.titlebar_item.clone() }
 
     /// 注册 action handler — 外部 crate（terminal-view 等）在 observe_new 里调用。
     /// 对齐 Zed `Workspace::register_action::<A>(callback)`。

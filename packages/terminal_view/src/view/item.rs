@@ -9,11 +9,7 @@ use super::TerminalView;
 impl Item for TerminalView {
     type Event = ();
 
-    fn tab_label(&self, _cx: &App) -> gpui::SharedString {
-        "Terminal".into()
-    }
+    fn tab_label(&self, _cx: &App) -> gpui::SharedString { "Terminal".into() }
 
-    fn tab_icon(&self, _cx: &App) -> IconName {
-        IconName::TerminalAlt
-    }
+    fn tab_icon(&self, _cx: &App) -> IconName { IconName::TerminalAlt }
 }

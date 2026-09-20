@@ -22,27 +22,19 @@ pub trait Extension: Send + Sync {
     fn id(&self) -> &str;
 
     /// 声明扩展需要宿主授予的能力。
-    fn capabilities(&self) -> &[ExtensionCapability] {
-        &[]
-    }
+    fn capabilities(&self) -> &[ExtensionCapability] { &[] }
 
     /// 一次性调用。扩展通过 registrar 注册工具、命令和事件处理器。
     fn register(&self, _reg: &mut Registrar) {}
 
     /// 扩展进入运行态。
-    async fn start(&self, _ctx: ExtensionCtx) -> Result<(), ExtensionError> {
-        Ok(())
-    }
+    async fn start(&self, _ctx: ExtensionCtx) -> Result<(), ExtensionError> { Ok(()) }
 
     /// 扩展退出运行态。
-    async fn stop(&self, _reason: StopReason) -> Result<(), ExtensionError> {
-        Ok(())
-    }
+    async fn stop(&self, _reason: StopReason) -> Result<(), ExtensionError> { Ok(()) }
 
     /// 健康检查。
-    async fn health(&self) -> Result<(), ExtensionError> {
-        Ok(())
-    }
+    async fn health(&self) -> Result<(), ExtensionError> { Ok(()) }
 
     /// 配置热更新。
     async fn on_config_changed(&self, _config: ExtensionConfig) -> Result<(), ExtensionError> {
@@ -87,9 +79,7 @@ impl ExtensionConfig {
         serde_json::from_value(self.0.clone())
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.0.as_object().is_some_and(|o| o.is_empty())
-    }
+    pub fn is_empty(&self) -> bool { self.0.as_object().is_some_and(|o| o.is_empty()) }
 }
 
 // ─── Extension Context ───────────────────────────────────────────────────
@@ -119,9 +109,7 @@ impl ExtensionCtx {
         }
     }
 
-    pub fn shutdown(&self) -> tokio_util::sync::CancellationToken {
-        self.tasks.shutdown()
-    }
+    pub fn shutdown(&self) -> tokio_util::sync::CancellationToken { self.tasks.shutdown() }
 }
 
 /// 扩展退出原因。
@@ -147,9 +135,7 @@ impl ExtensionTasks {
         }
     }
 
-    pub fn shutdown(&self) -> tokio_util::sync::CancellationToken {
-        self.shutdown.clone()
-    }
+    pub fn shutdown(&self) -> tokio_util::sync::CancellationToken { self.shutdown.clone() }
 
     pub fn spawn<F>(&self, fut: F)
     where
@@ -164,9 +150,7 @@ impl ExtensionTasks {
         }
     }
 
-    pub fn cancel(&self) {
-        self.shutdown.cancel();
-    }
+    pub fn cancel(&self) { self.shutdown.cancel(); }
 
     pub async fn wait(&self, timeout: std::time::Duration) {
         let Ok(mut handles) = self.handles.lock() else {
@@ -221,23 +205,17 @@ impl Registrar {
         self.hooks.push((event, mode, priority, handler));
     }
 
-    pub fn tools(&self) -> &[(crate::ToolDefinition, Arc<dyn ToolHandler>)] {
-        &self.tools
-    }
+    pub fn tools(&self) -> &[(crate::ToolDefinition, Arc<dyn ToolHandler>)] { &self.tools }
 
     pub fn hooks(&self) -> &[(ExtensionEvent, HookMode, i32, Arc<dyn LifecycleHandler>)] {
         &self.hooks
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.tools.is_empty() && self.hooks.is_empty()
-    }
+    pub fn is_empty(&self) -> bool { self.tools.is_empty() && self.hooks.is_empty() }
 }
 
 impl Default for Registrar {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 // ─── Handler Traits ──────────────────────────────────────────────────────

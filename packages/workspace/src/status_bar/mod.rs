@@ -32,9 +32,7 @@ use settings_content::SidebarSide;
 
 /// 状态栏项（对齐 zed `StatusItemView`）。
 pub trait StatusItemView: Render {
-    fn has_custom_menu(&self) -> bool {
-        false
-    }
+    fn has_custom_menu(&self) -> bool { false }
 }
 
 /// trait 对象化的 item handle。
@@ -45,15 +43,9 @@ pub trait StatusItemViewHandle: Send + Sync {
 }
 
 impl<T: StatusItemView> StatusItemViewHandle for Entity<T> {
-    fn to_any(&self) -> AnyView {
-        self.clone().into()
-    }
-    fn item_type(&self) -> TypeId {
-        TypeId::of::<T>()
-    }
-    fn has_custom_menu(&self) -> bool {
-        false
-    }
+    fn to_any(&self) -> AnyView { self.clone().into() }
+    fn item_type(&self) -> TypeId { TypeId::of::<T>() }
+    fn has_custom_menu(&self) -> bool { false }
 }
 
 /// 底部状态栏。
@@ -100,9 +92,7 @@ impl StatusBar {
             .retain(|item| item.item_type() != TypeId::of::<T>());
     }
 
-    pub fn hide_item(&mut self, item_type: TypeId) {
-        self.hidden_items.insert(item_type);
-    }
+    pub fn hide_item(&mut self, item_type: TypeId) { self.hidden_items.insert(item_type); }
 
     // ---- 渲染 ----
 

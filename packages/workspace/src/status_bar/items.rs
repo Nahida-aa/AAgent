@@ -105,9 +105,7 @@ impl IntoElement for StatusButton {
 pub struct Search;
 
 impl Search {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for Search {}
@@ -126,9 +124,7 @@ impl Render for Search {
 pub struct LanguageServers;
 
 impl LanguageServers {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for LanguageServers {}
@@ -143,9 +139,7 @@ impl Render for LanguageServers {
 pub struct Diagnostics;
 
 impl Diagnostics {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for Diagnostics {}
@@ -174,9 +168,7 @@ impl ActiveFileName {
     }
 
     /// 无缓冲区（隐藏）。
-    pub fn empty(_cx: &mut Context<Self>) -> Self {
-        Self { name: None }
-    }
+    pub fn empty(_cx: &mut Context<Self>) -> Self { Self { name: None } }
 }
 
 impl StatusItemView for ActiveFileName {}
@@ -199,9 +191,7 @@ impl Render for ActiveFileName {
 pub struct GitBlame;
 
 impl GitBlame {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for GitBlame {}
@@ -216,9 +206,7 @@ impl Render for GitBlame {
 pub struct MergeConflict;
 
 impl MergeConflict {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for MergeConflict {}
@@ -233,9 +221,7 @@ impl Render for MergeConflict {
 pub struct ActivityIndicator;
 
 impl ActivityIndicator {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for ActivityIndicator {}
@@ -250,9 +236,7 @@ impl Render for ActivityIndicator {
 pub struct EditPrediction;
 
 impl EditPrediction {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for EditPrediction {}
@@ -287,9 +271,7 @@ impl Render for EditPrediction {
 pub struct Encoding;
 
 impl Encoding {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for Encoding {}
@@ -304,9 +286,7 @@ impl Render for Encoding {
 pub struct Language;
 
 impl Language {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for Language {}
@@ -322,9 +302,7 @@ impl Render for Language {
 pub struct Toolchain;
 
 impl Toolchain {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for Toolchain {}
@@ -339,9 +317,7 @@ impl Render for Toolchain {
 pub struct LineEnding;
 
 impl LineEnding {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for LineEnding {}
@@ -356,9 +332,7 @@ impl Render for LineEnding {
 pub struct CursorPosition;
 
 impl CursorPosition {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for CursorPosition {}
@@ -374,9 +348,7 @@ impl Render for CursorPosition {
 pub struct ImageInfo;
 
 impl ImageInfo {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for ImageInfo {}
@@ -391,9 +363,7 @@ impl Render for ImageInfo {
 pub struct VimMode;
 
 impl VimMode {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for VimMode {}
@@ -408,9 +378,7 @@ impl Render for VimMode {
 pub struct PendingKeystrokes;
 
 impl PendingKeystrokes {
-    pub fn new(_cx: &mut Context<Self>) -> Self {
-        Self
-    }
+    pub fn new(_cx: &mut Context<Self>) -> Self { Self }
 }
 
 impl StatusItemView for PendingKeystrokes {}

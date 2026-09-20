@@ -53,21 +53,13 @@ impl Dock {
         }
     }
 
-    pub fn position(&self) -> DockPosition {
-        self.position
-    }
+    pub fn position(&self) -> DockPosition { self.position }
 
-    pub fn is_open(&self) -> bool {
-        self.is_open
-    }
+    pub fn is_open(&self) -> bool { self.is_open }
 
-    pub fn active_panel_index(&self) -> Option<usize> {
-        self.active_panel_index
-    }
+    pub fn active_panel_index(&self) -> Option<usize> { self.active_panel_index }
 
-    pub fn panels(&self) -> &[Arc<dyn PanelHandle>] {
-        &self.panels
-    }
+    pub fn panels(&self) -> &[Arc<dyn PanelHandle>] { &self.panels }
 
     pub fn add_panel(&mut self, panel: Arc<dyn PanelHandle>) {
         self.panels.push(panel);
@@ -162,9 +154,7 @@ impl Dock {
     }
 
     /// 是否有用户设置的固定尺寸覆盖（有则不能 flexible sizing）。
-    pub fn has_size_override(&self) -> bool {
-        self.size_override.is_some()
-    }
+    pub fn has_size_override(&self) -> bool { self.size_override.is_some() }
 
     /// 用户 resize 后设置新尺寸（对齐 zed dock.rs `resize_active_panel`）。
     /// Zed dock.rs:L414 — 只 clamp 最小值为 RESIZE_HANDLE_SIZE, 不设上限。
@@ -175,9 +165,7 @@ impl Dock {
     }
 
     /// 重置为 active panel 的 default_size。
-    pub fn reset_size(&mut self) {
-        self.size_override = None;
-    }
+    pub fn reset_size(&mut self) { self.size_override = None; }
 
     /// 对齐 zed `Dock::clamp_panel_size` — 窗口 resize 时, 如果 dock size > main_area 可用空间,
     /// 把 size_override 夹到 max_size。
@@ -215,9 +203,7 @@ impl Dock {
     }
 
     /// Dock 里有没有这个类型的 panel。
-    pub fn has_panel<T: Panel>(&self) -> bool {
-        self.panel_index_for_type::<T>().is_some()
-    }
+    pub fn has_panel<T: Panel>(&self) -> bool { self.panel_index_for_type::<T>().is_some() }
 
     /// 让 Dock 打开并激活指定类型的 panel。
     pub fn open_panel<T: Panel>(&mut self, cx: &mut App) {

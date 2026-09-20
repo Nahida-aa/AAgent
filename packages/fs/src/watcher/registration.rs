@@ -79,13 +79,9 @@ impl OsWatcher {
         })
     }
 
-    pub fn kind(&self) -> OsWatcherKind {
-        self.kind
-    }
+    pub fn kind(&self) -> OsWatcherKind { self.kind }
 
-    pub fn diagnostics(&self) -> &Arc<DiagnosticRecorder> {
-        &self.diagnostics
-    }
+    pub fn diagnostics(&self) -> &Arc<DiagnosticRecorder> { &self.diagnostics }
 
     fn ensure_backend(&self) -> Result<()> {
         let mut backend = self.backend.lock().unwrap();
@@ -176,9 +172,7 @@ impl OsWatcher {
 }
 
 impl Drop for OsWatcher {
-    fn drop(&mut self) {
-        let _ = self.backend.lock().unwrap().take();
-    }
+    fn drop(&mut self) { let _ = self.backend.lock().unwrap().take(); }
 }
 
 // ---------- FsWatcher ----------

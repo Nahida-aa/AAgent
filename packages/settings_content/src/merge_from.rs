@@ -73,9 +73,7 @@ impl<T: Clone> MergeFrom for Vec<T> {
 }
 
 impl<T: MergeFrom> MergeFrom for Box<T> {
-    fn merge_from(&mut self, other: &Self) {
-        self.as_mut().merge_from(other.as_ref())
-    }
+    fn merge_from(&mut self, other: &Self) { self.as_mut().merge_from(other.as_ref()) }
 }
 
 // Implementations for collections that extend/merge their contents

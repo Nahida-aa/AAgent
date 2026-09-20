@@ -67,9 +67,7 @@ impl Default for OpenProjectOptions {
 }
 
 impl OpenProjectOptions {
-    pub fn new() -> Self {
-        Self::default()
-    }
+    pub fn new() -> Self { Self::default() }
 
     pub fn with_fs(mut self, fs: Arc<dyn Fs>) -> Self {
         self.fs = Some(fs);
@@ -138,19 +136,13 @@ impl Project {
     }
 
     /// 文件系统实现。
-    pub fn fs(&self) -> &Arc<dyn Fs> {
-        &self.fs
-    }
+    pub fn fs(&self) -> &Arc<dyn Fs> { &self.fs }
 
     /// 项目根路径。
-    pub fn root_path(&self) -> &Path {
-        &self.root_path
-    }
+    pub fn root_path(&self) -> &Path { &self.root_path }
 
     /// 所有 worktree（含主线）。
-    pub fn worktrees(&self) -> &[WorktreeEntry] {
-        &self.worktrees
-    }
+    pub fn worktrees(&self) -> &[WorktreeEntry] { &self.worktrees }
 
     /// 主线 worktree（id=0）。
     pub fn main_worktree(&self) -> &WorktreeEntry {
@@ -159,9 +151,7 @@ impl Project {
     }
 
     /// Per-project settings 文件路径。
-    pub fn settings_path(&self) -> &Path {
-        &self.settings_path
-    }
+    pub fn settings_path(&self) -> &Path { &self.settings_path }
 
     /// 找到某个路径所属的 worktree。
     pub fn worktree_for_path(&self, path: &Path) -> Option<&WorktreeEntry> {

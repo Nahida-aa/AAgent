@@ -36,27 +36,17 @@ pub trait SidebarHandle: Send + Sync {
 /// Entity::update(cx, |this, cx| ...) 从 &mut App 调 entity 方法，
 /// 这是 GPUI 设计的"从外部操作 entity"的 API。
 impl<T: Sidebar + 'static> SidebarHandle for Entity<T> {
-    fn width(&self, cx: &App) -> Pixels {
-        self.read(cx).width(cx)
-    }
+    fn width(&self, cx: &App) -> Pixels { self.read(cx).width(cx) }
 
     fn set_width(&self, width: Option<Pixels>, cx: &mut App) {
         self.update(cx, |this, cx| this.set_width(width, cx))
     }
 
-    fn has_notifications(&self, cx: &App) -> bool {
-        self.read(cx).has_notifications(cx)
-    }
+    fn has_notifications(&self, cx: &App) -> bool { self.read(cx).has_notifications(cx) }
 
-    fn to_any(&self) -> AnyView {
-        self.clone().into()
-    }
+    fn to_any(&self) -> AnyView { self.clone().into() }
 
-    fn entity_id(&self) -> EntityId {
-        Entity::entity_id(self)
-    }
+    fn entity_id(&self) -> EntityId { Entity::entity_id(self) }
 
-    fn side(&self, cx: &App) -> SidebarSide {
-        self.read(cx).side(cx)
-    }
+    fn side(&self, cx: &App) -> SidebarSide { self.read(cx).side(cx) }
 }

@@ -78,13 +78,9 @@ impl StyledAnsiTextHandler {
 }
 
 impl Handler for StyledAnsiTextHandler {
-    fn input(&mut self, c: char) {
-        self.text.push(c);
-    }
+    fn input(&mut self, c: char) { self.text.push(c); }
 
-    fn linefeed(&mut self) {
-        self.text.push('\n');
-    }
+    fn linefeed(&mut self) { self.text.push('\n'); }
 
     fn put_tab(&mut self, count: u16) {
         self.text.extend(std::iter::repeat_n('\t', count as usize));
@@ -114,18 +110,14 @@ struct PlainAnsiTextHandler {
 }
 
 impl Handler for PlainAnsiTextHandler {
-    fn input(&mut self, c: char) {
-        self.text.push(c);
-    }
+    fn input(&mut self, c: char) { self.text.push(c); }
 
     fn linefeed(&mut self) {
         self.text.push('\n');
         self.line_start = self.text.len();
     }
 
-    fn carriage_return(&mut self) {
-        self.text.truncate(self.line_start);
-    }
+    fn carriage_return(&mut self) { self.text.truncate(self.line_start); }
 
     fn put_tab(&mut self, count: u16) {
         self.text.extend(std::iter::repeat_n('\t', count as usize));

@@ -22,9 +22,7 @@ pub const CURSOR_MARKER: &str = "<|user_cursor|>";
 /// this region becomes non-editable.
 pub const PREFILL_RATIO: f64 = 0.1; // 10%
 
-fn estimate_tokens(bytes: usize) -> usize {
-    bytes / 3
-}
+fn estimate_tokens(bytes: usize) -> usize { bytes / 3 }
 
 /// Leave some slack to avoid overflow.
 fn apply_prompt_budget_margin(max_tokens: usize) -> usize {
@@ -197,9 +195,7 @@ impl ZetaFormat {
     }
 }
 
-fn empty_range() -> Range<usize> {
-    0..0
-}
+fn empty_range() -> Range<usize> { 0..0 }
 
 #[derive(Clone, Debug, PartialEq, Hash, Serialize, Deserialize)]
 #[serde(tag = "event")]
@@ -2387,9 +2383,7 @@ mod v0113_ordered {
 mod v0114180_editable_region {
     use super::*;
 
-    pub fn special_tokens() -> &'static [&'static str] {
-        v0113_ordered::special_tokens()
-    }
+    pub fn special_tokens() -> &'static [&'static str] { v0113_ordered::special_tokens() }
 }
 
 pub mod v0120_git_merge_markers {

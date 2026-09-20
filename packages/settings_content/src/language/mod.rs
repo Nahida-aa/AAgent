@@ -295,21 +295,15 @@ pub struct MercuryEditPredictionSettingsContent {
 pub struct OllamaModelName(pub String);
 
 impl AsRef<str> for OllamaModelName {
-    fn as_ref(&self) -> &str {
-        &self.0
-    }
+    fn as_ref(&self) -> &str { &self.0 }
 }
 
 impl From<String> for OllamaModelName {
-    fn from(value: String) -> Self {
-        Self(value)
-    }
+    fn from(value: String) -> Self { Self(value) }
 }
 
 impl From<OllamaModelName> for String {
-    fn from(value: OllamaModelName) -> Self {
-        value.0
-    }
+    fn from(value: OllamaModelName) -> Self { value.0 }
 }
 
 #[with_fallible_options]
@@ -1078,9 +1072,7 @@ pub enum FormatterList {
 }
 
 impl Default for FormatterList {
-    fn default() -> Self {
-        Self::Single(Formatter::default())
-    }
+    fn default() -> Self { Self::Single(Formatter::default()) }
 }
 
 impl AsRef<[Formatter]> for FormatterList {
@@ -1239,9 +1231,7 @@ impl<'a> IntoIterator for &'a FileTypeMap {
     type Item = (&'a Arc<str>, &'a ExtendingSet<String>);
     type IntoIter = std::collections::hash_map::Iter<'a, Arc<str>, ExtendingSet<String>>;
 
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.iter()
-    }
+    fn into_iter(self) -> Self::IntoIter { self.0.iter() }
 }
 
 /// Determines how indent guides are colored.

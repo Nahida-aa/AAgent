@@ -14,6 +14,7 @@ pub mod command;
 #[cfg(not(target_family = "wasm"))]
 pub mod process;
 pub mod redact;
+pub mod schemars;
 pub mod serde;
 
 pub trait RangeExt<T> {

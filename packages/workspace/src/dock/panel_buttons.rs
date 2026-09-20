@@ -55,9 +55,7 @@ impl PanelButtons {
         Self { dock, all_docks }
     }
 
-    pub fn dock(&self) -> &Entity<Dock> {
-        &self.dock
-    }
+    pub fn dock(&self) -> &Entity<Dock> { &self.dock }
 }
 
 impl StatusItemView for PanelButtons {}

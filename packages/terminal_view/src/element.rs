@@ -128,13 +128,9 @@ impl Element for TerminalElement {
     type RequestLayoutState = ();
     type PrepaintState = ();
 
-    fn id(&self) -> Option<ElementId> {
-        Some(ElementId::Name("aa-terminal".into()))
-    }
+    fn id(&self) -> Option<ElementId> { Some(ElementId::Name("aa-terminal".into())) }
 
-    fn source_location(&self) -> Option<&'static core::panic::Location<'static>> {
-        None
-    }
+    fn source_location(&self) -> Option<&'static core::panic::Location<'static>> { None }
 
     fn request_layout(
         &mut self,
@@ -283,9 +279,7 @@ impl Element for TerminalElement {
 impl IntoElement for TerminalElement {
     type Element = Self;
 
-    fn into_element(self) -> Self::Element {
-        self
-    }
+    fn into_element(self) -> Self::Element { self }
 }
 
 fn is_default_color(c: Color) -> bool {

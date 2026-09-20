@@ -65,9 +65,7 @@ impl Sidebar {
         cx.notify();
     }
 
-    pub fn side(&self) -> SidebarSide {
-        self.side
-    }
+    pub fn side(&self) -> SidebarSide { self.side }
 
     fn toggle_archive(&mut self, cx: &mut Context<Self>) {
         self.show_archive = !self.show_archive;
@@ -211,9 +209,7 @@ impl Render for Sidebar {
 
 // Sidebar entity 实现 workspace::Sidebar trait — 桥接 SidebarHandle dyn object。
 impl SidebarTrait for Sidebar {
-    fn width(&self, _cx: &App) -> gpui::Pixels {
-        self.width
-    }
+    fn width(&self, _cx: &App) -> gpui::Pixels { self.width }
 
     fn set_width(&mut self, width: Option<gpui::Pixels>, _cx: &mut Context<Self>) {
         if let Some(w) = width {
@@ -227,7 +223,5 @@ impl SidebarTrait for Sidebar {
         false // AAgent 暂时没有未读通知机制
     }
 
-    fn side(&self, _cx: &App) -> SidebarSide {
-        self.side
-    }
+    fn side(&self, _cx: &App) -> SidebarSide { self.side }
 }

@@ -9,13 +9,9 @@ pub struct ToolRegistry {
 }
 
 impl ToolRegistry {
-    pub fn new() -> Self {
-        Self { tools: Vec::new() }
-    }
+    pub fn new() -> Self { Self { tools: Vec::new() } }
 
-    pub fn register(&mut self, tool: Arc<dyn Tool>) {
-        self.tools.push(tool);
-    }
+    pub fn register(&mut self, tool: Arc<dyn Tool>) { self.tools.push(tool); }
 
     pub fn find_definition(&self, name: &str) -> Option<ToolDefinition> {
         self.tools
@@ -35,15 +31,9 @@ impl ToolRegistry {
         self.tools.iter().map(|t| t.definition()).collect()
     }
 
-    pub fn all_tools(&self) -> Vec<Arc<dyn Tool>> {
-        self.tools.clone()
-    }
+    pub fn all_tools(&self) -> Vec<Arc<dyn Tool>> { self.tools.clone() }
 
-    pub fn len(&self) -> usize {
-        self.tools.len()
-    }
+    pub fn len(&self) -> usize { self.tools.len() }
 
-    pub fn is_empty(&self) -> bool {
-        self.tools.is_empty()
-    }
+    pub fn is_empty(&self) -> bool { self.tools.is_empty() }
 }

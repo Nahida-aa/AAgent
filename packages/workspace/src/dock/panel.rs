@@ -26,16 +26,12 @@ pub trait Panel: Render + Sized {
     fn default_position(&self, cx: &App) -> DockPosition;
     fn position_is_valid(&self, position: DockPosition) -> bool;
     fn default_size(&self, cx: &App) -> Pixels;
-    fn supports_flexible_size(&self) -> bool {
-        false
-    }
+    fn supports_flexible_size(&self) -> bool { false }
     fn icon(&self, cx: &App) -> IconName;
     fn icon_tooltip(&self, cx: &App) -> &'static str;
     /// 启动时是否自动打开该面板所在 Dock。对齐 zed `Panel::starts_open()`。
     /// Zed: ProjectPanel 默认 true，TerminalPanel 默认 false（settings 可配）。
-    fn starts_open(&self, _cx: &App) -> bool {
-        false
-    }
+    fn starts_open(&self, _cx: &App) -> bool { false }
     /// Dock 开/关 或 active panel 切换时调用。对齐 zed dock.rs:L586-593。
     /// 默认空实现 — 有需要的 panel（如 TerminalPanel）覆盖来 spawn 默认内容。
     fn set_active(&mut self, _active: bool, _cx: &mut Context<Self>) {}
@@ -65,40 +61,20 @@ pub trait PanelHandle: Send + Sync {
 }
 
 impl<T: Panel> PanelHandle for Entity<T> {
-    fn panel_id(&self) -> EntityId {
-        Entity::entity_id(self)
-    }
-    fn persistent_name(&self) -> &'static str {
-        T::persistent_name()
-    }
-    fn panel_key(&self) -> &'static str {
-        T::panel_key()
-    }
-    fn position(&self, cx: &App) -> DockPosition {
-        self.read(cx).default_position(cx)
-    }
+    fn panel_id(&self) -> EntityId { Entity::entity_id(self) }
+    fn persistent_name(&self) -> &'static str { T::persistent_name() }
+    fn panel_key(&self) -> &'static str { T::panel_key() }
+    fn position(&self, cx: &App) -> DockPosition { self.read(cx).default_position(cx) }
     fn position_is_valid(&self, position: DockPosition) -> bool {
         _ = position;
         true
     }
-    fn default_size(&self, cx: &App) -> Pixels {
-        self.read(cx).default_size(cx)
-    }
-    fn supports_flexible_size(&self, cx: &App) -> bool {
-        self.read(cx).supports_flexible_size()
-    }
-    fn icon(&self, cx: &App) -> IconName {
-        self.read(cx).icon(cx)
-    }
-    fn icon_tooltip(&self, cx: &App) -> &'static str {
-        self.read(cx).icon_tooltip(cx)
-    }
-    fn to_any(&self) -> gpui::AnyView {
-        self.clone().into()
-    }
-    fn as_any(&self) -> &dyn std::any::Any {
-        self as &dyn std::any::Any
-    }
+    fn default_size(&self, cx: &App) -> Pixels { self.read(cx).default_size(cx) }
+    fn supports_flexible_size(&self, cx: &App) -> bool { self.read(cx).supports_flexible_size() }
+    fn icon(&self, cx: &App) -> IconName { self.read(cx).icon(cx) }
+    fn icon_tooltip(&self, cx: &App) -> &'static str { self.read(cx).icon_tooltip(cx) }
+    fn to_any(&self) -> gpui::AnyView { self.clone().into() }
+    fn as_any(&self) -> &dyn std::any::Any { self as &dyn std::any::Any }
     fn set_active(&self, active: bool, cx: &mut App) {
         self.update(cx, |panel, cx| panel.set_active(active, cx));
     }
@@ -115,31 +91,17 @@ impl Render for ProjectPanel {
 }
 
 impl Panel for ProjectPanel {
-    fn panel_key() -> &'static str {
-        "project_panel"
-    }
-    fn persistent_name() -> &'static str {
-        "project"
-    }
-    fn default_position(&self, _cx: &App) -> DockPosition {
-        DockPosition::Right
-    }
+    fn panel_key() -> &'static str { "project_panel" }
+    fn persistent_name() -> &'static str { "project" }
+    fn default_position(&self, _cx: &App) -> DockPosition { DockPosition::Right }
     fn position_is_valid(&self, p: DockPosition) -> bool {
         matches!(p, DockPosition::Left | DockPosition::Right)
     }
-    fn default_size(&self, _cx: &App) -> Pixels {
-        px(240.0)
-    }
-    fn icon(&self, _cx: &App) -> IconName {
-        IconName::FileTree
-    }
-    fn icon_tooltip(&self, _cx: &App) -> &'static str {
-        "Project Panel"
-    }
+    fn default_size(&self, _cx: &App) -> Pixels { px(240.0) }
+    fn icon(&self, _cx: &App) -> IconName { IconName::FileTree }
+    fn icon_tooltip(&self, _cx: &App) -> &'static str { "Project Panel" }
     /// 对齐 Zed ProjectPanel — settings 默认 starts_open: true。
-    fn starts_open(&self, _cx: &App) -> bool {
-        true
-    }
+    fn starts_open(&self, _cx: &App) -> bool { true }
 }
 
 // ---------- Git Panel ----------
@@ -153,27 +115,15 @@ impl Render for GitPanel {
 }
 
 impl Panel for GitPanel {
-    fn panel_key() -> &'static str {
-        "git_panel"
-    }
-    fn persistent_name() -> &'static str {
-        "git"
-    }
-    fn default_position(&self, _cx: &App) -> DockPosition {
-        DockPosition::Right
-    }
+    fn panel_key() -> &'static str { "git_panel" }
+    fn persistent_name() -> &'static str { "git" }
+    fn default_position(&self, _cx: &App) -> DockPosition { DockPosition::Right }
     fn position_is_valid(&self, p: DockPosition) -> bool {
         matches!(p, DockPosition::Left | DockPosition::Right)
     }
-    fn default_size(&self, _cx: &App) -> Pixels {
-        px(360.0)
-    }
-    fn icon(&self, _cx: &App) -> IconName {
-        IconName::GitBranch
-    }
-    fn icon_tooltip(&self, _cx: &App) -> &'static str {
-        "Git Panel"
-    }
+    fn default_size(&self, _cx: &App) -> Pixels { px(360.0) }
+    fn icon(&self, _cx: &App) -> IconName { IconName::GitBranch }
+    fn icon_tooltip(&self, _cx: &App) -> &'static str { "Git Panel" }
 }
 
 // ---------- Collab Panel ----------
@@ -187,27 +137,15 @@ impl Render for CollabPanel {
 }
 
 impl Panel for CollabPanel {
-    fn panel_key() -> &'static str {
-        "collab_panel"
-    }
-    fn persistent_name() -> &'static str {
-        "collab"
-    }
-    fn default_position(&self, _cx: &App) -> DockPosition {
-        DockPosition::Right
-    }
+    fn panel_key() -> &'static str { "collab_panel" }
+    fn persistent_name() -> &'static str { "collab" }
+    fn default_position(&self, _cx: &App) -> DockPosition { DockPosition::Right }
     fn position_is_valid(&self, p: DockPosition) -> bool {
         matches!(p, DockPosition::Left | DockPosition::Right)
     }
-    fn default_size(&self, _cx: &App) -> Pixels {
-        px(240.0)
-    }
-    fn icon(&self, _cx: &App) -> IconName {
-        IconName::UserGroup
-    }
-    fn icon_tooltip(&self, _cx: &App) -> &'static str {
-        "Collab Panel"
-    }
+    fn default_size(&self, _cx: &App) -> Pixels { px(240.0) }
+    fn icon(&self, _cx: &App) -> IconName { IconName::UserGroup }
+    fn icon_tooltip(&self, _cx: &App) -> &'static str { "Collab Panel" }
 }
 
 // ---------- Outline Panel ----------
@@ -221,27 +159,15 @@ impl Render for OutlinePanel {
 }
 
 impl Panel for OutlinePanel {
-    fn panel_key() -> &'static str {
-        "outline_panel"
-    }
-    fn persistent_name() -> &'static str {
-        "outline"
-    }
-    fn default_position(&self, _cx: &App) -> DockPosition {
-        DockPosition::Right
-    }
+    fn panel_key() -> &'static str { "outline_panel" }
+    fn persistent_name() -> &'static str { "outline" }
+    fn default_position(&self, _cx: &App) -> DockPosition { DockPosition::Right }
     fn position_is_valid(&self, p: DockPosition) -> bool {
         matches!(p, DockPosition::Left | DockPosition::Right)
     }
-    fn default_size(&self, _cx: &App) -> Pixels {
-        px(300.0)
-    }
-    fn icon(&self, _cx: &App) -> IconName {
-        IconName::ListTree
-    }
-    fn icon_tooltip(&self, _cx: &App) -> &'static str {
-        "Outline Panel"
-    }
+    fn default_size(&self, _cx: &App) -> Pixels { px(300.0) }
+    fn icon(&self, _cx: &App) -> IconName { IconName::ListTree }
+    fn icon_tooltip(&self, _cx: &App) -> &'static str { "Outline Panel" }
 }
 
 // ---------- Agent Panel (flexible) ----------
@@ -255,34 +181,16 @@ impl Render for AgentPanel {
 }
 
 impl Panel for AgentPanel {
-    fn panel_key() -> &'static str {
-        "agent"
-    }
-    fn persistent_name() -> &'static str {
-        "agent"
-    }
-    fn default_position(&self, _cx: &App) -> DockPosition {
-        DockPosition::Left
-    }
-    fn position_is_valid(&self, p: DockPosition) -> bool {
-        p != DockPosition::Bottom
-    }
-    fn default_size(&self, _cx: &App) -> Pixels {
-        px(640.0)
-    }
-    fn supports_flexible_size(&self) -> bool {
-        true
-    }
-    fn icon(&self, _cx: &App) -> IconName {
-        IconName::ZedAssistant
-    }
-    fn icon_tooltip(&self, _cx: &App) -> &'static str {
-        "Agent Panel"
-    }
+    fn panel_key() -> &'static str { "agent" }
+    fn persistent_name() -> &'static str { "agent" }
+    fn default_position(&self, _cx: &App) -> DockPosition { DockPosition::Left }
+    fn position_is_valid(&self, p: DockPosition) -> bool { p != DockPosition::Bottom }
+    fn default_size(&self, _cx: &App) -> Pixels { px(640.0) }
+    fn supports_flexible_size(&self) -> bool { true }
+    fn icon(&self, _cx: &App) -> IconName { IconName::ZedAssistant }
+    fn icon_tooltip(&self, _cx: &App) -> &'static str { "Agent Panel" }
     /// 非 ProjectPanel 一律默认 false，由 settings 配置开启。
-    fn starts_open(&self, _cx: &App) -> bool {
-        false
-    }
+    fn starts_open(&self, _cx: &App) -> bool { false }
 }
 
 // ---------- Terminal Panel ----------
@@ -301,27 +209,13 @@ impl Render for DebugPanel {
 }
 
 impl Panel for DebugPanel {
-    fn panel_key() -> &'static str {
-        "debug"
-    }
-    fn persistent_name() -> &'static str {
-        "debug"
-    }
-    fn default_position(&self, _cx: &App) -> DockPosition {
-        DockPosition::Bottom
-    }
-    fn position_is_valid(&self, _p: DockPosition) -> bool {
-        true
-    }
-    fn default_size(&self, _cx: &App) -> Pixels {
-        px(320.0)
-    }
-    fn icon(&self, _cx: &App) -> IconName {
-        IconName::Debug
-    }
-    fn icon_tooltip(&self, _cx: &App) -> &'static str {
-        "Debug Panel"
-    }
+    fn panel_key() -> &'static str { "debug" }
+    fn persistent_name() -> &'static str { "debug" }
+    fn default_position(&self, _cx: &App) -> DockPosition { DockPosition::Bottom }
+    fn position_is_valid(&self, _p: DockPosition) -> bool { true }
+    fn default_size(&self, _cx: &App) -> Pixels { px(320.0) }
+    fn icon(&self, _cx: &App) -> IconName { IconName::Debug }
+    fn icon_tooltip(&self, _cx: &App) -> &'static str { "Debug Panel" }
 }
 
 // ---------- helper ----------

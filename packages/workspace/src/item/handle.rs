@@ -39,19 +39,13 @@ pub trait ItemHandle {
     // ── Toolbar / Breadcrumbs ──
 
     /// 当前 item 是否要显示 Toolbar（默认 true）。
-    fn show_toolbar(&self, _cx: &App) -> bool {
-        true
-    }
+    fn show_toolbar(&self, _cx: &App) -> bool { true }
 
     /// Breadcrumbs 在 Toolbar 的位置（默认 Hidden — 只有实现了 breadcrumbs 的 item 才显示）。
-    fn breadcrumb_location(&self, _cx: &App) -> ToolbarItemLocation {
-        ToolbarItemLocation::Hidden
-    }
+    fn breadcrumb_location(&self, _cx: &App) -> ToolbarItemLocation { ToolbarItemLocation::Hidden }
 
     /// 返回 breadcrumbs 分段文字 + 可选字体。
-    fn breadcrumbs(&self, _cx: &App) -> Option<(Vec<HighlightedText>, Option<Font>)> {
-        None
-    }
+    fn breadcrumbs(&self, _cx: &App) -> Option<(Vec<HighlightedText>, Option<Font>)> { None }
 
     /// Breadcrumbs 左边的可选前缀元素（如 git 分支图标）。
     fn breadcrumb_prefix(&self, _window: &mut gpui::Window, _cx: &mut App) -> Option<AnyElement> {
@@ -94,19 +88,13 @@ pub trait Item:
     // ── Toolbar / Breadcrumbs 默认实现 ──
 
     /// 当前 item 是否要显示 Toolbar（默认 true）。
-    fn show_toolbar(&self, _cx: &App) -> bool {
-        true
-    }
+    fn show_toolbar(&self, _cx: &App) -> bool { true }
 
     /// Breadcrumbs 在 Toolbar 的位置（默认 Hidden）。
-    fn breadcrumb_location(&self, _cx: &App) -> ToolbarItemLocation {
-        ToolbarItemLocation::Hidden
-    }
+    fn breadcrumb_location(&self, _cx: &App) -> ToolbarItemLocation { ToolbarItemLocation::Hidden }
 
     /// 返回 breadcrumbs 分段文字 + 可选字体。默认 None（不显示 breadcrumbs）。
-    fn breadcrumbs(&self, _cx: &App) -> Option<(Vec<HighlightedText>, Option<Font>)> {
-        None
-    }
+    fn breadcrumbs(&self, _cx: &App) -> Option<(Vec<HighlightedText>, Option<Font>)> { None }
 
     /// Breadcrumbs 左边的可选前缀元素（如 git 分支图标）。
     fn breadcrumb_prefix(
@@ -121,13 +109,9 @@ pub trait Item:
 // ─── WeakEntity<T> → WeakItemHandle ──────────────────────────────────────
 
 impl<T: Item> WeakItemHandle for WeakEntity<T> {
-    fn id(&self) -> EntityId {
-        self.entity_id()
-    }
+    fn id(&self) -> EntityId { self.entity_id() }
 
-    fn boxed_clone(&self) -> Box<dyn WeakItemHandle> {
-        Box::new(self.clone())
-    }
+    fn boxed_clone(&self) -> Box<dyn WeakItemHandle> { Box::new(self.clone()) }
 
     fn upgrade(&self) -> Option<Box<dyn ItemHandle>> {
         self.upgrade().map(|e| Box::new(e) as Box<dyn ItemHandle>)
@@ -137,27 +121,13 @@ impl<T: Item> WeakItemHandle for WeakEntity<T> {
 // ─── Entity<T> → ItemHandle ──────────────────────────────────────────────
 
 impl<T: Item> ItemHandle for Entity<T> {
-    fn tab_label(&self, cx: &App) -> SharedString {
-        self.read(cx).tab_label(cx)
-    }
-    fn tab_icon(&self, cx: &App) -> IconName {
-        self.read(cx).tab_icon(cx)
-    }
-    fn item_id(&self) -> EntityId {
-        self.entity_id()
-    }
-    fn item_focus_handle(&self, cx: &App) -> FocusHandle {
-        self.read(cx).focus_handle(cx)
-    }
-    fn render_content(&self, cx: &App) -> AnyElement {
-        self.clone().into_any_element()
-    }
-    fn boxed_clone(&self) -> Box<dyn ItemHandle> {
-        Box::new(self.clone())
-    }
-    fn downgrade_item(&self) -> Box<dyn WeakItemHandle> {
-        Box::new(self.downgrade())
-    }
+    fn tab_label(&self, cx: &App) -> SharedString { self.read(cx).tab_label(cx) }
+    fn tab_icon(&self, cx: &App) -> IconName { self.read(cx).tab_icon(cx) }
+    fn item_id(&self) -> EntityId { self.entity_id() }
+    fn item_focus_handle(&self, cx: &App) -> FocusHandle { self.read(cx).focus_handle(cx) }
+    fn render_content(&self, cx: &App) -> AnyElement { self.clone().into_any_element() }
+    fn boxed_clone(&self) -> Box<dyn ItemHandle> { Box::new(self.clone()) }
+    fn downgrade_item(&self) -> Box<dyn WeakItemHandle> { Box::new(self.downgrade()) }
 
     fn breadcrumb_location(&self, cx: &App) -> ToolbarItemLocation {
         self.read(cx).breadcrumb_location(cx)

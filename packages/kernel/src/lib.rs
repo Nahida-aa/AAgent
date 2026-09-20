@@ -18,13 +18,9 @@ pub struct Kernel {
 }
 
 impl Kernel {
-    pub fn builder() -> KernelBuilder {
-        KernelBuilder::default()
-    }
+    pub fn builder() -> KernelBuilder { KernelBuilder::default() }
 
-    pub fn tool_providers(&self) -> &[Arc<dyn ToolProvider>] {
-        &self.providers
-    }
+    pub fn tool_providers(&self) -> &[Arc<dyn ToolProvider>] { &self.providers }
 
     pub fn build_tool_registry(&self, scope: &ToolProviderScope<'_>) -> ToolRegistry {
         let mut registry = ToolRegistry::new();

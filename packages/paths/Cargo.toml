@@ -1,0 +1,11 @@
+[package]
+name = "paths"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+const_format.workspace = true
+dirs.workspace = true
+ignore.workspace = true
+util.workspace = true

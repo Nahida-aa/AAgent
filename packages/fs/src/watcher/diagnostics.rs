@@ -176,9 +176,7 @@ impl WatchRecording {
 }
 
 impl Default for WatchRecording {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 fn unix_millis() -> u128 {

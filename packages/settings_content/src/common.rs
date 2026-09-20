@@ -64,15 +64,11 @@ pub enum ParseStatus {
 pub struct DelayMs(pub u64);
 
 impl From<u64> for DelayMs {
-    fn from(n: u64) -> Self {
-        Self(n)
-    }
+    fn from(n: u64) -> Self { Self(n) }
 }
 
 impl std::fmt::Display for DelayMs {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}ms", self.0)
-    }
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{}ms", self.0) }
 }
 
 impl std::str::FromStr for DelayMs {
@@ -100,20 +96,14 @@ impl std::str::FromStr for DelayMs {
 pub struct ExtendingVec<T>(pub Vec<T>);
 
 impl<T> Into<Vec<T>> for ExtendingVec<T> {
-    fn into(self) -> Vec<T> {
-        self.0
-    }
+    fn into(self) -> Vec<T> { self.0 }
 }
 impl<T> From<Vec<T>> for ExtendingVec<T> {
-    fn from(vec: Vec<T>) -> Self {
-        ExtendingVec(vec)
-    }
+    fn from(vec: Vec<T>) -> Self { ExtendingVec(vec) }
 }
 
 impl<T: Clone> merge_from::MergeFrom for ExtendingVec<T> {
-    fn merge_from(&mut self, other: &Self) {
-        self.0.extend_from_slice(other.0.as_slice());
-    }
+    fn merge_from(&mut self, other: &Self) { self.0.extend_from_slice(other.0.as_slice()); }
 }
 
 // A SplicingVec in the settings replaces the value it merges over, except that
@@ -134,9 +124,7 @@ impl SplicingVec {
 }
 
 impl From<Vec<String>> for SplicingVec {
-    fn from(vec: Vec<String>) -> Self {
-        SplicingVec(vec)
-    }
+    fn from(vec: Vec<String>) -> Self { SplicingVec(vec) }
 }
 
 impl merge_from::MergeFrom for SplicingVec {
@@ -168,15 +156,11 @@ impl merge_from::MergeFrom for SplicingVec {
 pub struct ExtendingSet<T: std::hash::Hash + Eq>(pub IndexSet<T>);
 
 impl<T: std::hash::Hash + Eq> From<Vec<T>> for ExtendingSet<T> {
-    fn from(vec: Vec<T>) -> Self {
-        ExtendingSet(vec.into_iter().collect())
-    }
+    fn from(vec: Vec<T>) -> Self { ExtendingSet(vec.into_iter().collect()) }
 }
 
 impl<T: Clone + std::hash::Hash + Eq> merge_from::MergeFrom for ExtendingSet<T> {
-    fn merge_from(&mut self, other: &Self) {
-        self.0.extend(other.0.iter().cloned());
-    }
+    fn merge_from(&mut self, other: &Self) { self.0.extend(other.0.iter().cloned()); }
 }
 
 // A SaturatingBool in the settings can only ever be set to true,
@@ -187,21 +171,15 @@ impl<T: Clone + std::hash::Hash + Eq> merge_from::MergeFrom for ExtendingSet<T> 
 pub struct SaturatingBool(pub bool);
 
 impl From<bool> for SaturatingBool {
-    fn from(value: bool) -> Self {
-        SaturatingBool(value)
-    }
+    fn from(value: bool) -> Self { SaturatingBool(value) }
 }
 
 impl From<SaturatingBool> for bool {
-    fn from(value: SaturatingBool) -> bool {
-        value.0
-    }
+    fn from(value: SaturatingBool) -> bool { value.0 }
 }
 
 impl merge_from::MergeFrom for SaturatingBool {
-    fn merge_from(&mut self, other: &Self) {
-        self.0 |= other.0
-    }
+    fn merge_from(&mut self, other: &Self) { self.0 |= other.0 }
 }
 
 // ---------- Language server capability toggles ----------
@@ -210,8 +188,19 @@ impl merge_from::MergeFrom for SaturatingBool {
 ///
 /// 对齐 Zed `crates/settings_content/src/workspace.rs:1120`。
 #[derive(
-    Debug, PartialEq, Eq, Clone, Copy, Default, Serialize, Deserialize, JsonSchema, MergeFrom,
-    strum::VariantArray, strum::VariantNames, strum::EnumMessage,
+    Debug,
+    PartialEq,
+    Eq,
+    Clone,
+    Copy,
+    Default,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    MergeFrom,
+    strum::VariantArray,
+    strum::VariantNames,
+    strum::EnumMessage,
 )]
 #[serde(rename_all = "snake_case")]
 pub enum SemanticTokens {
@@ -226,14 +215,10 @@ pub enum SemanticTokens {
 
 impl SemanticTokens {
     /// Returns true if semantic tokens should be requested from language servers.
-    pub fn enabled(&self) -> bool {
-        self != &Self::Off
-    }
+    pub fn enabled(&self) -> bool { self != &Self::Off }
 
     /// Returns true if tree-sitter syntax highlighting should be used.
-    pub fn use_tree_sitter(&self) -> bool {
-        self != &Self::Full
-    }
+    pub fn use_tree_sitter(&self) -> bool { self != &Self::Full }
 }
 
 /// Controls whether folding ranges from language servers are used instead of
@@ -241,8 +226,18 @@ impl SemanticTokens {
 ///
 /// 对齐 Zed `crates/settings_content/src/workspace.rs:1158`。
 #[derive(
-    Debug, PartialEq, Eq, Clone, Copy, Default, Serialize, Deserialize, JsonSchema, MergeFrom,
-    strum::VariantArray, strum::VariantNames,
+    Debug,
+    PartialEq,
+    Eq,
+    Clone,
+    Copy,
+    Default,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    MergeFrom,
+    strum::VariantArray,
+    strum::VariantNames,
 )]
 #[serde(rename_all = "snake_case")]
 pub enum DocumentFoldingRanges {
@@ -254,17 +249,25 @@ pub enum DocumentFoldingRanges {
 }
 
 impl DocumentFoldingRanges {
-    pub fn enabled(&self) -> bool {
-        self != &Self::Off
-    }
+    pub fn enabled(&self) -> bool { self != &Self::Off }
 }
 
 /// Controls the source of document symbols used for outlines and breadcrumbs.
 ///
 /// 对齐 Zed `crates/settings_content/src/workspace.rs:1188`。
 #[derive(
-    Debug, PartialEq, Eq, Clone, Copy, Default, Serialize, Deserialize, JsonSchema, MergeFrom,
-    strum::VariantArray, strum::VariantNames,
+    Debug,
+    PartialEq,
+    Eq,
+    Clone,
+    Copy,
+    Default,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    MergeFrom,
+    strum::VariantArray,
+    strum::VariantNames,
 )]
 #[serde(rename_all = "snake_case")]
 pub enum DocumentSymbols {
@@ -278,7 +281,5 @@ pub enum DocumentSymbols {
 }
 
 impl DocumentSymbols {
-    pub fn lsp_enabled(&self) -> bool {
-        self == &Self::On
-    }
+    pub fn lsp_enabled(&self) -> bool { self == &Self::On }
 }

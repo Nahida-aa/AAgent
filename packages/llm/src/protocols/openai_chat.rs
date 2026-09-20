@@ -50,9 +50,7 @@ impl OpenAiCompatibleProvider {
 
 #[async_trait]
 impl ModelProvider for OpenAiCompatibleProvider {
-    fn id(&self) -> ProviderId {
-        ProviderId("openai-compatible".into())
-    }
+    fn id(&self) -> ProviderId { ProviderId("openai-compatible".into()) }
 
     async fn chat(&self, request: ModelRequest) -> Result<ModelResponse, ModelError> {
         let body = build_request(&request, &self.config, false);

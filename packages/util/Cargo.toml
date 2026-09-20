@@ -22,3 +22,8 @@ percent-encoding.workspace = true
 smol.workspace = true
 libc.workspace = true
 gpui_util.workspace = true
+schemars.workspace = true
+serde_json.workspace = true
+
+[target.'cfg(target_os = "macos")'.dependencies]
+mach2.workspace = true

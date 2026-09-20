@@ -28,10 +28,7 @@ pub use toolbar::TerminalToolbarContent;
 use serde::{Deserialize, Serialize};
 use settings_macros::{MergeFrom, with_fallible_options};
 
-use crate::{
-    FontFamilyName, FontSize, FontWeightContent,
-    theme::font::FontFeaturesContent,
-};
+use crate::{FontFamilyName, FontSize, FontWeightContent, theme::font::FontFeaturesContent};
 
 /// Terminal settings 顶层 — 被 `#[serde(flatten)]` 内嵌 project 级设置。
 ///

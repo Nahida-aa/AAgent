@@ -51,14 +51,10 @@ impl Rope {
     }
 
     /// 总字节数。
-    pub fn len(&self) -> usize {
-        self.chunks.summary().text.len
-    }
+    pub fn len(&self) -> usize { self.chunks.summary().text.len }
 
     /// 总字符数。
-    pub fn char_count(&self) -> usize {
-        self.chunks.summary().text.chars
-    }
+    pub fn char_count(&self) -> usize { self.chunks.summary().text.chars }
 
     /// 总行数。
     pub fn line_count(&self) -> usize {
@@ -67,9 +63,7 @@ impl Rope {
     }
 
     /// 是否空。
-    pub fn is_empty(&self) -> bool {
-        self.chunks.is_empty()
-    }
+    pub fn is_empty(&self) -> bool { self.chunks.is_empty() }
 
     /// 转成 String（遍历所有 chunk）。
     pub fn to_string(&self) -> String {

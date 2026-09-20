@@ -18,9 +18,7 @@ pub struct InlineAssistTabBarButton {
 }
 
 impl InlineAssistTabBarButton {
-    pub fn new(focus_handle: FocusHandle) -> Self {
-        Self { focus_handle }
-    }
+    pub fn new(focus_handle: FocusHandle) -> Self { Self { focus_handle } }
 }
 
 impl RenderOnce for InlineAssistTabBarButton {

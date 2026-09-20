@@ -91,9 +91,7 @@ impl AgentPanel {
         self.new_thread_menu_open = !self.new_thread_menu_open;
     }
 
-    pub fn is_agent_selected(&self, agent: &Agent) -> bool {
-        &self.selected_agent == agent
-    }
+    pub fn is_agent_selected(&self, agent: &Agent) -> bool { &self.selected_agent == agent }
 
     /// Placeholder "send": emits the editor text, clears, refocuses the editor.
     fn send(&mut self, window: &mut Window, cx: &mut Context<Self>) {
@@ -478,7 +476,5 @@ impl Render for AgentPanel {
 }
 
 impl Focusable for AgentPanel {
-    fn focus_handle(&self, _: &App) -> FocusHandle {
-        self.focus_handle.clone()
-    }
+    fn focus_handle(&self, _: &App) -> FocusHandle { self.focus_handle.clone() }
 }

@@ -47,9 +47,7 @@ impl TerminalView {
         }
     }
 
-    pub fn backend(&self) -> &AlacrittyBackend {
-        &self.backend
-    }
+    pub fn backend(&self) -> &AlacrittyBackend { &self.backend }
 
     fn on_key(&mut self, event: &KeyDownEvent, _window: &mut Window, cx: &mut Context<Self>) {
         let mut bytes: Vec<u8> = Vec::new();
@@ -110,9 +108,7 @@ impl TerminalView {
 impl EventEmitter<()> for TerminalView {}
 
 impl Focusable for TerminalView {
-    fn focus_handle(&self, _: &App) -> FocusHandle {
-        self.focus_handle.clone()
-    }
+    fn focus_handle(&self, _: &App) -> FocusHandle { self.focus_handle.clone() }
 }
 
 impl Render for TerminalView {

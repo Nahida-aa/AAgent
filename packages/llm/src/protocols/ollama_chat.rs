@@ -45,9 +45,7 @@ impl OllamaProvider {
 
 #[async_trait]
 impl ModelProvider for OllamaProvider {
-    fn id(&self) -> ProviderId {
-        ProviderId("ollama".into())
-    }
+    fn id(&self) -> ProviderId { ProviderId("ollama".into()) }
 
     async fn chat(&self, request: ModelRequest) -> Result<ModelResponse, ModelError> {
         let body = build_request(&request, &self.config, false);

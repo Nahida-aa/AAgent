@@ -35,7 +35,5 @@ pub trait Sidebar: Render + Sized {
 
     /// 是否显示 thread list view（vs archive view）。
     /// 默认 true — archive 视图切换由 toggle_archive 内部管理。
-    fn is_threads_list_view_active(&self) -> bool {
-        true
-    }
+    fn is_threads_list_view_active(&self) -> bool { true }
 }

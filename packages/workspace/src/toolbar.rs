@@ -124,9 +124,7 @@ impl Toolbar {
         }
     }
 
-    pub fn hidden(&self) -> bool {
-        self.hidden
-    }
+    pub fn hidden(&self) -> bool { self.hidden }
 
     /// 注册一个 ToolbarItemView。
     ///
@@ -207,9 +205,7 @@ impl Toolbar {
 }
 
 impl Default for Toolbar {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 // ---------- Render ----------
@@ -264,13 +260,9 @@ impl Render for Toolbar {
 // ---------- ToolbarItemViewHandle impl for Entity<T> ----------
 
 impl<T: ToolbarItemView> ToolbarItemViewHandle for Entity<T> {
-    fn id(&self) -> EntityId {
-        self.entity_id()
-    }
+    fn id(&self) -> EntityId { self.entity_id() }
 
-    fn to_any(&self) -> AnyView {
-        self.clone().into()
-    }
+    fn to_any(&self) -> AnyView { self.clone().into() }
 
     fn set_active_pane_item(
         &self,

@@ -71,9 +71,7 @@ struct WasmExtension {
 
 #[async_trait::async_trait]
 impl Extension for WasmExtension {
-    fn id(&self) -> &str {
-        &self.plugin_id
-    }
+    fn id(&self) -> &str { &self.plugin_id }
 
     fn register(&self, reg: &mut Registrar) {
         for tool_val in &self.tools {
@@ -98,9 +96,7 @@ impl Extension for WasmExtension {
         }
     }
 
-    async fn start(&self, _ctx: ExtensionCtx) -> Result<(), ExtensionError> {
-        Ok(())
-    }
+    async fn start(&self, _ctx: ExtensionCtx) -> Result<(), ExtensionError> { Ok(()) }
 
     async fn stop(&self, _reason: aa_core::extension::StopReason) -> Result<(), ExtensionError> {
         Ok(())

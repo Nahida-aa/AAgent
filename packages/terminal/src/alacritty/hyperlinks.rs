@@ -48,9 +48,7 @@ impl From<(String, bool, Match)> for HyperlinkMatch {
 }
 
 impl Default for RegexSearches {
-    fn default() -> Self {
-        Self::new(Vec::<String>::new(), Duration::ZERO)
-    }
+    fn default() -> Self { Self::new(Vec::<String>::new(), Duration::ZERO) }
 }
 
 impl RegexSearches {

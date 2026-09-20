@@ -39,9 +39,7 @@ struct Listener {
 }
 
 impl EventListener for Listener {
-    fn send_event(&self, event: AlacTermEvent) {
-        self.events.lock().push(event);
-    }
+    fn send_event(&self, event: AlacTermEvent) { self.events.lock().push(event); }
 }
 
 /// The alacritty emulator + PTY behind a session.
@@ -143,13 +141,9 @@ impl AlacrittyBackend {
         let _ = self.pty_tx.send(Msg::Resize(bounds.window_size()));
     }
 
-    pub fn has_events(&self) -> bool {
-        !self.events.lock().is_empty()
-    }
+    pub fn has_events(&self) -> bool { !self.events.lock().is_empty() }
 
-    pub fn drain_events(&self) {
-        self.events.lock().clear();
-    }
+    pub fn drain_events(&self) { self.events.lock().clear(); }
 
     pub fn write_input(&self, bytes: &[u8]) {
         let _ = self.pty_tx.send(Msg::Input(bytes.to_vec().into()));

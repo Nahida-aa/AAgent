@@ -43,17 +43,11 @@ impl Chunk {
         }
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.text.is_empty()
-    }
+    pub fn is_empty(&self) -> bool { self.text.is_empty() }
 
-    pub fn as_str(&self) -> &str {
-        &self.text
-    }
+    pub fn as_str(&self) -> &str { &self.text }
 
-    pub fn len(&self) -> usize {
-        self.text.len()
-    }
+    pub fn len(&self) -> usize { self.text.len() }
 }
 
 // ---------- TextSummary ----------
@@ -112,13 +106,9 @@ pub struct ChunkSummary {
 }
 
 impl ContextLessSummary for ChunkSummary {
-    fn zero() -> Self {
-        Default::default()
-    }
+    fn zero() -> Self { Default::default() }
 
-    fn add_summary(&mut self, other: &Self) {
-        self.text += &other.text;
-    }
+    fn add_summary(&mut self, other: &Self) { self.text += &other.text; }
 }
 
 impl Item for Chunk {
@@ -133,9 +123,7 @@ impl Item for Chunk {
 
 /// 让 TextSummary 可以作为维度（按字节 offset 导航）
 impl<'a> Dimension<'a, ChunkSummary> for TextSummary {
-    fn zero(_cx: <ChunkSummary as Summary>::Context<'_>) -> Self {
-        Default::default()
-    }
+    fn zero(_cx: <ChunkSummary as Summary>::Context<'_>) -> Self { Default::default() }
 
     fn add_summary(
         &mut self,
@@ -148,9 +136,7 @@ impl<'a> Dimension<'a, ChunkSummary> for TextSummary {
 
 /// 让 usize 可以作为维度（按字节数导航）
 impl<'a> Dimension<'a, ChunkSummary> for usize {
-    fn zero(_cx: <ChunkSummary as Summary>::Context<'_>) -> Self {
-        0
-    }
+    fn zero(_cx: <ChunkSummary as Summary>::Context<'_>) -> Self { 0 }
 
     fn add_summary(
         &mut self,

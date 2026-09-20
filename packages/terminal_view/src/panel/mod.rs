@@ -62,9 +62,7 @@ impl TerminalPanel {
         panel
     }
 
-    fn has_no_terminals(&self, cx: &App) -> bool {
-        self.active_pane.read(cx).items().is_empty()
-    }
+    fn has_no_terminals(&self, cx: &App) -> bool { self.active_pane.read(cx).items().is_empty() }
 
     fn handle_pane_event(
         &mut self,
@@ -92,9 +90,7 @@ impl TerminalPanel {
     }
 
     /// 创建一个新的 TerminalView 加进 active_pane。
-    pub fn new_terminal(&mut self, cx: &mut Context<Self>) {
-        self.spawn_default_terminal(cx);
-    }
+    pub fn new_terminal(&mut self, cx: &mut Context<Self>) { self.spawn_default_terminal(cx); }
 
     fn spawn_default_terminal(&mut self, cx: &mut Context<Self>) {
         let working_dir = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
@@ -149,34 +145,22 @@ impl Render for TerminalPanel {
 }
 
 impl Panel for TerminalPanel {
-    fn panel_key() -> &'static str {
-        "terminal"
-    }
+    fn panel_key() -> &'static str { "terminal" }
 
-    fn persistent_name() -> &'static str {
-        "terminal"
-    }
+    fn persistent_name() -> &'static str { "terminal" }
 
-    fn default_position(&self, _cx: &App) -> DockPosition {
-        DockPosition::Bottom
-    }
+    fn default_position(&self, _cx: &App) -> DockPosition { DockPosition::Bottom }
 
     fn position_is_valid(&self, _position: DockPosition) -> bool {
         // Terminal 可以在任何 dock 位置（Zed 里 Terminal/Debug 都这样）
         true
     }
 
-    fn default_size(&self, _cx: &App) -> gpui::Pixels {
-        px(320.0)
-    }
+    fn default_size(&self, _cx: &App) -> gpui::Pixels { px(320.0) }
 
-    fn icon(&self, _cx: &App) -> IconName {
-        IconName::TerminalAlt
-    }
+    fn icon(&self, _cx: &App) -> IconName { IconName::TerminalAlt }
 
-    fn icon_tooltip(&self, _cx: &App) -> &'static str {
-        "Terminal Panel"
-    }
+    fn icon_tooltip(&self, _cx: &App) -> &'static str { "Terminal Panel" }
 
     /// 对齐 zed terminal_panel.rs:L1745-1761 — active 且 pane 空 → spawn 默认 shell
     fn set_active(&mut self, active: bool, cx: &mut Context<Self>) {
@@ -188,7 +172,5 @@ impl Panel for TerminalPanel {
 
     /// 对齐 Zed TerminalPanel — 从 settings 读，默认 false。
     /// 现在还没 settings 系统，先硬编码 false。
-    fn starts_open(&self, _cx: &App) -> bool {
-        false
-    }
+    fn starts_open(&self, _cx: &App) -> bool { false }
 }

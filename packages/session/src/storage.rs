@@ -29,9 +29,7 @@ pub fn data_dir() -> PathBuf {
     }
 }
 
-fn session_path(session_id: &str) -> PathBuf {
-    data_dir().join(format!("{session_id}.json"))
-}
+fn session_path(session_id: &str) -> PathBuf { data_dir().join(format!("{session_id}.json")) }
 
 /// Save (or update) a session file.
 pub fn save(

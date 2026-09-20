@@ -40,6 +40,4 @@ fn test_wasm_plugin_load_and_execute() {
 }
 
 /// 测试 WAT 组件源码，用于内联测试。
-fn test_wasm_component() -> &'static str {
-    include_str!("test_wasm_plugin.wat")
-}
+fn test_wasm_component() -> &'static str { include_str!("test_wasm_plugin.wat") }

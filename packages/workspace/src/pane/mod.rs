@@ -171,37 +171,23 @@ impl Pane {
 
     /// ReopenClosedItem — 弹出最近关闭的 tab（目前只返回 EntityId，
     /// 真正的 "重新加回 Pane" 逻辑由 Workspace 或 Panel 消费）。
-    pub fn pop_closed(&mut self) -> Option<EntityId> {
-        self.nav_history.pop_closed()
-    }
+    pub fn pop_closed(&mut self) -> Option<EntityId> { self.nav_history.pop_closed() }
 
-    pub fn can_go_back(&self) -> bool {
-        self.nav_history.can_go_back()
-    }
+    pub fn can_go_back(&self) -> bool { self.nav_history.can_go_back() }
 
-    pub fn can_go_forward(&self) -> bool {
-        self.nav_history.can_go_forward()
-    }
+    pub fn can_go_forward(&self) -> bool { self.nav_history.can_go_forward() }
 
-    pub fn items(&self) -> &[Box<dyn ItemHandle>] {
-        &self.items
-    }
+    pub fn items(&self) -> &[Box<dyn ItemHandle>] { &self.items }
 
-    pub fn active_item_index(&self) -> usize {
-        self.active_item_index
-    }
+    pub fn active_item_index(&self) -> usize { self.active_item_index }
 
-    pub fn is_empty(&self) -> bool {
-        self.items.is_empty()
-    }
+    pub fn is_empty(&self) -> bool { self.items.is_empty() }
 }
 
 impl EventEmitter<Event> for Pane {}
 
 impl Focusable for Pane {
-    fn focus_handle(&self, _: &App) -> FocusHandle {
-        self.focus_handle.clone()
-    }
+    fn focus_handle(&self, _: &App) -> FocusHandle { self.focus_handle.clone() }
 }
 
 impl Render for Pane {

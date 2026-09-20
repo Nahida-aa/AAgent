@@ -32,9 +32,7 @@ pub const TAG_ID_LEN: usize = 4;
 const BASE64_URL_SAFE_ALPHABET: &[u8; 64] =
     b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
-pub fn marker_tag(id: &str) -> String {
-    format!("{MARKER_TAG_PREFIX}{id}{MARKER_TAG_SUFFIX}")
-}
+pub fn marker_tag(id: &str) -> String { format!("{MARKER_TAG_PREFIX}{id}{MARKER_TAG_SUFFIX}") }
 
 /// Marker tags assigned to one contiguous snippet of context.
 #[derive(Debug, Clone)]

@@ -39,9 +39,7 @@ impl ProviderKind {
     }
 
     /// 构建可分享给多任务的 provider 实例。
-    pub fn build_arc(&self) -> Arc<dyn ModelProvider> {
-        Arc::from(self.build())
-    }
+    pub fn build_arc(&self) -> Arc<dyn ModelProvider> { Arc::from(self.build()) }
 
     /// 本地 Ollama。
     pub fn ollama(base_url: impl Into<String>, default_model: impl Into<String>) -> Self {
@@ -81,9 +79,7 @@ impl Provider {
         }
     }
 
-    pub fn build(&self) -> Box<dyn ModelProvider> {
-        self.kind.build()
-    }
+    pub fn build(&self) -> Box<dyn ModelProvider> { self.kind.build() }
 }
 
 /// 内置厂商 profile(都走 openai-compatible 协议)。
@@ -121,9 +117,7 @@ pub struct ProviderRegistry {
 }
 
 impl ProviderRegistry {
-    pub fn new() -> Self {
-        Self::default()
-    }
+    pub fn new() -> Self { Self::default() }
 
     /// 注册一种 provider,id 取自 `ProviderKind::kind_id()`。
     pub fn register(&mut self, kind: ProviderKind) -> &mut Self {
@@ -142,11 +136,7 @@ impl ProviderRegistry {
     }
 
     /// 取出可分享的 provider 实例。
-    pub fn get_arc(&self, id: &str) -> Option<Arc<dyn ModelProvider>> {
-        self.map.get(id).cloned()
-    }
+    pub fn get_arc(&self, id: &str) -> Option<Arc<dyn ModelProvider>> { self.map.get(id).cloned() }
 
-    pub fn ids(&self) -> impl Iterator<Item = &str> {
-        self.map.keys().map(|s| s.as_str())
-    }
+    pub fn ids(&self) -> impl Iterator<Item = &str> { self.map.keys().map(|s| s.as_str()) }
 }

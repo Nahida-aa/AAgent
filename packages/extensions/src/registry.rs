@@ -54,9 +54,7 @@ impl ExtensionRegistry {
     }
 
     /// 获取扩展 ID 列表。
-    pub fn ids(&self) -> Vec<&str> {
-        self.entries.iter().map(|e| e.ext.id()).collect()
-    }
+    pub fn ids(&self) -> Vec<&str> { self.entries.iter().map(|e| e.ext.id()).collect() }
 
     /// 获取指定扩展的引用。
     pub fn get_by_id(&self, id: &str) -> Option<&Box<dyn Extension>> {
@@ -102,7 +100,5 @@ impl ExtensionRegistry {
 }
 
 impl Default for ExtensionRegistry {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }

@@ -131,13 +131,9 @@ impl NavHistory {
         self.closed_stack.pop_back().map(|e| e.entity_id)
     }
 
-    pub fn can_go_back(&self) -> bool {
-        !self.backward_stack.is_empty()
-    }
+    pub fn can_go_back(&self) -> bool { !self.backward_stack.is_empty() }
 
-    pub fn can_go_forward(&self) -> bool {
-        !self.forward_stack.is_empty()
-    }
+    pub fn can_go_forward(&self) -> bool { !self.forward_stack.is_empty() }
 
     pub fn clear(&mut self) {
         self.backward_stack.clear();
@@ -147,7 +143,5 @@ impl NavHistory {
 }
 
 impl Default for NavHistory {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }

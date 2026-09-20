@@ -23,9 +23,7 @@ impl ProcessIdGetter {
         }
     }
 
-    pub fn fallback_pid(&self) -> Pid {
-        Pid::from_u32(self.fallback_pid)
-    }
+    pub fn fallback_pid(&self) -> Pid { Pid::from_u32(self.fallback_pid) }
 }
 
 #[cfg(unix)]
@@ -114,9 +112,7 @@ impl PtyProcessInfo {
         }
     }
 
-    pub(crate) fn pid_getter(&self) -> &ProcessIdGetter {
-        &self.pid_getter
-    }
+    pub(crate) fn pid_getter(&self) -> &ProcessIdGetter { &self.pid_getter }
 
     fn refresh(&self) -> Option<MappedRwLockReadGuard<'_, Process>> {
         let pid = self.pid_getter.pid()?;
@@ -170,9 +166,7 @@ impl PtyProcessInfo {
     }
 
     #[cfg(not(unix))]
-    pub(crate) fn terminate_child_process(&self) -> bool {
-        false
-    }
+    pub(crate) fn terminate_child_process(&self) -> bool { false }
 
     fn load(&self) -> Option<ProcessInfo> {
         let process = self.refresh()?;
@@ -192,9 +186,7 @@ impl PtyProcessInfo {
     }
 
     #[cfg(all(test, unix))]
-    pub(crate) fn load_for_test(&self) -> Option<ProcessInfo> {
-        self.load()
-    }
+    pub(crate) fn load_for_test(&self) -> Option<ProcessInfo> { self.load() }
 
     /// Updates the cached process info, emitting a [`Event::TitleChanged`] event if the Zed-relevant info has changed
     pub(crate) fn emit_title_changed_if_changed(self: &Arc<Self>, cx: &mut Context<'_, Terminal>) {
@@ -238,9 +230,7 @@ impl PtyProcessInfo {
         }));
     }
 
-    pub(crate) fn pid(&self) -> Option<Pid> {
-        self.pid_getter.pid()
-    }
+    pub(crate) fn pid(&self) -> Option<Pid> { self.pid_getter.pid() }
 }
 
 #[cfg(all(test, unix))]

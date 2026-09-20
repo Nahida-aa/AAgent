@@ -37,9 +37,7 @@ impl Breadcrumbs {
     }
 }
 impl Default for Breadcrumbs {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 impl EventEmitter<ToolbarItemEvent> for Breadcrumbs {}

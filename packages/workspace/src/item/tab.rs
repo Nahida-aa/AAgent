@@ -63,7 +63,5 @@ pub enum ItemBufferKind {
 }
 
 impl Default for ItemBufferKind {
-    fn default() -> Self {
-        Self::None
-    }
+    fn default() -> Self { Self::None }
 }

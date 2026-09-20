@@ -25,11 +25,7 @@ pub use aa_core::event::ExtensionEvent;
 
 // ─── 辅助宏 ───────────────────────────────────────────────────────────
 /// 快速创建一个 ToolResult::text。
-pub fn text_result(content: impl Into<String>) -> ToolResult {
-    ToolResult::text(content)
-}
+pub fn text_result(content: impl Into<String>) -> ToolResult { ToolResult::text(content) }
 
 /// 快速创建一个 ToolResult::error。
-pub fn error_result(content: impl Into<String>) -> ToolResult {
-    ToolResult::error(content)
-}
+pub fn error_result(content: impl Into<String>) -> ToolResult { ToolResult::error(content) }

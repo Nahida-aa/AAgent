@@ -20,7 +20,9 @@ mod profile;
 mod sandbox;
 mod sidebar;
 
-pub use agent_server::{AgentConfigOptionValue, AllAgentServersSettings, CustomAgentServerSettings};
+pub use agent_server::{
+    AgentConfigOptionValue, AllAgentServersSettings, CustomAgentServerSettings,
+};
 pub use model_selection::LanguageModelSelection;
 pub use sidebar::{SidebarDockPosition, SidebarSide};
 mod thinking;

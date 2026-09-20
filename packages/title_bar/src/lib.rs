@@ -452,9 +452,7 @@ impl TitleBar {
 }
 
 impl Focusable for TitleBar {
-    fn focus_handle(&self, _: &App) -> FocusHandle {
-        self.focus_handle.clone()
-    }
+    fn focus_handle(&self, _: &App) -> FocusHandle { self.focus_handle.clone() }
 }
 
 impl Render for TitleBar {

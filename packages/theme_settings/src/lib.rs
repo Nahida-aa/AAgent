@@ -20,12 +20,8 @@ use gpui::{App, AssetSource, Result, SharedString};
 struct GlobalAssets(Arc<dyn AssetSource>);
 
 impl AssetSource for GlobalAssets {
-    fn load(&self, path: &str) -> Result<Option<Cow<'static, [u8]>>> {
-        self.0.load(path)
-    }
-    fn list(&self, path: &str) -> Result<Vec<SharedString>> {
-        self.0.list(path)
-    }
+    fn load(&self, path: &str) -> Result<Option<Cow<'static, [u8]>>> { self.0.load(path) }
+    fn list(&self, path: &str) -> Result<Vec<SharedString>> { self.0.list(path) }
 }
 
 /// 安装主题系统（应用启动时调用一次）。

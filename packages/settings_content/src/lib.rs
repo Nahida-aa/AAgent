@@ -26,6 +26,7 @@ mod ui;
 pub use action::{ActionName, ActionWithArguments, CommandAliasTarget};
 use collections::{HashMap, IndexMap};
 pub use language::*;
+pub use project::SemanticTokenRules;
 pub use serde_helper::{
     serialize_f32_with_two_decimal_places, serialize_optional_f32_with_two_decimal_places,
 };
@@ -62,7 +63,6 @@ pub use theme::{
 mod editor;
 use editor::{CenteredPaddingSettings, InactiveOpacity};
 
-pub use ui::DockPosition;
 mod common;
 mod macros;
 mod overrides;
@@ -70,7 +70,6 @@ mod profiles;
 mod workspace;
 use crate::{
     agent::{AgentSettingsContent, AllAgentServersSettings},
-    common::ParseStatus,
     contents::{
         AudioSettingsContent, BaseKeymapContent, CallHierarchySettingsContent, CallSettingsContent,
         CommandPaletteSettingsContent, DebuggerSettingsContent, FileFinderSettingsContent,
@@ -87,7 +86,7 @@ use crate::{
     profiles::SettingsProfile,
     project::{
         DiagnosticsSettingsContent, GitSettings, GlobalLspSettingsContent, NodeBinarySettings,
-        ProjectSettingsContent, SessionSettingsContent,
+        SessionSettingsContent,
     },
     title_bar::TitleBarSettingsContent,
     ui::{HideMouseMode, LineIndicatorFormat, ReduceMotionMode},
@@ -98,7 +97,11 @@ use crate::{
         project_panel::ProjectPanelSettingsContent,
     },
 };
+pub use common::ParseStatus;
 pub use editor::cursor::CursorShape;
+pub use profiles::ProfileBase;
+pub use project::{LspSettings, LspSettingsMap, ProjectSettingsContent};
+pub use ui::DockPosition;
 use ui::{DockSide, ShowIndentGuides};
 pub use workspace::folder_indicator::FolderIndicator;
 

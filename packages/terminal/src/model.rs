@@ -19,9 +19,7 @@ pub struct Point {
 }
 
 impl Point {
-    pub fn new(line: i32, column: usize) -> Self {
-        Self { line, column }
-    }
+    pub fn new(line: i32, column: usize) -> Self { Self { line, column } }
 }
 
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
@@ -31,21 +29,13 @@ pub struct Range {
 }
 
 impl Range {
-    pub fn new(start: Point, end: Point) -> Self {
-        Self { start, end }
-    }
+    pub fn new(start: Point, end: Point) -> Self { Self { start, end } }
 
-    pub fn start(&self) -> Point {
-        self.start
-    }
+    pub fn start(&self) -> Point { self.start }
 
-    pub fn end(&self) -> Point {
-        self.end
-    }
+    pub fn end(&self) -> Point { self.end }
 
-    pub fn contains(&self, point: Point) -> bool {
-        self.start <= point && point <= self.end
-    }
+    pub fn contains(&self, point: Point) -> bool { self.start <= point && point <= self.end }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -56,9 +46,7 @@ pub struct SelectionRange {
 }
 
 impl SelectionRange {
-    pub fn point_range(self) -> Range {
-        Range::new(self.start, self.end)
-    }
+    pub fn point_range(self) -> Range { Range::new(self.start, self.end) }
 }
 
 #[derive(Clone, Debug)]
@@ -136,39 +124,25 @@ impl Modes {
     pub const MOUSE_MODE: Self =
         Self(Self::MOUSE_REPORT_CLICK.0 | Self::MOUSE_DRAG.0 | Self::MOUSE_MOTION.0);
 
-    pub const fn empty() -> Self {
-        Self::NONE
-    }
+    pub const fn empty() -> Self { Self::NONE }
 
-    pub const fn contains(self, other: Self) -> bool {
-        self.0 & other.0 == other.0
-    }
+    pub const fn contains(self, other: Self) -> bool { self.0 & other.0 == other.0 }
 
-    pub const fn intersects(self, other: Self) -> bool {
-        self.0 & other.0 != 0
-    }
+    pub const fn intersects(self, other: Self) -> bool { self.0 & other.0 != 0 }
 
-    pub fn insert(&mut self, other: Self) {
-        self.0 |= other.0;
-    }
+    pub fn insert(&mut self, other: Self) { self.0 |= other.0; }
 
-    pub fn remove(&mut self, other: Self) {
-        self.0 &= !other.0;
-    }
+    pub fn remove(&mut self, other: Self) { self.0 &= !other.0; }
 }
 
 impl BitOr for Modes {
     type Output = Self;
 
-    fn bitor(self, rhs: Self) -> Self::Output {
-        Self(self.0 | rhs.0)
-    }
+    fn bitor(self, rhs: Self) -> Self::Output { Self(self.0 | rhs.0) }
 }
 
 impl BitOrAssign for Modes {
-    fn bitor_assign(&mut self, rhs: Self) {
-        self.insert(rhs);
-    }
+    fn bitor_assign(&mut self, rhs: Self) { self.insert(rhs); }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -216,9 +190,7 @@ impl Deref for IndexedCell {
     type Target = Cell;
 
     #[inline]
-    fn deref(&self) -> &Cell {
-        &self.cell
-    }
+    fn deref(&self) -> &Cell { &self.cell }
 }
 
 // TODO: Un-pub
@@ -322,21 +294,13 @@ impl TerminalBounds {
         raw.next_up().floor() as usize
     }
 
-    pub fn height(&self) -> Pixels {
-        self.bounds.size.height
-    }
+    pub fn height(&self) -> Pixels { self.bounds.size.height }
 
-    pub fn width(&self) -> Pixels {
-        self.bounds.size.width
-    }
+    pub fn width(&self) -> Pixels { self.bounds.size.width }
 
-    pub fn cell_width(&self) -> Pixels {
-        self.cell_width
-    }
+    pub fn cell_width(&self) -> Pixels { self.cell_width }
 
-    pub fn line_height(&self) -> Pixels {
-        self.line_height
-    }
+    pub fn line_height(&self) -> Pixels { self.line_height }
 }
 
 const DEBUG_TERMINAL_WIDTH: Pixels = px(500.);

@@ -21,9 +21,7 @@ enum TerminalModeKind {
 
 impl TerminalMode {
     /// Creates a terminal for an interactive shell.
-    pub fn interactive() -> Self {
-        Self(TerminalModeKind::Interactive)
-    }
+    pub fn interactive() -> Self { Self(TerminalModeKind::Interactive) }
 
     /// Creates an interactive terminal that reports when its shell exits.
     pub fn interactive_with_completion(completion_tx: Sender<Option<ExitStatus>>) -> Self {

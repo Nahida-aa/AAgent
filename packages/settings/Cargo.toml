@@ -6,15 +6,24 @@ license.workspace = true
 description = "AAgent 设置系统 (RustEmbed default.json → gpui Global SettingsStore)"
 
 [dependencies]
+collections.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
-rust-embed = { version = "8", features = ["include-exclude"] }
-json5 = "0.4"
+rust-embed = { workspace = true }
+json5 = { workspace = true }
+paths.workspace = true
 gpui.workspace = true
 inventory.workspace = true
 settings_macros.workspace = true
+settings_content.workspace = true
+anyhow.workspace = true
 strum.workspace = true
 settings_json.workspace = true
+path.workspace = true
 util.workspace = true
+fs.workspace = true
+schemars.workspace = true
+futures.workspace = true
+
 [dev-dependencies]
 tempfile = { workspace = true }

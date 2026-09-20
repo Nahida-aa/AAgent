@@ -69,6 +69,4 @@ impl TerminalProvider for TerminalPanelProvider {
     }
 }
 
-fn current_dir() -> PathBuf {
-    std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
-}
+fn current_dir() -> PathBuf { std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")) }

@@ -148,9 +148,7 @@ impl StyledLine {
         self.spans.push(Span::styled(text.to_string(), style));
     }
 
-    fn has_content(&self) -> bool {
-        !self.spans.is_empty() || !self.buffer.is_empty()
-    }
+    fn has_content(&self) -> bool { !self.spans.is_empty() || !self.buffer.is_empty() }
 
     fn flush(&mut self) {
         if !self.buffer.is_empty() {

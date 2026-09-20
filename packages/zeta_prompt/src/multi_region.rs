@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Context as _, Result};
+use anyhow::{Context as _, Result, anyhow};
 
 pub const MARKER_TAG_PREFIX: &str = "<|marker_";
 pub const MARKER_TAG_SUFFIX: &str = "|>";

@@ -15,9 +15,7 @@ pub struct ToolProviderScope<'a> {
 }
 
 impl<'a> ToolProviderScope<'a> {
-    pub fn new(working_dir: &'a str) -> Self {
-        Self { working_dir }
-    }
+    pub fn new(working_dir: &'a str) -> Self { Self { working_dir } }
 }
 
 /// 工具的抽象接口。

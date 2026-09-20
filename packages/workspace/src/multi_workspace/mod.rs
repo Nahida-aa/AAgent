@@ -74,21 +74,13 @@ impl MultiWorkspace {
         cx.notify();
     }
 
-    pub fn workspace(&self) -> &Entity<Workspace> {
-        &self.workspace
-    }
+    pub fn workspace(&self) -> &Entity<Workspace> { &self.workspace }
 
-    pub fn sidebar(&self) -> Option<&dyn SidebarHandle> {
-        self.sidebar.as_deref()
-    }
+    pub fn sidebar(&self) -> Option<&dyn SidebarHandle> { self.sidebar.as_deref() }
 
-    pub fn sidebar_open(&self) -> bool {
-        self.sidebar_open
-    }
+    pub fn sidebar_open(&self) -> bool { self.sidebar_open }
 
-    pub fn sidebar_side(&self, _cx: &App) -> SidebarSide {
-        self.sidebar_side
-    }
+    pub fn sidebar_side(&self, _cx: &App) -> SidebarSide { self.sidebar_side }
 
     /// 只读渲染状态 — 对齐 zed L334-L338。
     pub fn sidebar_render_state(&self, _cx: &App) -> SidebarRenderState {

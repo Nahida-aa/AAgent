@@ -486,9 +486,7 @@ pub struct Hunk {
 }
 
 impl Hunk {
-    pub fn is_empty(&self) -> bool {
-        self.context.is_empty() && self.edits.is_empty()
-    }
+    pub fn is_empty(&self) -> bool { self.context.is_empty() && self.edits.is_empty() }
 }
 
 #[derive(Debug, PartialEq)]
@@ -677,9 +675,7 @@ pub struct HunkLocation {
 }
 
 impl<'a> DiffLine<'a> {
-    pub fn parse(line: &'a str) -> Self {
-        Self::try_parse(line).unwrap_or(Self::Garbage(line))
-    }
+    pub fn parse(line: &'a str) -> Self { Self::try_parse(line).unwrap_or(Self::Garbage(line)) }
 
     fn try_parse(line: &'a str) -> Option<Self> {
         if line.starts_with("\\ No newline") {

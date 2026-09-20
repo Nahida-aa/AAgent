@@ -198,9 +198,7 @@ impl FakeFs {
         })
     }
 
-    pub fn new_arc() -> Arc<dyn Fs> {
-        Self::new() as Arc<dyn Fs>
-    }
+    pub fn new_arc() -> Arc<dyn Fs> { Self::new() as Arc<dyn Fs> }
 
     pub fn set_case_sensitive(&self, case_sensitive: bool) {
         self.state.lock().unwrap().case_sensitive = case_sensitive;

@@ -59,7 +59,5 @@ impl HostRouter {
 }
 
 impl Default for HostRouter {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }

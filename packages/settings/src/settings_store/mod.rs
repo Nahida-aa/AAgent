@@ -16,11 +16,14 @@ mod semantic_tokens;
 mod settings;
 mod updates;
 mod watcher;
-use crate::settings_store::parse_result::MigrationStatus;
-use crate::settings_store::semantic_tokens::DefaultSemanticTokenRules;
-pub use crate::settings_store::settings::RegisteredSetting;
-use crate::settings_store::settings::{Settings, SettingsLocation};
-use crate::settings_store::{file::SettingsFile, parse_result::SettingsParseResult};
+pub use crate::settings_store::{
+    error::InvalidSettingsError,
+    file::{LocalSettingsKind, LocalSettingsPath, SettingsFile},
+    parse_result::{MigrationStatus, SettingsParseResult},
+    schema::{LSP_SETTINGS_SCHEMA_URL_PREFIX, SettingsJsonSchemaParams},
+    semantic_tokens::DefaultSemanticTokenRules,
+    settings::{RegisteredSetting, Settings, SettingsKey, SettingsLocation},
+};
 use crate::{ActiveSettingsProfileName, EditorconfigStore, WorktreeId};
 use anyhow::{Context as _, Result};
 use collections::{BTreeMap, HashMap, TypeIdHashMap, btree_map, hash_map};

@@ -29,12 +29,10 @@ fs.workspace = true
 schemars.workspace = true
 futures.workspace = true
 log.workspace = true
+release_channel.workspace = true
 
 [dev-dependencies]
 tempfile = { workspace = true }
-fs = { workspace = true, features = ["test-support"] }
-gpui = { workspace = true, features = ["test-support"] }
-
 indoc.workspace = true
 pretty_assertions.workspace = true
 unindent.workspace = true

@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use super::SettingsStore;
 use crate::{
     WorktreeId,
@@ -8,6 +6,7 @@ use crate::{
         file::{LocalSettingsKind, LocalSettingsPath, SettingsFile},
     },
 };
+use anyhow::{Context as _, Result};
 use collections::{BTreeMap, HashMap, TypeIdHashMap, btree_map, hash_map};
 use gpui::App;
 use path::rel_path::RelPath;
@@ -15,6 +14,7 @@ use paths::{local_settings_file_relative_path, task_file_name};
 use settings_content::{
     ExtensionsSettingsContent, ParseStatus, ProjectSettingsContent, SettingsContent,
 };
+use std::sync::Arc;
 
 impl SettingsStore {
     /// Add or remove a set of local settings via a JSON string.

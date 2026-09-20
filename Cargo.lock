@@ -3535,7 +3535,7 @@ dependencies = [
  "ttf-parser",
  "url",
  "usvg",
- "util_macros",
+ "util_macros 0.1.0 (git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f)",
  "uuid",
  "waker-fn",
  "web-time",
@@ -5982,6 +5982,7 @@ source = "git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c7
 dependencies = [
  "anyhow",
  "dunce",
+ "serde",
 ]
 
 [[package]]
@@ -7055,6 +7056,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
+name = "release_channel"
+version = "0.1.0"
+dependencies = [
+ "gpui",
+ "semver",
+]
+
+[[package]]
 name = "renderdoc-sys"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7541,12 +7550,15 @@ dependencies = [
  "futures",
  "gpui",
  "gpui_util",
+ "indoc",
  "inventory",
  "json5",
  "log",
  "migrator",
  "path",
  "paths",
+ "pretty_assertions",
+ "release_channel",
  "rust-embed",
  "schemars",
  "serde",
@@ -7557,6 +7569,7 @@ dependencies = [
  "smallvec",
  "strum 0.28.0",
  "tempfile",
+ "unindent",
  "util",
 ]
 
@@ -9061,6 +9074,7 @@ dependencies = [
  "mach2 0.5.0",
  "path",
  "percent-encoding",
+ "rand 0.9.5",
  "regex",
  "rust-embed",
  "schemars",
@@ -9069,7 +9083,16 @@ dependencies = [
  "shlex 1.3.0",
  "smol",
  "url",
+ "util_macros 0.1.0",
  "which 7.0.3",
+]
+
+[[package]]
+name = "util_macros"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn 2.0.119",
 ]
 
 [[package]]

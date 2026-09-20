@@ -9,7 +9,7 @@ serde = { workspace = true, features = ["derive"] }
 shlex = "1"
 which = "7"
 log.workspace = true
-path.workspace = true
+path = { workspace = true, features = ["serde"] }
 regex.workspace = true
 itertools.workspace = true
 globset.workspace = true
@@ -24,6 +24,12 @@ libc.workspace = true
 gpui_util.workspace = true
 schemars.workspace = true
 serde_json.workspace = true
-
+rand = { workspace = true, optional = true }
+util_macros = { workspace = true, optional = true }
 [target.'cfg(target_os = "macos")'.dependencies]
 mach2.workspace = true
+
+[features]
+test-support = ["rand", "util_macros", "path/test-support"]
+# Embed `fs_embed!` assets at compile time even in debug builds.
+debug-embed = ["rust-embed/debug-embed"]

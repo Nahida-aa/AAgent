@@ -1,5 +1,5 @@
+use anyhow::{Context as _, Result};
 use settings_content::ParseStatus;
-
 /// The result of parsing settings, including any migration attempts
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SettingsParseResult {

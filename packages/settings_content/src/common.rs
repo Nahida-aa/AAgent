@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use settings_macros::MergeFrom;
 
 use crate::merge_from;
+use anyhow::Context as _;
 
 /// A non-negative size in pixels.
 ///

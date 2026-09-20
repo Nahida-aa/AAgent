@@ -15,21 +15,21 @@ mod display;
 mod dock;
 mod shell;
 mod toolbar;
-pub use display::ShowScrollbar;
+pub use display::{
+    AlternateScroll, CursorShapeContent, ScrollbarSettingsContent, ShowScrollbar, TerminalBell,
+    TerminalBlink, TerminalLineHeight,
+};
+pub use dock::TerminalDockPosition;
+pub use shell::{
+    ActivateScript, CondaManager, PathHyperlinkRegex, Shell, VenvSettings, WorkingDirectory,
+};
+pub use toolbar::TerminalToolbarContent;
 
 use serde::{Deserialize, Serialize};
 use settings_macros::{MergeFrom, with_fallible_options};
 
 use crate::{
     FontFamilyName, FontSize, FontWeightContent,
-    terminal::{
-        display::{
-            AlternateScroll, CursorShapeContent, ScrollbarSettingsContent, TerminalBell,
-            TerminalBlink, TerminalLineHeight,
-        },
-        dock::TerminalDockPosition,
-        toolbar::TerminalToolbarContent,
-    },
     theme::font::FontFeaturesContent,
 };
 
@@ -38,7 +38,7 @@ use crate::{
 /// 注意：不能加 `#[with_fallible_options]` —— serde flatten 与该 macro
 /// 自动追加的字段级 `#[serde(default)]` 冲突。
 /// 改为 struct 级 `#[serde(default)]`，所有字段本来就是 `Option<T>`。
-#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize, MergeFrom)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, JsonSchema, MergeFrom)]
 #[serde(default)]
 pub struct TerminalSettingsContent {
     /// 项目级设置（shell、working_directory、env、venv、path_hyperlink）。

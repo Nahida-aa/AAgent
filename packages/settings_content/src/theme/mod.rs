@@ -70,7 +70,7 @@ use crate::theme::font::{CodeFade, FontFeaturesContent};
 /// 所有字段都是 `Option<_>`，None 表示用默认值
 /// （由 `theme-settings` crate 的 Default impl 或 gpui_learn ThemeRegistry 提供）。
 #[with_fallible_options]
-#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema, MergeFrom)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 #[serde(default)]
 pub struct ThemeSettingsContent {
     /// UI 字体大小。

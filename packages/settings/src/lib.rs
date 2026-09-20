@@ -1,121 +1,187 @@
-//! AAgent 设置系统（对齐 Zed `crates/settings`，极简版）。
-//!
-//! 基础设施层 — SettingsStore + Settings trait + RegisterSetting 支持。
-//! Setting struct 在 `settings-content` crate（language_model / agent / editor ...）。
-//!
-//! 加载模型：
-//!   1. RustEmbed 内嵌的 `settings/default.json`（兜底）
-//!   2. `~/.config/aa/settings.json`（用户覆盖）
-//!
-//! 注册机制：
-//!   - 每种 setting struct 用 `#[derive(RegisterSetting)]` 标记
-//!   - 宏展开生成 `inventory::submit!` 条目（编译期收集）
-//!   - `SettingsStore::init()` 时遍历 `inventory::collect!(RegisteredSetting)` 初始化
+mod base_keymap_setting;
+mod content_into_gpui;
+mod editable_setting_control;
+mod editorconfig_store;
+mod granted_write_path;
+mod keymap_file;
+mod settings_file;
+mod settings_store;
+mod vscode_import;
 
-use rust_embed::RustEmbed;
-use serde::{Serialize, de::DeserializeOwned};
-use serde_json::Value;
+pub use settings_macros::RegisterSetting;
 
-pub mod settings_store;
-use settings_macros::{MergeFrom, with_fallible_options};
-pub use settings_store::{
-    AnySettingValue, RegisteredSetting, RelPath, SettingValue, SettingsStore, WorktreeId,
-};
-
-// ---------- SettingsContent ----------
-
-/// 设置内容的统一入口 — 简化版对齐 Zed `settings_json::SettingsContent`。
-/// Zed 版本有 layered content tracking（User / Default / Server / Project），
-/// AAgent 简化版就是一个 `serde_json::Value` wrapper。
-#[with_fallible_options]
-#[derive(
-    Debug, PartialEq, Default, Clone, Serialize, JsonSchema, MergeFrom, Clone, Debug, Default,
-)]
-pub struct SettingsContent {
-    pub value: Value,
-    /// Configuration of the terminal in Zed.
-    pub terminal: Option<TerminalSettingsContent>,
+pub mod settings_content {
+    pub use ::settings_content::*;
 }
 
-impl SettingsContent {
-    pub fn new(value: Value) -> Self {
-        Self { value }
-    }
-
-    pub fn empty() -> Self {
-        Self {
-            value: Value::Object(serde_json::Map::new()),
-        }
-    }
-
-    /// 按路径取一个字段（同 SettingsStore::try_get_path）。
-    pub fn try_get<T: serde::de::DeserializeOwned>(&self, path: &[&str]) -> Option<T> {
-        let mut current = &self.value;
-        for key in path {
-            current = match current.get(*key) {
-                Some(v) => v,
-                None => return None,
-            };
-        }
-        serde_json::from_value(current.clone()).ok()
-    }
-
-    /// 从合并后的 Value 树反序列化整个结构体。
-    pub fn deserialize<T: serde::de::DeserializeOwned>(&self) -> Result<T, serde_json::Error> {
-        serde_json::from_value(self.value.clone())
-    }
+pub mod fallible_options {
+    pub use ::settings_content::{FallibleOption, parse_json};
 }
 
-// ---------- Settings trait ----------
-
-/// 可以从设置文件反序列化的类型。
-///
-/// 每个 setting struct（如 `AgentSettings`、`LanguageModelSettings`）实现这个 trait。
-/// 宏 `#[derive(RegisterSetting)]` 要求类型也实现本 trait。
-pub trait Settings: 'static + Sized + Send + Sync + DeserializeOwned {
-    /// 从合并后的 SettingsContent 反序列化。
-    ///
-    /// # 约定
-    /// - default.json 里必须有这个 setting 的 key（和 json 字段名一致）
-    /// - 缺失时 panic（运行时错误 → 开发者漏了 default.json entry）
-    fn from_settings(content: &SettingsContent) -> Self;
-
-    /// 从一个 JSON Value 直接反序列化（便利方法）。
-    fn from_value(value: Value) -> Result<Self, serde_json::Error> {
-        serde_json::from_value(value)
-    }
-}
-
-// ---------- private 模块（宏需要） ----------
-
-/// #[doc(hidden)] — 给 `settings-macros::RegisterSetting` 宏展开用的类型。
 #[doc(hidden)]
 pub mod private {
-    pub use crate::settings_store::setting_value::{RegisteredSetting, SettingValue};
+    pub use crate::settings_store::{RegisteredSetting, SettingValue};
     pub use inventory;
 }
 
-// ---------- RustEmbed ----------
+use gpui::{App, Global};
 
-/// 对齐 Zed crates/settings/src/settings.rs 的 SettingsAssets 模式：
-/// settings 归 settings crate 自己 embed，icons/fonts 归 aa-gpui-kit-assets。
-#[derive(RustEmbed)]
-#[folder = "../../assets"]
-#[include = "settings/*"]
-#[exclude = "*.DS_Store"]
-pub struct SettingsAssets;
+use std::env;
+use std::{borrow::Cow, fmt, str};
+use util::asset_str;
 
-/// 从内嵌资源读取 default.json 原始文本。
-pub fn embedded_default_json() -> std::borrow::Cow<'static, str> {
-    match SettingsAssets::get("settings/default.json")
-        .expect("settings/default.json must be embedded")
-        .data
-    {
-        std::borrow::Cow::Borrowed(bytes) => std::borrow::Cow::Borrowed(
-            std::str::from_utf8(bytes).expect("embedded default.json is UTF-8"),
-        ),
-        std::borrow::Cow::Owned(bytes) => std::borrow::Cow::Owned(
-            String::from_utf8(bytes).expect("embedded default.json is UTF-8"),
-        ),
+pub use ::settings_content::*;
+pub use base_keymap_setting::*;
+pub use content_into_gpui::IntoGpui;
+pub use editable_setting_control::*;
+pub use editorconfig_store::{
+    Editorconfig, EditorconfigEvent, EditorconfigProperties, EditorconfigStore,
+};
+pub use granted_write_path::GrantedWritePath;
+pub use keymap_file::{
+    KeyBindingValidator, KeyBindingValidatorRegistration, KeybindSource, KeybindUpdateOperation,
+    KeybindUpdateTarget, KeymapFile, KeymapFileLoadResult,
+};
+pub use settings_file::*;
+pub use settings_json::*;
+pub use settings_store::{
+    DefaultSemanticTokenRules, InvalidSettingsError, LSP_SETTINGS_SCHEMA_URL_PREFIX,
+    LocalSettingsKind, LocalSettingsPath, MigrationStatus, Settings, SettingsFile,
+    SettingsJsonSchemaParams, SettingsKey, SettingsLocation, SettingsParseResult, SettingsStore,
+};
+
+pub use vscode_import::{VsCodeSettings, VsCodeSettingsSource};
+
+pub use keymap_file::ActionSequence;
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct ActiveSettingsProfileName(pub String);
+
+impl Global for ActiveSettingsProfileName {}
+
+pub trait UserSettingsContentExt {
+    fn for_profile(&self, cx: &App) -> Option<&SettingsProfile>;
+    fn for_release_channel(&self) -> Option<&SettingsContent>;
+    fn for_os(&self) -> Option<&SettingsContent>;
+}
+
+impl UserSettingsContentExt for UserSettingsContent {
+    fn for_profile(&self, cx: &App) -> Option<&SettingsProfile> {
+        let Some(active_profile) = cx.try_global::<ActiveSettingsProfileName>() else {
+            return None;
+        };
+        self.profiles.get(&active_profile.0)
     }
+
+    fn for_release_channel(&self) -> Option<&SettingsContent> {
+        self.release_channel_overrides
+            .get_by_key(release_channel::RELEASE_CHANNEL.dev_name())
+    }
+
+    fn for_os(&self) -> Option<&SettingsContent> {
+        self.platform_overrides.get_by_key(env::consts::OS)
+    }
+}
+
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Hash, PartialOrd, Ord, serde::Serialize)]
+pub struct WorktreeId(usize);
+
+impl From<WorktreeId> for usize {
+    fn from(value: WorktreeId) -> Self { value.0 }
+}
+
+impl WorktreeId {
+    pub fn from_usize(handle_id: usize) -> Self { Self(handle_id) }
+
+    pub fn from_proto(id: u64) -> Self { Self(id as usize) }
+
+    pub fn to_proto(self) -> u64 { self.0 as u64 }
+
+    pub fn to_usize(self) -> usize { self.0 }
+}
+
+impl fmt::Display for WorktreeId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { std::fmt::Display::fmt(&self.0, f) }
+}
+
+// Dev builds read the checkout's files at runtime instead of embedding them;
+// see the `assets` crate for the rationale.
+util::fs_embed! {
+    pub struct SettingsAssets,
+    crate_relative = "../../assets",
+    root_relative = "assets",
+    include = ["settings/*", "keymaps/*"],
+    exclude = ["*.DS_Store"],
+}
+
+pub fn init(cx: &mut App) {
+    let settings = SettingsStore::new(cx, &default_settings());
+    cx.set_global(settings);
+    SettingsStore::observe_active_settings_profile_name(cx).detach();
+}
+
+pub fn default_settings() -> Cow<'static, str> {
+    asset_str::<SettingsAssets>("settings/default.json")
+}
+
+pub fn default_semantic_token_rules() -> Cow<'static, str> {
+    asset_str::<SettingsAssets>("settings/default_semantic_token_rules.json")
+}
+
+#[cfg(target_os = "macos")]
+pub const DEFAULT_KEYMAP_PATH: &str = "keymaps/default-macos.json";
+
+#[cfg(target_os = "windows")]
+pub const DEFAULT_KEYMAP_PATH: &str = "keymaps/default-windows.json";
+
+#[cfg(not(any(target_os = "macos", target_os = "windows")))]
+pub const DEFAULT_KEYMAP_PATH: &str = "keymaps/default-linux.json";
+
+pub fn default_keymap() -> Cow<'static, str> { asset_str::<SettingsAssets>(DEFAULT_KEYMAP_PATH) }
+
+pub const VIM_KEYMAP_PATH: &str = "keymaps/vim.json";
+
+pub fn vim_keymap() -> Cow<'static, str> { asset_str::<SettingsAssets>(VIM_KEYMAP_PATH) }
+
+/// Specific keybinding overrides. Loaded after the base keymap so they win over
+/// conflicting base-keymap (and default `Editor`) bindings for the same chords,
+/// while still allowing user keymaps (loaded last) to override them. Shared
+/// across features - prefer adding a context block here over creating another
+/// override keymap file.
+#[cfg(target_os = "macos")]
+pub const SPECIFIC_OVERRIDES_KEYMAP_PATH: &str = "keymaps/specific-overrides-macos.json";
+
+#[cfg(not(target_os = "macos"))]
+pub const SPECIFIC_OVERRIDES_KEYMAP_PATH: &str = "keymaps/specific-overrides.json";
+
+pub fn initial_user_settings_content() -> Cow<'static, str> {
+    asset_str::<SettingsAssets>("settings/initial_user_settings.json")
+}
+
+pub fn initial_server_settings_content() -> Cow<'static, str> {
+    asset_str::<SettingsAssets>("settings/initial_server_settings.json")
+}
+
+pub fn initial_project_settings_content() -> Cow<'static, str> {
+    asset_str::<SettingsAssets>("settings/initial_local_settings.json")
+}
+
+pub fn initial_keymap_content() -> Cow<'static, str> {
+    asset_str::<SettingsAssets>("keymaps/initial.json")
+}
+
+pub fn initial_tasks_content() -> Cow<'static, str> {
+    asset_str::<SettingsAssets>("settings/initial_tasks.json")
+}
+
+pub fn initial_worktree_setup_tasks_content() -> Cow<'static, str> {
+    asset_str::<SettingsAssets>("settings/initial_worktree_setup_tasks.json")
+}
+
+pub fn initial_debug_tasks_content() -> Cow<'static, str> {
+    asset_str::<SettingsAssets>("settings/initial_debug_tasks.json")
+}
+
+pub fn initial_local_debug_tasks_content() -> Cow<'static, str> {
+    asset_str::<SettingsAssets>("settings/initial_local_debug_tasks.json")
 }

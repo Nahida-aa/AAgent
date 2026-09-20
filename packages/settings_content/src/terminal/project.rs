@@ -19,7 +19,7 @@ use super::shell::{PathHyperlinkRegex, Shell, WorkingDirectory};
 
 /// 项目级 terminal settings — 被 `serde(flatten)` 进 TerminalSettingsContent。
 #[with_fallible_options]
-#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize, MergeFrom)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct ProjectTerminalSettingsContent {
     /// Shell — 复用 `util::shell::Shell`。
     pub shell: Option<Shell>,

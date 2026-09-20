@@ -7452,9 +7452,11 @@ dependencies = [
  "rust-embed",
  "serde",
  "serde_json",
+ "settings_json",
  "settings_macros",
  "strum 0.28.0",
  "tempfile",
+ "util",
 ]
 
 [[package]]
@@ -8958,6 +8960,7 @@ dependencies = [
  "path",
  "percent-encoding",
  "regex",
+ "rust-embed",
  "serde",
  "shlex 1.3.0",
  "smol",

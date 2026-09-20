@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use collections::HashMap;
 use std::io;
 use std::os::fd::{AsRawFd, FromRawFd, RawFd};
 use std::sync::Arc;
@@ -56,9 +56,7 @@ impl PtySession {
         })
     }
 
-    pub fn raw_fd(&self) -> RawFd {
-        self.master_fd.as_raw_fd()
-    }
+    pub fn raw_fd(&self) -> RawFd { self.master_fd.as_raw_fd() }
 
     pub fn write(&self, data: &[u8]) -> io::Result<()> {
         let ret = unsafe {
@@ -110,9 +108,7 @@ impl TerminalManager {
         }
     }
 
-    pub async fn list(&self) -> Vec<Uuid> {
-        self.sessions.read().await.keys().copied().collect()
-    }
+    pub async fn list(&self) -> Vec<Uuid> { self.sessions.read().await.keys().copied().collect() }
 
     pub async fn create(&self, shell: Option<&str>) -> io::Result<Uuid> {
         let session = PtySession::spawn(shell)?;

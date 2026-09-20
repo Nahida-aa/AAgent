@@ -11,6 +11,7 @@ mod centered_layout;
 pub mod item;
 mod pane_split;
 mod preview_tabs;
+pub use preview_tabs::PreviewTabsSettingsContent;
 
 mod opening;
 pub mod project_panel;

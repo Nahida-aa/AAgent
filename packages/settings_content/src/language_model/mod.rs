@@ -171,7 +171,7 @@ impl Config {
         }
         Config {
             model: None,
-            provider: HashMap::new(),
+            provider: HashMap::default(),
             mcp: None,
         }
     }
@@ -288,7 +288,7 @@ mod tests {
     fn test_resolve_defaults() {
         let cfg = Config {
             model: None,
-            provider: HashMap::new(),
+            provider: HashMap::default(),
             mcp: None,
         };
         let resolved = cfg.resolve(None, None, None);
@@ -302,7 +302,7 @@ mod tests {
     fn test_resolve_from_model_string() {
         let cfg = Config {
             model: Some("ollama/llama3.2".into()),
-            provider: HashMap::new(),
+            provider: HashMap::default(),
             mcp: None,
         };
         let resolved = cfg.resolve(None, None, None);
@@ -315,7 +315,7 @@ mod tests {
     fn test_resolve_model_without_provider_prefix() {
         let cfg = Config {
             model: Some("deepseek-chat".into()),
-            provider: HashMap::new(),
+            provider: HashMap::default(),
             mcp: None,
         };
         let resolved = cfg.resolve(None, None, None);
@@ -327,7 +327,7 @@ mod tests {
     fn test_resolve_cli_overrides_file() {
         let cfg = Config {
             model: Some("ollama/llama3.2".into()),
-            provider: HashMap::new(),
+            provider: HashMap::default(),
             mcp: None,
         };
         let resolved = cfg.resolve(
@@ -342,7 +342,7 @@ mod tests {
 
     #[test]
     fn test_resolve_provider_config_from_file() {
-        let mut provider = HashMap::new();
+        let mut provider = HashMap::default();
         provider.insert(
             "openai".into(),
             ProviderConfig {
@@ -403,7 +403,7 @@ mod tests {
     fn test_mcp_config_fallback_env() {
         let cfg = Config {
             model: None,
-            provider: HashMap::new(),
+            provider: HashMap::default(),
             mcp: None,
         };
         assert!(cfg.mcp_servers_json().is_none());

@@ -16,6 +16,7 @@ globset.workspace = true
 dirs.workspace = true
 anyhow.workspace = true
 url.workspace = true
+rust-embed.workspace = true
 percent-encoding.workspace = true
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 smol.workspace = true

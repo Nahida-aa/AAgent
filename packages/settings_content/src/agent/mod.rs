@@ -20,7 +20,9 @@ mod profile;
 mod sandbox;
 mod sidebar;
 
+pub use agent_server::{AgentConfigOptionValue, AllAgentServersSettings, CustomAgentServerSettings};
 pub use model_selection::LanguageModelSelection;
+pub use sidebar::{SidebarDockPosition, SidebarSide};
 mod thinking;
 mod tool_permissions;
 use crate::{
@@ -31,7 +33,6 @@ use crate::{
         notification::{NotifyWhenAgentWaiting, PlaySoundWhenAgentDone},
         profile::AgentProfileContent,
         sandbox::{GrantedWritePathContent, SandboxPermissionsContent},
-        sidebar::SidebarDockPosition,
         thinking::ThinkingBlockDisplay,
         tool_permissions::{ToolPermissionMode, ToolPermissionsContent, ToolRegexRule},
     },

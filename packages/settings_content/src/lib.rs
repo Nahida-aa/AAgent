@@ -50,7 +50,7 @@ pub use terminal::{
     ActivateScript, AlternateScroll, CondaManager, CursorShapeContent, PathHyperlinkRegex,
     ProjectTerminalSettingsContent, ScrollbarSettingsContent, Shell, ShowScrollbar, TerminalBell,
     TerminalBlink, TerminalDockPosition, TerminalLineHeight, TerminalSettingsContent,
-    TerminalToolbarContent, VenvSettings, VenvSettingsResolved, WorkingDirectory,
+    TerminalToolbarContent, VenvSettings, WorkingDirectory,
 };
 pub use theme::{
     AccentContent, BufferLineHeight, DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME, FontFamilyName,
@@ -69,7 +69,7 @@ mod overrides;
 mod profiles;
 mod workspace;
 use crate::{
-    agent::AgentSettingsContent,
+    agent::{AgentSettingsContent, AllAgentServersSettings},
     common::ParseStatus,
     contents::{
         AudioSettingsContent, BaseKeymapContent, CallHierarchySettingsContent, CallSettingsContent,
@@ -92,7 +92,7 @@ use crate::{
     title_bar::TitleBarSettingsContent,
     ui::{HideMouseMode, LineIndicatorFormat, ReduceMotionMode},
     workspace::{
-        WorkspaceSettingsContent,
+        PreviewTabsSettingsContent, WorkspaceSettingsContent,
         bar::{StatusBarSettingsContent, TabBarSettingsContent},
         item::ItemSettingsContent,
         project_panel::ProjectPanelSettingsContent,

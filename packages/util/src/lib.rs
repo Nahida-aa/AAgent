@@ -2,6 +2,7 @@ pub mod paths;
 pub mod shell;
 pub mod shell_builder;
 use std::{
+    borrow::Cow,
     cmp,
     ops::{Range, RangeInclusive},
 };
@@ -27,9 +28,7 @@ impl<T: Ord + Clone> RangeExt<T> for Range<T> {
         cmp::min(&self.start, &self.end).clone()..cmp::max(&self.start, &self.end).clone()
     }
 
-    fn to_inclusive(&self) -> RangeInclusive<T> {
-        self.start.clone()..=self.end.clone()
-    }
+    fn to_inclusive(&self) -> RangeInclusive<T> { self.start.clone()..=self.end.clone() }
 
     fn overlaps(&self, other: &Range<T>) -> bool {
         self.start < other.end && other.start < self.end
@@ -45,9 +44,7 @@ impl<T: Ord + Clone> RangeExt<T> for RangeInclusive<T> {
         cmp::min(self.start(), self.end()).clone()..=cmp::max(self.start(), self.end()).clone()
     }
 
-    fn to_inclusive(&self) -> RangeInclusive<T> {
-        self.clone()
-    }
+    fn to_inclusive(&self) -> RangeInclusive<T> { self.clone() }
 
     fn overlaps(&self, other: &Range<T>) -> bool {
         self.start() < &other.end && &other.start <= self.end()
@@ -76,4 +73,12 @@ pub fn set_pre_exec_to_start_new_session(
         });
     };
     command
+}
+
+/// Get an embedded file as a string.
+pub fn asset_str<A: rust_embed::RustEmbed>(path: &str) -> Cow<'static, str> {
+    match A::get(path).expect(path).data {
+        Cow::Borrowed(bytes) => Cow::Borrowed(std::str::from_utf8(bytes).unwrap()),
+        Cow::Owned(bytes) => Cow::Owned(String::from_utf8(bytes).unwrap()),
+    }
 }

@@ -5,8 +5,6 @@
 //! - `AccentContent` accent 颜色条目
 //! - `PlayerColorContent` 多人光标颜色
 
-use std::collections::BTreeMap;
-
 use collections::IndexMap;
 use schemars::JsonSchema;
 use serde::{Deserialize, Deserializer, Serialize};

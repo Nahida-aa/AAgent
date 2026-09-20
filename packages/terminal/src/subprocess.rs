@@ -17,7 +17,7 @@ pub(crate) struct SubprocessHandle {
 }
 
 impl SubprocessHandle {
-    fn kill(&self) {
+    pub(crate) fn kill(&self) {
         if let Some(child) = self.child.lock().as_mut() {
             child.kill().log_err();
         }

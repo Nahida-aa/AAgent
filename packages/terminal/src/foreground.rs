@@ -3,9 +3,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant};
 
 use super::task::{TaskStatus, task_summary};
-use crate::alacritty::{
-    AlacrittyTerm, clear_saved_screen, display_offset, last_non_empty_lines, make_content,
-};
+
 use crate::bounds::normalize_terminal_bounds;
 use crate::builder::TerminalBuilder;
 use crate::cell::{GridLinesChange, RenderableCells};
@@ -50,8 +48,9 @@ use std::process::ExitStatus;
 use log::trace;
 
 use crate::alacritty::{
-    append_text_to_term, apply_config, clear_saved_screen, content_text, find_from_terminal_point,
-    resize, screen_lines, scroll_display, scroll_to_point, search_matches, selection_text,
+    AlacrittyTerm, append_text_to_term, apply_config, clear_saved_screen, content_text,
+    display_offset, find_from_terminal_point, last_non_empty_lines, make_content, resize,
+    screen_lines, scroll_display, scroll_to_point, search_matches, selection_text,
     set_default_cursor_style, set_selection as set_term_selection,
     toggle_vi_mode as toggle_term_vi_mode, total_lines, update_selection as update_term_selection,
     update_selection_to_vi_cursor, update_vi_cursor_for_scroll, used_lines, vi_goto_point,

@@ -22,18 +22,17 @@ use std::{process::ExitStatus, sync::Arc};
 use util::Shell;
 use util::paths::PathStyle;
 use vte::ansi::{Processor, StdSyncHandler};
-mod ansi_text;
-mod colors;
-mod pty_info;
-pub use alacritty::{AlacrittyBackend, DisplayCell, DisplayCursor};
 mod actions;
+mod ansi_text;
 mod bounds;
 mod cell;
+mod colors;
 mod cursor;
 mod error;
 mod headless;
 mod hyperlink_handlers;
 mod keyboard;
+mod pty_info;
 mod pty_io;
 use terminal_settings::{AlternateScroll, CursorShape as SettingsCursorShape, TerminalSettings};
 mod cwd;
@@ -48,7 +47,9 @@ mod scroll;
 mod selection;
 mod shell;
 mod startup_marker;
-use crate::alacritty::{AlacrittyTermConfig, AlacrittyTermLock, HyperlinkMatch, RegexSearches};
+use crate::alacritty::{
+    AlacrittyTermConfig, AlacrittyTermLock, HyperlinkMatch, PtySender, RegexSearches,
+};
 use crate::cursor::{Cursor, CursorShape, Point, Range, SelectionRange};
 use crate::events::{InternalEvent, TerminalBackendEvent};
 use crate::pty_info::{ProcessIdGetter, PtyProcessInfo};
@@ -157,15 +158,6 @@ pub(crate) struct CopyTemplate {
     path_hyperlink_timeout: Duration,
     window_id: u64,
 }
-const FIND_HYPERLINK_THROTTLE_PX: Pixels = px(5.0);
-const FIND_HYPERLINK_THROTTLE: Duration = Duration::from_millis(100);
-
-/// Minimum pointer movement before a left click begins a selection. This keeps
-/// a click that jitters by a pixel or two (such as the window-focusing click)
-/// from starting a selection and, with `copy_on_select` enabled, clobbering the
-/// clipboard. Mirrors the drag threshold used by gpui's `div` element.
-const SELECTION_DRAG_THRESHOLD: f64 = 2.0;
-impl Terminal {}
 
 impl Drop for Terminal {
     fn drop(&mut self) {

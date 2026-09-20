@@ -42,6 +42,7 @@ pub(crate) use crate::alacritty::{
         apply_config, current_child_signal_mask, display_offset, new_term, open_pty, pty_options,
         resize, spawn_event_loop,
     },
+    search::search_matches,
     term_ops::{
         append_text_to_term, clear_saved_screen, content_text, full_content_range,
         last_non_empty_lines, screen_lines, scroll_display, scroll_to_point, selection_text,
@@ -49,7 +50,7 @@ pub(crate) use crate::alacritty::{
         update_selection_to_vi_cursor, update_vi_cursor_for_scroll, used_lines, vi_goto_point,
         vi_motion,
     },
-    types::AlacrittySearch,
+    types::{AlacrittySearch, PtySender},
 };
 
 pub(super) type AlacrittyPty = tty::Pty;

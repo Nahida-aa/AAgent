@@ -4,9 +4,9 @@ use task::SpawnInTerminal;
 
 use super::task::{TaskState, TaskStatus};
 
-pub struct TerminalMode(TerminalModeKind);
+pub struct TerminalMode(pub(crate) TerminalModeKind);
 
-pub(super) enum TerminalModeKind {
+pub enum TerminalModeKind {
     Interactive,
     InteractiveWithCompletion(Sender<Option<ExitStatus>>),
     Task {

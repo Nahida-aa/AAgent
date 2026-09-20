@@ -4,9 +4,7 @@ use std::time::{Duration, Instant};
 
 use super::task::{TaskStatus, task_summary};
 use crate::CwdHistoryEntry;
-use crate::alacritty::{
-    AlacrittyTerm, clear_saved_screen, display_offset, last_non_empty_lines, make_content,
-};
+
 use crate::bounds::normalize_terminal_bounds;
 use crate::cmd::normalize_path_command_name;
 use crate::mappings::keys::to_esc_str;
@@ -43,7 +41,8 @@ use std::process::ExitStatus;
 use log::trace;
 
 use crate::alacritty::{
-    append_text_to_term, clear_saved_screen, find_from_terminal_point, resize, scroll_display,
+    AlacrittyTerm, append_text_to_term, clear_saved_screen, display_offset,
+    find_from_terminal_point, last_non_empty_lines, make_content, resize, scroll_display,
     scroll_to_point, selection_text, set_selection as set_term_selection,
     toggle_vi_mode as toggle_term_vi_mode, update_selection as update_term_selection,
     update_selection_to_vi_cursor, update_vi_cursor_for_scroll, vi_goto_point, vi_motion,

@@ -63,6 +63,7 @@ http_client = { path = "packages/http_client" }
 
 
 async-trait = "0.1"
+alacritty_terminal = { git = "https://github.com/zed-industries/alacritty", rev = "4c129667ce56611becdc82de6e28218c80e2e88f" }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 parking_lot = "0.12"
@@ -126,7 +127,6 @@ tempfile = "3"
 inventory = "0.3"
 smol = "2.0"
 # Terminal
-alacritty_terminal = { git = "https://github.com/zed-industries/alacritty", rev = "4c129667ce56611becdc82de6e28218c80e2e88f" }
 libc = "0.2"
 async-channel = "2"
 

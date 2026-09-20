@@ -4,10 +4,13 @@
 //!
 //! Shell quoting / command 构造逻辑委托 `util::shell_builder::ShellBuilder`。
 
-use std::collections::HashMap;
+use aagent_actions::RevealTarget;
+use collections::HashMap;
 use std::path::PathBuf;
 
 use util::shell::Shell;
+
+use crate::{HideStrategy, RevealStrategy, SaveStrategy};
 
 /// 任务唯一标识。
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
@@ -39,9 +42,22 @@ pub struct SpawnInTerminal {
     pub use_new_terminal: bool,
     /// Whether to allow multiple instances of the same task.
     pub allow_concurrent_runs: bool,
+    /// What to do with the terminal pane and tab, after the command was started.
+    pub reveal: RevealStrategy,
+    /// Where to show tasks' terminal output.
+    pub reveal_target: RevealTarget,
+    /// What to do with the terminal pane and tab, after the command had finished.
+    pub hide: HideStrategy,
     /// Shell configuration。后续接入 ShellBuilder 时用。
-    #[allow(dead_code)]
     pub shell: Shell,
+    /// Whether to show the task summary line in the task output (success/failure).
+    pub show_summary: bool,
+    /// Whether to show the command line in the task output.
+    pub show_command: bool,
+    /// Whether to show the rerun button in the terminal tab.
+    pub show_rerun: bool,
+    /// Which edited buffers to save before running the task.
+    pub save: SaveStrategy,
 }
 
 impl SpawnInTerminal {

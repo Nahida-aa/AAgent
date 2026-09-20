@@ -8,9 +8,10 @@ use gpui::{FontFallbacks, FontFeatures, FontWeight, Pixels};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use settings::PathHyperlinkRegex;
+pub use settings_content::AlternateScroll;
 use settings_content::{
-    AlternateScroll, FontFamilyName, ShowScrollbar, TerminalBell, TerminalBlink,
-    TerminalDockPosition, TerminalLineHeight, VenvSettings, WorkingDirectory,
+    FontFamilyName, ShowScrollbar, TerminalBell, TerminalBlink, TerminalDockPosition,
+    TerminalLineHeight, VenvSettings, WorkingDirectory,
 };
 use settings_macros::RegisterSetting;
 use util::Shell;

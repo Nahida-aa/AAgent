@@ -21,8 +21,54 @@ edition = "2024"
 license = "MIT"
 
 [workspace.dependencies]
+# --- Workspace-internal path deps (统一管理，子 crate 用 .workspace = true) ---
 a_log = { path = "packages/a_log",  }
+a_tracing = { path = "packages/a_tracing" }
+a_tracing_macro = { path = "packages/a_tracing_macro" }
+aagent_actions = { path = "packages/aagent_actions" }
 settings_json = { path = "packages/settings_json", default-features = false }
+aa-kernel = { path = "packages/kernel" }
+aa-core = { path = "packages/core" }
+aa-extension-sdk = { path = "packages/extension-sdk" }
+aa-extensions = { path = "packages/extensions" }
+aa-function-tools = { path = "packages/function-tools" }
+aa-extension-mcp = { path = "packages/extension-mcp" }
+aa-llm = { path = "packages/llm" }
+aa-session = { path = "packages/session" }
+aa-server = { path = "packages/server" }
+paths = { path = "packages/paths" }
+sidebar = { path = "packages/sidebar" }
+terminal = { path = "packages/terminal" }
+terminal_view = { path = "packages/terminal_view" }
+task = { path = "packages/task" }
+title_bar = { path = "packages/title_bar" }
+settings = { path = "packages/settings" }
+settings_content = { path = "packages/settings_content" }
+settings_macros = { path = "packages/settings_macros" }
+breadcrumbs = { path = "packages/breadcrumbs" }
+theme_settings = { path = "packages/theme_settings" }
+util = { path = "packages/util" }
+util_macros = { path = "packages/util_macros" }
+workspace = { path = "packages/workspace" }
+fs = { path = "packages/fs" }
+project = { path = "packages/project" }
+rope = { path = "packages/rope" }
+text = { path = "packages/text" }
+release_channel = { path = "packages/release_channel" }
+
+migrator = { path = "packages/migrator" }
+language = { path = "packages/language" }
+cloud_llm_client = { path = "packages/cloud_llm_client" }
+http_client = { path = "packages/http_client" }
+
+
+async-trait = "0.1"
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+parking_lot = "0.12"
+futures = "0.3"
+futures-util = { version = "0.3", default-features = false, features = ["std"] }
+futures-lite = "2"
 # 与 gpui_learn / aa-player 保持相同 GPUI 来源，方便经验复用。
 gpui = { version = "0.2.2", default-features = false }
 gpui_macros = { version = "0.1.0" }
@@ -38,12 +84,6 @@ serde_json_lenient = { version = "0.2", features = [
 ] }
 serde_path_to_error = "0.1.17"
 schemars = { version = "1", features = ["derive"] }
-async-trait = "0.1"
-tracing = "0.1.40"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-parking_lot = "0.12"
-futures = "0.3"
-futures-util = { version = "0.3", default-features = false, features = ["std"] }
 uuid = { version = "1", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde"] }
 tokio-util = { version = "0.7", features = ["rt"] }
@@ -95,40 +135,7 @@ sum_tree = { git = "https://github.com/zed-industries/zed.git", rev = "f6838a7c4
 notify = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
 notify-types = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
 
-# --- Workspace-internal path deps (统一管理，子 crate 用 .workspace = true) ---
-aa-kernel = { path = "packages/kernel" }
-aa-core = { path = "packages/core" }
-aa-extension-sdk = { path = "packages/extension-sdk" }
-aa-extensions = { path = "packages/extensions" }
-aa-function-tools = { path = "packages/function-tools" }
-aa-extension-mcp = { path = "packages/extension-mcp" }
-aa-llm = { path = "packages/llm" }
-aa-session = { path = "packages/session" }
-aa-server = { path = "packages/server" }
-paths = { path = "packages/paths" }
-sidebar = { path = "packages/sidebar" }
-terminal = { path = "packages/terminal" }
-terminal_view = { path = "packages/terminal_view" }
-task = { path = "packages/task" }
-title_bar = { path = "packages/title_bar" }
-settings = { path = "packages/settings" }
-settings_content = { path = "packages/settings_content" }
-settings_macros = { path = "packages/settings_macros" }
-breadcrumbs = { path = "packages/breadcrumbs" }
-theme_settings = { path = "packages/theme_settings" }
-util = { path = "packages/util" }
-util_macros = { path = "packages/util_macros" }
-workspace = { path = "packages/workspace" }
-fs = { path = "packages/fs" }
-project = { path = "packages/project" }
-rope = { path = "packages/rope" }
-text = { path = "packages/text" }
-release_channel = { path = "packages/release_channel" }
 
-migrator = { path = "packages/migrator" }
-language = { path = "packages/language" }
-cloud_llm_client = { path = "packages/cloud_llm_client" }
-http_client = { path = "packages/http_client" }
 async-lock = "3.4.2"
 async-compression = { version = "0.4", features = ["bzip2", "gzip", "futures-io"] }
 async-fs = "2.1"
@@ -170,6 +177,7 @@ log = { version = "0.4.16", features = ["kv_unstable_serde", "serde"] }
 quote = "1.0.9"
 rand = "0.9"
 rust-embed = { version = "8.11", features = ["include-exclude"] }
+thiserror = "2.0.12"
 semver = { version = "1.0", features = ["serde"] }
 serde_urlencoded = "0.7"
 streaming-iterator = "0.1"
@@ -177,9 +185,9 @@ smallvec = { version = "1.6", features = ["union", "const_new"] }
 sha2 = "0.10"
 syn = { version = "2.0.101", features = ["full", "extra-traits", "visit-mut"] }
 sysinfo = "0.39"
-zeta_prompt = { path = "packages/zeta_prompt" }
+urlencoding = "2.1.2"
 vte = { version = "0.15.0", features = ["ansi"] }
-thiserror = "2.0.12"
+zeta_prompt = { path = "packages/zeta_prompt" }
 # 外部 gpui_learn 共享库（GitHub git 依赖，稳定可复现）
 aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "09916d529c25a5eeef6f53f16dbd345483784269" }
 aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "09916d529c25a5eeef6f53f16dbd345483784269" }

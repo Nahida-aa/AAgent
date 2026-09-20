@@ -1,32 +1,55 @@
+use crate::terminal_settings::CursorShape as SettingsCursorShape;
 use alacritty_terminal::{
-    event::{Event as AlacTermEvent, EventListener, Notify, WindowSize},
-    event_loop::{EventLoop, Msg, Notifier},
-    grid::{Dimensions, Grid, GridIterator, Row, Scroll as AlacScroll},
-    index::{Boundary, Column, Direction as AlacDirection, Line, Point as AlacPoint},
-    selection::{
-        Selection as AlacSelection, SelectionRange as AlacSelectionRange,
-        SelectionType as AlacSelectionType,
-    },
-    sync::FairMutex,
-    term::{
-        Config, Osc52, RenderableCursor, SEMANTIC_ESCAPE_CHARS, Term, TermMode,
-        cell::{Cell as AlacCell, Flags, Hyperlink as AlacHyperlink},
-        search::{Match, RegexIter, RegexSearch},
-    },
-    tty,
-    vi_mode::{ViModeCursor, ViMotion as AlacViMotion},
-    vte::ansi::{
-        ClearMode, CursorShape as AlacCursorShape, CursorStyle as AlacCursorStyle,
-        NamedPrivateMode, PrivateMode,
-    },
+    term::{Config, Osc52, SEMANTIC_ESCAPE_CHARS},
+    vte::ansi::{CursorShape as AlacCursorShape, CursorStyle as AlacCursorStyle},
 };
 
-use crate::alacritty::pty::ZedListener;
+use super::AlacrittyTermConfig;
 
-pub(crate) type AlacrittyPty = tty::Pty;
-pub(crate) type AlacrittyTerm = Term<ZedListener>;
-pub(crate) type AlacrittyTermConfig = Config;
-pub(crate) type AlacrittyTermLock = FairMutex<AlacrittyTerm>;
-pub(crate) type AlacrittyCell = AlacCell;
-pub(crate) type AlacrittyGridIterator<'a> = GridIterator<'a, AlacCell>;
-pub(crate) type AlacrittyHyperlink = AlacHyperlink;
+pub(crate) fn display_only_term_config(
+    scrolling_history: usize,
+    cursor_shape: SettingsCursorShape,
+) -> AlacrittyTermConfig {
+    Config {
+        scrolling_history,
+        default_cursor_style: alacritty_cursor_style(cursor_shape),
+        semantic_escape_chars: format!("{SEMANTIC_ESCAPE_CHARS}─"),
+        osc52: Osc52::Disabled,
+        ..Config::default()
+    }
+}
+
+pub(crate) fn pty_term_config(
+    scrolling_history: usize,
+    cursor_shape: SettingsCursorShape,
+) -> AlacrittyTermConfig {
+    Config {
+        scrolling_history,
+        default_cursor_style: alacritty_cursor_style(cursor_shape),
+        semantic_escape_chars: format!("{SEMANTIC_ESCAPE_CHARS}─"),
+        ..Config::default()
+    }
+}
+
+pub(crate) fn set_default_cursor_style(
+    config: &mut AlacrittyTermConfig,
+    cursor_shape: SettingsCursorShape,
+) {
+    config.default_cursor_style = alacritty_cursor_style(cursor_shape);
+}
+
+fn alacritty_cursor_style(cursor_shape: SettingsCursorShape) -> AlacCursorStyle {
+    AlacCursorStyle {
+        shape: alacritty_cursor_shape(cursor_shape),
+        blinking: false,
+    }
+}
+
+fn alacritty_cursor_shape(cursor_shape: SettingsCursorShape) -> AlacCursorShape {
+    match cursor_shape {
+        SettingsCursorShape::Block => AlacCursorShape::Block,
+        SettingsCursorShape::Underline => AlacCursorShape::Underline,
+        SettingsCursorShape::Bar => AlacCursorShape::Beam,
+        SettingsCursorShape::Hollow => AlacCursorShape::HollowBlock,
+    }
+}

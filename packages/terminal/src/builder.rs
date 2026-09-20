@@ -1,17 +1,61 @@
+#[cfg(not(windows))]
+use crate::alacritty::current_child_signal_mask;
+use crate::alacritty::{
+    display_only_term_config, new_term, pty_options, pty_term_config, spawn_event_loop,
+};
+use crate::bounds::normalize_terminal_bounds;
+use crate::cell::Content;
+use crate::events::TerminalBackendEvent;
+use crate::mode::{TerminalMode, TerminalModeKind};
+use crate::pty_info::{ProcessIdGetter, PtyProcessInfo};
+use crate::selection::SelectionPhase;
+use crate::shell::HeadlessTerminal;
+use crate::subprocess::{SubprocessHandle, convert_lf_to_crlf};
 use crate::terminal_settings::{
     AlternateScroll, CursorShape as SettingsCursorShape, TerminalSettings,
 };
+use crate::{
+    AlacrittyTermLock, CopyTemplate, CwdHistoryEntry, PtyResources, RegexSearches, TerminalBounds,
+    TerminalError, TerminalType,
+};
 use crate::{Terminal, events::PtyEvent};
+use anyhow::{Result, bail};
+use collections::{HashMap, VecDeque};
 use futures::{
     FutureExt,
     channel::mpsc::{UnboundedReceiver, unbounded},
 };
+use futures_lite::future::yield_now;
+use gpui::{App, BackgroundExecutor, Context, Task, px};
+use std::path::PathBuf;
+use std::process::ExitStatus;
+use std::sync::Arc;
+use std::time::{Duration, Instant};
+use util::Shell;
+use util::paths::PathStyle;
+use vte::ansi::{Processor, StdSyncHandler};
 
 pub struct TerminalBuilder {
     terminal: Terminal,
     events_rx: UnboundedReceiver<PtyEvent>,
 }
 
+/// Inserts Zed-specific environment variables for terminal sessions.
+/// Used by both local terminals and remote terminals (via SSH).
+pub fn insert_zed_terminal_env(
+    env: &mut HashMap<String, String>,
+    version: &impl std::fmt::Display,
+) {
+    env.insert("ZED_TERM".to_string(), "true".to_string());
+    env.insert("TERM_PROGRAM".to_string(), "zed".to_string());
+    env.insert("TERM".to_string(), "xterm-256color".to_string());
+    env.insert("COLORTERM".to_string(), "truecolor".to_string());
+    env.insert("TERM_PROGRAM_VERSION".to_string(), version.to_string());
+}
+
+// https://github.com/alacritty/alacritty/blob/cb3a79dbf6472740daca8440d5166c1d4af5029e/extra/man/alacritty.5.scd?plain=1#L207-L213
+const DEFAULT_SCROLL_HISTORY_LINES: usize = 10_000;
+pub const MAX_SCROLL_HISTORY_LINES: usize = 100_000;
 impl TerminalBuilder {
     pub fn new_display_only(
         cursor_shape: SettingsCursorShape,
@@ -522,13 +566,104 @@ impl TerminalBuilder {
     }
 }
 
-struct CopyTemplate {
-    shell: Shell,
+/// Spawns `program`/`args` as a plain subprocess with piped stdout/stderr and
+/// drives its output into `term`, mirroring what the Alacritty event loop does
+/// for a PTY but without one. Used when [`HeadlessTerminal`] is enabled.
+fn spawn_task_subprocess(
+    program: String,
+    args: Vec<String>,
     env: HashMap<String, String>,
-    cursor_shape: SettingsCursorShape,
-    alternate_scroll: AlternateScroll,
-    max_scroll_history_lines: Option<usize>,
-    path_hyperlink_regexes: Vec<String>,
-    path_hyperlink_timeout: Duration,
-    window_id: u64,
+    working_directory: Option<PathBuf>,
+    term: Arc<AlacrittyTermLock>,
+    events_tx: futures::channel::mpsc::UnboundedSender<PtyEvent>,
+    executor: &BackgroundExecutor,
+) -> Result<SubprocessHandle> {
+    use futures::io::AsyncReadExt as _;
+    use std::process::Stdio;
+
+    let mut command = util::command::new_std_command(&program);
+    command.args(&args);
+    command.envs(&env);
+    if let Some(directory) = &working_directory {
+        command.current_dir(directory);
+    }
+
+    let mut child =
+        util::process::Child::spawn(command, Stdio::null(), Stdio::piped(), Stdio::piped())?;
+    let stdout = child.stdout.take();
+    let stderr = child.stderr.take();
+    let child = Arc::new(parking_lot::Mutex::new(Some(child)));
+
+    let reader = executor.spawn({
+        let child = child.clone();
+        let executor = executor.clone();
+        async move {
+            // stdout and stderr are pumped concurrently, each through its own
+            // parser; the shared term mutex serializes grid mutation.
+            type BoxedReader = Box<dyn futures::io::AsyncRead + Unpin + Send>;
+            let pump = |reader: Option<BoxedReader>| {
+                let term = term.clone();
+                let events_tx = events_tx.clone();
+                async move {
+                    let Some(mut reader) = reader else { return };
+                    let mut processor = Processor::<StdSyncHandler>::new();
+                    let mut buffer = [0u8; 8192];
+                    let mut previous_byte_was_cr = false;
+                    loop {
+                        match reader.read(&mut buffer).await {
+                            Ok(0) => return,
+                            Err(error) => {
+                                log::warn!("failed to read subprocess output: {error}");
+                                return;
+                            }
+                            Ok(count) => {
+                                let converted =
+                                    convert_lf_to_crlf(&buffer[..count], &mut previous_byte_was_cr);
+                                {
+                                    let mut term = term.lock();
+                                    processor.advance(&mut *term, &converted);
+                                }
+                                events_tx
+                                    .unbounded_send(PtyEvent::Event(TerminalBackendEvent::Wakeup))
+                                    .ok();
+                            }
+                        }
+                    }
+                }
+            };
+            let stdout = stdout.map(|reader| Box::new(reader) as BoxedReader);
+            let stderr = stderr.map(|reader| Box::new(reader) as BoxedReader);
+            futures::future::join(pump(stdout), pump(stderr)).await;
+
+            // Both pipes are closed, so the child has exited or is about to.
+            // Poll for its status without holding the lock across an await.
+            let status = loop {
+                let status = match child.lock().as_mut() {
+                    Some(child) => match child.try_status() {
+                        Ok(status) => status,
+                        Err(error) => {
+                            log::warn!("failed to get subprocess exit status: {error}");
+                            break None;
+                        }
+                    },
+                    None => Some(ExitStatus::default()),
+                };
+                match status {
+                    Some(status) => break Some(status),
+                    None => executor.timer(Duration::from_millis(20)).await,
+                }
+            };
+            child.lock().take();
+            let event = match status {
+                Some(status) => TerminalBackendEvent::ChildExit(status),
+                None => TerminalBackendEvent::Exit,
+            };
+            events_tx.unbounded_send(PtyEvent::Event(event)).ok();
+        }
+    });
+
+    Ok(SubprocessHandle {
+        child,
+        _reader: reader,
+    })
 }

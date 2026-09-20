@@ -1,8 +1,15 @@
-use std::{path::PathBuf, process::ExitStatus, sync::Arc};
+use std::{
+    fmt::{self, Formatter},
+    path::PathBuf,
+    process::ExitStatus,
+    sync::Arc,
+};
 
 use crate::{
     alacritty::HyperlinkMatch,
-    model::{Point, Selection, TerminalBounds},
+    bounds::TerminalBounds,
+    cursor::Point,
+    selection::{Scroll, Selection, ViMotion},
 };
 use alacritty_terminal::vte::ansi::Rgb;
 use gpui::{
@@ -63,35 +70,6 @@ pub enum InternalEvent {
     MoveViCursorToPoint(Point),
 }
 
-#[derive(Clone, Copy, Debug)]
-enum ViMotion {
-    Up,
-    Down,
-    Left,
-    Right,
-    First,
-    Last,
-    FirstOccupied,
-    High,
-    Middle,
-    Low,
-    WordLeft,
-    WordRight,
-    WordRightEnd,
-    Bracket,
-    ParagraphUp,
-    ParagraphDown,
-}
-
-#[derive(Clone, Copy, Debug)]
-enum Scroll {
-    Delta(i32),
-    PageUp,
-    PageDown,
-    Top,
-    Bottom,
-}
-
 #[derive(Clone)]
 pub(crate) enum TerminalBackendEvent {
     MouseCursorDirty,
@@ -108,7 +86,25 @@ pub(crate) enum TerminalBackendEvent {
     Exit,
     ChildExit(ExitStatus),
 }
-
+impl fmt::Debug for TerminalBackendEvent {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::MouseCursorDirty => f.write_str("MouseCursorDirty"),
+            Self::Title(title) => write!(f, "Title({title})"),
+            Self::ResetTitle => f.write_str("ResetTitle"),
+            Self::ClipboardStore(data) => write!(f, "ClipboardStore({data})"),
+            Self::ClipboardLoad(_) => f.write_str("ClipboardLoad"),
+            Self::ColorRequest(index, _) => write!(f, "ColorRequest({index})"),
+            Self::PtyWrite(output) => write!(f, "PtyWrite({output})"),
+            Self::TextAreaSizeRequest(_) => f.write_str("TextAreaSizeRequest"),
+            Self::CursorBlinkingChange => f.write_str("CursorBlinkingChange"),
+            Self::Wakeup => f.write_str("Wakeup"),
+            Self::Bell => f.write_str("Bell"),
+            Self::Exit => f.write_str("Exit"),
+            Self::ChildExit(status) => write!(f, "ChildExit({status})"),
+        }
+    }
+}
 pub enum PtyEvent {
     Event(TerminalBackendEvent),
 }

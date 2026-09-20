@@ -8,3 +8,5 @@ anyhow = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 schemars = { workspace = true }
 util = { workspace = true }
+aagent_actions = { workspace = true }
+collections = { workspace = true }

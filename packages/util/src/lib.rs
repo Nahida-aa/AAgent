@@ -17,6 +17,23 @@ pub mod redact;
 pub mod schemars;
 pub mod serde;
 
+/// Removes characters from the end of the string if its length is greater than `max_chars` and
+/// appends "..." to the string. Returns string unchanged if its length is smaller than max_chars.
+pub fn truncate_and_trailoff(s: &str, max_chars: usize) -> String {
+    debug_assert!(max_chars >= 5);
+
+    // If the string's byte length is <= max_chars, walking the string can be skipped since the
+    // number of chars is <= the number of bytes.
+    if s.len() <= max_chars {
+        return s.to_string();
+    }
+    let truncation_ix = s.char_indices().map(|(i, _)| i).nth(max_chars);
+    match truncation_ix {
+        Some(index) => s[..index].to_string() + "…",
+        _ => s.to_string(),
+    }
+}
+
 /// Re-exports that back [`fs_embed!`] so a caller only needs to depend on `util`,
 /// not on `rust_embed` directly (the macro's dependency is an implementation
 /// detail). Hidden from the public API.

@@ -6,30 +6,73 @@ pub mod alacritty;
 mod builder;
 mod cmd;
 mod events;
+mod hyperlink;
+mod input;
+mod mouse;
 mod task;
 pub mod terminal_settings;
 use async_channel::{Receiver, Sender};
-use gpui::{Pixels, Point as GpuiPoint};
+use collections::HashMap;
+use gpui::{App, BackgroundExecutor, Context, EventEmitter, Pixels, Point as GpuiPoint, Task, px};
+use std::borrow::Cow;
+use std::collections::VecDeque;
 use std::path::PathBuf;
+use std::time::{Duration, Instant};
 use std::{process::ExitStatus, sync::Arc};
+use util::Shell;
+use util::paths::PathStyle;
+use vte::ansi::{Processor, StdSyncHandler};
 mod ansi_text;
 mod colors;
 mod pty_info;
 pub use alacritty::{AlacrittyBackend, DisplayCell, DisplayCursor};
+mod actions;
+mod bounds;
+mod cell;
+mod cursor;
 mod error;
-mod model;
+mod headless;
+mod hyperlink_handlers;
+mod keyboard;
+mod pty_io;
+use terminal_settings::{AlternateScroll, CursorShape as SettingsCursorShape, TerminalSettings};
+mod cwd;
+mod event_loop;
+mod mappings;
+mod mode;
+mod modes;
 mod process_info;
+mod pty_resources;
+mod render;
+mod scroll;
+mod selection;
 mod shell;
-use crate::model::{Point, SelectionSide};
-use crate::pty_info::PtyProcessInfo;
-use crate::{cmd::CwdHistoryEntry, task::TaskState};
+mod startup_marker;
+use crate::alacritty::{AlacrittyTermConfig, AlacrittyTermLock, HyperlinkMatch, RegexSearches};
+use crate::cursor::{Cursor, CursorShape, Point, Range, SelectionRange};
+use crate::events::{InternalEvent, TerminalBackendEvent};
+use crate::pty_info::{ProcessIdGetter, PtyProcessInfo};
+use crate::subprocess::SubprocessHandle;
+use crate::task::{TaskState, TaskStatus};
 pub use ansi_text::{AnsiSpans, ParsedAnsiText, parse_ansi_text, strip_ansi_text};
+pub use bounds::TerminalBounds;
 pub use colors::get_color_at_index;
 pub use error::TerminalError;
 pub use events::{Event, PtyEvent};
-pub use model::Range;
-pub use model::TerminalBounds;
 mod subprocess;
+use crate::mappings::colors::to_vte_rgb;
+use crate::mappings::keys::to_esc_str;
+use crate::modes::Modes;
+mod foreground;
+
+use crate::{
+    cell::{Cell, Content, GridLinesChange, IndexedCell, RenderableCells},
+    hyperlink::{Hyperlink, HyperlinkData},
+    selection::{
+        HoveredWord, Scroll, Search, Selection, SelectionPhase, SelectionSide, SelectionType,
+        ViMotion,
+    },
+};
 /// Separates retained PTY process metadata from resources needed only while
 /// the terminal is live.
 enum PtyResources {
@@ -46,78 +89,91 @@ enum TerminalType {
 }
 
 pub struct Terminal {
-    terminal_type: TerminalType,
+    pub(crate) terminal_type: TerminalType,
     /// Set for non-PTY terminals (see [`HeadlessTerminal`]); owns the spawned
     /// subprocess and the task pumping its output into the grid.
-    subprocess: Option<SubprocessHandle>,
-    completion_tx: Option<Sender<Option<ExitStatus>>>,
-    term: Arc<AlacrittyTermLock>,
-    term_config: AlacrittyTermConfig,
-    output_processor: Processor<StdSyncHandler>,
-    events: VecDeque<InternalEvent>,
+    pub(crate) subprocess: Option<SubprocessHandle>,
+    pub(crate) completion_tx: Option<Sender<Option<ExitStatus>>>,
+    pub(crate) term: Arc<AlacrittyTermLock>,
+    pub(crate) term_config: AlacrittyTermConfig,
+    pub(crate) output_processor: Processor<StdSyncHandler>,
+    pub(crate) events: VecDeque<InternalEvent>,
     /// This is only used for mouse mode cell change detection
-    last_mouse: Option<(Point, SelectionSide)>,
+    pub(crate) last_mouse: Option<(Point, SelectionSide)>,
     /// Window-relative position of the most recent left mouse-down. Used to
     /// apply a drag threshold before starting a selection (see #58970).
-    mouse_down_position: Option<GpuiPoint<Pixels>>,
+    pub(crate) mouse_down_position: Option<GpuiPoint<Pixels>>,
     pub matches: Vec<Range>,
     pub last_content: Content,
     pub selection_head: Option<Point>,
 
     pub breadcrumb_text: String,
-    title_override: Option<String>,
-    scroll_px: Pixels,
-    next_link_id: usize,
-    selection_phase: SelectionPhase,
-    hyperlink_regex_searches: RegexSearches,
-    task: Option<TaskState>,
-    vi_mode_enabled: bool,
-    is_remote_terminal: bool,
-    last_mouse_move_time: Instant,
-    last_hyperlink_search_position: Option<GpuiPoint<Pixels>>,
-    mouse_down_hyperlink: Option<HyperlinkMatch>,
+    pub(crate) title_override: Option<String>,
+    pub(crate) scroll_px: Pixels,
+    pub(crate) next_link_id: usize,
+    pub(crate) selection_phase: SelectionPhase,
+    pub(crate) hyperlink_regex_searches: RegexSearches,
+    pub(crate) task: Option<TaskState>,
+    pub(crate) vi_mode_enabled: bool,
+    pub(crate) is_remote_terminal: bool,
+    pub(crate) last_mouse_move_time: Instant,
+    pub(crate) last_hyperlink_search_position: Option<GpuiPoint<Pixels>>,
+    pub(crate) mouse_down_hyperlink: Option<HyperlinkMatch>,
     #[cfg(windows)]
-    shell_program: Option<String>,
-    template: CopyTemplate,
-    activation_script: Vec<String>,
-    child_exited: Option<ExitStatus>,
-    keyboard_input_sent: bool,
-    init_command_startup_marker: Option<String>,
-    init_command_startup_tx: Option<Sender<()>>,
-    event_loop_task: Task<Result<(), anyhow::Error>>,
-    background_executor: BackgroundExecutor,
-    path_style: PathStyle,
-    cwd_history: Vec<CwdHistoryEntry>,
-    pending_cwd_boundary: Option<i32>,
+    pub(crate) shell_program: Option<String>,
+    pub(crate) template: CopyTemplate,
+    pub(crate) activation_script: Vec<String>,
+    pub(crate) child_exited: Option<ExitStatus>,
+    pub(crate) keyboard_input_sent: bool,
+    pub(crate) init_command_startup_marker: Option<String>,
+    pub(crate) init_command_startup_tx: Option<Sender<()>>,
+    pub(crate) event_loop_task: Task<Result<(), anyhow::Error>>,
+    pub(crate) background_executor: BackgroundExecutor,
+    pub(crate) path_style: PathStyle,
+    pub(crate) cwd_history: Vec<CwdHistoryEntry>,
+    pub(crate) pending_cwd_boundary: Option<i32>,
     #[cfg(any(test, feature = "test-support"))]
-    input_log: Vec<Vec<u8>>,
+    pub(crate) input_log: Vec<Vec<u8>>,
     #[cfg(test)]
-    suppress_hyperlink_throttle_once: bool,
+    pub(crate) suppress_hyperlink_throttle_once: bool,
     #[cfg(any(test, feature = "test-support"))]
-    pty_write_log: std::cell::RefCell<Vec<Vec<u8>>>,
+    pub(crate) pty_write_log: std::cell::RefCell<Vec<Vec<u8>>>,
 }
-impl Terminal {
-    pub(crate) fn record_cwd_change(&mut self, new_working_directory: PathBuf) {
-        if self.is_remote_terminal {
-            return;
-        }
 
-        let scrollback_position = self.pending_cwd_boundary.take().unwrap_or_else(|| {
-            let term = self.term.lock_unfair();
-            Self::scrollback_position(term.grid().cursor.point.line.0, term.history_size())
-        });
-        self.cwd_history.push(CwdHistoryEntry {
-            scrollback_position,
-            working_directory: new_working_directory,
-        });
-    }
-    fn scrollback_position(line: i32, history_size: usize) -> i32 {
-        let history_size = i32::try_from(history_size).unwrap_or(i32::MAX);
-        history_size.saturating_add(line)
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub(crate) struct CwdHistoryEntry {
+    /// Line offset in the retained scrollback buffer.
+    scrollback_position: i32,
+    working_directory: PathBuf,
+}
+
+pub(crate) struct CopyTemplate {
+    shell: Shell,
+    env: HashMap<String, String>,
+    cursor_shape: SettingsCursorShape,
+    alternate_scroll: AlternateScroll,
+    max_scroll_history_lines: Option<usize>,
+    path_hyperlink_regexes: Vec<String>,
+    path_hyperlink_timeout: Duration,
+    window_id: u64,
+}
+const FIND_HYPERLINK_THROTTLE_PX: Pixels = px(5.0);
+const FIND_HYPERLINK_THROTTLE: Duration = Duration::from_millis(100);
+
+/// Minimum pointer movement before a left click begins a selection. This keeps
+/// a click that jitters by a pixel or two (such as the window-focusing click)
+/// from starting a selection and, with `copy_on_select` enabled, clobbering the
+/// clipboard. Mirrors the drag threshold used by gpui's `div` element.
+const SELECTION_DRAG_THRESHOLD: f64 = 2.0;
+impl Terminal {}
+
+impl Drop for Terminal {
+    fn drop(&mut self) {
+        if let Some(subprocess) = self.subprocess.take() {
+            subprocess.kill();
+        }
+        self.release_pty_resources();
     }
 }
-#[derive(PartialEq, Eq)]
-enum SelectionPhase {
-    Selecting,
-    Ended,
-}
+
+impl EventEmitter<Event> for Terminal {}

@@ -8236,7 +8236,9 @@ checksum = "adb6935a6f5c20170eeceb1a3835a49e12e19d792f6dd344ccc76a985ca5a6ca"
 name = "task"
 version = "0.1.0"
 dependencies = [
+ "aagent_actions",
  "anyhow",
+ "collections",
  "schemars",
  "serde",
  "util",
@@ -8298,6 +8300,7 @@ dependencies = [
  "async-channel 2.5.0",
  "collections",
  "futures",
+ "futures-lite",
  "gpui",
  "gpui_util",
  "itertools 0.14.0",
@@ -8306,6 +8309,7 @@ dependencies = [
  "parking_lot",
  "percent-encoding",
  "regex",
+ "release_channel",
  "schemars",
  "serde",
  "settings",
@@ -8315,6 +8319,7 @@ dependencies = [
  "task",
  "thiserror 2.0.20",
  "url",
+ "urlencoding",
  "util",
  "vte",
 ]
@@ -9046,6 +9051,12 @@ dependencies = [
  "percent-encoding",
  "serde",
 ]
+
+[[package]]
+name = "urlencoding"
+version = "2.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "daf8dba3b7eb870caf1ddeed7bc9d2a049f3cfdfae7cb521b087cc33ae4c49da"
 
 [[package]]
 name = "usvg"

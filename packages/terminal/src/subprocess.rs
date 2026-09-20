@@ -11,9 +11,9 @@ use vte::ansi::{Attr, Handler, Processor, StdSyncHandler};
 /// Owns a non-PTY task subprocess and the background task pumping its output
 /// into the terminal emulator. Used by headless hosts (e.g. the eval CLI) where
 /// PTY allocation fails with `ENOTTY`. Dropping this kills the child.
-struct SubprocessHandle {
-    child: Arc<parking_lot::Mutex<Option<util::process::Child>>>,
-    _reader: Task<()>,
+pub(crate) struct SubprocessHandle {
+    pub(crate) child: Arc<parking_lot::Mutex<Option<util::process::Child>>>,
+    pub(crate) _reader: Task<()>,
 }
 
 impl SubprocessHandle {
@@ -27,7 +27,7 @@ impl SubprocessHandle {
 /// Spawns `program`/`args` as a plain subprocess with piped stdout/stderr and
 /// drives its output into `term`, mirroring what the Alacritty event loop does
 /// for a PTY but without one. Used when [`HeadlessTerminal`] is enabled.
-fn spawn_task_subprocess(
+pub(crate) fn spawn_task_subprocess(
     program: String,
     args: Vec<String>,
     env: HashMap<String, String>,
@@ -132,7 +132,7 @@ fn spawn_task_subprocess(
 /// emits `\n`, which moves Alacritty's cursor down without returning it to
 /// column zero and makes the rendered output look misaligned. Alacritty has no
 /// setting for this, so we insert a `\r` before each `\n` that lacks one.
-fn convert_lf_to_crlf(bytes: &[u8], previous_byte_was_cr: &mut bool) -> Vec<u8> {
+pub(crate) fn convert_lf_to_crlf(bytes: &[u8], previous_byte_was_cr: &mut bool) -> Vec<u8> {
     let mut converted = Vec::with_capacity(bytes.len());
     for &byte in bytes {
         if byte == b'\n' && !*previous_byte_was_cr {

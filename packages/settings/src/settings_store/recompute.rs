@@ -1,8 +1,10 @@
 use anyhow::{Context as _, Result};
 use gpui::{App, SharedString};
+use gpui_util::ResultExt as _;
 use path::rel_path::RelPath;
 use settings_content::{
-    MergeFrom, ParseStatus, ProfileBase, SemanticTokenRules, SettingsContent, UserSettingsContent,
+    MergeFrom, ParseStatus, ProfileBase, RootUserSettings, SemanticTokenRules, SettingsContent,
+    UserSettingsContent,
 };
 use std::rc::Rc;
 

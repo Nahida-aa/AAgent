@@ -4,8 +4,13 @@
 //! Project 持有 `Arc<dyn Fs>`，让整个系统可测试——测试时注入 FakeFs。
 
 use std::path::{Path, PathBuf};
+use std::pin::Pin;
+use std::sync::Arc;
+use std::time::Duration;
 
 use anyhow::Result;
+use futures::Stream;
+use gpui::App;
 
 pub mod fake_fs;
 pub mod real_fs;
@@ -13,6 +18,7 @@ pub mod watcher;
 
 pub use fake_fs::{FakeFs, FakeFsEntry, FakeFsState, MTime};
 pub use real_fs::RealFs;
+pub use watcher::{FsWatcher, OsWatcher, PathEvent, PathEventKind, Watcher, create_default};
 
 // ---------- Fs trait ----------
 
@@ -38,6 +44,14 @@ pub trait Fs: Send + Sync {
     async fn save(&self, path: &Path, text: &str) -> Result<()> {
         self.write(path, text.as_bytes()).await
     }
+    /// 原子写入：先写临时文件再 rename，避免写一半崩溃导致文件损坏。
+    async fn atomic_write(&self, path: PathBuf, text: String) -> Result<()> {
+        // 默认实现：先创建父目录，再 write
+        if let Some(parent) = path.parent() {
+            self.create_dir(parent).await?;
+        }
+        self.write(&path, text.as_bytes()).await
+    }
     async fn remove_file(&self, path: &Path) -> Result<()>;
     async fn remove_dir(&self, path: &Path, recursive: bool) -> Result<()>;
     async fn rename(&self, from: &Path, to: &Path) -> Result<()>;
@@ -46,6 +60,21 @@ pub trait Fs: Send + Sync {
     async fn canonicalize(&self, path: &Path) -> Result<PathBuf>;
     async fn read_dir(&self, path: &Path) -> Result<Vec<PathBuf>>;
     async fn metadata(&self, path: &Path) -> Result<Option<Metadata>>;
+
+    // ---- watch ----
+    async fn watch(
+        &self,
+        path: &Path,
+        _latency: Duration,
+    ) -> (
+        Pin<Box<dyn Send + Stream<Item = Vec<PathEvent>>>>,
+        Arc<dyn Watcher>,
+    );
+}
+
+impl dyn Fs {
+    /// 全局 Fs 访问入口——默认返回 RealFs。
+    pub fn global(_cx: &gpui::App) -> Arc<dyn Fs> { Arc::new(RealFs) }
 }
 
 /// 文件/目录元信息（精简版，对齐 std::fs::Metadata）。

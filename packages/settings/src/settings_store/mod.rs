@@ -24,13 +24,17 @@ pub use crate::settings_store::{
     semantic_tokens::DefaultSemanticTokenRules,
     settings::{RegisteredSetting, Settings, SettingsKey, SettingsLocation},
 };
-use crate::{ActiveSettingsProfileName, EditorconfigStore, WorktreeId};
+use crate::{ActiveSettingsProfileName, EditorconfigStore, UserSettingsContentExt, WorktreeId};
 use anyhow::{Context as _, Result};
 use collections::{BTreeMap, HashMap, TypeIdHashMap, btree_map, hash_map};
 use fs::Fs;
 use futures::future::LocalBoxFuture;
 use futures::{StreamExt, channel::mpsc};
-use gpui::{App, AsyncApp, BorrowAppContext, Entity, Global, SharedString, Task};
+use gpui::{
+    App, AppContext as _, AsyncApp, BorrowAppContext, Entity, Global, SharedString, Task,
+    UpdateGlobal as _,
+};
+use gpui_util::ResultExt as _;
 use path::rel_path::RelPath;
 use serde::de::DeserializeOwned;
 use serde_json::Value;

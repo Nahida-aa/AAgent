@@ -122,6 +122,7 @@ impl settings::Settings for TerminalSettings {
         }
     }
 }
+
 #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum CursorShape {

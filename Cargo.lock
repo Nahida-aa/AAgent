@@ -3,6 +3,25 @@
 version = 4
 
 [[package]]
+name = "a_log"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "collections",
+ "log",
+ "tempfile",
+]
+
+[[package]]
+name = "a_tracing"
+version = "0.1.0"
+
+[[package]]
+name = "a_tracing_macro"
+version = "0.1.0"
+
+[[package]]
 name = "aa-app"
 version = "0.1.0"
 dependencies = [
@@ -3137,6 +3156,8 @@ dependencies = [
  "anyhow",
  "async-channel 2.5.0",
  "async-trait",
+ "futures",
+ "gpui",
  "notify",
  "serde",
  "tempfile",
@@ -3377,6 +3398,10 @@ dependencies = [
  "indexmap",
  "stable_deref_trait",
 ]
+
+[[package]]
+name = "git"
+version = "0.1.0"
 
 [[package]]
 name = "gl_generator"

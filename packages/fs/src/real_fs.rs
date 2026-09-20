@@ -1,11 +1,14 @@
 //! RealFs — 真实 OS 文件系统实现。
 
 use std::path::{Path, PathBuf};
+use std::pin::Pin;
 use std::sync::Arc;
+use std::time::Duration;
 
 use anyhow::Result;
+use futures::Stream;
 
-use crate::{Fs, Metadata};
+use crate::{Fs, Metadata, PathEvent, Watcher};
 
 /// 真实 OS 文件系统实现——生产环境用。
 pub struct RealFs;
@@ -81,4 +84,27 @@ impl Fs for RealFs {
             len: meta.len(),
         }))
     }
+
+    async fn watch(
+        &self,
+        _path: &Path,
+        _latency: Duration,
+    ) -> (
+        Pin<Box<dyn Send + Stream<Item = Vec<PathEvent>>>>,
+        Arc<dyn Watcher>,
+    ) {
+        // 返回一个永不产生事件的 stream + noop watcher
+        let stream: Pin<Box<dyn Send + Stream<Item = Vec<PathEvent>>>> =
+            Box::pin(futures::stream::empty());
+        let watcher = Arc::new(NoopWatcher);
+        (stream, watcher)
+    }
+}
+
+/// 空实现的 Watcher — 测试/精简模式用。
+pub struct NoopWatcher;
+
+impl Watcher for NoopWatcher {
+    fn add(&self, _path: &Path) -> Result<()> { Ok(()) }
+    fn remove(&self, _path: &Path) -> Result<()> { Ok(()) }
 }

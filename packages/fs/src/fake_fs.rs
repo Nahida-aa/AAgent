@@ -3,10 +3,12 @@
 
 use std::collections::BTreeMap;
 use std::path::{Component, Path, PathBuf};
+use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::Result;
+use futures::Stream;
 
 use crate::{Fs, Metadata};
 
@@ -486,5 +488,19 @@ impl Fs for FakeFs {
             }
         };
         result
+    }
+
+    async fn watch(
+        &self,
+        _path: &Path,
+        _latency: Duration,
+    ) -> (
+        Pin<Box<dyn Send + Stream<Item = Vec<crate::PathEvent>>>>,
+        Arc<dyn crate::Watcher>,
+    ) {
+        let stream: Pin<Box<dyn Send + Stream<Item = Vec<crate::PathEvent>>>> =
+            Box::pin(futures::stream::empty());
+        let watcher = Arc::new(crate::real_fs::NoopWatcher);
+        (stream, watcher)
     }
 }

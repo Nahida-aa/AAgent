@@ -1,6 +1,6 @@
 use std::any::{Any, TypeId};
 
-use gpui::{App, AsyncApp, BorrowAppContext};
+use gpui::{App, AsyncApp, BorrowAppContext, UpdateGlobal as _};
 use path::rel_path::RelPath;
 
 use super::SettingsStore;

@@ -1,8 +1,11 @@
 use anyhow::{Context as _, Result};
 use fs::Fs;
 use futures::{FutureExt, channel::oneshot};
-use gpui::{App, AsyncApp};
-use settings_content::{ParseStatus, RootUserSettings, SettingsContent, UserSettingsContent};
+use gpui::{App, AsyncApp, BorrowAppContext};
+use gpui_util::ResultExt as _;
+use settings_content::{
+    MergeFrom, ParseStatus, RootUserSettings, SettingsContent, UserSettingsContent,
+};
 use settings_json::{infer_json_indent_size, update_value_in_json_text};
 use std::{ops::Range, sync::Arc};
 

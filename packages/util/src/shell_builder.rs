@@ -201,19 +201,13 @@ impl ShellBuilder {
     }
 
     /// Detected ShellKind — 供外部查询 shell 类型。
-    pub fn kind(&self) -> ShellKind {
-        self.kind
-    }
+    pub fn kind(&self) -> ShellKind { self.kind }
 
     /// Program name。
-    pub fn program(&self) -> &str {
-        &self.program
-    }
+    pub fn program(&self) -> &str { &self.program }
 
     /// Collected args (not including -c / -C yet).
-    pub fn args(&self) -> &[String] {
-        &self.args
-    }
+    pub fn args(&self) -> &[String] { &self.args }
 }
 
 #[cfg(test)]

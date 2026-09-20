@@ -18,15 +18,11 @@ pub struct Child {
 impl std::ops::Deref for Child {
     type Target = smol::process::Child;
 
-    fn deref(&self) -> &Self::Target {
-        &self.process
-    }
+    fn deref(&self) -> &Self::Target { &self.process }
 }
 
 impl std::ops::DerefMut for Child {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.process
-    }
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.process }
 }
 
 impl Child {

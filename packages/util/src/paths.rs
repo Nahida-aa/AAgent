@@ -268,9 +268,7 @@ impl SanitizedPath {
         }
     }
 
-    pub fn new_arc<T: AsRef<Path> + ?Sized>(path: &T) -> Arc<Self> {
-        Self::new(path).into()
-    }
+    pub fn new_arc<T: AsRef<Path> + ?Sized>(path: &T) -> Arc<Self> { Self::new(path).into() }
 
     pub fn cast_arc(path: Arc<Self>) -> Arc<Path> {
         // safe because `Path` and `SanitizedPath` have the same repr and Drop impl
@@ -282,41 +280,25 @@ impl SanitizedPath {
         unsafe { mem::transmute::<&Arc<Self>, &Arc<Path>>(path) }
     }
 
-    pub fn starts_with(&self, prefix: &Self) -> bool {
-        self.0.starts_with(&prefix.0)
-    }
+    pub fn starts_with(&self, prefix: &Self) -> bool { self.0.starts_with(&prefix.0) }
 
-    pub fn as_path(&self) -> &Path {
-        &self.0
-    }
+    pub fn as_path(&self) -> &Path { &self.0 }
 
-    pub fn file_name(&self) -> Option<&std::ffi::OsStr> {
-        self.0.file_name()
-    }
+    pub fn file_name(&self) -> Option<&std::ffi::OsStr> { self.0.file_name() }
 
-    pub fn extension(&self) -> Option<&std::ffi::OsStr> {
-        self.0.extension()
-    }
+    pub fn extension(&self) -> Option<&std::ffi::OsStr> { self.0.extension() }
 
-    pub fn join<P: AsRef<Path>>(&self, path: P) -> PathBuf {
-        self.0.join(path)
-    }
+    pub fn join<P: AsRef<Path>>(&self, path: P) -> PathBuf { self.0.join(path) }
 
-    pub fn parent(&self) -> Option<&Self> {
-        self.0.parent().map(Self::unchecked_new)
-    }
+    pub fn parent(&self) -> Option<&Self> { self.0.parent().map(Self::unchecked_new) }
 
     pub fn strip_prefix(&self, base: &Self) -> Result<&Path, StripPrefixError> {
         self.0.strip_prefix(base.as_path())
     }
 
-    pub fn to_str(&self) -> Option<&str> {
-        self.0.to_str()
-    }
+    pub fn to_str(&self) -> Option<&str> { self.0.to_str() }
 
-    pub fn to_path_buf(&self) -> PathBuf {
-        self.0.to_path_buf()
-    }
+    pub fn to_path_buf(&self) -> PathBuf { self.0.to_path_buf() }
 }
 
 impl std::fmt::Debug for SanitizedPath {
@@ -326,9 +308,7 @@ impl std::fmt::Debug for SanitizedPath {
 }
 
 impl Display for SanitizedPath {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0.display())
-    }
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result { write!(f, "{}", self.0.display()) }
 }
 
 impl From<&SanitizedPath> for Arc<SanitizedPath> {
@@ -340,15 +320,11 @@ impl From<&SanitizedPath> for Arc<SanitizedPath> {
 }
 
 impl From<&SanitizedPath> for PathBuf {
-    fn from(sanitized_path: &SanitizedPath) -> Self {
-        sanitized_path.as_path().into()
-    }
+    fn from(sanitized_path: &SanitizedPath) -> Self { sanitized_path.as_path().into() }
 }
 
 impl AsRef<Path> for SanitizedPath {
-    fn as_ref(&self) -> &Path {
-        &self.0
-    }
+    fn as_ref(&self) -> &Path { &self.0 }
 }
 
 #[derive(Debug, Clone)]
@@ -358,21 +334,13 @@ pub struct RemotePathBuf {
 }
 
 impl RemotePathBuf {
-    pub fn new(string: String, style: PathStyle) -> Self {
-        Self { style, string }
-    }
+    pub fn new(string: String, style: PathStyle) -> Self { Self { style, string } }
 
-    pub fn from_str(path: &str, style: PathStyle) -> Self {
-        Self::new(path.to_string(), style)
-    }
+    pub fn from_str(path: &str, style: PathStyle) -> Self { Self::new(path.to_string(), style) }
 
-    pub fn path_style(&self) -> PathStyle {
-        self.style
-    }
+    pub fn path_style(&self) -> PathStyle { self.style }
 
-    pub fn to_proto(self) -> String {
-        self.string
-    }
+    pub fn to_proto(self) -> String { self.string }
 }
 
 impl Display for RemotePathBuf {
@@ -748,9 +716,7 @@ impl std::fmt::Debug for PathMatcher {
 }
 
 impl PartialEq for PathMatcher {
-    fn eq(&self, other: &Self) -> bool {
-        self.sources.eq(&other.sources)
-    }
+    fn eq(&self, other: &Self) -> bool { self.sources.eq(&other.sources) }
 }
 
 impl Eq for PathMatcher {}

@@ -81,9 +81,7 @@ pub enum ShellKind {
 
 impl ShellKind {
     /// 基于系统默认 shell 检测类型。
-    pub fn system() -> Self {
-        Self::new(&get_system_shell(), cfg!(windows))
-    }
+    pub fn system() -> Self { Self::new(&get_system_shell(), cfg!(windows)) }
 
     /// 根据 program 名 / 路径推断 ShellKind。
     ///
@@ -548,9 +546,7 @@ impl ShellKind {
     }
 
     /// shlex split — 只有 POSIX/Nushell/Fish 类 shell 用。
-    pub fn split(&self, input: &str) -> Option<Vec<String>> {
-        shlex::split(input)
-    }
+    pub fn split(&self, input: &str) -> Option<Vec<String>> { shlex::split(input) }
 
     /// 命令前缀 + quoting aware — PowerShell `&` / Nushell `^` 不被当成 shell 语法吃掉。
     pub fn prepend_command_prefix<'a>(&self, command: &'a str) -> Cow<'a, str> {

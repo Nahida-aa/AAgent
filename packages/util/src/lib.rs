@@ -9,6 +9,8 @@ use std::{
     cmp,
     ops::{Range, RangeInclusive},
 };
+mod connection;
+pub use connection::ConnectionResult;
 pub mod markdown;
 pub use shell::{Shell, ShellKind};
 pub use shell_builder::ShellBuilder;

@@ -14,10 +14,10 @@ use settings::Settings;
 use theme_settings::ThemeSettings;
 
 use aa_gpui_kit_ui::{CopyButton, Tooltip, prelude::*};
+use gpui_util::ResultExt;
 use std::ops::Deref;
 use std::sync::{Arc, LazyLock};
 use std::{any::TypeId, time::Duration};
-use util::ResultExt;
 
 #[derive(Default)]
 pub struct Notifications {

@@ -28,6 +28,7 @@ use crate::item::ItemHandle;
 /// # Clone
 /// `Box<dyn ItemHandle>` 不能自动 Clone（trait object 不知道具体类型），
 /// 手动 impl Clone 调用 `ItemHandle::boxed_clone`。
+#[derive(Clone)]
 pub struct DraggedTab {
     /// 来源 Pane
     pub pane: Entity<Pane>,
@@ -38,28 +39,3 @@ pub struct DraggedTab {
     /// 被拖 tab 在 source pane 里是不是当前激活项
     pub is_active: bool,
 }
-
-// 手动 Clone — ItemHandle 有 boxed_clone，Box<dyn ItemHandle> 不能 auto Clone
-// （对齐 zed crate/workspace/src/pane.rs:524 的 DraggedTab 也有 boxed_clone）
-impl std::clone::Clone for DraggedTab {
-    fn clone(&self) -> Self {
-        Self {
-            pane: self.pane.clone(),
-            item: self.item.boxed_clone(),
-            ix: self.ix,
-            is_active: self.is_active,
-        }
-    }
-}
-
-/// 行选择的拖拽标记（编辑器内部用）。
-///
-/// Zed 在 pane.rs 里也定义了一个 DraggedSelection，
-/// AAgent 还没有编辑器，先占位。
-#[derive(Clone, Debug)]
-pub struct DraggedSelection;
-
-// 以后还会有：
-// - SplitDirection { Left, Right, Up, Down }       // pane split 方向
-// - SplitMode { ClonePane, EmptyPane, MovePane }    // split 时 item 处理
-// - drag_split_direction: Option<SplitDirection>    // Pane 内部标记当前悬停在哪个 split handle

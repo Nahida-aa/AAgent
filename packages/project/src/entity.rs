@@ -10,11 +10,16 @@
 //! 注意：当前版本是**纯数据骨架**，不依赖 GPUI。
 //! 升级为 GPUI Entity 时（像 Zed 那样）再把 Entity 字段加进来。
 
+use fs::{Fs, RealFs};
+use gpui_util::{ResultExt as _, maybe};
+use path::rel_path::RelPath;
+use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-
-use fs::{Fs, RealFs};
-use serde::{Deserialize, Serialize};
+use util::{
+    path_list::PathList,
+    paths::{PathStyle, SanitizedPath, is_absolute},
+};
 
 /// Worktree 标识（等价于 Zed 的 WorktreeId）。
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -226,18 +231,59 @@ impl std::fmt::Debug for Project {
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct ProjectPath {
     pub worktree_id: WorktreeId,
-    pub path: PathBuf,
+    pub path: Arc<RelPath>,
 }
 
 impl ProjectPath {
-    pub fn new(worktree_id: WorktreeId, path: impl Into<PathBuf>) -> Self {
+    pub fn from_file(value: &dyn language::File, cx: &App) -> Self {
+        ProjectPath {
+            worktree_id: value.worktree_id(cx),
+            path: value.path().clone(),
+        }
+    }
+
+    pub fn from_proto(p: proto::ProjectPath) -> Option<Self> {
+        Some(Self {
+            worktree_id: WorktreeId::from_proto(p.worktree_id),
+            path: RelPath::from_unix_str(&p.path).log_err()?.into(),
+        })
+    }
+
+    pub fn to_proto(&self) -> proto::ProjectPath {
+        proto::ProjectPath {
+            worktree_id: self.worktree_id.to_proto(),
+            path: self.path.as_ref().as_unix_str().to_owned(),
+        }
+    }
+
+    pub fn root_path(worktree_id: WorktreeId) -> Self {
+        Self {
+            worktree_id,
+            path: RelPath::empty_arc(),
+        }
+    }
+
+    pub fn starts_with(&self, other: &ProjectPath) -> bool {
+        self.worktree_id == other.worktree_id && self.path.starts_with(&other.path)
+    }
+}
+impl<'a> From<&'a ProjectPath> for SettingsLocation<'a> {
+    fn from(val: &'a ProjectPath) -> Self {
+        SettingsLocation {
+            worktree_id: val.worktree_id,
+            path: val.path.as_ref(),
+        }
+    }
+}
+
+impl<P: Into<Arc<RelPath>>> From<(WorktreeId, P)> for ProjectPath {
+    fn from((worktree_id, path): (WorktreeId, P)) -> Self {
         Self {
             worktree_id,
             path: path.into(),
         }
     }
 }
-
 // ---------- Tests ----------
 
 #[cfg(test)]

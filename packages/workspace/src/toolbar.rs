@@ -5,18 +5,27 @@
 //! 去掉 `can_navigate`，用 `px(...)` 代替 Zed 的 `DynamicSpacing`。
 
 use crate::ItemHandle;
-use aa_gpui_kit_ui::prelude::*;
-use gpui::{AnyView, App, Context, Entity, EntityId, EventEmitter, KeyContext, Render, Window};
+use aa_gpui_kit_ui::{h_flex, prelude::*, v_flex};
+use gpui::{
+    AnyView, App, Context, Div, Entity, EntityId, EventEmitter, Global, KeyContext,
+    ParentElement as _, Render, Styled, Window,
+};
+use language::LanguageRegistry;
+use std::sync::Arc;
 
-// ---------- ToolbarItemEvent ----------
+pub struct PaneSearchBarCallbacks {
+    pub setup_search_bar:
+        fn(Option<Arc<LanguageRegistry>>, &Entity<Toolbar>, &mut Window, &mut App),
+    pub wrap_div_with_search_actions: fn(Div, Entity<crate::Pane>) -> Div,
+}
+
+impl Global for PaneSearchBarCallbacks {}
 
 /// Toolbar item 向 Toolbar 发出的事件。
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum ToolbarItemEvent {
     ChangeLocation(ToolbarItemLocation),
 }
-
-// ---------- ToolbarItemLocation ----------
 
 /// Toolbar item 在 Toolbar 里的位置。
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -26,8 +35,6 @@ pub enum ToolbarItemLocation {
     PrimaryRight,
     Secondary,
 }
-
-// ---------- ToolbarItemView trait ----------
 
 /// Toolbar 里每个 item 的 View trait。
 ///
@@ -76,6 +83,7 @@ trait ToolbarItemViewHandle: Send {
 pub struct Toolbar {
     active_item: Option<Box<dyn ItemHandle>>,
     hidden: bool,
+    can_navigate: bool,
     items: Vec<(Box<dyn ToolbarItemViewHandle>, ToolbarItemLocation)>,
 }
 
@@ -115,17 +123,24 @@ impl Toolbar {
             }
         })
     }
+}
 
+impl Default for Toolbar {
+    fn default() -> Self { Self::new() }
+}
+impl ToolBar {
     pub fn new() -> Self {
         Self {
             active_item: None,
             hidden: false,
             items: Default::default(),
+            can_navigate: true,
         }
     }
-
-    pub fn hidden(&self) -> bool { self.hidden }
-
+    pub fn set_can_navigate(&mut self, can_navigate: bool, cx: &mut Context<Self>) {
+        self.can_navigate = can_navigate;
+        cx.notify();
+    }
     /// 注册一个 ToolbarItemView。
     ///
     /// Toolbar 会订阅该 Entity 的 ToolbarItemEvent，处理 ChangeLocation。
@@ -154,7 +169,6 @@ impl Toolbar {
         self.items.push((Box::new(item), location));
         cx.notify();
     }
-
     /// 当 Pane 的 active item 变化时调用。
     ///
     /// 更新 hidden 状态 + 通知所有 toolbar items。
@@ -193,6 +207,7 @@ impl Toolbar {
             .iter()
             .find_map(|(item, _)| item.to_any().downcast().ok())
     }
+    pub fn hidden(&self) -> bool { self.hidden }
 
     /// 向 KeyContext 贡献所有可见 item 的 context。
     pub fn contribute_context(&self, context: &mut KeyContext, cx: &App) {
@@ -204,8 +219,32 @@ impl Toolbar {
     }
 }
 
-impl Default for Toolbar {
-    fn default() -> Self { Self::new() }
+impl<T: ToolbarItemView> ToolbarItemViewHandle for Entity<T> {
+    fn id(&self) -> EntityId { self.entity_id() }
+
+    fn to_any(&self) -> AnyView { self.clone().into() }
+
+    fn set_active_pane_item(
+        &self,
+        active_pane_item: Option<&dyn ItemHandle>,
+        window: &mut Window,
+        cx: &mut App,
+    ) -> ToolbarItemLocation {
+        self.update(cx, |this, cx| {
+            this.set_active_pane_item(active_pane_item, window, cx)
+        })
+    }
+
+    fn focus_changed(&mut self, pane_focused: bool, window: &mut Window, cx: &mut App) {
+        self.update(cx, |this, cx| {
+            this.pane_focus_update(pane_focused, window, cx);
+            cx.notify();
+        });
+    }
+
+    fn contribute_context(&self, context: &mut KeyContext, cx: &App) {
+        self.read(cx).contribute_context(context, cx)
+    }
 }
 
 // ---------- Render ----------
@@ -254,35 +293,5 @@ impl Render for Toolbar {
                     }),
             )
             .children(secondary_items)
-    }
-}
-
-// ---------- ToolbarItemViewHandle impl for Entity<T> ----------
-
-impl<T: ToolbarItemView> ToolbarItemViewHandle for Entity<T> {
-    fn id(&self) -> EntityId { self.entity_id() }
-
-    fn to_any(&self) -> AnyView { self.clone().into() }
-
-    fn set_active_pane_item(
-        &self,
-        active_pane_item: Option<&dyn ItemHandle>,
-        window: &mut Window,
-        cx: &mut App,
-    ) -> ToolbarItemLocation {
-        self.update(cx, |this, cx| {
-            this.set_active_pane_item(active_pane_item, window, cx)
-        })
-    }
-
-    fn focus_changed(&mut self, pane_focused: bool, window: &mut Window, cx: &mut App) {
-        self.update(cx, |this, cx| {
-            this.pane_focus_update(pane_focused, window, cx);
-            cx.notify();
-        });
-    }
-
-    fn contribute_context(&self, context: &mut KeyContext, cx: &App) {
-        self.read(cx).contribute_context(context, cx)
     }
 }

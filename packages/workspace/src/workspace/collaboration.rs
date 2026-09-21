@@ -1,7 +1,7 @@
 use super::Workspace;
 use crate::{dock::Dock, workspace::events::CloseIntent};
 use anyhow::{Context as _, Result, anyhow};
-use gpui::{App, Context, Entity, PromptLevel, Task, Window};
+use gpui::{App, AsyncApp, Context, Entity, PromptLevel, Task, Window};
 
 impl Workspace {}
 

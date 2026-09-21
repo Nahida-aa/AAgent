@@ -20,128 +20,271 @@
 //! - `is_preview` / `row` 保留
 
 use gpui::EntityId;
+use gpui::{App, Context, FocusOutEvent, Window};
+use project::Project;
+use settings::Settings;
 use std::collections::VecDeque;
+use theme_settings::ThemeSettings;
 
-/// 一次导航记录。对齐 Zed NavigationEntry。
-#[derive(Debug, Clone)]
-pub struct NavigationEntry {
-    pub entity_id: EntityId,
-    /// item 内部的恢复数据（比如光标位置、scroll 位置）。
-    /// 类型擦除为 () 占位，等有 Editor 时换成 `Arc<dyn Any>`。
-    pub data: Option<()>,
-    /// 单调递增的时间戳 — Zed 用 `Arc<AtomicUsize>` 从全局计数器拿，
-    /// AAgent 简化为 NavHistory 内部自增。
-    pub timestamp: usize,
-    /// 是否 preview item（Zed 有 "preview tab" 概念）。
-    pub is_preview: bool,
-    /// Neovim 风格去重 row — 同一 item + 同一 row 的导航会被合并。
-    pub row: Option<u32>,
-}
+use super::Pane;
+use super::history::{NavigationMode, TagNavigationMode};
+use crate::item::{ItemSettings, PreviewTabsSettings};
+use crate::workspace_settings::{FocusFollowsMouse, TabBarSettings, WorkspaceSettings};
 
-/// NavHistory — 维护 backward/forward/closed 三个栈。
-///
-/// 对齐 Zed NavHistoryState 的核心字段:
-/// - backward_stack: 已经离开的导航记录
-/// - forward_stack: 可以前进回去的记录
-/// - closed_stack: 最近关闭的 item（ReopenClosedItem 用）
-///
-/// 跟 ActivationHistory 的区别:
-/// - ActivationHistory: 扁平 "最近激活优先" 排序，实现 ActivateLastItem
-/// - NavHistory: 严格 back/forward 双向栈，实现 GoBack/GoForward
-pub struct NavHistory {
-    backward_stack: VecDeque<NavigationEntry>,
-    forward_stack: VecDeque<NavigationEntry>,
-    closed_stack: VecDeque<NavigationEntry>,
-    next_timestamp: usize,
-}
+impl Pane {
+    pub fn activate_item(
+        &mut self,
+        index: usize,
+        activate_pane: bool,
+        focus_item: bool,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        use NavigationMode::{GoingBack, GoingForward};
+        if index < self.items.len() {
+            let prev_active_item_ix = mem::replace(&mut self.active_item_index, index);
+            if (prev_active_item_ix != self.active_item_index
+                || matches!(self.nav_history.mode(), GoingBack | GoingForward))
+                && let Some(prev_item) = self.items.get(prev_active_item_ix)
+            {
+                prev_item.deactivated(window, cx);
+            }
+            self.update_history(index);
+            self.update_toolbar(window, cx);
+            self.update_status_bar(window, cx);
 
-const MAX_STACK_LEN: usize = 50;
+            if focus_item {
+                self.focus_active_item(window, cx);
+            }
 
-impl NavHistory {
-    pub fn new() -> Self {
-        Self {
-            backward_stack: VecDeque::new(),
-            forward_stack: VecDeque::new(),
-            closed_stack: VecDeque::new(),
-            next_timestamp: 0,
+            cx.emit(Event::ActivateItem {
+                local: activate_pane,
+                focus_changed: focus_item,
+            });
+
+            self.update_active_tab(index);
+            cx.notify();
         }
     }
 
-    fn next_timestamp(&mut self) -> usize {
-        let ts = self.next_timestamp;
-        self.next_timestamp += 1;
-        ts
+    pub(super) fn update_active_tab(&mut self, index: usize) {
+        if !self.is_tab_pinned(index) {
+            self.suppress_scroll = false;
+            self.tab_bar_scroll_handle
+                .scroll_to_item(index - self.pinned_tab_count);
+        }
     }
 
-    /// 激活新 item 时调 — 把当前 active push 到 backward，清空 forward。
-    /// 对齐 Zed NavHistory::push_navigation。
-    pub fn record_navigation(&mut self, from: EntityId, to: EntityId) {
-        let ts = self.next_timestamp();
-        // 去重：如果 backward 尾部已经是同一个 item（走了个小圈），更新 timestamp 就行。
-        if let Some(last) = self.backward_stack.back_mut() {
-            if last.entity_id == from {
-                last.timestamp = ts;
-                self.forward_stack.clear();
-                let _ = to;
-                return;
+    pub(super) fn update_history(&mut self, index: usize) {
+        if let Some(newly_active_item) = self.items.get(index) {
+            self.activation_history
+                .retain(|entry| entry.entity_id != newly_active_item.item_id());
+            self.activation_history.push(ActivationHistoryEntry {
+                entity_id: newly_active_item.item_id(),
+                timestamp: self
+                    .next_activation_timestamp
+                    .fetch_add(1, Ordering::SeqCst),
+            });
+        }
+    }
+
+    pub fn activate_previous_item(
+        &mut self,
+        action: &ActivatePreviousItem,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        let mut index = self.active_item_index;
+        if index > 0 {
+            index -= 1;
+        } else if action.wrap_around && !self.items.is_empty() {
+            index = self.items.len() - 1;
+        }
+        self.activate_item(index, true, true, window, cx);
+    }
+
+    pub fn activate_next_item(
+        &mut self,
+        action: &ActivateNextItem,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        let mut index = self.active_item_index;
+        if index + 1 < self.items.len() {
+            index += 1;
+        } else if action.wrap_around {
+            index = 0;
+        }
+        self.activate_item(index, true, true, window, cx);
+    }
+
+    pub fn swap_item_left(
+        &mut self,
+        _: &SwapItemLeft,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        let index = self.active_item_index;
+        if index == 0 {
+            return;
+        }
+
+        self.items.swap(index, index - 1);
+        self.activate_item(index - 1, true, true, window, cx);
+    }
+
+    pub fn swap_item_right(
+        &mut self,
+        _: &SwapItemRight,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        let index = self.active_item_index;
+        if index + 1 >= self.items.len() {
+            return;
+        }
+
+        self.items.swap(index, index + 1);
+        self.activate_item(index + 1, true, true, window, cx);
+    }
+
+    pub fn activate_last_item(
+        &mut self,
+        _: &ActivateLastItem,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        let index = self.items.len().saturating_sub(1);
+        self.activate_item(index, true, true, window, cx);
+    }
+    pub fn navigate_backward(&mut self, _: &GoBack, window: &mut Window, cx: &mut Context<Self>) {
+        if let Some(workspace) = self.workspace.upgrade() {
+            let pane = cx.entity().downgrade();
+            window.defer(cx, move |window, cx| {
+                workspace.update(cx, |workspace, cx| {
+                    workspace.go_back(pane, window, cx).detach_and_log_err(cx)
+                })
+            })
+        }
+    }
+
+    pub(super) fn navigate_forward(
+        &mut self,
+        _: &GoForward,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if let Some(workspace) = self.workspace.upgrade() {
+            let pane = cx.entity().downgrade();
+            window.defer(cx, move |window, cx| {
+                workspace.update(cx, |workspace, cx| {
+                    workspace
+                        .go_forward(pane, window, cx)
+                        .detach_and_log_err(cx)
+                })
+            })
+        }
+    }
+
+    pub fn go_to_older_tag(
+        &mut self,
+        _: &GoToOlderTag,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if let Some(workspace) = self.workspace.upgrade() {
+            let pane = cx.entity().downgrade();
+            window.defer(cx, move |window, cx| {
+                workspace.update(cx, |workspace, cx| {
+                    workspace
+                        .navigate_tag_history(pane, TagNavigationMode::Older, window, cx)
+                        .detach_and_log_err(cx)
+                })
+            })
+        }
+    }
+
+    pub fn go_to_newer_tag(
+        &mut self,
+        _: &GoToNewerTag,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if let Some(workspace) = self.workspace.upgrade() {
+            let pane = cx.entity().downgrade();
+            window.defer(cx, move |window, cx| {
+                workspace.update(cx, |workspace, cx| {
+                    workspace
+                        .navigate_tag_history(pane, TagNavigationMode::Newer, window, cx)
+                        .detach_and_log_err(cx)
+                })
+            })
+        }
+    }
+
+    pub(super) fn history_updated(&mut self, cx: &mut Context<Self>) {
+        self.toolbar.update(cx, |_, cx| cx.notify());
+    }
+
+    pub fn alternate_file(
+        &mut self,
+        _: &AlternateFile,
+        window: &mut Window,
+        cx: &mut Context<Pane>,
+    ) {
+        let (_, alternative) = &self.alternate_file_items;
+        if let Some(alternative) = alternative {
+            let existing = self
+                .items()
+                .find_position(|item| item.item_id() == alternative.id());
+            if let Some((ix, _)) = existing {
+                self.activate_item(ix, true, true, window, cx);
+            } else if let Some(upgraded) = alternative.upgrade() {
+                self.add_item(upgraded, true, true, None, window, cx);
             }
         }
-        self.backward_stack.push_back(NavigationEntry {
-            entity_id: from,
-            data: None,
-            timestamp: ts,
-            is_preview: false,
-            row: None,
+    }
+
+    pub fn track_alternate_file_items(&mut self) {
+        if let Some(item) = self.active_item().map(|item| item.downgrade_item()) {
+            let (current, _) = &self.alternate_file_items;
+            match current {
+                Some(current) => {
+                    if current.id() != item.id() {
+                        self.alternate_file_items =
+                            (Some(item), self.alternate_file_items.0.take());
+                    }
+                }
+                None => {
+                    self.alternate_file_items = (Some(item), None);
+                }
+            }
+        }
+    }
+    pub(super) fn update_toolbar(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        let active_item = self
+            .items
+            .get(self.active_item_index)
+            .map(|item| item.as_ref());
+        self.toolbar.update(cx, |toolbar, cx| {
+            toolbar.set_active_item(active_item, window, cx);
         });
-        self.backward_stack.truncate(MAX_STACK_LEN);
-        // 用户手动导航后 forward stack 失效（浏览器行为）
-        self.forward_stack.clear();
-        let _ = to;
     }
 
-    /// 关闭 item 时调 — 塞进 closed stack（用于 ReopenClosedItem）。
-    pub fn record_closed(&mut self, entity_id: EntityId) {
-        let ts = self.next_timestamp();
-        self.closed_stack.push_back(NavigationEntry {
-            entity_id,
-            data: None,
-            timestamp: ts,
-            is_preview: false,
-            row: None,
+    pub(super) fn update_status_bar(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        let workspace = self.workspace.clone();
+        let pane = cx.entity();
+
+        window.defer(cx, move |window, cx| {
+            let Ok(status_bar) =
+                workspace.read_with(cx, |workspace, _| workspace.status_bar.clone())
+            else {
+                return;
+            };
+
+            status_bar.update(cx, move |status_bar, cx| {
+                status_bar.set_active_pane(&pane, window, cx);
+            });
         });
-        self.closed_stack.truncate(MAX_STACK_LEN);
     }
-
-    /// GoBack — 从 backward pop，push 到 forward。返回要激活的 EntityId。
-    pub fn go_back(&mut self) -> Option<EntityId> {
-        let entry = self.backward_stack.pop_back()?;
-        self.forward_stack.push_back(entry.clone());
-        Some(entry.entity_id)
-    }
-
-    /// GoForward — 从 forward pop，push 到 backward。
-    pub fn go_forward(&mut self) -> Option<EntityId> {
-        let entry = self.forward_stack.pop_back()?;
-        self.backward_stack.push_back(entry.clone());
-        Some(entry.entity_id)
-    }
-
-    /// ReopenClosedItem — 从 closed stack pop。
-    pub fn pop_closed(&mut self) -> Option<EntityId> {
-        self.closed_stack.pop_back().map(|e| e.entity_id)
-    }
-
-    pub fn can_go_back(&self) -> bool { !self.backward_stack.is_empty() }
-
-    pub fn can_go_forward(&self) -> bool { !self.forward_stack.is_empty() }
-
-    pub fn clear(&mut self) {
-        self.backward_stack.clear();
-        self.forward_stack.clear();
-        self.closed_stack.clear();
-    }
-}
-
-impl Default for NavHistory {
-    fn default() -> Self { Self::new() }
 }

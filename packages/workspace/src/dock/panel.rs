@@ -8,228 +8,219 @@
 //! Zed 每个面板（Project、Git、Agent、Terminal...）是独立 Entity，
 //! 各自实现 Panel trait，Dock 存 Arc<dyn PanelHandle>。
 
+use crate::Pane;
+use crate::status_bar::HideStatusItem;
+use aa_gpui_kit_ui::IconName;
+use client::proto;
+use gpui::{
+    Action, AnyView, App, Context, Entity, EntityId, EventEmitter, FocusHandle, IntoElement,
+    ParentElement, Pixels, Render, Styled, Window, div, prelude::*, px,
+};
+use std::any::Any;
 use std::sync::Arc;
 
-use aa_gpui_kit_ui::IconName;
-use gpui::{
-    App, Context, Entity, EntityId, IntoElement, ParentElement, Pixels, Render, Styled, Window,
-    div, prelude::*, px,
-};
-use settings_content::DockPosition;
+use super::position::DockPosition;
+use super::size::PanelSizeState;
 
-// ---------- Panel trait ----------
-
-/// 面板 entity 实现的 trait。对齐 zed `dock.rs::Panel`。
-pub trait Panel: Render + Sized {
-    fn panel_key() -> &'static str;
-    fn persistent_name() -> &'static str;
-    fn default_position(&self, cx: &App) -> DockPosition;
-    fn position_is_valid(&self, position: DockPosition) -> bool;
-    fn default_size(&self, cx: &App) -> Pixels;
-    fn supports_flexible_size(&self) -> bool { false }
-    fn icon(&self, cx: &App) -> IconName;
-    fn icon_tooltip(&self, cx: &App) -> &'static str;
-    /// 启动时是否自动打开该面板所在 Dock。对齐 zed `Panel::starts_open()`。
-    /// Zed: ProjectPanel 默认 true，TerminalPanel 默认 false（settings 可配）。
-    fn starts_open(&self, _cx: &App) -> bool { false }
-    /// Dock 开/关 或 active panel 切换时调用。对齐 zed dock.rs:L586-593。
-    /// 默认空实现 — 有需要的 panel（如 TerminalPanel）覆盖来 spawn 默认内容。
-    fn set_active(&mut self, _active: bool, _cx: &mut Context<Self>) {}
+pub enum PanelEvent {
+    ZoomIn,
+    ZoomOut,
+    Activate,
+    Close,
 }
 
-// ---------- PanelHandle trait ----------
+pub trait Panel: Focusable + EventEmitter<PanelEvent> + Render + Sized {
+    fn persistent_name() -> &'static str;
+    fn panel_key() -> &'static str;
 
-use std::any::Any;
+    /// The `Focusable::focus_handle` root identifies the panel's subtree for containment checks
+    /// and must be tracked by the panel's root element. This method returns the handle that should
+    /// receive focus when the panel is activated, such as a filter, commit, or message editor; it
+    /// must be a focus-tree descendant of the root or containment checks such as Zen-mode auto-close
+    /// and toggle-focus will misbehave.
+    fn activation_focus_handle(&self, cx: &App) -> FocusHandle { self.focus_handle(cx) }
+    fn position(&self, window: &Window, cx: &App) -> DockPosition;
+    fn position_is_valid(&self, position: DockPosition) -> bool;
+    fn set_position(&mut self, position: DockPosition, window: &mut Window, cx: &mut Context<Self>);
+    fn default_size(&self, window: &Window, cx: &App) -> Pixels;
+    fn min_size(&self, _window: &Window, _cx: &App) -> Option<Pixels> { None }
+    fn initial_size_state(&self, _window: &Window, _cx: &App) -> PanelSizeState {
+        PanelSizeState::default()
+    }
+    fn size_state_changed(&mut self, _window: &mut Window, _cx: &mut Context<Self>) {}
+    fn supports_flexible_size(&self) -> bool { false }
+    fn has_flexible_size(&self, _window: &Window, _cx: &App) -> bool { false }
+    fn set_flexible_size(
+        &mut self,
+        _flexible: bool,
+        _window: &mut Window,
+        _cx: &mut Context<Self>,
+    ) {
+    }
+    fn icon(&self, window: &Window, cx: &App) -> Option<ui::IconName>;
+    fn icon_tooltip(&self, window: &Window, cx: &App) -> Option<&'static str>;
+    fn toggle_action(&self) -> Box<dyn Action>;
+    fn icon_label(&self, _window: &Window, _: &App) -> Option<String> { None }
+    fn is_zoomed(&self, _window: &Window, _cx: &App) -> bool { false }
+    fn starts_open(&self, _window: &Window, _cx: &App) -> bool { false }
+    fn set_zoomed(&mut self, _zoomed: bool, _window: &mut Window, _cx: &mut Context<Self>) {}
+    fn set_active(&mut self, _active: bool, _window: &mut Window, _cx: &mut Context<Self>) {}
+    fn pane(&self) -> Option<Entity<Pane>> { None }
+    fn remote_id() -> Option<proto::PanelId> { None }
+    fn activation_priority(&self) -> u32;
+    fn enabled(&self, _cx: &App) -> bool { true }
+    fn is_agent_panel(&self) -> bool { false }
+    /// Returns metadata describing how to hide this panel's button from the
+    /// status bar by writing to user settings. Implementors should return
+    /// `None` if the panel button cannot be hidden through settings.
+    fn hide_button_setting(&self, _: &App) -> Option<HideStatusItem> { None }
+}
 
-/// Dock 持有的 trait object。对齐 zed `dock.rs::PanelHandle`。
 pub trait PanelHandle: Send + Sync {
     fn panel_id(&self) -> EntityId;
     fn persistent_name(&self) -> &'static str;
     fn panel_key(&self) -> &'static str;
-    fn position(&self, cx: &App) -> DockPosition;
-    fn position_is_valid(&self, position: DockPosition) -> bool;
-    fn default_size(&self, cx: &App) -> Pixels;
+    fn position(&self, window: &Window, cx: &App) -> DockPosition;
+    fn position_is_valid(&self, position: DockPosition, cx: &App) -> bool;
+    fn set_position(&self, position: DockPosition, window: &mut Window, cx: &mut App);
+    fn is_zoomed(&self, window: &Window, cx: &App) -> bool;
+    fn set_zoomed(&self, zoomed: bool, window: &mut Window, cx: &mut App);
+    fn set_active(&self, active: bool, window: &mut Window, cx: &mut App);
+    fn remote_id(&self) -> Option<proto::PanelId>;
+    fn pane(&self, cx: &App) -> Option<Entity<Pane>>;
+    fn default_size(&self, window: &Window, cx: &App) -> Pixels;
+    fn min_size(&self, window: &Window, cx: &App) -> Option<Pixels>;
+    fn initial_size_state(&self, window: &Window, cx: &App) -> PanelSizeState;
+    fn size_state_changed(&self, window: &mut Window, cx: &mut App);
     fn supports_flexible_size(&self, cx: &App) -> bool;
-    fn icon(&self, cx: &App) -> IconName;
-    fn icon_tooltip(&self, cx: &App) -> &'static str;
-    /// 转为 AnyView 让 Dock::render 能渲染。对齐 zed `PanelHandle::to_any()`。
-    fn to_any(&self) -> gpui::AnyView;
-    /// 用于 downcast 回 Entity<T>（Dock::panel() 方法）。
-    fn as_any(&self) -> &dyn std::any::Any;
-    /// Dock 开/关 或 active panel 切换时调用 set_active。对齐 zed dock.rs:L586-593。
-    fn set_active(&self, active: bool, cx: &mut App);
+    fn has_flexible_size(&self, window: &Window, cx: &App) -> bool;
+    fn set_flexible_size(&self, flexible: bool, window: &mut Window, cx: &mut App);
+    fn icon(&self, window: &Window, cx: &App) -> Option<ui::IconName>;
+    fn icon_tooltip(&self, window: &Window, cx: &App) -> Option<&'static str>;
+    fn toggle_action(&self, window: &Window, cx: &App) -> Box<dyn Action>;
+    fn icon_label(&self, window: &Window, cx: &App) -> Option<String>;
+    fn panel_focus_handle(&self, cx: &App) -> FocusHandle;
+    /// See `Panel::activation_focus_handle`.
+    fn activation_focus_handle(&self, cx: &App) -> FocusHandle;
+    fn to_any(&self) -> AnyView;
+    fn activation_priority(&self, cx: &App) -> u32;
+    fn enabled(&self, cx: &App) -> bool;
+    fn is_agent_panel(&self, cx: &App) -> bool;
+    fn hide_button_setting(&self, cx: &App) -> Option<HideStatusItem>;
+    fn move_to_next_position(&self, window: &mut Window, cx: &mut App) {
+        let current_position = self.position(window, cx);
+        let next_position = [
+            DockPosition::Left,
+            DockPosition::Bottom,
+            DockPosition::Right,
+        ]
+        .into_iter()
+        .filter(|position| self.position_is_valid(*position, cx))
+        .skip_while(|valid_position| *valid_position != current_position)
+        .nth(1)
+        .unwrap_or(DockPosition::Left);
+
+        self.set_position(next_position, window, cx);
+    }
 }
 
-impl<T: Panel> PanelHandle for Entity<T> {
+impl<T> PanelHandle for Entity<T>
+where
+    T: Panel,
+{
     fn panel_id(&self) -> EntityId { Entity::entity_id(self) }
+
     fn persistent_name(&self) -> &'static str { T::persistent_name() }
+
     fn panel_key(&self) -> &'static str { T::panel_key() }
-    fn position(&self, cx: &App) -> DockPosition { self.read(cx).default_position(cx) }
-    fn position_is_valid(&self, position: DockPosition) -> bool {
-        _ = position;
-        true
+
+    fn position(&self, window: &Window, cx: &App) -> DockPosition {
+        self.read(cx).position(window, cx)
     }
-    fn default_size(&self, cx: &App) -> Pixels { self.read(cx).default_size(cx) }
+
+    fn position_is_valid(&self, position: DockPosition, cx: &App) -> bool {
+        self.read(cx).position_is_valid(position)
+    }
+
+    fn set_position(&self, position: DockPosition, window: &mut Window, cx: &mut App) {
+        self.update(cx, |this, cx| this.set_position(position, window, cx))
+    }
+
+    fn is_zoomed(&self, window: &Window, cx: &App) -> bool { self.read(cx).is_zoomed(window, cx) }
+
+    fn set_zoomed(&self, zoomed: bool, window: &mut Window, cx: &mut App) {
+        self.update(cx, |this, cx| this.set_zoomed(zoomed, window, cx))
+    }
+
+    fn set_active(&self, active: bool, window: &mut Window, cx: &mut App) {
+        self.update(cx, |this, cx| this.set_active(active, window, cx))
+    }
+
+    fn pane(&self, cx: &App) -> Option<Entity<Pane>> { self.read(cx).pane() }
+
+    fn remote_id(&self) -> Option<PanelId> { T::remote_id() }
+
+    fn default_size(&self, window: &Window, cx: &App) -> Pixels {
+        self.read(cx).default_size(window, cx)
+    }
+
+    fn min_size(&self, window: &Window, cx: &App) -> Option<Pixels> {
+        self.read(cx).min_size(window, cx)
+    }
+
+    fn initial_size_state(&self, window: &Window, cx: &App) -> PanelSizeState {
+        self.read(cx).initial_size_state(window, cx)
+    }
+
+    fn size_state_changed(&self, window: &mut Window, cx: &mut App) {
+        self.update(cx, |this, cx| this.size_state_changed(window, cx))
+    }
+
     fn supports_flexible_size(&self, cx: &App) -> bool { self.read(cx).supports_flexible_size() }
-    fn icon(&self, cx: &App) -> IconName { self.read(cx).icon(cx) }
-    fn icon_tooltip(&self, cx: &App) -> &'static str { self.read(cx).icon_tooltip(cx) }
-    fn to_any(&self) -> gpui::AnyView { self.clone().into() }
-    fn as_any(&self) -> &dyn std::any::Any { self as &dyn std::any::Any }
-    fn set_active(&self, active: bool, cx: &mut App) {
-        self.update(cx, |panel, cx| panel.set_active(active, cx));
+
+    fn has_flexible_size(&self, window: &Window, cx: &App) -> bool {
+        self.read(cx).has_flexible_size(window, cx)
+    }
+
+    fn set_flexible_size(&self, flexible: bool, window: &mut Window, cx: &mut App) {
+        self.update(cx, |this, cx| this.set_flexible_size(flexible, window, cx))
+    }
+
+    fn icon(&self, window: &Window, cx: &App) -> Option<ui::IconName> {
+        self.read(cx).icon(window, cx)
+    }
+
+    fn icon_tooltip(&self, window: &Window, cx: &App) -> Option<&'static str> {
+        self.read(cx).icon_tooltip(window, cx)
+    }
+
+    fn toggle_action(&self, _: &Window, cx: &App) -> Box<dyn Action> {
+        self.read(cx).toggle_action()
+    }
+
+    fn icon_label(&self, window: &Window, cx: &App) -> Option<String> {
+        self.read(cx).icon_label(window, cx)
+    }
+
+    fn to_any(&self) -> AnyView { self.clone().into() }
+
+    fn panel_focus_handle(&self, cx: &App) -> FocusHandle { self.read(cx).focus_handle(cx) }
+
+    fn activation_focus_handle(&self, cx: &App) -> FocusHandle {
+        self.read(cx).activation_focus_handle(cx)
+    }
+
+    fn activation_priority(&self, cx: &App) -> u32 { self.read(cx).activation_priority() }
+
+    fn enabled(&self, cx: &App) -> bool { self.read(cx).enabled(cx) }
+
+    fn is_agent_panel(&self, cx: &App) -> bool { self.read(cx).is_agent_panel() }
+
+    fn hide_button_setting(&self, cx: &App) -> Option<HideStatusItem> {
+        self.read(cx).hide_button_setting(cx)
     }
 }
 
-// ---------- Project Panel ----------
-
-pub struct ProjectPanel;
-
-impl Render for ProjectPanel {
-    fn render(&mut self, _w: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        placeholder("project")
-    }
-}
-
-impl Panel for ProjectPanel {
-    fn panel_key() -> &'static str { "project_panel" }
-    fn persistent_name() -> &'static str { "project" }
-    fn default_position(&self, _cx: &App) -> DockPosition { DockPosition::Right }
-    fn position_is_valid(&self, p: DockPosition) -> bool {
-        matches!(p, DockPosition::Left | DockPosition::Right)
-    }
-    fn default_size(&self, _cx: &App) -> Pixels { px(240.0) }
-    fn icon(&self, _cx: &App) -> IconName { IconName::FileTree }
-    fn icon_tooltip(&self, _cx: &App) -> &'static str { "Project Panel" }
-    /// 对齐 Zed ProjectPanel — settings 默认 starts_open: true。
-    fn starts_open(&self, _cx: &App) -> bool { true }
-}
-
-// ---------- Git Panel ----------
-
-pub struct GitPanel;
-
-impl Render for GitPanel {
-    fn render(&mut self, _w: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        placeholder("git")
-    }
-}
-
-impl Panel for GitPanel {
-    fn panel_key() -> &'static str { "git_panel" }
-    fn persistent_name() -> &'static str { "git" }
-    fn default_position(&self, _cx: &App) -> DockPosition { DockPosition::Right }
-    fn position_is_valid(&self, p: DockPosition) -> bool {
-        matches!(p, DockPosition::Left | DockPosition::Right)
-    }
-    fn default_size(&self, _cx: &App) -> Pixels { px(360.0) }
-    fn icon(&self, _cx: &App) -> IconName { IconName::GitBranch }
-    fn icon_tooltip(&self, _cx: &App) -> &'static str { "Git Panel" }
-}
-
-// ---------- Collab Panel ----------
-
-pub struct CollabPanel;
-
-impl Render for CollabPanel {
-    fn render(&mut self, _w: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        placeholder("collab")
-    }
-}
-
-impl Panel for CollabPanel {
-    fn panel_key() -> &'static str { "collab_panel" }
-    fn persistent_name() -> &'static str { "collab" }
-    fn default_position(&self, _cx: &App) -> DockPosition { DockPosition::Right }
-    fn position_is_valid(&self, p: DockPosition) -> bool {
-        matches!(p, DockPosition::Left | DockPosition::Right)
-    }
-    fn default_size(&self, _cx: &App) -> Pixels { px(240.0) }
-    fn icon(&self, _cx: &App) -> IconName { IconName::UserGroup }
-    fn icon_tooltip(&self, _cx: &App) -> &'static str { "Collab Panel" }
-}
-
-// ---------- Outline Panel ----------
-
-pub struct OutlinePanel;
-
-impl Render for OutlinePanel {
-    fn render(&mut self, _w: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        placeholder("outline")
-    }
-}
-
-impl Panel for OutlinePanel {
-    fn panel_key() -> &'static str { "outline_panel" }
-    fn persistent_name() -> &'static str { "outline" }
-    fn default_position(&self, _cx: &App) -> DockPosition { DockPosition::Right }
-    fn position_is_valid(&self, p: DockPosition) -> bool {
-        matches!(p, DockPosition::Left | DockPosition::Right)
-    }
-    fn default_size(&self, _cx: &App) -> Pixels { px(300.0) }
-    fn icon(&self, _cx: &App) -> IconName { IconName::ListTree }
-    fn icon_tooltip(&self, _cx: &App) -> &'static str { "Outline Panel" }
-}
-
-// ---------- Agent Panel (flexible) ----------
-
-pub struct AgentPanel;
-
-impl Render for AgentPanel {
-    fn render(&mut self, _w: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        placeholder("agent")
-    }
-}
-
-impl Panel for AgentPanel {
-    fn panel_key() -> &'static str { "agent" }
-    fn persistent_name() -> &'static str { "agent" }
-    fn default_position(&self, _cx: &App) -> DockPosition { DockPosition::Left }
-    fn position_is_valid(&self, p: DockPosition) -> bool { p != DockPosition::Bottom }
-    fn default_size(&self, _cx: &App) -> Pixels { px(640.0) }
-    fn supports_flexible_size(&self) -> bool { true }
-    fn icon(&self, _cx: &App) -> IconName { IconName::ZedAssistant }
-    fn icon_tooltip(&self, _cx: &App) -> &'static str { "Agent Panel" }
-    /// 非 ProjectPanel 一律默认 false，由 settings 配置开启。
-    fn starts_open(&self, _cx: &App) -> bool { false }
-}
-
-// ---------- Terminal Panel ----------
-// TerminalPanel 已移到 aa-terminal-view crate。
-// 原来的 placeholder 在 panel.rs 是一个空 struct + placeholder render。
-// 现在由 terminal-view/src/panel.rs 提供真正的实现（持有 active_pane + new_terminal）。
-
-// ---------- Debug Panel ----------
-
-pub struct DebugPanel;
-
-impl Render for DebugPanel {
-    fn render(&mut self, _w: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        placeholder("debug")
-    }
-}
-
-impl Panel for DebugPanel {
-    fn panel_key() -> &'static str { "debug" }
-    fn persistent_name() -> &'static str { "debug" }
-    fn default_position(&self, _cx: &App) -> DockPosition { DockPosition::Bottom }
-    fn position_is_valid(&self, _p: DockPosition) -> bool { true }
-    fn default_size(&self, _cx: &App) -> Pixels { px(320.0) }
-    fn icon(&self, _cx: &App) -> IconName { IconName::Debug }
-    fn icon_tooltip(&self, _cx: &App) -> &'static str { "Debug Panel" }
-}
-
-// ---------- helper ----------
-
-fn placeholder(name: &str) -> gpui::AnyElement {
-    div()
-        .flex_1()
-        .flex()
-        .items_center()
-        .justify_center()
-        .w_full()
-        .h_full()
-        .text_size(px(16.0))
-        .text_color(gpui::hsla(0.0, 0.0, 0.5, 1.0))
-        .child(format!("{} (placeholder)", name))
-        .into_any_element()
+impl From<&dyn PanelHandle> for AnyView {
+    fn from(val: &dyn PanelHandle) -> Self { val.to_any() }
 }

@@ -4,7 +4,7 @@ use anyhow::{Context as _, Result, anyhow};
 use gpui::{App, Context, Entity, PromptLevel, Task, Window};
 
 impl Workspace {
-    pub(super) fn serialize_workspace(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+    pub(crate) fn serialize_workspace(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         if self._schedule_serialize_workspace.is_none() {
             self._schedule_serialize_workspace =
                 Some(cx.spawn_in(window, async move |this, cx| {
@@ -142,7 +142,7 @@ impl Workspace {
         }
     }
 
-    async fn serialize_items(
+    pub(super) async fn serialize_items(
         this: &WeakEntity<Self>,
         items_rx: UnboundedReceiver<Box<dyn SerializableItemHandle>>,
         cx: &mut AsyncWindowContext,

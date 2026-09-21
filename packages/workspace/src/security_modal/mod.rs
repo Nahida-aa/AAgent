@@ -12,17 +12,17 @@ use gpui::{
     WeakEntity,
 };
 
+use aa_gpui_kit_theme::ActiveTheme;
 use aa_gpui_kit_ui::{
     AlertModal, Checkbox, KeyBinding, ListBulletItem, ToggleState, WithScrollbar, prelude::*,
 };
+use aa_gpui_kit_ui_input::InputField;
 use project::{
     WorktreeId,
     trusted_worktrees::{PathTrust, RemoteHostLocation, TrustedWorktrees},
     worktree_store::WorktreeStore,
 };
 use smallvec::SmallVec;
-use theme::ActiveTheme;
-use ui_input::InputField;
 
 use util::paths::PathStyle;
 

@@ -18,298 +18,361 @@ use gpui::{
 
 use crate::item::{Item, ItemHandle};
 
-pub mod activate_item;
 pub mod dragged;
 pub mod event;
 pub mod group;
-pub mod history;
-pub mod navigation;
-
-pub use activate_item::ActivateItem;
 pub use dragged::{DraggedSelection, DraggedTab};
 pub use event::Event;
-pub use history::ActivationHistory;
-pub use navigation::NavHistory;
+pub use history::{ActivationHistory, NavHistory};
+mod actions;
+mod add_item;
+mod close;
+mod focus;
+mod helpers;
+mod history;
+mod mouse;
+mod navigation;
+mod pin;
+mod preview;
+mod queries;
+mod render;
+mod selection;
+mod tab_bar;
+mod zoom;
 
-actions!(
-    pane,
-    [
-        CloseActiveItem,
-        ActivateNextItem,
-        ActivatePreviousItem,
-        ClosePane,
-        /// 激活最近激活过的 item（对齐 zed ActivateLastItem）。
-        ActivateLastItem,
-        /// 在最近浏览过的 tab 里回退（对齐 zed GoBack）。
-        GoBack,
-        /// 在最近浏览过的 tab 里前进（对齐 zed GoForward）。
-        GoForward,
-        /// 重开最近关闭的 tab（对齐 zed ReopenClosedItem）。
-        ReopenClosedItem,
-    ]
-);
+pub use actions::*;
+pub use helpers::*;
+pub use history::*;
+pub use queries::*;
+pub use selection::*;
+
+use collections::{HashMap, HashSet};
+use std::any::Any;
+use std::num::NonZeroUsize;
+use std::rc::Rc;
+use std::sync::Arc;
+use std::sync::atomic::AtomicUsize;
+
+use gpui::{
+    Action, AnyElement, AnyView, App, Context, Entity, EntityId, EventEmitter, FocusHandle,
+    Focusable, Pixels, Point, Render, ScrollHandle, Subscription, Task, WeakEntity,
+    WeakFocusHandle, Window,
+};
+use language::DiagnosticSeverity;
+use parking_lot::Mutex;
+use project::{Project, ProjectPath};
+use ui::{ContextMenu, PopoverMenuHandle};
+use util::TryFutureExt;
+
+use crate::Workspace;
+use crate::item::{Item, ItemBufferKind, ItemHandle, ProjectItemKind, WeakItemHandle};
+use crate::toolbar::Toolbar;
+use crate::workspace_settings::{FocusFollowsMouse, WorkspaceSettings};
+
+pub enum Event {
+    AddItem {
+        item: Box<dyn ItemHandle>,
+    },
+    ActivateItem {
+        local: bool,
+        focus_changed: bool,
+    },
+    Remove {
+        focus_on_pane: Option<Entity<Pane>>,
+    },
+    RemovedItem {
+        item: Box<dyn ItemHandle>,
+    },
+    Split {
+        direction: SplitDirection,
+        mode: SplitMode,
+    },
+    ItemPinned,
+    ItemUnpinned,
+    JoinAll,
+    JoinIntoNext,
+    ChangeItemTitle,
+    Focus,
+    ZoomIn,
+    ZoomOut,
+    UserSavedItem {
+        item: Box<dyn WeakItemHandle>,
+        save_intent: SaveIntent,
+    },
+}
+
+impl fmt::Debug for Event {
+    /* 原 impl */
+}
+
+pub struct ActivationHistoryEntry {
+    pub entity_id: EntityId,
+    pub timestamp: usize,
+}
 
 /// Tab 容器 — 装多个 Item，顶部 tab bar 切换。
 pub struct Pane {
-    focus_handle: FocusHandle,
-    items: Vec<Box<dyn ItemHandle>>,
-    active_item_index: usize,
-    close_pane_if_empty: bool,
-    /// 激活历史 — 最近激活的 item 排最前，实现 "activate last"。
-    activation_history: ActivationHistory,
-    /// 导航历史 — back/forward 栈，实现 GoBack/GoForward。
-    nav_history: NavHistory,
+    pub(super) alternate_file_items: (
+        Option<Box<dyn WeakItemHandle>>,
+        Option<Box<dyn WeakItemHandle>>,
+    ),
+    pub(super) focus_handle: FocusHandle,
+    pub(super) items: Vec<Box<dyn ItemHandle>>,
+    pub(super) activation_history: Vec<ActivationHistoryEntry>,
+    pub(super) next_activation_timestamp: Arc<AtomicUsize>,
+    pub(super) zoomed: bool,
+    pub(super) was_focused: bool,
+    pub(super) active_item_index: usize,
+    pub(super) preview_item_id: Option<EntityId>,
+    pub(super) last_focus_handle_by_item: HashMap<EntityId, WeakFocusHandle>,
+    pub(super) nav_history: NavHistory,
+    pub(super) toolbar: Entity<Toolbar>,
+    pub(crate) workspace: WeakEntity<Workspace>,
+    pub(super) project: WeakEntity<Project>,
+    pub drag_split_direction: Option<SplitDirection>,
+    pub(super) can_drop_predicate: Option<Arc<dyn Fn(&dyn Any, &mut Window, &mut App) -> bool>>,
+    pub(super) can_split_predicate:
+        Option<Arc<dyn Fn(&mut Self, &dyn Any, &mut Window, &mut Context<Self>) -> bool>>,
+    pub(super) can_toggle_zoom: bool,
+    pub(super) should_display_tab_bar: Rc<dyn Fn(&Window, &mut Context<Pane>) -> bool>,
+    pub(super) should_display_welcome_page: bool,
+    pub(super) render_tab_bar_buttons: Rc<
+        dyn Fn(
+            &mut Pane,
+            &mut Window,
+            &mut Context<Pane>,
+        ) -> (Option<AnyElement>, Option<AnyElement>),
+    >,
+    pub(super) render_tab_bar: Rc<dyn Fn(&mut Pane, &mut Window, &mut Context<Pane>) -> AnyElement>,
+    pub(super) show_tab_bar_buttons: bool,
+    pub(super) max_tabs: Option<NonZeroUsize>,
+    pub(super) use_max_tabs: bool,
+    pub(super) _subscriptions: Vec<Subscription>,
+    pub(super) tab_bar_scroll_handle: ScrollHandle,
+    pub(super) suppress_scroll: bool,
+    pub(super) display_nav_history_buttons: Option<bool>,
+    pub(super) double_click_dispatch_action: Box<dyn Action>,
+    pub(super) save_modals_spawned: HashSet<EntityId>,
+    pub(super) close_pane_if_empty: bool,
+    pub new_item_context_menu_handle: PopoverMenuHandle<ContextMenu>,
+    pub split_item_context_menu_handle: PopoverMenuHandle<ContextMenu>,
+    pub(super) pinned_tab_count: usize,
+    pub(super) diagnostics: HashMap<ProjectPath, DiagnosticSeverity>,
+    pub(super) zoom_out_on_close: bool,
+    pub(super) focus_follows_mouse: FocusFollowsMouse,
+    pub(super) diagnostic_summary_update: Task<()>,
+    pub project_item_restoration_data: HashMap<ProjectItemKind, Box<dyn Any + Send>>,
+    pub(super) welcome_page: Option<Entity<crate::welcome::WelcomePage>>,
+    pub in_center_group: bool,
 }
 
-impl Pane {
-    pub fn new(cx: &mut Context<Self>) -> Self {
-        Self {
-            focus_handle: cx.focus_handle(),
-            items: Vec::new(),
-            active_item_index: 0,
-            close_pane_if_empty: true,
-            activation_history: ActivationHistory::new(),
-            nav_history: NavHistory::new(),
-        }
-    }
+pub enum Side {
+    Left,
+    Right,
+}
 
-    pub fn add_item<T: Item>(&mut self, item: Entity<T>, cx: &mut Context<Self>) {
-        let entity_id = item.entity_id();
-        self.items.push(Box::new(item) as Box<dyn ItemHandle>);
-        let prev_active_id = self
-            .items
-            .get(self.active_item_index)
-            .map(|it| it.item_id());
-        self.active_item_index = self.items.len() - 1;
-        self.activation_history.record_activation(entity_id);
-        if let Some(from) = prev_active_id {
-            self.nav_history.record_navigation(from, entity_id);
-        }
-        cx.emit(Event::ItemAdded(entity_id));
-        cx.emit(Event::ActiveItemChanged);
-        cx.notify();
-    }
+#[derive(Copy, Clone)]
+pub(super) enum PinOperation {
+    Pin,
+    Unpin,
+}
 
-    pub fn activate_item(&mut self, index: usize, cx: &mut Context<Self>) {
-        if index >= self.items.len() || self.active_item_index == index {
-            return;
-        }
-        let from_id = self.items[self.active_item_index].item_id();
-        self.active_item_index = index;
-        let to_id = self.items[index].item_id();
-        self.activation_history.record_activation(to_id);
-        self.nav_history.record_navigation(from_id, to_id);
-        cx.emit(Event::ActiveItemChanged);
-        cx.notify();
-    }
-
-    pub fn close_item(&mut self, index: usize, cx: &mut Context<Self>) {
-        if index >= self.items.len() {
-            return;
-        }
-        let closed_id = self.items[index].item_id();
-        let _ = self.items.remove(index);
-        self.activation_history.remove(closed_id);
-        self.nav_history.record_closed(closed_id);
-
-        if self.items.is_empty() {
-            self.active_item_index = 0;
-            if self.close_pane_if_empty {
-                cx.emit(Event::Empty);
-            }
-        } else {
-            self.active_item_index = (self.active_item_index.min(self.items.len() - 1)).max(0);
-        }
-        cx.emit(Event::ItemClosed(closed_id));
-        cx.notify();
-    }
-
-    /// 激活最近激活过的 item（除了当前 active 的）。
-    /// 对齐 Zed 的 ActivateLastItem action。
-    pub fn activate_last_item(&mut self, cx: &mut Context<Self>) {
-        if self.items.len() < 2 {
-            return;
-        }
-        let current_id = self.items[self.active_item_index].item_id();
-        if let Some(recent_id) = self.activation_history.most_recent_excluding(current_id) {
-            if let Some(index) = self.items.iter().position(|it| it.item_id() == recent_id) {
-                self.activate_item(index, cx);
-            }
-        }
-    }
-
-    /// GoBack — 回到上一个 tab。
-    /// 对齐 Zed 的 GoBack action。
-    pub fn go_back(&mut self, cx: &mut Context<Self>) {
-        if let Some(target_id) = self.nav_history.go_back() {
-            if let Some(index) = self.items.iter().position(|it| it.item_id() == target_id) {
-                // 直接设 index，不走 activate_item（避免污染 nav_history）
-                if self.active_item_index != index {
-                    self.active_item_index = index;
-                    self.activation_history.record_activation(target_id);
-                    cx.emit(Event::ActiveItemChanged);
-                    cx.notify();
-                }
-            }
-        }
-    }
-
-    /// GoForward — 前进到下一个 tab。
-    /// 对齐 Zed 的 GoForward action。
-    pub fn go_forward(&mut self, cx: &mut Context<Self>) {
-        if let Some(target_id) = self.nav_history.go_forward() {
-            if let Some(index) = self.items.iter().position(|it| it.item_id() == target_id) {
-                if self.active_item_index != index {
-                    self.active_item_index = index;
-                    self.activation_history.record_activation(target_id);
-                    cx.emit(Event::ActiveItemChanged);
-                    cx.notify();
-                }
-            }
-        }
-    }
-
-    /// ReopenClosedItem — 弹出最近关闭的 tab（目前只返回 EntityId，
-    /// 真正的 "重新加回 Pane" 逻辑由 Workspace 或 Panel 消费）。
-    pub fn pop_closed(&mut self) -> Option<EntityId> { self.nav_history.pop_closed() }
-
-    pub fn can_go_back(&self) -> bool { self.nav_history.can_go_back() }
-
-    pub fn can_go_forward(&self) -> bool { self.nav_history.can_go_forward() }
-
-    pub fn items(&self) -> &[Box<dyn ItemHandle>] { &self.items }
-
-    pub fn active_item_index(&self) -> usize { self.active_item_index }
-
-    pub fn is_empty(&self) -> bool { self.items.is_empty() }
+pub struct DraggedTab {
+    pub pane: Entity<Pane>,
+    pub item: Box<dyn ItemHandle>,
+    pub ix: usize,
+    pub detail: usize,
+    pub is_active: bool,
 }
 
 impl EventEmitter<Event> for Pane {}
 
 impl Focusable for Pane {
-    fn focus_handle(&self, _: &App) -> FocusHandle { self.focus_handle.clone() }
-}
-
-impl Render for Pane {
-    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        div()
-            .size_full()
-            .flex_col()
-            .on_action(cx.listener(|this: &mut Self, _: &CloseActiveItem, _, cx| {
-                if !this.items.is_empty() {
-                    this.close_item(this.active_item_index, cx);
-                }
-            }))
-            .on_action(cx.listener(|this: &mut Self, e: &ActivateItem, _, cx| {
-                this.activate_item(e.0, cx);
-            }))
-            .on_action(cx.listener(|this: &mut Self, _: &ActivateNextItem, _, cx| {
-                if this.items.len() > 1 {
-                    let next = (this.active_item_index + 1) % this.items.len();
-                    this.activate_item(next, cx);
-                }
-            }))
-            .on_action(
-                cx.listener(|this: &mut Self, _: &ActivatePreviousItem, _, cx| {
-                    if this.items.len() > 1 {
-                        let prev =
-                            (this.active_item_index + this.items.len() - 1) % this.items.len();
-                        this.activate_item(prev, cx);
-                    }
-                }),
-            )
-            .on_action(cx.listener(|this: &mut Self, _: &ActivateLastItem, _, cx| {
-                this.activate_last_item(cx);
-            }))
-            .on_action(cx.listener(|this: &mut Self, _: &GoBack, _, cx| {
-                this.go_back(cx);
-            }))
-            .on_action(cx.listener(|this: &mut Self, _: &GoForward, _, cx| {
-                this.go_forward(cx);
-            }))
-            .child(self.render_tab_bar(cx))
-            .child(self.render_active_item(cx))
-    }
+    fn focus_handle(&self, _cx: &App) -> FocusHandle { self.focus_handle.clone() }
 }
 
 impl Pane {
-    fn render_tab_bar(&mut self, cx: &mut Context<Self>) -> impl IntoElement {
-        let colors = cx.theme().colors();
+    pub fn new(
+        workspace: WeakEntity<Workspace>,
+        project: Entity<Project>,
+        next_timestamp: Arc<AtomicUsize>,
+        can_drop_predicate: Option<Arc<dyn Fn(&dyn Any, &mut Window, &mut App) -> bool + 'static>>,
+        double_click_dispatch_action: Box<dyn Action>,
+        use_max_tabs: bool,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) -> Self {
+        let focus_handle = cx.focus_handle();
+        let max_tabs = if use_max_tabs {
+            WorkspaceSettings::get_global(cx).max_tabs
+        } else {
+            None
+        };
 
-        if self.items.is_empty() {
-            return div();
+        let subscriptions = vec![
+            cx.on_focus(&focus_handle, window, Pane::focus_in),
+            cx.on_focus_in(&focus_handle, window, Pane::focus_in),
+            cx.on_focus_out(&focus_handle, window, Pane::focus_out),
+            cx.observe_global_in::<SettingsStore>(window, Self::settings_changed),
+            cx.subscribe(&project, Self::project_events),
+        ];
+
+        let handle = cx.entity().downgrade();
+
+        Self {
+            alternate_file_items: (None, None),
+            focus_handle,
+            items: Vec::new(),
+            activation_history: Vec::new(),
+            next_activation_timestamp: next_timestamp.clone(),
+            was_focused: false,
+            zoomed: false,
+            active_item_index: 0,
+            preview_item_id: None,
+            max_tabs,
+            use_max_tabs,
+            last_focus_handle_by_item: Default::default(),
+            nav_history: NavHistory(Arc::new(Mutex::new(NavHistoryState {
+                mode: NavigationMode::Normal,
+                backward_stack: Default::default(),
+                forward_stack: Default::default(),
+                closed_stack: Default::default(),
+                tag_stack: Default::default(),
+                tag_stack_pos: Default::default(),
+                paths_by_item: Default::default(),
+                pane: handle,
+                next_timestamp,
+                preview_item_id: None,
+            }))),
+            toolbar: cx.new(|_| Toolbar::new()),
+            tab_bar_scroll_handle: ScrollHandle::new(),
+            suppress_scroll: false,
+            drag_split_direction: None,
+            workspace,
+            project: project.downgrade(),
+            can_drop_predicate,
+            can_split_predicate: None,
+            can_toggle_zoom: true,
+            should_display_tab_bar: Rc::new(|_, cx| TabBarSettings::get_global(cx).show),
+            should_display_welcome_page: false,
+            render_tab_bar_buttons: Rc::new(default_render_tab_bar_buttons),
+            render_tab_bar: Rc::new(Self::render_tab_bar),
+            show_tab_bar_buttons: TabBarSettings::get_global(cx).show_tab_bar_buttons,
+            display_nav_history_buttons: Some(
+                TabBarSettings::get_global(cx).show_nav_history_buttons,
+            ),
+            _subscriptions: subscriptions,
+            double_click_dispatch_action,
+            save_modals_spawned: HashSet::default(),
+            close_pane_if_empty: true,
+            split_item_context_menu_handle: Default::default(),
+            new_item_context_menu_handle: Default::default(),
+            pinned_tab_count: 0,
+            diagnostics: Default::default(),
+            zoom_out_on_close: true,
+            focus_follows_mouse: WorkspaceSettings::get_global(cx).focus_follows_mouse,
+            diagnostic_summary_update: Task::ready(()),
+            project_item_restoration_data: HashMap::default(),
+            welcome_page: None,
+            in_center_group: false,
         }
-
-        let mut tab_bar = div()
-            .flex()
-            .flex_row()
-            .items_center()
-            .px_1()
-            .h(px(28.0))
-            .border_b_1()
-            .border_color(colors.border);
-
-        for (i, item) in self.items.iter().enumerate() {
-            let is_active = i == self.active_item_index;
-            let icon = item.tab_icon(cx);
-            let label = item.tab_label(cx);
-
-            let tab_id = format!("pane-tab-{i}");
-            let close_id = format!("pane-tab-close-{i}");
-
-            tab_bar = tab_bar.child(
-                div()
-                    .id(tab_id)
-                    .flex()
-                    .flex_row()
-                    .items_center()
-                    .gap_1()
-                    .px_2()
-                    .h_full()
-                    .text_size(px(13.0))
-                    .cursor_pointer()
-                    .bg(if is_active {
-                        colors.panel_background
-                    } else {
-                        colors.surface_background
-                    })
-                    .child(aa_gpui_kit_ui::base::icon::Icon::new(icon).size(px(14.0)))
-                    .child(label)
-                    .on_click(cx.listener(move |this: &mut Self, _, _, cx| {
-                        this.activate_item(i, cx);
-                    }))
-                    .child(
-                        div()
-                            .id(close_id)
-                            .pl_1()
-                            .cursor_pointer()
-                            .on_click(cx.listener(move |this: &mut Self, _, _, cx| {
-                                this.close_item(i, cx);
-                            }))
-                            .child(
-                                aa_gpui_kit_ui::base::icon::Icon::new(IconName::Close)
-                                    .size(px(12.0)),
-                            ),
-                    ),
-            );
-        }
-        tab_bar
     }
 
-    fn render_active_item(&mut self, cx: &mut Context<Self>) -> impl IntoElement {
-        let colors = cx.theme().colors();
-        if let Some(item) = self.items.get(self.active_item_index) {
-            item.render_content(cx)
-        } else {
-            div()
-                .flex_1()
-                .flex()
-                .items_center()
-                .justify_center()
-                .text_size(px(14.0))
-                .text_color(colors.text_muted)
-                .child("Pane 为空")
-                .into_any_element()
+    // 设置方法，全部保持 pub
+    pub fn set_should_display_tab_bar<F>(&mut self, should_display_tab_bar: F)
+    where
+        F: 'static + Fn(&Window, &mut Context<Pane>) -> bool,
+    {
+        self.should_display_tab_bar = Rc::new(should_display_tab_bar);
+    }
+
+    pub fn set_should_display_welcome_page(&mut self, should_display_welcome_page: bool) {
+        self.should_display_welcome_page = should_display_welcome_page;
+    }
+
+    pub fn set_can_split(
+        &mut self,
+        can_split_predicate: Option<
+            Arc<dyn Fn(&mut Self, &dyn Any, &mut Window, &mut Context<Self>) -> bool + 'static>,
+        >,
+    ) {
+        self.can_split_predicate = can_split_predicate;
+    }
+
+    pub fn set_can_toggle_zoom(&mut self, can_toggle_zoom: bool, cx: &mut Context<Self>) {
+        self.can_toggle_zoom = can_toggle_zoom;
+        cx.notify();
+    }
+
+    pub fn set_close_pane_if_empty(&mut self, close_pane_if_empty: bool, cx: &mut Context<Self>) {
+        self.close_pane_if_empty = close_pane_if_empty;
+        cx.notify();
+    }
+
+    pub fn set_can_navigate(&mut self, can_navigate: bool, cx: &mut Context<Self>) {
+        self.toolbar.update(cx, |toolbar, cx| {
+            toolbar.set_can_navigate(can_navigate, cx);
+        });
+        cx.notify();
+    }
+
+    pub fn set_render_tab_bar<F>(&mut self, cx: &mut Context<Self>, render: F)
+    where
+        F: 'static + Fn(&mut Pane, &mut Window, &mut Context<Pane>) -> AnyElement,
+    {
+        self.render_tab_bar = Rc::new(render);
+        cx.notify();
+    }
+
+    pub fn set_render_tab_bar_buttons<F>(&mut self, cx: &mut Context<Self>, render: F)
+    where
+        F: 'static
+            + Fn(
+                &mut Pane,
+                &mut Window,
+                &mut Context<Pane>,
+            ) -> (Option<AnyElement>, Option<AnyElement>),
+    {
+        self.render_tab_bar_buttons = Rc::new(render);
+        cx.notify();
+    }
+
+    pub fn nav_history_for_item<T: Item>(&self, item: &Entity<T>) -> ItemNavHistory {
+        ItemNavHistory {
+            history: self.nav_history.clone(),
+            item: Arc::new(item.downgrade()),
         }
+    }
+
+    pub fn nav_history(&self) -> &NavHistory { &self.nav_history }
+
+    pub fn nav_history_mut(&mut self) -> &mut NavHistory { &mut self.nav_history }
+
+    pub fn fork_nav_history(&self) -> NavHistory {
+        let history = self.nav_history.0.lock().clone();
+        NavHistory(Arc::new(Mutex::new(history)))
+    }
+
+    pub fn set_nav_history(&mut self, history: NavHistory, cx: &Context<Self>) {
+        self.nav_history = history;
+        self.nav_history().0.lock().pane = cx.entity().downgrade();
+    }
+
+    pub fn disable_history(&mut self) { self.nav_history.disable(); }
+
+    pub fn enable_history(&mut self) { self.nav_history.enable(); }
+
+    pub fn can_navigate_backward(&self) -> bool {
+        !self.nav_history.0.lock().backward_stack.is_empty()
+    }
+
+    pub fn can_navigate_forward(&self) -> bool {
+        !self.nav_history.0.lock().forward_stack.is_empty()
+    }
+    pub fn display_nav_history_buttons(&mut self, display: Option<bool>) {
+        self.display_nav_history_buttons = display;
+    }
+    pub fn set_zoom_out_on_close(&mut self, zoom_out_on_close: bool) {
+        self.zoom_out_on_close = zoom_out_on_close;
     }
 }

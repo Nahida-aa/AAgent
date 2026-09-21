@@ -5,6 +5,7 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+anyhow.workspace = true
 gpui.workspace = true
 aa_gpui_kit_theme.workspace = true
 aa_gpui_kit_ui.workspace = true
@@ -24,3 +25,5 @@ markdown.workspace = true
 util.workspace = true
 worktree.workspace = true
 remote.workspace = true
+gpui_util.workspace = true
+aa_gpui_kit_ui_input.workspace = true

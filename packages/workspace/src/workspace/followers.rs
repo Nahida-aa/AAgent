@@ -512,7 +512,7 @@ impl Workspace {
             Ok(())
         })
     }
-    async fn process_leader_update(
+    pub(super) async fn process_leader_update(
         this: &WeakEntity<Self>,
         leader_id: PeerId,
         update: proto::UpdateFollowers,
@@ -828,7 +828,7 @@ impl Workspace {
             .create_shared_screen(peer_id, pane, window, cx)
     }
 
-    fn on_active_call_event(
+    pub(super) fn on_active_call_event(
         &mut self,
         event: &ActiveCallEvent,
         window: &mut Window,

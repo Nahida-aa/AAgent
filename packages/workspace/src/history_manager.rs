@@ -3,8 +3,9 @@ use std::{path::PathBuf, sync::Arc};
 use fs::Fs;
 use gpui::{App, Context};
 use gpui::{AppContext, Entity, Global, MenuItem};
+use gpui_util::ResultExt;
 use smallvec::SmallVec;
-use util::{ResultExt, paths::PathExt};
+use util::paths::PathExt;
 
 use crate::{
     NewWindow, SerializedWorkspaceLocation, WorkspaceId, path_list::PathList,

@@ -11,3 +11,6 @@ futures = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 tempfile = { workspace = true }
 gpui = { workspace = true }
+util.workspace = true
+gpui_util.workspace = true
+path.workspace = true

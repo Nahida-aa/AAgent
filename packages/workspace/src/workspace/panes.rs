@@ -384,7 +384,7 @@ impl Workspace {
         self.center.reset_pane_sizes(cx);
         cx.notify();
     }
-    fn handle_pane_event(
+    pub(super) fn handle_pane_event(
         &mut self,
         pane: &Entity<Pane>,
         event: &pane::Event,

@@ -387,7 +387,7 @@ impl Workspace {
             cx,
         )
     }
-    fn update_history(&self, cx: &mut App) {
+    pub(super) fn update_history(&self, cx: &mut App) {
         let Some(id) = self.database_id() else {
             return;
         };

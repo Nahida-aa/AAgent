@@ -11,6 +11,7 @@ pub use shell::{Shell, ShellKind};
 pub use shell_builder::ShellBuilder;
 #[cfg(not(target_family = "wasm"))]
 pub mod command;
+pub mod path_list;
 #[cfg(not(target_family = "wasm"))]
 pub mod process;
 pub mod redact;

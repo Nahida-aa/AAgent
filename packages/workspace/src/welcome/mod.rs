@@ -14,7 +14,7 @@ use gpui::{WeakEntity, linear_color_stop, linear_gradient};
 use menu::{SelectNext, SelectPrevious};
 
 use aa_gpui_kit_ui::{
-    ButtonLike, Divider, DividerColor, KeyBinding, Vector, VectorName, prelude::*,
+    ButtonLike, Divider, DividerColor, IconSize, KeyBinding, Vector, VectorName, prelude::*,
 };
 use aagent_actions::{
     Extensions, OpenKeymap, OpenOnboarding, OpenSettings, assistant::ToggleFocus, command_palette,

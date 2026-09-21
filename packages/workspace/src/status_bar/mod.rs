@@ -27,12 +27,27 @@ use gpui::{
     prelude::*, px,
 };
 
-use crate::dock::panel_buttons::PanelButtons;
+use crate::dock::buttons::PanelButtons;
 use settings_content::SidebarSide;
 
 /// 状态栏项（对齐 zed `StatusItemView`）。
 pub trait StatusItemView: Render {
-    fn has_custom_menu(&self) -> bool { false }
+    /// Event callback that is triggered when the active pane item changes.
+    fn set_active_pane_item(
+        &mut self,
+        active_pane_item: Option<&dyn crate::ItemHandle>,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    );
+
+    /// Returns metadata describing how this item can be hidden from the
+    /// status bar by writing to the user settings file.
+    ///
+    /// Implementors that return `None` must be inherently conditional on
+    /// another user-exposed setting; otherwise, they should return `Some` so
+    /// that the status bar can show a "Hide Button" entry in its
+    /// right-click menu.
+    fn hide_setting(&self, cx: &App) -> Option<HideStatusItem>;
 }
 
 /// trait 对象化的 item handle。

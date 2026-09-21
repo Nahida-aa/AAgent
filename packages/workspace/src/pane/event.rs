@@ -5,16 +5,72 @@
 
 use gpui::EntityId;
 
-/// Pane 内部事件。Pane 通过 `EventEmitter<Event>` 发出，
-/// Workspace 或 Panel 订阅来响应（比如 Empty 时关闭面板）。
-#[derive(Debug, Clone)]
 pub enum Event {
-    /// 所有 item 被关闭，Pane 变空。
-    Empty,
-    /// active item 变了（用户点 tab、activate_item、close active 都会触发）。
-    ActiveItemChanged,
-    /// 某个 item 被关闭。携带被关闭 item 的 EntityId。
-    ItemClosed(EntityId),
-    /// 某个 item 被添加。携带新 item 的 EntityId。
-    ItemAdded(EntityId),
+    AddItem {
+        item: Box<dyn ItemHandle>,
+    },
+    ActivateItem {
+        local: bool,
+        focus_changed: bool,
+    },
+    Remove {
+        focus_on_pane: Option<Entity<Pane>>,
+    },
+    RemovedItem {
+        item: Box<dyn ItemHandle>,
+    },
+    Split {
+        direction: SplitDirection,
+        mode: SplitMode,
+    },
+    ItemPinned,
+    ItemUnpinned,
+    JoinAll,
+    JoinIntoNext,
+    ChangeItemTitle,
+    Focus,
+    ZoomIn,
+    ZoomOut,
+    UserSavedItem {
+        item: Box<dyn WeakItemHandle>,
+        save_intent: SaveIntent,
+    },
+}
+
+impl fmt::Debug for Event {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Event::AddItem { item } => f
+                .debug_struct("AddItem")
+                .field("item", &item.item_id())
+                .finish(),
+            Event::ActivateItem { local, .. } => f
+                .debug_struct("ActivateItem")
+                .field("local", local)
+                .finish(),
+            Event::Remove { .. } => f.write_str("Remove"),
+            Event::RemovedItem { item } => f
+                .debug_struct("RemovedItem")
+                .field("item", &item.item_id())
+                .finish(),
+            Event::Split { direction, mode } => f
+                .debug_struct("Split")
+                .field("direction", direction)
+                .field("mode", mode)
+                .finish(),
+            Event::JoinAll => f.write_str("JoinAll"),
+            Event::JoinIntoNext => f.write_str("JoinIntoNext"),
+            Event::ChangeItemTitle => f.write_str("ChangeItemTitle"),
+            Event::Focus => f.write_str("Focus"),
+            Event::ZoomIn => f.write_str("ZoomIn"),
+            Event::ZoomOut => f.write_str("ZoomOut"),
+            Event::UserSavedItem { item, save_intent } => f
+                .debug_struct("UserSavedItem")
+                .field("item", &item.id())
+                .field("save_intent", save_intent)
+                .finish(),
+            Event::ItemPinned => f.write_str("ItemPinned"),
+            Event::ItemUnpinned => f.write_str("ItemUnpinned"),
+        }
+    }
 }

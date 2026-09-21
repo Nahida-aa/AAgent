@@ -7,3 +7,11 @@ license.workspace = true
 [dependencies]
 gpui = { workspace = true }
 settings.workspace = true
+parking_lot.workspace = true
+collections.workspace = true
+anyhow.workspace = true
+futures.workspace = true
+aa_gpui_kit_theme.workspace = true
+postage.workspace = true
+toml.workspace = true
+language_core.workspace = true

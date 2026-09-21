@@ -81,9 +81,9 @@ pub struct TerminalSettingsContent {
     /// 默认：true
     pub flexible: Option<bool>,
     /// 默认：640
-    pub default_width: Option<f32>,
+    pub default_width: Option<crate::PixelSetting>,
     /// 默认：320
-    pub default_height: Option<f32>,
+    pub default_height: Option<crate::PixelSetting>,
 
     // ---- Scrolling ----
     /// 默认：10_000（最大 100_000）

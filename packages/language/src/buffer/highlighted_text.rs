@@ -29,6 +29,23 @@ pub struct HighlightedTextBuilder {
 }
 
 impl HighlightedText {
+    pub fn from_buffer_range<T: ToOffset>(
+        range: Range<T>,
+        snapshot: &text::BufferSnapshot,
+        syntax_snapshot: &SyntaxSnapshot,
+        override_style: Option<HighlightStyle>,
+        syntax_theme: &SyntaxTheme,
+    ) -> Self {
+        let mut highlighted_text = HighlightedTextBuilder::default();
+        highlighted_text.add_text_from_buffer_range(
+            range,
+            snapshot,
+            syntax_snapshot,
+            override_style,
+            syntax_theme,
+        );
+        highlighted_text.build()
+    }
     /// 转成 GPUI `StyledText`，用于渲染。
     ///
     /// 对齐 Zed buffer.rs:664。
@@ -104,6 +121,61 @@ impl HighlightedTextBuilder {
     /// 对齐 Zed buffer.rs:726。
     pub fn push_plain(&mut self, value: impl std::fmt::Display) {
         let _ = write!(&mut self.text, "{value}");
+    }
+
+    pub fn add_text_from_buffer_range<T: ToOffset>(
+        &mut self,
+        range: Range<T>,
+        snapshot: &text::BufferSnapshot,
+        syntax_snapshot: &SyntaxSnapshot,
+        override_style: Option<HighlightStyle>,
+        syntax_theme: &SyntaxTheme,
+    ) {
+        let range = range.to_offset(snapshot);
+        for chunk in Self::highlighted_chunks(range, snapshot, syntax_snapshot) {
+            let start = self.text.len();
+            self.text.push_str(chunk.text);
+            let end = self.text.len();
+
+            if let Some(highlight_style) = chunk
+                .syntax_highlight_id
+                .and_then(|id| syntax_theme.get(id).cloned())
+            {
+                let highlight_style = override_style.map_or(highlight_style, |override_style| {
+                    highlight_style.highlight(override_style)
+                });
+                self.highlights.push((start..end, highlight_style));
+            } else if let Some(override_style) = override_style {
+                self.highlights.push((start..end, override_style));
+            }
+        }
+    }
+
+    fn highlighted_chunks<'a>(
+        range: Range<usize>,
+        snapshot: &'a text::BufferSnapshot,
+        syntax_snapshot: &'a SyntaxSnapshot,
+    ) -> BufferChunks<'a> {
+        let captures = syntax_snapshot.captures(range.clone(), snapshot, |grammar| {
+            grammar
+                .highlights_config
+                .as_ref()
+                .map(|config| &config.query)
+        });
+
+        let highlight_maps = captures
+            .grammars()
+            .iter()
+            .map(|grammar| grammar.highlight_map())
+            .collect();
+
+        BufferChunks::new(
+            snapshot.as_rope(),
+            range,
+            Some((captures, highlight_maps)),
+            false,
+            None,
+        )
     }
 }
 

@@ -1,12 +1,30 @@
-//! Rope crate — 持久化 B-tree 字符串。
-//!
-//! 对齐 Zed `crates/rope`，精简版：
-//! - 用 Zed 的 `sum_tree`（B-tree）做底层存储
-//! - Chunk 是叶子节点（最大 CHUNK_SIZE=64 字节）
-//! - 只实现常用操作：push_str, len, slice_to_string, to_string
+//! A rope of fixed-size [`Chunk`]s, providing O(log n) indexing and
+//! point/offset/utf16 conversions via `SumTree` summaries.
 
-pub mod chunk;
-pub mod rope;
+mod chunk;
+mod cursor;
+mod dimension;
+mod iterators;
+mod offset_utf16;
+mod point;
+mod point_utf16;
+mod rope;
+mod summary;
+mod unclipped;
 
-pub use chunk::{CHUNK_SIZE, Chunk, ChunkSummary, TextSummary};
+#[cfg(test)]
+mod tests;
+
+pub use chunk::{Chunk, ChunkSlice};
+pub use cursor::Cursor;
+pub use dimension::{DimensionPair, TextDimension};
+pub use iterators::{Bytes, ChunkBitmaps, ChunkWithBitmaps, Chunks, Lines};
+pub use offset_utf16::OffsetUtf16;
+pub use point::Point;
+pub use point_utf16::PointUtf16;
 pub use rope::Rope;
+pub use summary::{ChunkSummary, TextSummary};
+pub use unclipped::Unclipped;
+
+// 子模块内部共享
+pub(crate) use chunk::Bitmap;

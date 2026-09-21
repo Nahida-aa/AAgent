@@ -1,44 +1,54 @@
-pub mod highlighted_text;
+// 子模块声明
+mod bracket_ranges;
+mod char_classifier;
+mod chunks;
+mod core;
+mod edit;
+mod edit_preview;
+mod event;
+mod file;
+mod highlighted_text;
+mod indent;
+mod snapshot;
+mod test_support; // #[cfg(any(test, feature="test-support"))]
+mod util;
+mod words;
 
+pub mod row_chunk;
+mod tree_sitter_data;
+use aa_clock as clock;
+// 对外导出
+pub use bracket_ranges::BracketMatch;
+pub use char_classifier::{CharClassifier, CharKind, CharScopeContext};
+pub use chunks::{BufferChunks, Chunk, LanguageAwareStyling};
+pub use core::{Buffer, EditedBufferSnapshot};
+pub use edit::{AutoIndentExclusion, AutoindentMode};
+pub use edit_preview::EditPreview;
+pub use event::{BufferEditSource, BufferEvent, Operation, ParseStatus};
+pub use file::{DiskState, File, LocalFile};
 pub use highlighted_text::{HighlightedText, HighlightedTextBuilder};
+pub use indent::{IndentKind, IndentSize};
+pub use snapshot::BufferSnapshot;
+pub use words::WordsQuery;
+
+#[cfg(any(test, feature = "test-support"))]
+pub use test_support::TestFile;
+
+// 共享类型
+pub type BufferRow = u32;
 
 /// Indicate whether a [`Buffer`] has permissions to edit.
 #[derive(PartialEq, Clone, Copy, Debug)]
 pub enum Capability {
-    /// The buffer is a mutable replica.
     ReadWrite,
-    /// The buffer is a mutable replica, but toggled to be only readable.
     Read,
-    /// The buffer is a read-only replica.
     ReadOnly,
 }
 
 impl Capability {
-    /// Returns `true` if the capability is `ReadWrite`.
     pub fn editable(self) -> bool { matches!(self, Capability::ReadWrite) }
 }
 
-/// The shape of a selection cursor.
-#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
-pub enum CursorShape {
-    /// A vertical bar
-    #[default]
-    Bar,
-    /// A block that surrounds the following character
-    Block,
-    /// An underline that runs along the following character
-    Underline,
-    /// A box drawn around the following character
-    Hollow,
-}
-
-impl From<settings::CursorShape> for CursorShape {
-    fn from(shape: settings::CursorShape) -> Self {
-        match shape {
-            settings::CursorShape::Bar => CursorShape::Bar,
-            settings::CursorShape::Block => CursorShape::Block,
-            settings::CursorShape::Underline => CursorShape::Underline,
-            settings::CursorShape::Hollow => CursorShape::Hollow,
-        }
-    }
-}
+// 便于子模块用 `super::*` 访问（与原文件 layout 保持一致）
+pub(crate) use event::DiagnosticEndpoint;
+pub(crate) use util::{contiguous_ranges, offset_in_sub_ranges, trailing_whitespace_ranges};

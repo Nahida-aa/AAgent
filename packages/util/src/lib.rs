@@ -3,6 +3,7 @@ pub mod paths;
 pub mod shell;
 pub use gpui_util::*;
 pub mod archive;
+pub use path::rel_path;
 pub mod shell_builder;
 use std::{
     borrow::Cow,
@@ -23,6 +24,11 @@ pub mod redact;
 pub mod schemars;
 pub mod serde;
 
+#[inline]
+pub const fn is_utf8_char_boundary(u8: u8) -> bool {
+    // This is bit magic equivalent to: b < 128 || b >= 192
+    (u8 as i8) >= -0x40
+}
 /// Removes characters from the end of the string if its length is greater than `max_chars` and
 /// appends "..." to the string. Returns string unchanged if its length is smaller than max_chars.
 pub fn truncate_and_trailoff(s: &str, max_chars: usize) -> String {

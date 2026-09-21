@@ -16,6 +16,18 @@ dependencies = [
 [[package]]
 name = "a_tracing"
 version = "0.1.0"
+dependencies = [
+ "a_log",
+ "a_tracing_macro",
+ "async-channel 2.5.0",
+ "js-sys",
+ "tracing",
+ "tracing-subscriber",
+ "tracing-tracy",
+ "tracy-client",
+ "wasm-bindgen",
+ "web-sys",
+]
 
 [[package]]
 name = "a_tracing_macro"
@@ -3469,6 +3481,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "generator"
+version = "0.8.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "54ade96dc9003043bce7c035c85a9df5a858bfb2039c5a2e6fdf00f324f6c551"
+dependencies = [
+ "cc",
+ "cfg-if",
+ "libc",
+ "log",
+ "rustversion",
+ "windows-link 0.2.1",
+ "windows-result 0.4.1",
+]
+
+[[package]]
 name = "generic-array"
 version = "0.14.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3694,7 +3721,7 @@ dependencies = [
  "gpui_macros",
  "gpui_shared_string",
  "gpui_util",
- "heapless 0.9.3",
+ "heapless",
  "http_client 0.1.0 (git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f)",
  "image",
  "inventory",
@@ -4080,16 +4107,6 @@ dependencies = [
  "foldhash 0.2.0",
  "serde",
  "serde_core",
-]
-
-[[package]]
-name = "heapless"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0bfb9eb618601c89945a70e254898da93b13be0388091d42117462b265bb3fad"
-dependencies = [
- "hash32",
- "stable_deref_trait",
 ]
 
 [[package]]
@@ -5142,6 +5159,19 @@ checksum = "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6"
 dependencies = [
  "serde_core",
  "value-bag",
+]
+
+[[package]]
+name = "loom"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "419e0dc8046cb947daa77eb95ae174acfbddb7673b4151f56d1eed8e93fbfaca"
+dependencies = [
+ "cfg-if",
+ "generator",
+ "scoped-tls",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
@@ -7690,8 +7720,14 @@ dependencies = [
 name = "rope"
 version = "0.1.0"
 dependencies = [
- "heapless 0.8.0",
+ "a_tracing",
+ "heapless",
+ "log",
+ "rayon",
  "sum_tree",
+ "tracing",
+ "unicode-segmentation",
+ "util",
 ]
 
 [[package]]
@@ -8614,7 +8650,7 @@ name = "sum_tree"
 version = "0.1.0"
 source = "git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f#f6838a7c4afecd7c212c43c70165588b92a5a11f"
 dependencies = [
- "heapless 0.9.3",
+ "heapless",
  "log",
  "rayon",
  "tracing",
@@ -9032,6 +9068,23 @@ dependencies = [
 [[package]]
 name = "text"
 version = "0.1.0"
+dependencies = [
+ "a_log",
+ "aa_clock",
+ "anyhow",
+ "collections",
+ "ctor",
+ "gpui",
+ "log",
+ "parking_lot",
+ "postage",
+ "rand 0.9.5",
+ "regex",
+ "rope",
+ "smallvec",
+ "sum_tree",
+ "util",
+]
 
 [[package]]
 name = "theme_settings"
@@ -9478,6 +9531,38 @@ dependencies = [
  "tracing",
  "tracing-core",
  "tracing-log",
+]
+
+[[package]]
+name = "tracing-tracy"
+version = "0.11.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0eaa1852afa96e0fe9e44caa53dc0bd2d9d05e0f2611ce09f97f8677af56e4ba"
+dependencies = [
+ "tracing-core",
+ "tracing-subscriber",
+ "tracy-client",
+]
+
+[[package]]
+name = "tracy-client"
+version = "0.18.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6131992ff3e2cb96f407eb4eb005427ba15e2687260d99089b90e60e33169ce0"
+dependencies = [
+ "loom",
+ "once_cell",
+ "tracy-client-sys",
+]
+
+[[package]]
+name = "tracy-client-sys"
+version = "0.29.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ab27f167b093214c68413a2e0bcd318f0591af475597405ff68138ba0a433379"
+dependencies = [
+ "cc",
+ "windows-targets",
 ]
 
 [[package]]

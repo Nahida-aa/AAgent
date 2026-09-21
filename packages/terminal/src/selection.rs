@@ -3,7 +3,7 @@ use crate::alacritty::AlacrittySearch;
 use super::cursor::{Point, Range, SelectionRange};
 
 #[derive(Clone, Copy, Debug)]
-pub(crate) enum ViMotion {
+pub enum ViMotion {
     Up,
     Down,
     Left,
@@ -23,7 +23,7 @@ pub(crate) enum ViMotion {
 }
 
 #[derive(Clone, Copy, Debug)]
-pub(crate) enum Scroll {
+pub enum Scroll {
     Delta(i32),
     PageUp,
     PageDown,
@@ -51,13 +51,13 @@ pub(crate) struct SelectionAnchor {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(crate) enum SelectionSide {
+pub enum SelectionSide {
     Left,
     Right,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(crate) enum SelectionType {
+pub enum SelectionType {
     Simple,
     Semantic,
     Lines,
@@ -87,7 +87,7 @@ impl Selection {
 }
 
 #[derive(PartialEq, Eq)]
-pub(crate) enum SelectionPhase {
+pub enum SelectionPhase {
     Selecting,
     Ended,
 }

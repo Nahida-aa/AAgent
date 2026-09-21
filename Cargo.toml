@@ -12,7 +12,7 @@ members = [
     "packages/server",
     "packages/settings",
     "packages/session",
-    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aagent_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/language_model_core", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/util_macros", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/language_core", "packages/db",
+    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aagent_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/language_model_core", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/util_macros", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/language_core", "packages/db", "packages/mermaid_render",
 ]
 
 [workspace.package]
@@ -121,15 +121,7 @@ tree-sitter-rust = "0.24.2"
 tree-sitter-typescript = { git = "https://github.com/zed-industries/tree-sitter-typescript", rev = "e2c53597d6a5d9cf7bbe8dccde576fe1e46c5899" } # https://github.com/tree-sitter/tree-sitter-typescript/pull/347
 tree-sitter-yaml = { git = "https://github.com/zed-industries/tree-sitter-yaml", rev = "baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a" }
 wasmtime = { version = "45", features = ["component-model", "wat"] }
-serde = { version = "1.0.221", features = ["derive", "rc"] }
-serde_json = { version = "1.0.144", features = ["preserve_order", "raw_value"] }
-serde_json_lenient = { version = "0.2", features = [
-    "preserve_order",
-    "raw_value",
-] }
-serde_path_to_error = "0.1.17"
-schemars = { version = "1", features = ["derive"] }
-strum = { version = "0.28", features = ["derive"] }
+
 dunce = "1.0"
 url = "2.2"
 regex = "1"
@@ -143,7 +135,6 @@ libc = "0.2"
 async-channel = "2"
 
 # Zed crates (统一 git rev)
-sum_tree = { git = "https://github.com/zed-industries/zed.git", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 notify = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
 notify-types = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
 
@@ -152,6 +143,7 @@ async-lock = "3.4.2"
 async-compression = { version = "0.4", features = ["bzip2", "gzip", "futures-io"] }
 async-fs = "2.1"
 async-tar = { git = "https://github.com/zed-industries/async-tar", rev = "bd3ad6f89df9a9da7a8535958756d6bf465936a0" }
+base64 = "0.22"
 bitflags = "2.6.0"
 bytes = "1.0"
 const_format = "0.2"
@@ -172,6 +164,7 @@ dirs = "6.0"
 ec4rs = { version = "1.2", features = ["allow-empty-values"] }
 gpui_shared_string = "0.1.0"
 globset = "0.4"
+html5ever = "0.39"
 http = "1.1"
 http-body = "1.0"
 httparse = "1.10"
@@ -179,23 +172,37 @@ ignore = "0.4.22"
 imara-diff = "0.2.0"
 indoc = "2"
 itertools = "0.14.0"
+json5 = "0.4"
+linkify = "0.10.0"
+log = { version = "0.4.16", features = ["kv_unstable_serde", "serde"] }
 mach2 = "0.5"
+markup5ever_rcdom = "0.39"
+quote = "1.0.9"
 unindent = "0.2.0"
 partial-json-fixer = "0.5.3"
 postage = { version = "0.5", features = ["futures-traits"] }
 pretty_assertions = { version = "1.3.0", features = ["unstable"] }
 percent-encoding = "2.3.2"
-json5 = "0.4"
-log = { version = "0.4.16", features = ["kv_unstable_serde", "serde"] }
-quote = "1.0.9"
+pulldown-cmark = { version = "0.13.0", default-features = false }
+thiserror = "2.0.12"
 rand = "0.9"
 rust-embed = { version = "8.11", features = ["include-exclude"] }
-thiserror = "2.0.12"
+serde = { version = "1.0.221", features = ["derive", "rc"] }
+serde_json = { version = "1.0.144", features = ["preserve_order", "raw_value"] }
+serde_json_lenient = { version = "0.2", features = [
+    "preserve_order",
+    "raw_value",
+] }
+serde_path_to_error = "0.1.17"
+schemars = { version = "1", features = ["derive"] }
+strum = { version = "0.28", features = ["derive"] }
 semver = { version = "1.0", features = ["serde"] }
 serde_urlencoded = "0.7"
+sha2 = "0.10"
 streaming-iterator = "0.1"
 smallvec = { version = "1.6", features = ["union", "const_new"] }
-sha2 = "0.10"
+sum_tree = { git = "https://github.com/zed-industries/zed.git", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
+stacksafe = "1.0"
 syn = { version = "2.0.101", features = ["full", "extra-traits", "visit-mut"] }
 sysinfo = "0.39"
 urlencoding = "2.1.2"

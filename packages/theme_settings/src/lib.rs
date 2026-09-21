@@ -9,9 +9,9 @@ pub mod settings;
 use std::borrow::Cow;
 use std::sync::Arc;
 
-use aa_gpui_kit_theme::default_colors::catppuccin_mocha;
 use aa_gpui_kit_theme::registry::ThemeRegistry;
 use aa_gpui_kit_theme::set_theme;
+use aa_gpui_kit_theme::{LoadThemes, default_colors::catppuccin_mocha};
 use gpui::{App, AssetSource, Result, SharedString};
 
 /// 把 gpui 全局里的 `Arc<dyn AssetSource>` 适配成注册表要的 `Box<dyn AssetSource>`。
@@ -28,7 +28,7 @@ impl AssetSource for GlobalAssets {
 /// 对齐 Zed `theme_settings::init` (crates/theme_settings/src/theme_settings.rs L71) —
 /// Zed 先调 `theme::init` 做基础装配，再装 settings provider，再 observe settings 变化。
 /// 这里先实现 `theme::init` 那部分（gpui_learn 的 init_theme 逻辑简化版）。
-pub fn init(cx: &mut App) {
+pub fn init(themes_to_load: LoadThemes, cx: &mut App) {
     // 1. 用 app 的 asset_source 构造注册表（gpui_learn ThemeRegistry::new 自带 Catppuccin 内置主题）
     let assets: Box<dyn AssetSource> = Box::new(GlobalAssets(cx.asset_source().clone()));
     ThemeRegistry::set_global(assets, cx);

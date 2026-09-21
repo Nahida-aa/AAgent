@@ -1,6 +1,46 @@
+use collections::HashSet;
+use std::cell::Cell;
+use std::collections::BTreeMap;
+use std::ops::Range;
+use std::rc::Rc;
+use std::sync::Arc;
+use std::time::Duration;
+
+use aa_gpui_kit_ui::{
+    Checkbox, CopyButton, Icon, IconButton, IconName, IconSize, Label, ToggleState, Tooltip,
+    prelude::*,
+};
+use gpui::{
+    AnyElement, App, Bounds, ClipboardItem, CursorStyle, DispatchPhase, Div, Element, ElementId,
+    Entity, GlobalElementId, Hitbox, HitboxBehavior, Hsla, Image, ImageSource, IntoElement,
+    KeyContext, MouseButton, MouseDownEvent, MouseEvent, MouseMoveEvent, MouseUpEvent,
+    ParentElement, Pixels, Point, ScrollHandle, SharedString, Stateful, StyleRefinement, Styled,
+    StyledImage, StyledText, Subscription, Task, TextAlign, TextStyleRefinement, VisualContext,
+    Window, actions, canvas, div, img, point, px, quad, relative, size,
+};
+use gpui_util::maybe;
+use language::{Language, LanguageRegistry, ResolvedHighlights};
+use parser::CodeBlockMetadata;
+
+use crate::builder::MarkdownElementBuilder;
+use crate::entity::{
+    CheckboxToggleCallback, CodeBlockRenderer, CodeSpanLinkCallback, CopyButtonVisibility,
+    Markdown, MarkdownOptions, MermaidZoomCallback, SourceClickCallback, UrlHoverCallback,
+    WrapButtonVisibility,
+};
+use crate::highlights::MarkdownHighlights;
+use crate::mermaid::{MermaidState, render_mermaid_diagram};
+use crate::parsed::ParsedMarkdown;
+use crate::parser::{
+    MarkdownEvent, MarkdownTag, MarkdownTagEnd, parse_links_only, parse_markdown_with_options,
+};
+use crate::rendered::RenderedText;
+use crate::selection::Selection;
+use crate::style::MarkdownStyle;
+
 pub struct MarkdownElement {
-    markdown: Entity<Markdown>,
-    style: MarkdownStyle,
+    pub(super) markdown: Entity<Markdown>,
+    pub(super) style: MarkdownStyle,
     code_block_renderer: CodeBlockRenderer,
     on_url_click: Option<Rc<dyn Fn(SharedString, &mut Window, &mut App)>>,
     on_url_hover: Option<UrlHoverCallback>,
@@ -8,7 +48,7 @@ pub struct MarkdownElement {
     on_source_click: Option<SourceClickCallback>,
     on_checkbox_toggle: Option<CheckboxToggleCallback>,
     on_mermaid_zoom: Option<MermaidZoomCallback>,
-    image_resolver: Option<Box<dyn Fn(&str, &App) -> Option<ImageSource>>>,
+    pub(super) image_resolver: Option<Box<dyn Fn(&str, &App) -> Option<ImageSource>>>,
     show_root_block_markers: bool,
     autoscroll: AutoscrollBehavior,
     /// Test-only hook to observe the laid-out text when this element is
@@ -186,7 +226,7 @@ impl MarkdownElement {
         }
     }
 
-    fn push_markdown_image(
+    pub(super) fn push_markdown_image(
         &self,
         builder: &mut MarkdownElementBuilder,
         range: &Range<usize>,
@@ -265,7 +305,7 @@ impl MarkdownElement {
         builder.push_image_child(image_element);
     }
 
-    fn push_markdown_paragraph(
+    pub(super) fn push_markdown_paragraph(
         &self,
         builder: &mut MarkdownElementBuilder,
         range: &Range<usize>,
@@ -291,12 +331,12 @@ impl MarkdownElement {
         builder.push_div(paragraph, range, markdown_end);
     }
 
-    fn pop_markdown_paragraph(&self, builder: &mut MarkdownElementBuilder) {
+    pub(super) fn pop_markdown_paragraph(&self, builder: &mut MarkdownElementBuilder) {
         builder.pop_div();
         builder.pop_text_style();
     }
 
-    fn push_markdown_heading(
+    pub(super) fn push_markdown_heading(
         &self,
         builder: &mut MarkdownElementBuilder,
         level: pulldown_cmark::HeadingLevel,
@@ -336,12 +376,12 @@ impl MarkdownElement {
         builder.push_div(heading, range, markdown_end);
     }
 
-    fn pop_markdown_heading(&self, builder: &mut MarkdownElementBuilder) {
+    pub(super) fn pop_markdown_heading(&self, builder: &mut MarkdownElementBuilder) {
         builder.pop_div();
         builder.pop_text_style();
     }
 
-    fn push_markdown_block_quote(
+    pub(super) fn push_markdown_block_quote(
         &self,
         builder: &mut MarkdownElementBuilder,
         kind: Option<pulldown_cmark::BlockQuoteKind>,
@@ -392,12 +432,12 @@ impl MarkdownElement {
         builder.push_div(block_div, range, markdown_end);
     }
 
-    fn pop_markdown_block_quote(&self, builder: &mut MarkdownElementBuilder) {
+    pub(super) fn pop_markdown_block_quote(&self, builder: &mut MarkdownElementBuilder) {
         builder.pop_div();
         builder.pop_text_style();
     }
 
-    fn push_metadata_block(
+    pub(super) fn push_metadata_block(
         &self,
         builder: &mut MarkdownElementBuilder,
         source: &str,
@@ -505,7 +545,7 @@ impl MarkdownElement {
         builder.pop_div();
     }
 
-    fn push_markdown_list_item(
+    pub(super) fn push_markdown_list_item(
         &self,
         builder: &mut MarkdownElementBuilder,
         bullet: AnyElement,
@@ -529,7 +569,7 @@ impl MarkdownElement {
         builder.push_div(div().flex_1().w_0(), range, markdown_end);
     }
 
-    fn pop_markdown_list_item(&self, builder: &mut MarkdownElementBuilder) {
+    pub(super) fn pop_markdown_list_item(&self, builder: &mut MarkdownElementBuilder) {
         builder.pop_div();
         builder.pop_div();
     }
@@ -1635,4 +1675,299 @@ impl Element for MarkdownElement {
         self.paint_mouse_listeners(hitbox, &rendered_markdown.text, window, cx);
         rendered_markdown.element.paint(window, cx);
     }
+}
+
+impl IntoElement for MarkdownElement {
+    type Element = Self;
+
+    fn into_element(self) -> Self::Element { self }
+}
+
+pub enum AutoscrollBehavior {
+    /// Propagate the request up the element tree for the nearest
+    /// scrollable ancestor (e.g. `List`) to handle.
+    Propagate,
+    /// Directly control a specific scroll handle.
+    Controlled(ScrollHandle),
+}
+
+pub enum AnyDiv {
+    Div(Div),
+    Stateful(Stateful<Div>),
+}
+
+impl AnyDiv {
+    pub(super) fn into_any_element(self) -> AnyElement {
+        match self {
+            Self::Div(div) => div.into_any_element(),
+            Self::Stateful(div) => div.into_any_element(),
+        }
+    }
+}
+
+impl From<Div> for AnyDiv {
+    fn from(value: Div) -> Self { Self::Div(value) }
+}
+
+impl From<Stateful<Div>> for AnyDiv {
+    fn from(value: Stateful<Div>) -> Self { Self::Stateful(value) }
+}
+
+impl Styled for AnyDiv {
+    fn style(&mut self) -> &mut StyleRefinement {
+        match self {
+            Self::Div(div) => div.style(),
+            Self::Stateful(div) => div.style(),
+        }
+    }
+}
+
+impl ParentElement for AnyDiv {
+    fn extend(&mut self, elements: impl IntoIterator<Item = AnyElement>) {
+        match self {
+            Self::Div(div) => div.extend(elements),
+            Self::Stateful(div) => div.extend(elements),
+        }
+    }
+}
+
+#[derive(Default)]
+struct TableState {
+    alignments: Vec<Alignment>,
+    in_head: bool,
+    row_index: usize,
+    col_index: usize,
+}
+
+impl TableState {
+    fn start(&mut self, alignments: Vec<Alignment>) {
+        self.alignments = alignments;
+        self.in_head = false;
+        self.row_index = 0;
+        self.col_index = 0;
+    }
+
+    fn end(&mut self) {
+        self.alignments.clear();
+        self.in_head = false;
+        self.row_index = 0;
+        self.col_index = 0;
+    }
+
+    fn start_head(&mut self) { self.in_head = true; }
+
+    fn end_head(&mut self) { self.in_head = false; }
+
+    fn start_row(&mut self) { self.col_index = 0; }
+
+    fn end_row(&mut self) { self.row_index += 1; }
+
+    fn end_cell(&mut self) { self.col_index += 1; }
+
+    fn current_cell_alignment(&self) -> Option<Alignment> {
+        if self.alignments.is_empty() {
+            return None;
+        }
+        if self.in_head {
+            return Some(Alignment::Center);
+        }
+        self.alignments.get(self.col_index).copied()
+    }
+}
+
+fn alignment_to_text_align(alignment: Alignment) -> Option<TextAlign> {
+    match alignment {
+        Alignment::Left => Some(TextAlign::Left),
+        Alignment::Center => Some(TextAlign::Center),
+        Alignment::Right => Some(TextAlign::Right),
+        Alignment::None => None,
+    }
+}
+
+// The contents of loose list items are wrapped in a paragraph, so their task
+// marker follows `Start(Paragraph)` rather than `Start(Item)`.
+fn task_list_marker_for_item(
+    events: &[(Range<usize>, MarkdownEvent)],
+    item_index: usize,
+) -> Option<(Range<usize>, bool)> {
+    let next_index = item_index.checked_add(1)?;
+    let marker_index = match &events.get(next_index)?.1 {
+        MarkdownEvent::Start(MarkdownTag::Paragraph) => next_index.checked_add(1)?,
+        MarkdownEvent::TaskListMarker(_) => next_index,
+        _ => return None,
+    };
+
+    match events.get(marker_index)? {
+        (range, MarkdownEvent::TaskListMarker(checked)) => Some((range.clone(), *checked)),
+        _ => None,
+    }
+}
+
+struct MetadataCellStyle {
+    row_index: usize,
+    is_key: bool,
+}
+
+fn collect_image_alt_text(
+    events_from_image_start: &[(Range<usize>, MarkdownEvent)],
+    source: &str,
+) -> Option<SharedString> {
+    let mut alt_text = String::new();
+    for (range, event) in events_from_image_start.iter().skip(1) {
+        match event {
+            MarkdownEvent::End(MarkdownTagEnd::Image) => break,
+            MarkdownEvent::Text => alt_text.push_str(&source[range.clone()]),
+            _ => {}
+        }
+    }
+    if alt_text.is_empty() {
+        None
+    } else {
+        Some(alt_text.into())
+    }
+}
+
+fn image_fallback_element(
+    dest_url: SharedString,
+    alt_text: Option<SharedString>,
+    open_image_url_on_click: bool,
+) -> AnyElement {
+    let link_label = alt_text
+        .filter(|alt| !alt.is_empty())
+        .unwrap_or_else(|| dest_url.clone());
+
+    let label = format!("Failed to Load: {link_label}");
+
+    div()
+        .id("image-fallback")
+        .min_w_0()
+        .child(Label::new(label).color(Color::Warning).underline())
+        .tooltip(Tooltip::text(
+            "Image failed to load. Open `zed: log` for more details.",
+        ))
+        .when(open_image_url_on_click, |this| {
+            this.cursor_pointer()
+                .on_click(move |_, _, cx| cx.open_url(&dest_url))
+        })
+        .into_any_element()
+}
+
+fn apply_heading_style(
+    mut heading: Div,
+    level: pulldown_cmark::HeadingLevel,
+    custom_styles: Option<&HeadingLevelStyles>,
+    border_color: Option<Hsla>,
+) -> Div {
+    heading = match level {
+        pulldown_cmark::HeadingLevel::H1 => heading.text_3xl(),
+        pulldown_cmark::HeadingLevel::H2 => heading.text_2xl(),
+        pulldown_cmark::HeadingLevel::H3 => heading.text_xl(),
+        pulldown_cmark::HeadingLevel::H4 => heading.text_lg(),
+        pulldown_cmark::HeadingLevel::H5 => heading.text_base(),
+        pulldown_cmark::HeadingLevel::H6 => heading.text_sm(),
+    };
+
+    heading = match level {
+        pulldown_cmark::HeadingLevel::H1 => heading,
+        _ => heading.mt_6(),
+    };
+
+    if let Some(border_color) = border_color {
+        heading = match level {
+            pulldown_cmark::HeadingLevel::H1 => {
+                heading.pb_2().border_b_1().border_color(border_color)
+            }
+            pulldown_cmark::HeadingLevel::H2 => {
+                heading.pb_1().border_b_1().border_color(border_color)
+            }
+            _ => heading,
+        };
+    }
+
+    if let Some(style) = heading_level_style(level, custom_styles) {
+        heading.style().text = style.clone();
+    }
+
+    heading
+}
+
+fn heading_level_style(
+    level: pulldown_cmark::HeadingLevel,
+    custom_styles: Option<&HeadingLevelStyles>,
+) -> Option<&TextStyleRefinement> {
+    let styles = custom_styles?;
+    match level {
+        pulldown_cmark::HeadingLevel::H1 => styles.h1.as_ref(),
+        pulldown_cmark::HeadingLevel::H2 => styles.h2.as_ref(),
+        pulldown_cmark::HeadingLevel::H3 => styles.h3.as_ref(),
+        pulldown_cmark::HeadingLevel::H4 => styles.h4.as_ref(),
+        pulldown_cmark::HeadingLevel::H5 => styles.h5.as_ref(),
+        pulldown_cmark::HeadingLevel::H6 => styles.h6.as_ref(),
+    }
+}
+
+fn render_wrap_code_block_button(
+    id: usize,
+    is_wrapped: bool,
+    markdown: Entity<Markdown>,
+) -> impl IntoElement {
+    let (icon, tooltip) = if is_wrapped {
+        (IconName::TextUnwrap, "Unwrap Content")
+    } else {
+        (IconName::TextWrap, "Wrap Content")
+    };
+    let button_id = ElementId::NamedChild(
+        Arc::new(ElementId::from(("wrap-code-block", markdown.entity_id()))),
+        id.to_string().into(),
+    );
+
+    IconButton::new(button_id, icon)
+        .icon_size(IconSize::Small)
+        .icon_color(Color::Muted)
+        .tooltip(Tooltip::text(tooltip))
+        .on_click(move |_event, _window, cx| {
+            markdown.update(cx, |markdown, cx| {
+                markdown.toggle_code_block_wrap(id);
+                cx.notify();
+            });
+        })
+}
+
+fn render_copy_code_block_button(
+    id: usize,
+    code: String,
+    markdown: Entity<Markdown>,
+) -> impl IntoElement {
+    let id = ElementId::NamedChild(
+        Arc::new(ElementId::from((
+            "copy-markdown-code",
+            markdown.entity_id(),
+        ))),
+        id.to_string().into(),
+    );
+
+    CopyButton::new(id.clone(), code.clone()).custom_on_click({
+        let markdown = markdown;
+        move |_window, cx| {
+            let id = id.clone();
+            markdown.update(cx, |this, cx| {
+                this.copied_code_blocks.insert(id.clone());
+
+                cx.write_to_clipboard(ClipboardItem::new_string(code.clone()));
+
+                cx.spawn(async move |this, cx| {
+                    cx.background_executor().timer(Duration::from_secs(2)).await;
+
+                    cx.update(|cx| {
+                        this.update(cx, |this, cx| {
+                            this.copied_code_blocks.remove(&id);
+                            cx.notify();
+                        })
+                    })
+                    .ok();
+                })
+                .detach();
+            });
+        }
+    })
 }

@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use anyhow::Context as _;
 use client::proto;
 use db::kvp::KeyValueStore;
@@ -9,6 +7,7 @@ use gpui::{
     Styled, Subscription, WeakEntity, Window, deferred, div, px,
 };
 use settings::{Settings, SettingsStore};
+use std::sync::Arc;
 
 use crate::Workspace;
 use crate::focus_follows_mouse::FocusFollowsMouse as _;

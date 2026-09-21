@@ -1,5 +1,8 @@
+pub mod fs;
 pub mod paths;
 pub mod shell;
+pub use gpui_util::*;
+pub mod archive;
 pub mod shell_builder;
 use std::{
     borrow::Cow,

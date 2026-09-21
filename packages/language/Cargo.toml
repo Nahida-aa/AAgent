@@ -15,7 +15,8 @@ encoding_rs.workspace = true
 fs.workspace = true
 futures.workspace = true
 futures-lite.workspace = true
-# fuzzy_nucleo.workspace = true
+# fuzzy_nucleo.workspace = true # 用 aa_gpui_fuzzy 代替
+aa_gpui_fuzzy.workspace = true
 globset.workspace = true
 gpui.workspace = true
 http_client.workspace = true
@@ -23,7 +24,7 @@ imara-diff.workspace = true
 language_core.workspace = true
 itertools.workspace = true
 log.workspace = true
-# lsp.workspace = true
+lsp.workspace = true
 parking_lot.workspace = true
 postage.workspace = true
 rand = { workspace = true, optional = true }
@@ -43,7 +44,7 @@ text.workspace = true
 aa_gpui_kit_theme.workspace = true
 toml.workspace = true
 tracing.workspace = true
-# grammars = { workspace = true, optional = true }
+grammars = { workspace = true, optional = true }
 tree-sitter-json = { workspace = true, optional = true }
 tree-sitter-md = { workspace = true, optional = true }
 tree-sitter-python = { workspace = true, optional = true }

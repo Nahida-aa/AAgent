@@ -24,7 +24,6 @@ pub mod item;
 pub mod multi_workspace;
 pub mod pane;
 pub mod status_bar;
-pub mod terminal;
 pub mod toolbar;
 
 pub use item::{Item, ItemEvent, ItemHandle, WeakItemHandle};
@@ -51,6 +50,45 @@ use dock::panel::{
 use dock::panel_buttons::PanelButtons;
 use dock::{Dock, DraggedDock, RESIZE_HANDLE_SIZE};
 use status_bar::StatusBar;
+
+pub mod active_file_name;
+pub mod dock;
+pub mod history_manager;
+pub mod invalid_item_view;
+pub mod item;
+mod modal_layer;
+mod multi_workspace;
+
+pub mod notifications;
+pub mod pane;
+pub mod path_list {
+    pub use util::path_list::{PathList, SerializedPathList};
+}
+pub mod path_link;
+mod persistence;
+pub mod searchable;
+pub mod security_modal;
+pub mod shared_screen;
+pub use shared_screen::SharedScreen;
+pub mod focus_follows_mouse;
+mod status_bar;
+pub mod tasks;
+mod theme_preview;
+mod toast_layer;
+mod toolbar;
+pub mod welcome;
+pub mod workspace_error;
+mod workspace_settings;
+
+mod workspace;
+pub use workspace::*;
+
+// 保留原来的 pub use dock::Panel; 等
+pub use dock::Panel;
+// pub use multi_workspace::{...};
+pub use path_list::{PathList, SerializedPathList};
+// pub use remote::{...};
+pub use toast_layer::{ToastAction, ToastLayer, ToastView};
 
 /// Bottom dock 布局（对齐 zed `settings_content/src/workspace.rs`）。
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

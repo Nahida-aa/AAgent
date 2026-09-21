@@ -8,10 +8,30 @@
 //! - [settings] — ItemSettings / PreviewTabsSettings / ClosePosition 等
 //! - [tab] — TabContentParams / TabTooltipContent / ItemBufferKind
 
+mod events;
+mod follow;
+mod handle;
+mod handle_impl;
+mod project_item;
+mod serializable;
+mod settings;
+mod traits;
+mod weak_handle;
+
+pub use events::*;
+pub use follow::*;
+pub use handle::*;
+pub use project_item::*;
+pub use serializable::*;
+pub use settings::*;
+pub use traits::*;
+pub use weak_handle::*;
+
 pub mod handle;
 pub mod settings;
 pub mod tab;
-
+use aa_gpui_kit_ui::{Color, Icon, Label, LabelCommon};
+use gpui::IntoElement;
 pub use handle::{Item, ItemHandle, WeakItemHandle};
 pub use settings::{
     ActivateOnClose, ClosePosition, ItemSettings, PreviewTabsSettings, ShowCloseButton,
@@ -19,15 +39,6 @@ pub use settings::{
 };
 pub use tab::{ItemBufferKind, TabContentParams, TabTooltipContent};
 
-// ---------- ItemEvent ----------
+use std::time::Duration;
 
-/// Item 发出的事件 — 供 Pane / Tab bar / Breadcrumbs 订阅。
-///
-/// 对齐 Zed `crates/workspace/src/item.rs:121`。
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
-pub enum ItemEvent {
-    CloseItem,
-    UpdateTab,
-    UpdateBreadcrumbs,
-    Edit,
-}
+pub const LEADER_UPDATE_THROTTLE: Duration = Duration::from_millis(200);

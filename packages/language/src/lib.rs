@@ -1,3 +1,6 @@
 pub mod buffer;
 
-pub use buffer::highlighted_text::{HighlightedText, HighlightedTextBuilder};
+pub use buffer::{
+    Capability, CursorShape,
+    highlighted_text::{HighlightedText, HighlightedTextBuilder},
+};

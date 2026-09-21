@@ -1,0 +1,10 @@
+[package]
+name = "editor"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+gpui.workspace = true
+language.workspace = true
+settings.workspace = true

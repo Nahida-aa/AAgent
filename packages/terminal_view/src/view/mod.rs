@@ -1,158 +1,170 @@
-//! TerminalView entity — PTY 渲染层。
+mod actions;
+mod block;
+mod context_menu;
+mod events;
+mod helpers;
+mod hover;
+mod ime;
+mod input;
+mod item;
+mod lifecycle;
+mod mode;
+mod rename;
+mod render;
+mod scroll;
+mod scrollbar_settings;
+mod searchable;
+mod serializable;
+mod tab;
+mod working_directory;
 
-pub mod item;
+pub use actions::*;
+pub use block::*;
+pub use mode::*;
 
-use std::path::PathBuf;
-
+use crate::persistence::TerminalDb;
+use crate::terminal_scrollbar::TerminalScrollHandle;
+use editor::{Editor, blink_manager::BlinkManager};
 use gpui::{
-    App, Context, EventEmitter, FocusHandle, Focusable, IntoElement, KeyDownEvent, Render, Window,
-    div, prelude::*,
+    App, Context, Entity, EventEmitter, FocusHandle, Pixels, Subscription, Task, WeakEntity, Window,
 };
-use terminal::TerminalBounds;
-use terminal::alacritty::AlacrittyBackend;
-use tracing::debug;
+use project::Project;
+use std::rc::Rc;
+use terminal::Terminal;
+use workspace::{Workspace, WorkspaceId};
 
-use crate::element::TerminalElement;
-
-/// A terminal session view: owns the pty-backed backend and forwards keyboard
-/// input into it. Renders via [`element::TerminalElement`].
 pub struct TerminalView {
-    backend: std::sync::Arc<AlacrittyBackend>,
-    focus_handle: FocusHandle,
-    /// last known column/line count, so the element can skip layout when size unchanged.
-    bounds: TerminalBounds,
+    pub(super) terminal: Entity<Terminal>,
+    pub(super) workspace: WeakEntity<Workspace>,
+    pub(super) project: WeakEntity<Project>,
+    pub(super) focus_handle: FocusHandle,
+    pub(super) has_bell: bool,
+    pub(super) context_menu: Option<(Entity<ContextMenu>, GpuiPoint<Pixels>, Subscription)>,
+    pub(super) cursor_shape: CursorShape,
+    pub(super) blink_manager: Entity<BlinkManager>,
+    pub(super) mode: TerminalMode,
+    pub(super) show_workspace_actions: Option<bool>,
+    pub(super) blinking_terminal_enabled: bool,
+    pub(super) needs_serialize: bool,
+    pub(super) custom_title: Option<String>,
+    pub(super) hover: Option<HoverTarget>,
+    pub(super) hover_tooltip_update: Task<()>,
+    pub(super) workspace_id: Option<WorkspaceId>,
+    pub(super) show_breadcrumbs: bool,
+    pub(super) block_below_cursor: Option<Rc<BlockProperties>>,
+    pub(super) scroll_top: Pixels,
+    pub(super) scroll_handle: TerminalScrollHandle,
+    pub(super) ime_state: Option<ImeState>,
+    pub(super) self_handle: WeakEntity<Self>,
+    pub(super) rename_editor: Option<Entity<Editor>>,
+    pub(super) rename_editor_subscription: Option<Subscription>,
+    pub(super) _subscriptions: Vec<Subscription>,
+    pub(super) _terminal_subscriptions: Vec<Subscription>,
+}
+
+impl EventEmitter<Event> for TerminalView {}
+impl EventEmitter<ItemEvent> for TerminalView {}
+impl EventEmitter<SearchEvent> for TerminalView {}
+impl Focusable for TerminalView {
+    /* 原样 */
 }
 
 impl TerminalView {
-    pub fn new(shell: Option<String>, working_dir: PathBuf, cx: &mut App) -> Self {
-        // Placeholder bounds; the element re-measures the real cell metrics on
-        // first layout and replaces these via `set_bounds`.
-        let bounds = TerminalBounds {
-            cell_width: 10.0,
-            line_height: 16.0,
-            width: 800.0,
-            height: 600.0,
-            font_size: 15.0,
-        };
-        let backend = match AlacrittyBackend::new(bounds, shell, working_dir) {
-            Ok(b) => std::sync::Arc::new(b),
-            Err(e) => {
-                debug!(error = ?e, "failed to spawn pty");
-                panic!("pty spawn failed: {e}")
-            }
-        };
+    pub fn new(
+        terminal: Entity<Terminal>,
+        workspace: WeakEntity<Workspace>,
+        workspace_id: Option<WorkspaceId>,
+        project: WeakEntity<Project>,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) -> Self {
+        let workspace_handle = workspace.clone();
+        let terminal_subscriptions =
+            subscribe_for_terminal_events(&terminal, workspace, window, cx);
+
+        let focus_handle = cx.focus_handle();
+        let focus_in = cx.on_focus_in(&focus_handle, window, |terminal_view, window, cx| {
+            terminal_view.focus_in(window, cx);
+        });
+        let focus_out = cx.on_focus_out(
+            &focus_handle,
+            window,
+            |terminal_view, _event, window, cx| {
+                terminal_view.focus_out(window, cx);
+            },
+        );
+        let cursor_shape = TerminalSettings::get_global(cx).cursor_shape;
+
+        let scroll_handle = TerminalScrollHandle::new(terminal.read(cx));
+
+        let blink_manager = cx.new(|cx| {
+            BlinkManager::new(
+                CURSOR_BLINK_INTERVAL,
+                |cx| {
+                    !matches!(
+                        TerminalSettings::get_global(cx).blinking,
+                        TerminalBlink::Off
+                    )
+                },
+                cx,
+            )
+        });
+
+        let subscriptions = vec![
+            focus_in,
+            focus_out,
+            cx.observe(&blink_manager, |_, _, cx| cx.notify()),
+            cx.observe_global::<SettingsStore>(Self::settings_changed),
+        ];
+
         Self {
-            backend,
-            focus_handle: cx.focus_handle(),
-            bounds,
+            terminal,
+            workspace: workspace_handle,
+            project,
+            has_bell: false,
+            focus_handle,
+            context_menu: None,
+            cursor_shape,
+            blink_manager,
+            blinking_terminal_enabled: false,
+            hover: None,
+            hover_tooltip_update: Task::ready(()),
+            mode: TerminalMode::Standalone,
+            show_workspace_actions: None,
+            workspace_id,
+            show_breadcrumbs: TerminalSettings::get_global(cx).toolbar.breadcrumbs,
+            block_below_cursor: None,
+            scroll_top: Pixels::ZERO,
+            scroll_handle,
+            needs_serialize: false,
+            custom_title: None,
+            ime_state: None,
+            self_handle: cx.entity().downgrade(),
+            rename_editor: None,
+            rename_editor_subscription: None,
+            _subscriptions: subscriptions,
+            _terminal_subscriptions: terminal_subscriptions,
         }
     }
-
-    pub fn backend(&self) -> &AlacrittyBackend { &self.backend }
-
-    fn on_key(&mut self, event: &KeyDownEvent, _window: &mut Window, cx: &mut Context<Self>) {
-        let mut bytes: Vec<u8> = Vec::new();
-        let k = &event.keystroke;
-
-        let key_str = k.key.as_str();
-        let is_alt = k.modifiers.alt;
-
-        match key_str {
-            "enter" => bytes.extend_from_slice(b"\r"),
-            "backspace" => bytes.push(0x7f),
-            "tab" => bytes.extend_from_slice(if k.modifiers.shift { b"\x1b[Z" } else { b"\t" }),
-            "escape" => bytes.push(0x1b),
-            "left" => bytes.extend_from_slice(if is_alt { b"\x1b[1;3D" } else { b"\x1b[D" }),
-            "right" => bytes.extend_from_slice(if is_alt { b"\x1b[1;3C" } else { b"\x1b[C" }),
-            "up" => bytes.extend_from_slice(if is_alt { b"\x1b[1;3A" } else { b"\x1b[A" }),
-            "down" => bytes.extend_from_slice(if is_alt { b"\x1b[1;3B" } else { b"\x1b[B" }),
-            "home" => bytes.extend_from_slice(b"\x1b[H"),
-            "end" => bytes.extend_from_slice(b"\x1b[F"),
-            "pageup" => bytes.extend_from_slice(b"\x1b[5~"),
-            "pagedown" => bytes.extend_from_slice(b"\x1b[6~"),
-            "delete" => bytes.extend_from_slice(b"\x1b[3~"),
-            "colon" if is_alt => {}
-            "shift" | "ctrl" | "alt" | "super" => {}
-            _ => {
-                if let Some(c) = k.key.chars().next() {
-                    let printable = k
-                        .key_char
-                        .as_deref()
-                        .and_then(|s| s.chars().next())
-                        .unwrap_or(c);
-
-                    let with_ctrl = k.modifiers.control;
-                    let is_letter = printable.is_ascii_alphabetic();
-                    if with_ctrl && is_letter {
-                        bytes.push(printable.to_ascii_uppercase() as u8 & 0x1f);
-                    } else if is_alt {
-                        bytes.push(0x1b);
-                        let mut s = [0u8; 4];
-                        let _ = printable.encode_utf8(&mut s);
-                        bytes.extend_from_slice(printable.to_string().as_bytes());
-                    } else if printable.is_control() {
-                        // skip
-                    } else {
-                        bytes.extend_from_slice(printable.to_string().as_bytes());
-                    }
-                }
+    ///Create a new Terminal in the current working directory or the user's home directory
+    pub fn deploy(
+        workspace: &mut Workspace,
+        action: &NewCenterTerminal,
+        window: &mut Window,
+        cx: &mut Context<Workspace>,
+    ) {
+        let local = action.local;
+        let working_directory = default_working_directory(workspace, cx);
+        TerminalPanel::add_center_terminal(workspace, window, cx, move |project, cx| {
+            if local {
+                project.create_local_terminal(cx)
+            } else {
+                project.create_terminal_shell(working_directory, cx)
             }
-        }
-
-        if !bytes.is_empty() {
-            self.backend.write_input(&bytes);
-            cx.notify();
-        }
+        })
+        .detach_and_log_err(cx);
     }
-}
-
-impl EventEmitter<()> for TerminalView {}
-
-impl Focusable for TerminalView {
-    fn focus_handle(&self, _: &App) -> FocusHandle { self.focus_handle.clone() }
-}
-
-impl Render for TerminalView {
-    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        div()
-            .size_full()
-            .track_focus(&self.focus_handle)
-            .key_context("terminal")
-            .on_key_down(cx.listener(Self::on_key))
-            .child(TerminalElement::new(self.backend.clone(), self.bounds))
-    }
-}
-
-/// Build bounds from the window's real UI metrics, mirroring how zed
-/// computes terminal dimensions: the font size comes from the global
-/// buffer font (here surfaced through `window.text_style()`), rem scaling
-/// uses the window's rem size, and the cell width is measured from the
-/// actual metrics of the resolved font.
-///
-/// The element re-measures on every layout pass and corrects the grid via
-/// [`element::TerminalElement`]; this is only the pre-layout approximation.
-pub fn initial_bounds(window: &Window) -> TerminalBounds {
-    let rem = window.rem_size();
-    let text_style = window.text_style();
-    let font_size = text_style.font_size.to_pixels(rem);
-    let font_size_f = f32::from(font_size);
-
-    let text_system = window.text_system();
-    let font_id = text_system.resolve_font(&text_style.font());
-    let cell_width = text_system
-        .advance(font_id, font_size, 'm')
-        .map(|adv| f32::from(adv.width))
-        .unwrap_or(font_size_f * 0.66);
-
-    // Default terminal line-height multiplier; matches zed's base value.
-    const LINE_HEIGHT_MULTIPLIER: f32 = 1.35;
-    let line_height = font_size_f * LINE_HEIGHT_MULTIPLIER;
-
-    TerminalBounds {
-        cell_width,
-        line_height,
-        width: f32::from(rem),
-        height: f32::from(rem),
-        font_size: font_size_f,
-    }
+    pub fn entity(&self) -> &Entity<Terminal> { &self.terminal }
+    pub fn terminal(&self) -> &Entity<Terminal> { &self.terminal }
+    pub fn has_bell(&self) -> bool { self.has_bell }
 }

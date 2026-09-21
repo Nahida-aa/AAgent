@@ -66,7 +66,7 @@ use crate::mappings::keys::to_esc_str;
 use crate::modes::Modes;
 mod foreground;
 
-use crate::{
+pub use crate::{
     cell::{Cell, Content, GridLinesChange, IndexedCell, RenderableCells},
     hyperlink::{Hyperlink, HyperlinkData},
     selection::{

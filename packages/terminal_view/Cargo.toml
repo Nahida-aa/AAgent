@@ -13,3 +13,5 @@ aa_gpui_kit_theme.workspace = true
 aa_gpui_kit_ui.workspace = true
 workspace.workspace = true
 tracing.workspace = true
+editor.workspace = true
+project.workspace = true

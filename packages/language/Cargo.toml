@@ -6,3 +6,4 @@ license.workspace = true
 
 [dependencies]
 gpui = { workspace = true }
+settings.workspace = true

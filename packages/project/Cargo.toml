@@ -10,3 +10,4 @@ fs = { workspace = true }
 futures = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 tempfile = { workspace = true }
+gpui = { workspace = true }

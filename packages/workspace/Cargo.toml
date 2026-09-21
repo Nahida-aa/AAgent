@@ -14,3 +14,13 @@ serde.workspace = true
 schemars = { workspace = true, features = ["derive"] }
 task.workspace = true
 language.workspace = true
+collections.workspace = true
+client.workspace = true
+project.workspace = true
+aagent_actions.workspace = true
+path.workspace = true
+parking_lot.workspace = true
+markdown.workspace = true
+util.workspace = true
+worktree.workspace = true
+remote.workspace = true

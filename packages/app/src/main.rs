@@ -14,8 +14,10 @@ fn main() {
                 .load_fonts(cx)
                 .expect("failed to load embedded fonts");
             theme_settings::init(cx);
-            aa_gpui_kit_ui::bind_input_keys(cx);
+            // 编辑器按键一律绑到本仓自己的 `packages/editor`（zed editor 移植版），
+            // 不引 gpui_learn 的 editor 包。
             editor::bind_editor_keys(cx);
+            editor::bind_input_keys(cx);
 
             // 设置系统（RustEmbed default.json → gpui Global SettingsStore）
             settings::SettingsStore::init(cx);

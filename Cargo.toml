@@ -12,7 +12,7 @@ members = [
     "packages/server",
     "packages/settings",
     "packages/session",
-    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aagent_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/language_model_core", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/util_macros", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/language_core", "packages/db", "packages/mermaid_render",
+    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aagent_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/language_model_core", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/util_macros", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/language_core", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/askpass", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",
 ]
 
 [workspace.package]
@@ -26,6 +26,7 @@ a_log = { path = "packages/a_log",  }
 a_tracing = { path = "packages/a_tracing" }
 a_tracing_macro = { path = "packages/a_tracing_macro" }
 aagent_actions = { path = "packages/aagent_actions" }
+ad_credentials_provider = { path = "packages/ad_credentials_provider" }
 settings_json = { path = "packages/settings_json", default-features = false }
 aa-kernel = { path = "packages/kernel" }
 aa-core = { path = "packages/core" }
@@ -36,57 +37,118 @@ aa-extension-mcp = { path = "packages/extension-mcp" }
 aa-llm = { path = "packages/llm" }
 aa-session = { path = "packages/session" }
 aa-server = { path = "packages/server" }
+askpass = { path = "packages/askpass" }
 breadcrumbs = { path = "packages/breadcrumbs" }
+buffer_diff = { path = "packages/buffer_diff" }
+context_server = { path = "packages/context_server" }
 client = { path = "packages/client" }
 cloud_llm_client = { path = "packages/cloud_llm_client" }
+dap = { path = "packages/dap" }
 editor = { path = "packages/editor" }
+extension = { path = "packages/extension" }
 fs = { path = "packages/fs" }
+git = { path = "packages/git" }
+git_hosting_providers = { path = "packages/git_hosting_providers" }
 paths = { path = "packages/paths" }
 proto = { path = "packages/proto" }
 language = { path = "packages/language" }
 language_core = { path = "packages/language_core" }
 language_model_core = { path = "packages/language_model_core" }
+lsp = { path = "packages/lsp" }
+migrator = { path = "packages/migrator" }
 markdown = { path = "packages/markdown" }
+node_runtime = { path = "packages/node_runtime" }
 terminal = { path = "packages/terminal" }
 terminal_view = { path = "packages/terminal_view" }
 task = { path = "packages/task" }
 title_bar = { path = "packages/title_bar" }
-settings = { path = "packages/settings" }
-settings_content = { path = "packages/settings_content" }
-settings_macros = { path = "packages/settings_macros" }
-theme_settings = { path = "packages/theme_settings" }
-util = { path = "packages/util" }
+
 util_macros = { path = "packages/util_macros" }
 sidebar = { path = "packages/sidebar" }
-workspace = { path = "packages/workspace" }
 project = { path = "packages/project" }
+prettier = { path = "packages/prettier" }
 rope = { path = "packages/rope" }
+rpc = { path = "packages/rpc" }
 text = { path = "packages/text" }
 release_channel = { path = "packages/release_channel" }
 remote = { path = "packages/remote" }
+workspace = { path = "packages/workspace" }
+settings = { path = "packages/settings" }
+settings_content = { path = "packages/settings_content" }
+settings_macros = { path = "packages/settings_macros" }
+snippet_provider = { path = "packages/snippet_provider" }
+theme_settings = { path = "packages/theme_settings" }
+util = { path = "packages/util" }
 worktree = { path = "packages/worktree" }
-migrator = { path = "packages/migrator" }
 http_client = { path = "packages/http_client" }
 zeta_prompt = { path = "packages/zeta_prompt" }
 
+aho-corasick = "1.1"
 anyhow = "1"
-
+async-channel = "2"
 axum = { version = "0.8", default-features = false }
 async-trait = "0.1"
 alacritty_terminal = { git = "https://github.com/zed-industries/alacritty", rev = "4c129667ce56611becdc82de6e28218c80e2e88f" }
+async-lock = "3.4.2"
+async-compression = { version = "0.4", features = ["bzip2", "gzip", "futures-io"] }
+async-fs = "2.1"
+async-tar = { git = "https://github.com/zed-industries/async-tar", rev = "bd3ad6f89df9a9da7a8535958756d6bf465936a0" }
+base64 = "0.22"
+bitflags = "2.6.0"
+bytes = "1.0"
+const_format = "0.2"
+convert_case = "0.11.0"
+chardetng = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
-
+circular-buffer = "1.0"
 clap = { version = "4", features = ["derive"] }
+
+collections = { version = "0.1.0" }
+
+derive_more = { version = "2.1.1", features = [
+    "add",
+    "add_assign",
+    "deref",
+    "deref_mut",
+    "display",
+    "from",
+    "from_str",
+    "mul",
+    "mul_assign",
+    "not",
+] }
+dirs = "6.0"
+dunce = "1.0"
+ec4rs = { version = "1.2", features = ["allow-empty-values"] }
+
+encoding_rs = "0.8"
+fancy-regex = "0.19"
 futures = "0.3"
 futures-util = { version = "0.3", default-features = false, features = ["std"] }
 futures-lite = "2"
+
+gpui_shared_string = "0.1.0"
+globset = "0.4"
+
 # 与 gpui_learn / aa-player 保持相同 GPUI 来源，方便经验复用。
 gpui = { version = "0.2.2", default-features = false }
 gpui_macros = { version = "0.1.0" }
 gpui_platform = { version = "0.1.0" }
 gpui_util = { version = "0.1.0" }
-collections = { version = "0.1.0" }
+html5ever = "0.39"
+http = "1.1"
+http-body = "1.0"
+httparse = "1.10"
+url = "2.2"
+regex = "1"
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream"] }
+glob = "0.3"
 lru = "0.16"
+tempfile = "3"
+inventory = "0.3"
+smol = "2.0"
+# Terminal
+libc = "0.2"
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 parking_lot = "0.12"
@@ -120,56 +182,38 @@ tree-sitter-ruby = "0.23"
 tree-sitter-rust = "0.24.2"
 tree-sitter-typescript = { git = "https://github.com/zed-industries/tree-sitter-typescript", rev = "e2c53597d6a5d9cf7bbe8dccde576fe1e46c5899" } # https://github.com/tree-sitter/tree-sitter-typescript/pull/347
 tree-sitter-yaml = { git = "https://github.com/zed-industries/tree-sitter-yaml", rev = "baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a" }
-wasmtime = { version = "45", features = ["component-model", "wat"] }
 
-dunce = "1.0"
-url = "2.2"
-regex = "1"
-reqwest = { version = "0.12", default-features = false, features = ["json", "stream"] }
-glob = "0.3"
-tempfile = "3"
-inventory = "0.3"
-smol = "2.0"
-# Terminal
-libc = "0.2"
-async-channel = "2"
+
+
 
 # Zed crates (统一 git rev)
 notify = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
 notify-types = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
 
 
-async-lock = "3.4.2"
-async-compression = { version = "0.4", features = ["bzip2", "gzip", "futures-io"] }
-async-fs = "2.1"
-async-tar = { git = "https://github.com/zed-industries/async-tar", rev = "bd3ad6f89df9a9da7a8535958756d6bf465936a0" }
-base64 = "0.22"
-bitflags = "2.6.0"
-bytes = "1.0"
-const_format = "0.2"
-convert_case = "0.11.0"
-derive_more = { version = "2.1.1", features = [
-    "add",
-    "add_assign",
-    "deref",
-    "deref_mut",
-    "display",
-    "from",
-    "from_str",
-    "mul",
-    "mul_assign",
-    "not",
-] }
-dirs = "6.0"
-ec4rs = { version = "1.2", features = ["allow-empty-values"] }
-gpui_shared_string = "0.1.0"
-globset = "0.4"
-html5ever = "0.39"
-http = "1.1"
-http-body = "1.0"
-httparse = "1.10"
+
 ignore = "0.4.22"
+# image's default features minus "avif", which only adds an encoder (rav1e);
+# decoding AVIF would additionally need the non-default "avif-native" feature.
+image = { version = "0.25.1", default-features = false, features = [
+    "bmp",
+    "dds",
+    "exr",
+    "ff",
+    "gif",
+    "hdr",
+    "ico",
+    "jpeg",
+    "png",
+    "pnm",
+    "qoi",
+    "rayon",
+    "tga",
+    "tiff",
+    "webp",
+] }
 imara-diff = "0.2.0"
+indexmap = { version = "2.7.0", features = ["serde"] }
 indoc = "2"
 itertools = "0.14.0"
 json5 = "0.4"
@@ -187,6 +231,9 @@ pulldown-cmark = { version = "0.13.0", default-features = false }
 thiserror = "2.0.12"
 rand = "0.9"
 rust-embed = { version = "8.11", features = ["include-exclude"] }
+urlencoding = "2.1.2"
+vte = { version = "0.15.0", features = ["ansi"] }
+
 serde = { version = "1.0.221", features = ["derive", "rc"] }
 serde_json = { version = "1.0.144", features = ["preserve_order", "raw_value"] }
 serde_json_lenient = { version = "0.2", features = [
@@ -194,27 +241,36 @@ serde_json_lenient = { version = "0.2", features = [
     "raw_value",
 ] }
 serde_path_to_error = "0.1.17"
-schemars = { version = "1", features = ["derive"] }
-strum = { version = "0.28", features = ["derive"] }
-semver = { version = "1.0", features = ["serde"] }
 serde_urlencoded = "0.7"
+semver = { version = "1.0", features = ["serde"] }
+schemars = { version = "1", features = ["derive"] }
 sha2 = "0.10"
+shellexpand = "3.1"
+strsim = "0.11"
+strum = { version = "0.28", features = ["derive"] }
 streaming-iterator = "0.1"
 smallvec = { version = "1.6", features = ["union", "const_new"] }
 sum_tree = { git = "https://github.com/zed-industries/zed.git", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 stacksafe = "1.0"
 syn = { version = "2.0.101", features = ["full", "extra-traits", "visit-mut"] }
 sysinfo = "0.39"
-urlencoding = "2.1.2"
-vte = { version = "0.15.0", features = ["ansi"] }
+wasmtime = { version = "45", features = ["component-model", "wat"] }
+wax = "0.7"
+which = "8"
+zeroize = "1.8"
 
 # 外部 gpui_learn 共享库（GitHub git 依赖，稳定可复现）
-aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "f631d67cae73a0b29e25c12b964ac50bda5253af" }
-aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "f631d67cae73a0b29e25c12b964ac50bda5253af" }
-aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "f631d67cae73a0b29e25c12b964ac50bda5253af" }
-aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "f631d67cae73a0b29e25c12b964ac50bda5253af" }
+aa_clock = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "326485e2514f948befd6965ee0f6c8a8c826b484" }
+aa_gpui_fuzzy = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "326485e2514f948befd6965ee0f6c8a8c826b484" }
+aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "326485e2514f948befd6965ee0f6c8a8c826b484" }
+aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "326485e2514f948befd6965ee0f6c8a8c826b484" }
+aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "326485e2514f948befd6965ee0f6c8a8c826b484" }
+aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "326485e2514f948befd6965ee0f6c8a8c826b484" }
 
+credentials_provider = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 path = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
+watch = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
+snippet = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 
 [patch.crates-io]
 tree-sitter-language = { git = "https://github.com/tree-sitter/tree-sitter", rev = "43623ec9bf0eaaf7113285c46e8a09018f181b18" }

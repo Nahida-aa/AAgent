@@ -4,6 +4,16 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
+[features]
+test-support = []
+github-download = [
+    "dep:async-fs",
+    "dep:async-tar",
+    "dep:sha2",
+    "dep:tempfile",
+    "dep:util",
+]
+
 [dependencies]
 anyhow.workspace = true
 async-compression.workspace = true

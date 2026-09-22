@@ -1,9 +1,10 @@
 use super::*;
 
+use ::rpc::proto;
 use anyhow::{Context as _, Result, anyhow};
 use futures::future::join_all;
 use gpui::{App, AppContext as _, Context, Entity, Task, TaskExt as _};
-use util::paths::{home_dir, PathStyle};
+use util::paths::PathStyle;
 use util::rel_path::RelPath;
 use worktree::{CreatedEntry, Entry, ProjectEntryId, Worktree, WorktreeId};
 
@@ -56,7 +57,7 @@ impl Project {
             Self::default_visible_worktree_paths(&self.worktree_store.read(cx), cx);
 
         if worktree_roots.is_empty() {
-            PathList::new(&[paths::home_dir().as_path()])
+            PathList::new(&[util::paths::home_dir().as_path()])
         } else {
             PathList::new(&worktree_roots)
         }
@@ -528,7 +529,7 @@ impl Project {
         let path = path.as_ref();
         let worktree_store = self.worktree_store.read(cx);
 
-        if is_absolute(&path.to_string_lossy(), path_style) {
+        if util::paths::is_absolute(&path.to_string_lossy(), path_style) {
             for worktree in worktree_store.visible_worktrees(cx) {
                 let worktree_abs_path = worktree.read(cx).abs_path();
 

@@ -1,196 +1,142 @@
-use std::sync::Arc;
+use db::kvp::KeyValueStore;
+use gpui::{App, AppContext as _, Context, Subscription, Task, WindowId};
+use util::ResultExt;
 
-use aa_core::llm::*;
-use aa_kernel::tool_provider::{Tool, ToolExecutionContext};
-
-pub mod storage;
-
-// ── Events ──────────────────────────────────────────────────
-
-#[derive(Debug, Clone)]
-pub enum SessionEvent {
-    Token(String),
-    ToolCall(ToolCall),
-    ToolResult {
-        name: String,
-        content: String,
-        is_error: bool,
-    },
-    Done {
-        usage: Option<Usage>,
-    },
-    Error(String),
+pub struct Session {
+    session_id: String,
+    old_session_id: Option<String>,
+    old_window_ids: Option<Vec<WindowId>>,
 }
 
-// ── Turn ─────────────────────────────────────────────────────
+const SESSION_ID_KEY: &str = "session_id";
+const SESSION_WINDOW_STACK_KEY: &str = "session_window_stack";
 
-pub struct TurnInput {
-    pub messages: Vec<Message>,
-    pub provider: Arc<dyn ModelProvider>,
-    pub tools: Vec<Arc<dyn Tool>>,
-    pub model: String,
-    pub working_dir: String,
-    pub session_id: String,
-}
+impl Session {
+    pub async fn new(session_id: String, db: KeyValueStore) -> Self {
+        let old_session_id = db.read_kvp(SESSION_ID_KEY).ok().flatten();
 
-pub async fn run_turn(input: TurnInput, tx: tokio::sync::mpsc::Sender<SessionEvent>) -> TurnInput {
-    let TurnInput {
-        mut messages,
-        provider,
-        tools,
-        model,
-        working_dir,
-        session_id,
-    } = input;
+        db.write_kvp(SESSION_ID_KEY.to_string(), session_id.clone())
+            .await
+            .log_err();
 
-    let tool_defs: Vec<serde_json::Value> = tools
-        .iter()
-        .map(|t| serde_json::to_value(t.definition()).unwrap())
-        .collect();
+        let old_window_ids = db
+            .read_kvp(SESSION_WINDOW_STACK_KEY)
+            .ok()
+            .flatten()
+            .and_then(|json| serde_json::from_str::<Vec<u64>>(&json).ok())
+            .map(|vec: Vec<u64>| {
+                vec.into_iter()
+                    .map(WindowId::from)
+                    .collect::<Vec<WindowId>>()
+            });
 
-    loop {
-        let request = ModelRequest {
-            messages: messages.clone(),
-            tools: tool_defs.clone(),
-            config: ModelConfig {
-                provider: provider.id(),
-                model: model.clone(),
-                temperature: None,
-                max_tokens: Some(4096),
-                top_p: None,
-            },
-        };
-
-        let mut stream_rx = match provider.chat_stream(request).await {
-            Ok(rx) => rx,
-            Err(e) => {
-                let _ = tx.send(SessionEvent::Error(format!("{e}"))).await;
-                return TurnInput {
-                    messages,
-                    provider,
-                    tools,
-                    model,
-                    working_dir,
-                    session_id,
-                };
-            }
-        };
-
-        let mut assistant_text = String::new();
-        let mut tool_calls: Vec<ToolCall> = Vec::new();
-
-        while let Some(event) = stream_rx.recv().await {
-            match event {
-                StreamEvent::Chunk(text) => {
-                    assistant_text.push_str(&text);
-                    let _ = tx.send(SessionEvent::Token(text)).await;
-                }
-                StreamEvent::ToolCall(tc) => {
-                    let _ = tx.send(SessionEvent::ToolCall(tc.clone())).await;
-                    tool_calls.push(tc);
-                }
-                StreamEvent::Done(usage) => {
-                    messages.push(Message {
-                        role: Role::Assistant,
-                        content: assistant_text.clone(),
-                        tool_calls: None,
-                        tool_call_id: None,
-                        name: None,
-                    });
-
-                    if tool_calls.is_empty() {
-                        let _ = tx.send(SessionEvent::Done { usage: Some(usage) }).await;
-                        return TurnInput {
-                            messages,
-                            provider,
-                            tools,
-                            model,
-                            working_dir,
-                            session_id,
-                        };
-                    }
-
-                    for tc in &tool_calls {
-                        let args: serde_json::Value = serde_json::from_str(&tc.function.arguments)
-                            .unwrap_or(serde_json::Value::Null);
-                        let ctx = ToolExecutionContext {
-                            session_id: session_id.clone(),
-                            working_dir: working_dir.clone(),
-                        };
-
-                        match tools
-                            .iter()
-                            .find(|t| t.definition().name == tc.function.name)
-                        {
-                            Some(tool) => match tool.execute(args, &ctx).await {
-                                Ok(result) => {
-                                    let content = result.content;
-                                    messages.push(Message {
-                                        role: Role::Tool,
-                                        content: content.clone(),
-                                        tool_calls: None,
-                                        tool_call_id: Some(tc.id.clone()),
-                                        name: Some(tc.function.name.clone()),
-                                    });
-                                    let _ = tx
-                                        .send(SessionEvent::ToolResult {
-                                            name: tc.function.name.clone(),
-                                            content,
-                                            is_error: result.is_error,
-                                        })
-                                        .await;
-                                }
-                                Err(e) => {
-                                    let err = format!("Error: {e}");
-                                    messages.push(Message {
-                                        role: Role::Tool,
-                                        content: err.clone(),
-                                        tool_calls: None,
-                                        tool_call_id: Some(tc.id.clone()),
-                                        name: Some(tc.function.name.clone()),
-                                    });
-                                    let _ = tx
-                                        .send(SessionEvent::ToolResult {
-                                            name: tc.function.name.clone(),
-                                            content: err,
-                                            is_error: true,
-                                        })
-                                        .await;
-                                }
-                            },
-                            None => {
-                                let err = format!("Tool '{}' not found", tc.function.name);
-                                messages.push(Message {
-                                    role: Role::Tool,
-                                    content: err.clone(),
-                                    tool_calls: None,
-                                    tool_call_id: Some(tc.id.clone()),
-                                    name: Some(tc.function.name.clone()),
-                                });
-                                let _ = tx
-                                    .send(SessionEvent::ToolResult {
-                                        name: tc.function.name.clone(),
-                                        content: err,
-                                        is_error: true,
-                                    })
-                                    .await;
-                            }
-                        }
-                    }
-                    tool_calls.clear();
-                }
-                StreamEvent::Error(msg) => {
-                    let _ = tx.send(SessionEvent::Error(msg)).await;
-                    return TurnInput {
-                        messages,
-                        provider,
-                        tools,
-                        model,
-                        working_dir,
-                        session_id,
-                    };
-                }
-            }
+        Self {
+            session_id,
+            old_session_id,
+            old_window_ids,
         }
+    }
+
+    #[cfg(any(test, feature = "test-support"))]
+    pub fn test() -> Self {
+        Self {
+            session_id: uuid::Uuid::new_v4().to_string(),
+            old_session_id: None,
+            old_window_ids: None,
+        }
+    }
+
+    #[cfg(any(test, feature = "test-support"))]
+    pub fn test_with_old_session(old_session_id: String) -> Self {
+        Self {
+            session_id: uuid::Uuid::new_v4().to_string(),
+            old_session_id: Some(old_session_id),
+            old_window_ids: None,
+        }
+    }
+
+    pub fn id(&self) -> &str { &self.session_id }
+}
+
+pub struct AppSession {
+    session: Session,
+    _serialization_task: Task<()>,
+    _subscriptions: Vec<Subscription>,
+}
+
+impl AppSession {
+    pub fn new(session: Session, cx: &Context<Self>) -> Self {
+        let _subscriptions = vec![cx.on_app_quit(Self::app_will_quit)];
+
+        let _serialization_task = if cfg!(not(any(test, feature = "test-support"))) {
+            let db = KeyValueStore::global(cx);
+            cx.spawn(async move |_, cx| {
+                // Disabled in tests: the infinite loop bypasses "parking forbidden" checks,
+                // causing tests to hang instead of panicking.
+                {
+                    let mut current_window_stack = Vec::new();
+                    loop {
+                        if let Some(windows) = cx.update(|cx| window_stack(cx))
+                            && !windows.is_empty()
+                            && windows != current_window_stack
+                        {
+                            store_window_stack(db.clone(), &windows).await;
+                            current_window_stack = windows;
+                        }
+
+                        cx.background_executor()
+                            .timer(std::time::Duration::from_millis(500))
+                            .await;
+                    }
+                }
+            })
+        } else {
+            Task::ready(())
+        };
+
+        Self {
+            session,
+            _subscriptions,
+            _serialization_task,
+        }
+    }
+
+    fn app_will_quit(&mut self, cx: &mut Context<Self>) -> Task<()> {
+        if let Some(window_stack) = window_stack(cx)
+            && !window_stack.is_empty()
+        {
+            let db = KeyValueStore::global(cx);
+            cx.background_spawn(async move { store_window_stack(db, &window_stack).await })
+        } else {
+            Task::ready(())
+        }
+    }
+
+    pub fn id(&self) -> &str { self.session.id() }
+
+    pub fn last_session_id(&self) -> Option<&str> { self.session.old_session_id.as_deref() }
+
+    #[cfg(any(test, feature = "test-support"))]
+    pub fn replace_session_for_test(&mut self, session: Session) { self.session = session; }
+
+    pub fn last_session_window_stack(&self) -> Option<Vec<WindowId>> {
+        self.session.old_window_ids.clone()
+    }
+}
+
+fn window_stack(cx: &App) -> Option<Vec<u64>> {
+    Some(
+        cx.window_stack()?
+            .into_iter()
+            .map(|window| window.window_id().as_u64())
+            .collect(),
+    )
+}
+
+async fn store_window_stack(db: KeyValueStore, windows: &[u64]) {
+    if let Ok(window_ids_json) = serde_json::to_string(windows) {
+        db.write_kvp(SESSION_WINDOW_STACK_KEY.to_string(), window_ids_json)
+            .await
+            .log_err();
     }
 }

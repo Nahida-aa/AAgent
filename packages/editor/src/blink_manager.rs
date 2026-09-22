@@ -1,6 +1,7 @@
-use gpui::{App, Context};
+use gpui::Context;
 use settings::SettingsStore;
 use std::time::Duration;
+use ui::App;
 
 pub struct BlinkManager {
     blink_interval: Duration,
@@ -108,8 +109,12 @@ impl BlinkManager {
         self.enabled = false;
     }
 
-    pub fn visible(&self) -> bool { self.visible }
+    pub fn visible(&self) -> bool {
+        self.visible
+    }
 
     #[cfg(test)]
-    pub(crate) fn enabled(&self) -> bool { self.enabled }
+    pub(crate) fn enabled(&self) -> bool {
+        self.enabled
+    }
 }

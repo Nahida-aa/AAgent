@@ -27,23 +27,32 @@ mod test_support;
 
 pub(crate) use state::{
     AgentLocation, BufferOrderedMessage, DebugAdapterClientState, DownloadingFile,
-    LocalProjectFlags, ProjectClientState, RemotelyCreatedModelGuard, RemotelyCreatedModels,
+    EntitySubscription, LocalProjectFlags, ProjectClientState, RemotelyCreatedModelGuard,
+    RemotelyCreatedModels,
 };
 
 
 // ---- 供 project/ 各子模块经 `use super::*;` 取用 ----
 // zed 的 project.rs 是 crate 根，子模块用的裸名天然可见；拆分后在这里统一转发。
-pub(crate) use crate::lsp_store::{LanguageServerToQuery, LspStoreEvent, ProgressToken};
-pub(crate) use crate::search::{SearchQuery, SearchResult};
-pub(crate) use crate::search_history::SearchHistory;
-pub(crate) use crate::Event;
-pub(crate) use client::Collaborator;
-pub(crate) use fs::Fs;
-pub(crate) use gpui::Context;
-pub(crate) use ::rpc::{ErrorCode, proto};
-pub(crate) use settings::WorktreeId;
-pub(crate) use util::rel_path::RelPath;
-pub(crate) use worktree::ProjectEntryId;
+// 这些供 project/ 各子模块经 `use super::*;` 取用。
+// glob 导入不会提升可见性，所以必须是 `pub use`（而非 pub(crate)）。
+// 注意：这里**不要**转发 `proto`——子模块自己 `use ::rpc::proto;`。
+// 否则 `use super::*` 会把 `proto` 带进子模块，让文件里的 `::rpc::proto::X`
+// 被解析成 `proto::proto::X`。
+pub use ::rpc::ErrorCode;
+pub use crate::search::{SearchQuery, SearchResult};
+pub use crate::search_history::SearchHistory;
+pub use crate::Event;
+pub use crate::ProjectPath;
+pub use client::Collaborator;
+pub use fs::{Fs, TrashId};
+pub use gpui::Context;
+pub use language::{Capability, LanguageServerId};
+pub use remote::RemoteConnectionOptions;
+pub use settings::WorktreeId;
+pub use util::rel_path::RelPath;
+pub use worktree::ProjectEntryId;
+pub use crate::lsp_store::{LanguageServerToQuery, LspStoreEvent, ProgressToken};
 
 use std::collections::{BTreeSet, HashMap, HashSet};
 use collections::IndexSet;

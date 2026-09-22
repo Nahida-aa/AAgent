@@ -25,7 +25,7 @@ impl Project {
     }
 
     async fn from_join_project_response(
-        response: TypedEnvelope<rpc::proto::JoinProjectResponse>,
+        response: TypedEnvelope<::rpc::proto::JoinProjectResponse>,
         subscriptions: [super::EntitySubscription; 8],
         client: Arc<Client>,
         run_tasks: bool,
@@ -39,7 +39,7 @@ impl Project {
 
     pub(crate) fn set_collaborators_from_proto(
            &mut self,
-           messages: Vec<rpc::proto::Collaborator>,
+           messages: Vec<::rpc::proto::Collaborator>,
            cx: &mut Context<Self>,
        ) -> anyhow::Result<()> {
            // 原样搬入

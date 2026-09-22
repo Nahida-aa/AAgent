@@ -10,10 +10,10 @@ use gpui::{App, AppContext, Context, Entity, Task, TaskExt};
 use language::{
     Anchor, Buffer, Language, Location, PointUtf16, ToOffset, ToPointUtf16, Transaction, Unclipped,
 };
-use lsp::{
+use ::lsp::{
     CodeActionKind, CompletionContext, LanguageServerId, LanguageServerName, LanguageServerSelector,
 };
-use rpc::proto::{self, REMOTE_SERVER_PROJECT_ID};
+use ::rpc::proto::{self, REMOTE_SERVER_PROJECT_ID};
 use text::{BufferId, Point};
 
 use crate::debugger::{breakpoint_store::ActiveStackFrame, session::Session};

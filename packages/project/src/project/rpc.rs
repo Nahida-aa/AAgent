@@ -7,13 +7,13 @@ use client::TypedEnvelope;
 use futures::StreamExt;
 use gpui::{AppContext as _, AsyncApp, Entity, WeakEntity};
 use itertools::Itertools;
-use rpc::proto;
+use ::rpc::proto;
 use util::ResultExt as _;
 
 use super::Project;
 use crate::buffer_store::BufferStore;
 use crate::lsp_store::CompletionDocumentation;
-use crate::crate::project_search::SearchResultsHandle;
+use crate::project_search::SearchResultsHandle;
 use crate::worktree_store::WorktreeStore;
 use crate::{Event, ProjectPath};
 

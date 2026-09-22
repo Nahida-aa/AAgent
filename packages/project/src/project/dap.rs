@@ -3,7 +3,7 @@ use super::*;
 use std::ops::Range;
 
 use anyhow::Result;
-use dap::inline_value::{InlineValueLocation, VariableLookupKind, VariableScope};
+use ::dap::inline_value::{InlineValueLocation, VariableLookupKind, VariableScope};
 use crate::debugger::{
     breakpoint_store::ActiveStackFrame,
     dap_store::DapStoreEvent,
@@ -17,7 +17,16 @@ use crate::protocol_helpers::provide_inline_values;
 use crate::types::InlayHint;
 
 impl Project {
-    pub fn active_debug_session(&self, cx: &gpui::App) -> Option<(Entity<Session>, ActiveStackFrame)> { /* 原样 */ }
+    pub fn active_debug_session(&self, cx: &App) -> Option<(Entity<Session>, ActiveStackFrame)> {
+        let active_position = self.breakpoint_store.read(cx).active_position()?;
+        let session = self
+            .dap_store
+            .read(cx)
+            .session_by_id(active_position.session_id)?;
+        Some((session, active_position.clone()))
+    }
+
+    #[inline]
     pub(crate) fn on_dap_store_event(
         &mut self,
         _: Entity<DapStore>,

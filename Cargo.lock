@@ -1229,6 +1229,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "auto_update"
+version = "0.1.0"
+dependencies = [
+ "a_log",
+ "aa_clock",
+ "anyhow",
+ "client",
+ "ctor",
+ "db",
+ "futures",
+ "futures-lite",
+ "gpui",
+ "http_client",
+ "log",
+ "parking_lot",
+ "paths",
+ "release_channel",
+ "semver",
+ "serde",
+ "serde_json",
+ "settings",
+ "smol",
+ "tempfile",
+ "util 0.1.0",
+ "which",
+ "workspace",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3618,9 +3647,88 @@ dependencies = [
 name = "editor"
 version = "0.1.0"
 dependencies = [
+ "a_log",
+ "a_tracing",
+ "aa_clock",
+ "aa_gpui_fuzzy",
+ "aa_gpui_kit_assets 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=c712ba162bd10c1a3a62d10c577acd8c06842249)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_ui",
+ "aa_gpui_kit_ui_input",
+ "aagent_actions",
+ "aho-corasick",
+ "anyhow",
+ "base64",
+ "breadcrumbs",
+ "buffer_diff",
+ "client",
+ "collections",
+ "convert_case 0.11.0",
+ "ctor",
+ "dap",
+ "db",
+ "edit_prediction_types",
+ "emojis",
+ "feature_flags",
+ "file_icons",
+ "fs",
+ "futures",
+ "futures-lite",
+ "git",
  "gpui",
+ "indoc",
+ "itertools 0.14.0",
  "language",
+ "language_detection",
+ "languages",
+ "linkify",
+ "log",
+ "lsp",
+ "markdown",
+ "menu",
+ "multi_buffer",
+ "ordered-float 5.5.0",
+ "parking_lot",
+ "pretty_assertions",
+ "project",
+ "proptest",
+ "proptest-derive",
+ "rand 0.9.5",
+ "regex",
+ "release_channel",
+ "rope",
+ "rpc",
+ "schemars",
+ "semver",
+ "serde",
+ "serde_json",
  "settings",
+ "smallvec",
+ "snippet",
+ "sum_tree",
+ "task",
+ "telemetry",
+ "text",
+ "theme_settings",
+ "tree-sitter-bash",
+ "tree-sitter-c",
+ "tree-sitter-go",
+ "tree-sitter-html",
+ "tree-sitter-md",
+ "tree-sitter-python",
+ "tree-sitter-rust",
+ "tree-sitter-typescript",
+ "tree-sitter-yaml",
+ "unicode-script",
+ "unicode-segmentation",
+ "unicode-width 0.2.2",
+ "unindent",
+ "url",
+ "urlencoding",
+ "util 0.1.0",
+ "uuid",
+ "vim_mode_setting",
+ "workspace",
 ]
 
 [[package]]
@@ -3654,6 +3762,15 @@ name = "embedded-io"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
+
+[[package]]
+name = "emojis"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b1514ced566c94991ed9563258ecf61e311fd773bf0a3f20606830386bf66e3"
+dependencies = [
+ "phf 0.13.1",
+]
 
 [[package]]
 name = "encoding_rs"
@@ -3706,6 +3823,19 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.119",
+]
+
+[[package]]
+name = "env_logger"
+version = "0.10.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4cd405aab171cb85d6735e5c8d9db038c17d3ca007a4d2c25f337935c3d90580"
+dependencies = [
+ "humantime",
+ "is-terminal",
+ "log",
+ "regex",
+ "termcolor",
 ]
 
 [[package]]
@@ -4957,6 +5087,24 @@ dependencies = [
  "anyhow",
  "language_core 0.1.0 (git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f)",
  "rust-embed",
+ "tree-sitter",
+ "tree-sitter-bash",
+ "tree-sitter-c",
+ "tree-sitter-cpp",
+ "tree-sitter-css",
+ "tree-sitter-diff",
+ "tree-sitter-gitcommit",
+ "tree-sitter-go",
+ "tree-sitter-gomod",
+ "tree-sitter-gowork",
+ "tree-sitter-jsdoc",
+ "tree-sitter-json",
+ "tree-sitter-md",
+ "tree-sitter-python",
+ "tree-sitter-regex",
+ "tree-sitter-rust",
+ "tree-sitter-typescript",
+ "tree-sitter-yaml",
  "util 0.1.0 (git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f)",
 ]
 
@@ -5009,6 +5157,10 @@ name = "hashbrown"
 version = "0.14.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
+dependencies = [
+ "ahash",
+ "allocator-api2",
+]
 
 [[package]]
 name = "hashbrown"
@@ -5041,6 +5193,15 @@ dependencies = [
  "foldhash 0.2.0",
  "serde",
  "serde_core",
+]
+
+[[package]]
+name = "hashlink"
+version = "0.8.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e8094feaf31ff591f651a2664fb9cfd92bba7a60ce3197265e9482ebe753c8f7"
+dependencies = [
+ "hashbrown 0.14.5",
 ]
 
 [[package]]
@@ -5225,6 +5386,12 @@ name = "httpdate"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
+
+[[package]]
+name = "humantime"
+version = "2.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "15cdd26707701c53297e2fa6afb323d55fbc1d0810c3aec078ae3ef0424c3c15"
 
 [[package]]
 name = "hybrid-array"
@@ -6185,6 +6352,68 @@ dependencies = [
 ]
 
 [[package]]
+name = "languages"
+version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "anyhow",
+ "async-compression",
+ "async-fs",
+ "async-tar",
+ "async-trait",
+ "chrono",
+ "collections",
+ "fs",
+ "futures",
+ "globset",
+ "gpui",
+ "grammars",
+ "http_client",
+ "itertools 0.14.0",
+ "json_schema_store",
+ "language",
+ "log",
+ "lsp",
+ "node_runtime",
+ "parking_lot",
+ "pet",
+ "pet-conda",
+ "pet-core",
+ "pet-fs",
+ "pet-poetry",
+ "pet-reporter",
+ "pet-virtualenv",
+ "pretty_assertions",
+ "project",
+ "regex",
+ "rope",
+ "semver",
+ "serde",
+ "serde_json",
+ "serde_json_lenient",
+ "settings",
+ "smallvec",
+ "smol",
+ "snippet",
+ "task",
+ "tempfile",
+ "terminal",
+ "tree-sitter",
+ "tree-sitter-bash",
+ "tree-sitter-c",
+ "tree-sitter-cpp",
+ "tree-sitter-css",
+ "tree-sitter-gitcommit",
+ "tree-sitter-go",
+ "tree-sitter-python",
+ "tree-sitter-rust",
+ "tree-sitter-typescript",
+ "unindent",
+ "url",
+ "util 0.1.0",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6838,6 +7067,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "menu"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f#f6838a7c4afecd7c212c43c70165588b92a5a11f"
+dependencies = [
+ "gpui",
+]
+
+[[package]]
 name = "mermaid_render"
 version = "0.1.0"
 dependencies = [
@@ -7045,6 +7282,15 @@ checksum = "bb85c154ba489f01b25c0d36ae69a87e4a1c73a72631fc6c0eb6dde34a73e44b"
 dependencies = [
  "num-traits",
  "pxfm",
+]
+
+[[package]]
+name = "msvc_spectre_libs"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "29e871a9861f3664f18b7e04e9301d4edd55090c2dadb4b1c602e26ab32b1f5b"
+dependencies = [
+ "cc",
 ]
 
 [[package]]
@@ -8057,6 +8303,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ordered-float"
+version = "5.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8c7c9e0d9b23589f26070720bac724174bfec1083e82f7854cdd0267518343c0"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
 name = "ordered-stream"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8261,6 +8516,433 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "adba4db388f687393c18c51348d44a41d870ca9df71a2c98172ea3035dc6936e"
 dependencies = [
  "pest",
+]
+
+[[package]]
+name = "pet"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "clap",
+ "env_logger",
+ "lazy_static",
+ "log",
+ "msvc_spectre_libs",
+ "pet-conda",
+ "pet-core",
+ "pet-env-var-path",
+ "pet-fs",
+ "pet-global-virtualenvs",
+ "pet-hatch",
+ "pet-homebrew",
+ "pet-jsonrpc",
+ "pet-linux-global-python",
+ "pet-mac-commandlinetools",
+ "pet-mac-python-org",
+ "pet-mac-xcode",
+ "pet-pipenv",
+ "pet-pixi",
+ "pet-poetry",
+ "pet-pyenv",
+ "pet-python-utils",
+ "pet-reporter",
+ "pet-telemetry",
+ "pet-uv",
+ "pet-venv",
+ "pet-virtualenv",
+ "pet-virtualenvwrapper",
+ "pet-windows-registry",
+ "pet-windows-store",
+ "pet-winpython",
+ "serde",
+ "serde_json",
+ "tracing",
+ "tracing-subscriber",
+ "winresource",
+]
+
+[[package]]
+name = "pet-conda"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "env_logger",
+ "lazy_static",
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "pet-reporter",
+ "rayon",
+ "regex",
+ "serde",
+ "serde_json",
+ "yaml-rust2",
+]
+
+[[package]]
+name = "pet-core"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "clap",
+ "lazy_static",
+ "log",
+ "msvc_spectre_libs",
+ "pet-fs",
+ "regex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "pet-env-var-path"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "lazy_static",
+ "log",
+ "msvc_spectre_libs",
+ "pet-conda",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "pet-virtualenv",
+ "regex",
+]
+
+[[package]]
+name = "pet-fs"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "glob",
+ "lazy_static",
+ "log",
+ "msvc_spectre_libs",
+ "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "pet-global-virtualenvs"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "log",
+ "msvc_spectre_libs",
+ "pet-conda",
+ "pet-core",
+ "pet-fs",
+ "pet-virtualenv",
+]
+
+[[package]]
+name = "pet-hatch"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "log",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "serde",
+ "toml 0.9.12+spec-1.1.0",
+]
+
+[[package]]
+name = "pet-homebrew"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "lazy_static",
+ "log",
+ "msvc_spectre_libs",
+ "pet-conda",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "pet-virtualenv",
+ "rayon",
+ "regex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "pet-jsonrpc"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "env_logger",
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "pet-linux-global-python"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "pet-virtualenv",
+]
+
+[[package]]
+name = "pet-mac-commandlinetools"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "pet-virtualenv",
+]
+
+[[package]]
+name = "pet-mac-python-org"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "pet-virtualenv",
+]
+
+[[package]]
+name = "pet-mac-xcode"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "pet-virtualenv",
+]
+
+[[package]]
+name = "pet-pipenv"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "lazy_static",
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "pet-virtualenv",
+ "regex",
+]
+
+[[package]]
+name = "pet-pixi"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "log",
+ "msvc_spectre_libs",
+ "pet-conda",
+ "pet-core",
+ "pet-python-utils",
+]
+
+[[package]]
+name = "pet-poetry"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "base64",
+ "lazy_static",
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "pet-reporter",
+ "pet-virtualenv",
+ "regex",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "toml 0.8.23",
+]
+
+[[package]]
+name = "pet-pyenv"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "lazy_static",
+ "log",
+ "msvc_spectre_libs",
+ "pet-conda",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "pet-reporter",
+ "regex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "pet-python-utils"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "env_logger",
+ "lazy_static",
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "pet-fs",
+ "regex",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+]
+
+[[package]]
+name = "pet-reporter"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "env_logger",
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "pet-jsonrpc",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "pet-telemetry"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "env_logger",
+ "lazy_static",
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "regex",
+]
+
+[[package]]
+name = "pet-uv"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "glob",
+ "log",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "serde",
+ "toml 0.9.12+spec-1.1.0",
+]
+
+[[package]]
+name = "pet-venv"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "pet-python-utils",
+ "pet-virtualenv",
+]
+
+[[package]]
+name = "pet-virtualenv"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+]
+
+[[package]]
+name = "pet-virtualenvwrapper"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "pet-virtualenv",
+]
+
+[[package]]
+name = "pet-windows-registry"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "lazy_static",
+ "log",
+ "msvc_spectre_libs",
+ "pet-conda",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "pet-virtualenv",
+ "pet-windows-store",
+ "regex",
+ "winreg",
+]
+
+[[package]]
+name = "pet-windows-store"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "lazy_static",
+ "log",
+ "msvc_spectre_libs",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "pet-virtualenv",
+ "regex",
+ "winreg",
+]
+
+[[package]]
+name = "pet-winpython"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
+dependencies = [
+ "lazy_static",
+ "log",
+ "pet-core",
+ "pet-fs",
+ "pet-python-utils",
+ "pet-virtualenv",
+ "regex",
 ]
 
 [[package]]
@@ -9667,6 +10349,26 @@ dependencies = [
 [[package]]
 name = "remote_connection"
 version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_ui",
+ "aa_gpui_kit_ui_input",
+ "anyhow",
+ "askpass",
+ "auto_update",
+ "editor",
+ "futures",
+ "gpui",
+ "log",
+ "markdown",
+ "menu",
+ "release_channel",
+ "remote",
+ "semver",
+ "settings",
+ "theme_settings",
+ "workspace",
+]
 
 [[package]]
 name = "renderdoc-sys"
@@ -10401,6 +11103,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "170fb83ab34de17dc69aa7c67482b22218ddb85da56546f9bd6b929e32a05930"
 dependencies = [
  "stable_deref_trait",
+]
+
+[[package]]
+name = "session"
+version = "0.1.0"
+dependencies = [
+ "db",
+ "gpui",
+ "serde_json",
+ "util 0.1.0",
+ "uuid",
 ]
 
 [[package]]
@@ -11580,7 +12293,7 @@ dependencies = [
  "nix 0.29.0",
  "num-derive",
  "num-traits",
- "ordered-float",
+ "ordered-float 4.6.0",
  "pest",
  "pest_derive",
  "phf 0.11.3",
@@ -12118,6 +12831,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tracing-serde"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "704b1aeb7be0d0a84fc9828cae51dab5970fee5088f83d1dd7ee6f6246fc6ff1"
+dependencies = [
+ "serde",
+ "tracing-core",
+]
+
+[[package]]
 name = "tracing-subscriber"
 version = "0.3.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -12127,12 +12850,15 @@ dependencies = [
  "nu-ansi-term",
  "once_cell",
  "regex-automata",
+ "serde",
+ "serde_json",
  "sharded-slab",
  "smallvec",
  "thread_local",
  "tracing",
  "tracing-core",
  "tracing-log",
+ "tracing-serde",
 ]
 
 [[package]]
@@ -12199,10 +12925,49 @@ dependencies = [
 ]
 
 [[package]]
+name = "tree-sitter-bash"
+version = "0.25.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e5ec769279cc91b561d3df0d8a5deb26b0ad40d183127f409494d6d8fc53062"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
 name = "tree-sitter-c"
 version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a9b2eb57a55fed6b00812912e730b7a275cf4fe98bfd6a5d76263d4438371728"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
+name = "tree-sitter-cpp"
+version = "0.23.4"
+source = "git+https://github.com/tree-sitter/tree-sitter-cpp?rev=5cb9b693cfd7bfacab1d9ff4acac1a4150700609#5cb9b693cfd7bfacab1d9ff4acac1a4150700609"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
+name = "tree-sitter-css"
+version = "0.23.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5ad6489794d41350d12a7fbe520e5199f688618f43aace5443980d1ddcf1b29e"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
+name = "tree-sitter-diff"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dfe1e5ca280a65dfe5ba4205c1bcc84edf486464fed315db53dee6da9a335889"
 dependencies = [
  "cc",
  "tree-sitter-language",
@@ -12229,6 +12994,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "tree-sitter-gitcommit"
+version = "0.0.1"
+source = "git+https://github.com/zed-industries/tree-sitter-git-commit?rev=88309716a69dd13ab83443721ba6e0b491d37ee9#88309716a69dd13ab83443721ba6e0b491d37ee9"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
+name = "tree-sitter-go"
+version = "0.25.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c8560a4d2f835cc0d4d2c2e03cbd0dde2f6114b43bc491164238d333e28b16ea"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
+name = "tree-sitter-gomod"
+version = "1.1.1"
+source = "git+https://github.com/camdencheek/tree-sitter-go-mod?rev=2e886870578eeba1927a2dc4bd2e2b3f598c5f9a#2e886870578eeba1927a2dc4bd2e2b3f598c5f9a"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
+name = "tree-sitter-gowork"
+version = "0.0.1"
+source = "git+https://github.com/zed-industries/tree-sitter-go-work?rev=acb0617bf7f4fda02c6217676cc64acb89536dc7#acb0617bf7f4fda02c6217676cc64acb89536dc7"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
 name = "tree-sitter-heex"
 version = "0.0.1"
 source = "git+https://github.com/zed-industries/tree-sitter-heex?rev=1dd45142fbb05562e35b2040c6129c9bca346592#1dd45142fbb05562e35b2040c6129c9bca346592"
@@ -12242,6 +13044,16 @@ name = "tree-sitter-html"
 version = "0.23.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "261b708e5d92061ede329babaaa427b819329a9d427a1d710abb0f67bbef63ee"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
+name = "tree-sitter-jsdoc"
+version = "0.23.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a3862dfcb1038fc5e7812d7df14190afdeb7e1415288fd5f51f58395f8cb0faf"
 dependencies = [
  "cc",
  "tree-sitter-language",
@@ -12282,6 +13094,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tree-sitter-regex"
+version = "0.24.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "712656f8c262a5a4b7d6026e6246950787d178d613864952554e1516a33ab0c1"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
 name = "tree-sitter-ruby"
 version = "0.23.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -12305,6 +13127,15 @@ dependencies = [
 name = "tree-sitter-typescript"
 version = "0.23.2"
 source = "git+https://github.com/zed-industries/tree-sitter-typescript?rev=e2c53597d6a5d9cf7bbe8dccde576fe1e46c5899#e2c53597d6a5d9cf7bbe8dccde576fe1e46c5899"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
+name = "tree-sitter-yaml"
+version = "0.6.1"
+source = "git+https://github.com/zed-industries/tree-sitter-yaml?rev=baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a#baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a"
 dependencies = [
  "cc",
  "tree-sitter-language",
@@ -13852,7 +14683,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f2ab60e120fd6eaa68d9567f3226e876684639d22a4219b313ff69ec0ccd5ac"
 dependencies = [
  "log",
- "ordered-float",
+ "ordered-float 4.6.0",
  "strsim",
  "thiserror 1.0.69",
  "wezterm-dynamic-derive",
@@ -14015,7 +14846,7 @@ dependencies = [
  "objc2-metal 0.3.2",
  "objc2-quartz-core 0.3.2",
  "once_cell",
- "ordered-float",
+ "ordered-float 4.6.0",
  "parking_lot",
  "portable-atomic",
  "portable-atomic-util",
@@ -14630,6 +15461,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "winresource"
+version = "0.1.31"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0986a8b1d586b7d3e4fe3d9ea39fb451ae22869dcea4aa109d287a374d866087"
+dependencies = [
+ "toml 1.1.6+spec-1.1.0",
+ "version_check",
+]
+
+[[package]]
 name = "winx"
 version = "0.36.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -14689,6 +15530,7 @@ dependencies = [
 name = "workspace"
 version = "0.1.0"
 dependencies = [
+ "a_log",
  "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
@@ -14696,20 +15538,29 @@ dependencies = [
  "anyhow",
  "client",
  "collections",
+ "db",
+ "fs",
  "gpui",
  "gpui_util",
+ "http_client",
  "language",
  "markdown",
  "parking_lot",
  "path",
+ "pretty_assertions",
  "project",
+ "proptest",
+ "proptest-derive",
  "remote",
  "schemars",
  "serde",
+ "session",
  "settings",
  "settings_content",
  "task",
+ "tempfile",
  "util 0.1.0",
+ "uuid",
  "worktree",
 ]
 
@@ -14897,6 +15748,17 @@ name = "y4m"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a5a4b21e1a62b67a2970e6831bc091d7b87e119e7f9791aef9702e3bef04448"
+
+[[package]]
+name = "yaml-rust2"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8902160c4e6f2fb145dbe9d6760a75e3c9522d8bf796ed7047c85919ac7115f8"
+dependencies = [
+ "arraydeque",
+ "encoding_rs",
+ "hashlink",
+]
 
 [[package]]
 name = "yansi"

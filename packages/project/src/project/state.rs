@@ -8,7 +8,21 @@ use language::{Buffer, Capability};
 use parking_lot::Mutex;
 use worktree::Worktree;
 
-use crate::lsp_store::LanguageServerName;
+use ::lsp::LanguageServerName;
+
+/// 加入协作项目时持有的一批订阅（对齐 zed `project.rs` 里的同名 enum）。
+pub(crate) enum EntitySubscription {
+    Project(client::PendingEntitySubscription<Project>),
+    BufferStore(client::PendingEntitySubscription<crate::buffer_store::BufferStore>),
+    GitStore(client::PendingEntitySubscription<crate::git_store::GitStore>),
+    WorktreeStore(client::PendingEntitySubscription<crate::worktree_store::WorktreeStore>),
+    LspStore(client::PendingEntitySubscription<crate::lsp_store::LspStore>),
+    SettingsObserver(client::PendingEntitySubscription<crate::project_settings::SettingsObserver>),
+    DapStore(client::PendingEntitySubscription<crate::debugger::dap_store::DapStore>),
+    BreakpointStore(
+        client::PendingEntitySubscription<crate::debugger::breakpoint_store::BreakpointStore>,
+    ),
+}
 
 /// 构造 Project 时的本地化开关（对齐 zed `LocalProjectFlags`）。
 #[derive(Clone, Copy, Debug)]
@@ -31,11 +45,11 @@ impl Default for LocalProjectFlags {
 pub(crate) enum BufferOrderedMessage {
     Operation {
         buffer_id: language::BufferId,
-        operation: rpc::proto::Operation,
+        operation: ::rpc::proto::Operation,
     },
     LanguageServerUpdate {
         language_server_id: language::LanguageServerId,
-        message: rpc::proto::update_language_server::Variant,
+        message: ::rpc::proto::update_language_server::Variant,
         name: Option<LanguageServerName>,
     },
     Resync,

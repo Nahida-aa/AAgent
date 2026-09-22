@@ -35,8 +35,6 @@ pub struct InlayHint {
 
 /// The user's intent behind a given completion confirmation.
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ResolveState {
     Resolved,
     CanResolve(LanguageServerId, Option<lsp::LSPAny>),
@@ -50,8 +48,6 @@ impl InlayHint {
         }
     }
 }
-
-#[derive(Debug, Clone, PartialEq)]
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum InlayHintLabel {
@@ -78,8 +74,6 @@ pub enum InlayHintLabelPartTooltip {
     String(String),
     MarkupContent(MarkupContent),
 }
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MarkupContent {

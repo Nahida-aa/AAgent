@@ -1,6 +1,6 @@
 use super::*;
 
-pub(crate) async fn decode_file_text(
+pub async fn decode_file_text(
     fs: &dyn Fs,
     abs_path: &Path,
 ) -> Result<(String, &'static Encoding, bool)> {

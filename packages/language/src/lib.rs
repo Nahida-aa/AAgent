@@ -13,6 +13,7 @@ mod manifest;
 pub mod modeline;
 mod outline;
 pub mod proto;
+pub use diagnostic_set::DiagnosticSet;
 mod runnable;
 mod syntax_map;
 mod task_context;

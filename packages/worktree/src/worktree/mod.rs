@@ -115,20 +115,22 @@ pub use traversal::{ChildEntriesIter, ChildEntriesOptions, PathTarget, Traversal
 pub(crate) use traversal::TraversalTarget;
 pub use worktree::Worktree;
 
+pub use git::discover_root_repo_common_dir;
 pub(crate) use git::{
-    discover_ancestor_git_repo, discover_git_paths, discover_root_repo_common_dir,
-    discover_root_repo_metadata, is_dot_git, watch_dir_tree, watch_git_dir_subdirectories,
+    discover_ancestor_git_repo, discover_git_paths, discover_root_repo_metadata, is_dot_git,
+    watch_dir_tree, watch_git_dir_subdirectories,
 };
 pub use loading::decode_byte_header;
-pub(crate) use loading::{decode_file_text, decode_file_text_to_rope};
+pub use loading::decode_file_text;
+pub(crate) use loading::decode_file_text_to_rope;
 pub(crate) use scanner::{
     BackgroundScanner, BackgroundScannerPhase, BackgroundScannerState, EventRoot, RemovedEntries,
     ScanJob, UpdateIgnoreStatusJob, build_diff, char_bag_for_path, is_beyond_scan_depth,
     merge_event_roots, swap_to_front,
 };
 pub(crate) use gitignore::{build_gitignore, build_gitignore_with_root};
+pub use summaries::{PathKey, PathProgress, PathSummary};
 pub(crate) use summaries::{
-    EntrySummary, PathEntry, PathEntrySummary, PathKey, PathProgress, PathSummary,
-    TraversalProgress,
+    EntrySummary, PathEntry, PathEntrySummary, TraversalProgress,
 };
 pub(crate) use watch::NullWatcher;

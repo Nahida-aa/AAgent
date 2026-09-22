@@ -200,14 +200,58 @@ impl ShellBuilder {
         (self.program, self.args)
     }
 
+    /// Builds a `smol::process::Command` with the given task command and arguments.
+    ///
+    /// Prefer this over manually constructing a command with the output of `Self::build`,
+    /// as this method handles `cmd` weirdness on windows correctly.
+    pub fn build_smol_command(
+        self,
+        task_command: Option<String>,
+        task_args: &[String],
+    ) -> smol::process::Command {
+        smol::process::Command::from(self.build_std_command(task_command, task_args))
+    }
+
+    /// Builds a `std::process::Command` with the given task command and arguments.
+    ///
+    /// Prefer this over manually constructing a command with the output of `Self::build`,
+    /// as this method handles `cmd` weirdness on windows correctly.
+    pub fn build_std_command(
+        self,
+        mut task_command: Option<String>,
+        task_args: &[String],
+    ) -> std::process::Command {
+        #[cfg(windows)]
+        let kind = self.kind;
+        if task_args.is_empty() {
+            task_command = task_command
+                .as_ref()
+                .map(|cmd| self.kind.try_quote_prefix_aware(&cmd).map(Cow::into_owned))
+                .unwrap_or(task_command);
+        }
+        let (program, args) = self.build(task_command, task_args);
+
+        let mut child = crate::command::new_std_command(program);
+
+        #[cfg(windows)]
+        if kind == ShellKind::Cmd {
+            use std::os::windows::process::CommandExt;
+
+            for arg in args {
+                child.raw_arg(arg);
+            }
+        } else {
+            child.args(args);
+        }
+
+        #[cfg(not(windows))]
+        child.args(args);
+
+        child
+    }
+
     /// Detected ShellKind — 供外部查询 shell 类型。
     pub fn kind(&self) -> ShellKind { self.kind }
-
-    /// Program name。
-    pub fn program(&self) -> &str { &self.program }
-
-    /// Collected args (not including -c / -C yet).
-    pub fn args(&self) -> &[String] { &self.args }
 }
 
 #[cfg(test)]

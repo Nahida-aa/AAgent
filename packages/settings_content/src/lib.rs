@@ -26,7 +26,7 @@ mod ui;
 pub use action::{ActionName, ActionWithArguments, CommandAliasTarget};
 use collections::{HashMap, IndexMap};
 pub use language::*;
-pub use project::SemanticTokenRules;
+pub use project::{GitHostingProviderConfig, SemanticTokenRules, *};
 pub use serde_helper::{
     serialize_f32_with_two_decimal_places, serialize_optional_f32_with_two_decimal_places,
 };

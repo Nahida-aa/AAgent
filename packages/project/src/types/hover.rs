@@ -1,5 +1,6 @@
 use super::*;
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct HoverBlock {
     pub text: String,
     pub kind: HoverBlockKind,

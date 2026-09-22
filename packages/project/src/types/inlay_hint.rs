@@ -1,5 +1,6 @@
 use super::*;
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum InlayId {
     EditPrediction(usize),
     DebuggerValue(usize),
@@ -35,6 +36,7 @@ pub struct InlayHint {
 /// The user's intent behind a given completion confirmation.
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ResolveState {
     Resolved,
     CanResolve(LanguageServerId, Option<lsp::LSPAny>),
@@ -51,6 +53,7 @@ impl InlayHint {
 
 #[derive(Debug, Clone, PartialEq)]
 
+#[derive(Debug, Clone, PartialEq)]
 pub enum InlayHintLabel {
     String(String),
     LabelParts(Vec<InlayHintLabelPart>),
@@ -78,6 +81,7 @@ pub enum InlayHintLabelPartTooltip {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MarkupContent {
     pub kind: HoverBlockKind,
     pub value: String,

@@ -1,5 +1,6 @@
 use super::*;
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct DocumentColor {
     pub lsp_range: lsp::Range,
     pub color: lsp::Color,

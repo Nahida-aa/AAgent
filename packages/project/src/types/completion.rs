@@ -1,5 +1,6 @@
 use super::*;
 
+#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub enum CompletionIntent {
     /// The user intends to 'commit' this result, if possible.
     /// Completion confirmations should run side effects.

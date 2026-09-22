@@ -331,7 +331,7 @@ impl Buffer {
         self.resolved_settings.as_ref()
     }
 
-    #[ztracing::instrument(skip_all)]
+    #[a_tracing::instrument(skip_all)]
     pub fn build_snapshot(
         text: Rope,
         language: Option<Arc<Language>>,
@@ -608,7 +608,7 @@ impl Buffer {
 
     /// Retrieve a snapshot of the buffer's raw text, without any
     /// language-related state like the syntax tree or diagnostics.
-    #[ztracing::instrument(skip_all)]
+    #[a_tracing::instrument(skip_all)]
     pub fn text_snapshot(&self) -> text::BufferSnapshot {
         // todo lw
         self.text.snapshot().clone()
@@ -653,7 +653,7 @@ impl Buffer {
         self.set_language_(language, true, cx);
     }
 
-    #[ztracing::instrument(skip_all)]
+    #[a_tracing::instrument(skip_all)]
     fn set_language_(
         &mut self,
         language: Option<Arc<Language>>,
@@ -1012,7 +1012,7 @@ impl Buffer {
     /// initiate an additional reparse recursively. To avoid concurrent parses
     /// for the same buffer, we only initiate a new parse if we are not already
     /// parsing in the background.
-    #[ztracing::instrument(skip_all)]
+    #[a_tracing::instrument(skip_all)]
     pub fn reparse(&mut self, cx: &mut Context<Self>, may_block: bool) {
         if self.text.version() != *self.tree_sitter_data.version() {
             Self::invalidate_tree_sitter_data(&mut self.tree_sitter_data, self.text.snapshot());

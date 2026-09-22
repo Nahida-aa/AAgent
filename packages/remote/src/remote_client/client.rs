@@ -1,5 +1,9 @@
 use crate::protocol::MessageId;
 use crate::proxy::ProxyLaunchError;
+use crate::remote_client::{
+    HEARTBEAT_INTERVAL, HEARTBEAT_TIMEOUT, INITIAL_CONNECTION_TIMEOUT, MAX_MISSED_HEARTBEATS,
+    MAX_RECONNECT_ATTEMPTS,
+};
 #[cfg(any(test, feature = "test-support"))]
 use crate::transport::mock::ConnectGuard;
 

@@ -1,16 +1,16 @@
 use super::*;
 
-struct BackgroundScannerState {
-    snapshot: LocalSnapshot,
-    symlink_paths_by_target: HashMap<Arc<Path>, SmallVec<[Arc<RelPath>; 1]>>,
-    scanned_dirs: HashSet<ProjectEntryId>,
-    watched_dir_abs_paths_by_entry_id: HashMap<ProjectEntryId, Arc<Path>>,
-    path_prefixes_to_scan: HashSet<Arc<RelPath>>,
-    paths_to_scan: HashSet<Arc<RelPath>>,
-    removed_entries: RemovedEntries,
-    changed_paths: Vec<Arc<RelPath>>,
-    prev_snapshot: Snapshot,
-    scanning_enabled: bool,
+pub(crate) struct BackgroundScannerState {
+    pub(crate) snapshot: LocalSnapshot,
+    pub(crate) symlink_paths_by_target: HashMap<Arc<Path>, SmallVec<[Arc<RelPath>; 1]>>,
+    pub(crate) scanned_dirs: HashSet<ProjectEntryId>,
+    pub(crate) watched_dir_abs_paths_by_entry_id: HashMap<ProjectEntryId, Arc<Path>>,
+    pub(crate) path_prefixes_to_scan: HashSet<Arc<RelPath>>,
+    pub(crate) paths_to_scan: HashSet<Arc<RelPath>>,
+    pub(crate) removed_entries: RemovedEntries,
+    pub(crate) changed_paths: Vec<Arc<RelPath>>,
+    pub(crate) prev_snapshot: Snapshot,
+    pub(crate) scanning_enabled: bool,
 }
 
 /// The entries that were removed from the snapshot as part of the current
@@ -48,7 +48,7 @@ impl RemovedEntries {
             .or_else(|| self.previous.take_by_inode(inode))
     }
 
-    fn rotate(&mut self) -> impl Iterator<Item = Entry> {
+    pub(crate) fn rotate(&mut self) -> impl Iterator<Item = Entry> {
         let dropped = mem::replace(&mut self.previous, mem::take(&mut self.current));
         dropped
             .by_inode
@@ -97,23 +97,23 @@ impl RemovedEntriesGeneration {
 }
 #[derive(Debug)]
 pub(crate) struct ScanJob {
-    abs_path: Arc<Path>,
-    path: Arc<RelPath>,
-    ignore_stack: IgnoreStack,
-    scan_queue: Sender<ScanJob>,
-    ancestor_inodes: TreeSet<u64>,
-    is_external: bool,
+    pub(crate) abs_path: Arc<Path>,
+    pub(crate) path: Arc<RelPath>,
+    pub(crate) ignore_stack: IgnoreStack,
+    pub(crate) scan_queue: Sender<ScanJob>,
+    pub(crate) ancestor_inodes: TreeSet<u64>,
+    pub(crate) is_external: bool,
 }
 
 pub(crate) struct UpdateIgnoreStatusJob {
-    abs_path: Arc<Path>,
-    ignore_stack: IgnoreStack,
-    ignore_queue: Sender<UpdateIgnoreStatusJob>,
-    scan_queue: Sender<ScanJob>,
+    pub(crate) abs_path: Arc<Path>,
+    pub(crate) ignore_stack: IgnoreStack,
+    pub(crate) ignore_queue: Sender<UpdateIgnoreStatusJob>,
+    pub(crate) scan_queue: Sender<ScanJob>,
 }
 
 impl BackgroundScannerState {
-    async fn enqueue_scan_dir(
+    pub(crate) async fn enqueue_scan_dir(
         &self,
         abs_path: Arc<Path>,
         entry: &Entry,
@@ -142,7 +142,7 @@ impl BackgroundScannerState {
         }
     }
 
-    fn reuse_entry_id(&mut self, entry: &mut Entry) {
+    pub(crate) fn reuse_entry_id(&mut self, entry: &mut Entry) {
         let Some(mtime) = entry.mtime else {
             return;
         };
@@ -151,7 +151,7 @@ impl BackgroundScannerState {
         }
     }
 
-    fn entry_id_for(
+    pub(crate) fn entry_id_for(
         &mut self,
         next_entry_id: &AtomicUsize,
         path: &RelPath,
@@ -161,7 +161,7 @@ impl BackgroundScannerState {
             .unwrap_or_else(|| ProjectEntryId::new(next_entry_id))
     }
 
-    fn reused_entry_id(
+    pub(crate) fn reused_entry_id(
         &mut self,
         path: &RelPath,
         inode: u64,
@@ -186,7 +186,12 @@ impl BackgroundScannerState {
         }
     }
 
-    async fn insert_entry(&mut self, entry: Entry, fs: &dyn Fs, watcher: &dyn Watcher) -> Entry {
+    pub(crate) async fn insert_entry(
+        &mut self,
+        entry: Entry,
+        fs: &dyn Fs,
+        watcher: &dyn Watcher,
+    ) -> Entry {
         let entry = self.snapshot.insert_entry(entry, fs).await;
         if entry.path.file_name() == Some(&DOT_GIT) {
             self.insert_git_repository(entry.path.clone(), fs, watcher)
@@ -199,7 +204,7 @@ impl BackgroundScannerState {
         entry
     }
 
-    fn populate_dir(
+    pub(crate) fn populate_dir(
         &mut self,
         parent_path: Arc<RelPath>,
         entries: impl IntoIterator<Item = Entry>,
@@ -265,7 +270,7 @@ impl BackgroundScannerState {
         self.snapshot.check_invariants(false);
     }
 
-    fn remove_path_from_snapshot_and_unwatch(
+    pub(crate) fn remove_path_from_snapshot_and_unwatch(
         &mut self,
         path: &RelPath,
         watcher: &dyn Watcher,
@@ -286,7 +291,7 @@ impl BackgroundScannerState {
         );
     }
 
-    fn unwatch_path(
+    pub(crate) fn unwatch_path(
         &mut self,
         watcher: &dyn Watcher,
         path: &RelPath,
@@ -322,7 +327,7 @@ impl BackgroundScannerState {
             });
     }
 
-    fn remove_path_from_snapshot(
+    pub(crate) fn remove_path_from_snapshot(
         &mut self,
         path: &RelPath,
         prune_repositories: bool,
@@ -394,7 +399,7 @@ impl BackgroundScannerState {
         removed_dir_abs_paths
     }
 
-    async fn insert_git_repository(
+    pub(crate) async fn insert_git_repository(
         &mut self,
         dot_git_path: Arc<RelPath>,
         fs: &dyn Fs,
@@ -439,7 +444,7 @@ impl BackgroundScannerState {
         .log_err();
     }
 
-    async fn insert_git_repository_for_path(
+    pub(crate) async fn insert_git_repository_for_path(
         &mut self,
         work_directory: WorkDirectory,
         dot_git_abs_path: Arc<Path>,

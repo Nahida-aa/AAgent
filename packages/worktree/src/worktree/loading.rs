@@ -58,7 +58,12 @@ pub(crate) async fn decode_file_text_to_rope(
     Ok((Rope::from(text), line_ending, encoding, has_bom))
 }
 
-async fn stream_utf8_into_rope(...) -> Result<Option<(Rope, LineEnding)>> {
+async fn stream_utf8_into_rope(
+    file: &mut (dyn Read + Send),
+    prefix: Vec<u8>,
+    reached_eof: bool,
+    abs_path: &Path,
+) -> Result<Option<(Rope, LineEnding)>> {
     let mut rope = Rope::new();
     let mut line_ending = None;
     let mut scratch = String::new();

@@ -55,7 +55,18 @@ pub(crate) struct RemotelyCreatedModelGuard {
 
 impl Drop for RemotelyCreatedModelGuard {
     fn drop(&mut self) {
-        // 原样搬入
+        if let Some(remote_models) = self.remote_models.upgrade() {
+            let mut remote_models = remote_models.lock();
+            assert!(
+                remote_models.retain_count > 0,
+                "RemotelyCreatedModelGuard dropped too many times"
+            );
+            remote_models.retain_count -= 1;
+            if remote_models.retain_count == 0 {
+                remote_models.buffers.clear();
+                remote_models.worktrees.clear();
+            }
+        }
     }
 }
 

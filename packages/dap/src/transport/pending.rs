@@ -14,7 +14,7 @@ impl PendingRequests {
         }
     }
 
-    fn flush(&mut self, e: anyhow::Error) {
+    pub(crate) fn flush(&mut self, e: anyhow::Error) {
         let Some(inner) = self.inner.as_mut() else {
             return;
         };

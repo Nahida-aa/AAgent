@@ -1,4 +1,6 @@
 use super::*;
+use rpc::proto;
+
 impl<'a> From<&'a Entry> for proto::Entry {
     fn from(entry: &'a Entry) -> Self {
         Self {

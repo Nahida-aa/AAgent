@@ -2,6 +2,8 @@ use super::*;
 mod diff;
 mod state;
 
+pub(crate) use state::{BackgroundScannerState, ScanJob, UpdateIgnoreStatusJob};
+
 pub(crate) struct BackgroundScanner {
     pub(crate) state: async_lock::Mutex<BackgroundScannerState>,
     pub(crate) fs: Arc<dyn Fs>,

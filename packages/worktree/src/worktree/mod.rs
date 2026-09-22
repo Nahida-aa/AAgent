@@ -1,5 +1,10 @@
 //! Worktree: local or remote file tree with scanning, git, and ignore support.
 
+use anyhow::anyhow;
+use futures::select_biased;
+use smallvec::smallvec;
+use util::maybe;
+
 mod constants;
 mod entry;
 mod event;
@@ -23,7 +28,8 @@ mod worktree;
 #[cfg(feature = "test-support")]
 mod test_support;
 
-pub use constants::{FS_WATCH_LATENCY, ROOT_PATH_CHECK_INTERVAL, STREAM_BLOCK_BYTES};
+pub use constants::{FS_WATCH_LATENCY, ROOT_PATH_CHECK_INTERVAL};
+pub(crate) use constants::STREAM_BLOCK_BYTES;
 pub use entry::{
     Entry, EntryKind, PathChange, ProjectEntryId, UpdatedEntriesSet, UpdatedGitRepositoriesSet,
     UpdatedGitRepository,
@@ -34,7 +40,9 @@ pub use local::{LocalWorktree, PathPrefixScanRequest, ScanRequest};
 pub use local_snapshot::LocalSnapshot;
 pub use model_handle::WorktreeModelHandle;
 pub use remote::RemoteWorktree;
-pub use repo::{LocalRepositoryEntry, WorkDirectory};
+pub use repo::WorkDirectory;
+pub(crate) use repo::LocalRepositoryEntry;
+use rpc::proto;
 pub use snapshot::Snapshot;
 pub use traversal::{ChildEntriesIter, ChildEntriesOptions, Traversal};
 pub use worktree::Worktree;

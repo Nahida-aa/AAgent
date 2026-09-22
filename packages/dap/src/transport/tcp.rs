@@ -119,15 +119,15 @@ impl TcpTransport {
 }
 
 impl Transport for TcpTransport {
-    pub(crate) fn has_adapter_logs(&self) -> bool { true }
+    fn has_adapter_logs(&self) -> bool { true }
 
-    pub(crate) fn kill(&mut self) {
+    fn kill(&mut self) {
         if let Some(process) = &mut *self.process.lock() {
             process.kill().log_err();
         }
     }
 
-    pub(crate) fn tcp_arguments(&self) -> Option<TcpArguments> {
+    fn tcp_arguments(&self) -> Option<TcpArguments> {
         Some(TcpArguments {
             host: self.host,
             port: self.port,
@@ -135,7 +135,7 @@ impl Transport for TcpTransport {
         })
     }
 
-    pub(crate) fn connect(
+    fn connect(
         &mut self,
     ) -> Task<
         Result<(

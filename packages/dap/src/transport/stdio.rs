@@ -56,11 +56,11 @@ impl StdioTransport {
 }
 
 impl Transport for StdioTransport {
-    pub(crate) fn has_adapter_logs(&self) -> bool { true }
+    fn has_adapter_logs(&self) -> bool { true }
 
-    pub(crate) fn kill(&mut self) { self.process.lock().kill().log_err(); }
+    fn kill(&mut self) { self.process.lock().kill().log_err(); }
 
-    pub(crate) fn connect(
+    fn connect(
         &mut self,
     ) -> Task<
         Result<(
@@ -78,7 +78,7 @@ impl Transport for StdioTransport {
         Task::ready(result)
     }
 
-    pub(crate) fn tcp_arguments(&self) -> Option<TcpArguments> { None }
+    fn tcp_arguments(&self) -> Option<TcpArguments> { None }
 }
 
 impl Drop for StdioTransport {

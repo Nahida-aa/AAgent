@@ -28,7 +28,7 @@ where
 /// A way to sort strings with starting numbers numerically first, falling back to alphanumeric one,
 /// case-insensitive.
 #[derive(Debug, PartialEq, Eq)]
-pub struct NumericPrefixWithSuffix<'a>(Option<u64>, &'a str);
+pub struct NumericPrefixWithSuffix<'a>(pub(crate) Option<u64>, pub(crate) &'a str);
 
 impl<'a> NumericPrefixWithSuffix<'a> {
     pub fn from_numeric_prefixed_str(str: &'a str) -> Self {

@@ -23,7 +23,14 @@ impl Project {
     #[inline] pub(crate) fn is_disconnected(&self, cx: &gpui::App) -> bool { /* 原样 */ }
     #[inline] pub(crate) fn capability(&self) -> language::Capability { /* 原样 */ }
     #[inline] pub(crate) fn is_read_only(&self, cx: &gpui::App) -> bool { /* 原样 */ }
-    #[inline] pub(crate) fn is_local(&self) -> bool { /* 原样 */ }
+    #[inline] pub(crate) fn is_local(&self) -> bool {
+        match &self.client_state {
+            ProjectClientState::Local | ProjectClientState::Shared { .. } => {
+                self.remote_client.is_none()
+            }
+            ProjectClientState::Collab { .. } => false,
+        }
+    }
     #[inline] pub(crate) fn is_via_remote_server(&self) -> bool { /* 原样 */ }
     #[inline] pub(crate) fn is_via_collab(&self) -> bool { /* 原样 */ }
     #[inline] pub(crate) fn is_remote(&self) -> bool { /* 原样 */ }

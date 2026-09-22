@@ -120,7 +120,7 @@ impl LocalSnapshot {
         entry
     }
 
-    fn ancestor_inodes_for_path(&self, path: &RelPath) -> TreeSet<u64> {
+    pub(crate) fn ancestor_inodes_for_path(&self, path: &RelPath) -> TreeSet<u64> {
         let mut inodes = TreeSet::default();
         for ancestor in path.ancestors().skip(1) {
             if let Some(entry) = self.entry_for_path(ancestor) {
@@ -130,7 +130,7 @@ impl LocalSnapshot {
         inodes
     }
 
-    async fn ignore_stack_for_abs_path(
+    pub(crate) async fn ignore_stack_for_abs_path(
         &self,
         abs_path: &Path,
         is_dir: bool,

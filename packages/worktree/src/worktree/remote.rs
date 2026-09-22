@@ -119,7 +119,7 @@ impl RemoteWorktree {
         })
     }
 
-    fn trash_entry(
+    pub(crate) fn trash_entry(
         &self,
         entry_id: ProjectEntryId,
         cx: &Context<Worktree>,

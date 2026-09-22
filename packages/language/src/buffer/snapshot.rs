@@ -1,4 +1,5 @@
 use super::*;
+use ::util::RangeExt;
 use ::util::maybe;
 use aa_clock::{self as clock, ReplicaId};
 use std::sync::Arc;
@@ -1141,24 +1142,30 @@ impl BufferSnapshot {
         std::iter::from_fn(move || {
             while let Some(mat) = matches.peek() {
                 let config = &configs[mat.grammar_index];
-                let containing_item_node = maybe!({
+                let containing_item_node = {
                     let item_node = mat.captures.iter().find_map(|cap| {
                         if cap.index == config.item_capture_ix {
                             Some(cap.node)
                         } else {
                             None
                         }
-                    })?;
-
-                    let item_byte_range = item_node.byte_range();
-                    if item_byte_range.end < range.start || item_byte_range.start > range.end {
-                        None
-                    } else {
-                        Some(item_node)
+                    });
+                    match item_node {
+                        Some(node) => {
+                            let item_byte_range = node.byte_range();
+                            if item_byte_range.end < range.start
+                                || item_byte_range.start > range.end
+                            {
+                                None
+                            } else {
+                                Some(node)
+                            }
+                        }
+                        None => None,
                     }
-                });
+                };
 
-                let range = containing_item_node.as_ref().map(|item_node| {
+                let range = containing_item_node.map(|item_node| {
                     Point::from_ts_point(item_node.start_position())
                         ..Point::from_ts_point(item_node.end_position())
                 });

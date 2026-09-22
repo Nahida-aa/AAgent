@@ -53,9 +53,9 @@ pub(crate) struct AutoindentRequestEntry {
 
 #[derive(Debug)]
 pub(crate) struct IndentSuggestion {
-    basis_row: u32,
-    delta: Ordering,
-    within_error: bool,
+    pub(crate) basis_row: u32,
+    pub(crate) delta: Ordering,
+    pub(crate) within_error: bool,
 }
 
 #[derive(Clone, Copy, Debug)]

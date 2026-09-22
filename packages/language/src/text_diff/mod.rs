@@ -1,11 +1,20 @@
 use crate::{CharClassifier, CharKind, CharScopeContext, LanguageScope};
+use aa_clock::{self as clock, Global};
 use anyhow::{Context, anyhow};
 use imara_diff::{Algorithm, InternedInput, Interner, Token, sources::lines};
 use std::{fmt::Write, iter, ops::Range, sync::Arc};
+use text::LineEnding;
 
-/// The diff type produced by [`imara_diff`], re-exported for callers (e.g. the
-/// buffer's `diff`/`ensure_final_newline` helpers) that reference `Diff`.
-pub use imara_diff::Diff;
+/// A diff of a buffer's contents against a base version.
+///
+/// This is *not* `imara_diff::Diff` (which is only used internally for the
+/// low-level diff computation) — it is the higher-level struct that the buffer
+/// builds and consumes in `diff` / `apply_diff` / `ensure_final_newline`.
+pub struct Diff {
+    pub base_version: clock::Global,
+    pub line_ending: LineEnding,
+    pub edits: Vec<(Range<usize>, Arc<str>)>,
+}
 
 const MAX_WORD_DIFF_LEN: usize = 512;
 const MAX_WORD_DIFF_LINE_COUNT: usize = 8;
@@ -40,7 +49,7 @@ pub fn unified_diff_with_context(
     let mut input = InternedInput::default();
     input.update_before(old_text.lines());
     input.update_after(new_text.lines());
-    let diff = Diff::compute(Algorithm::Histogram, &input);
+    let diff = imara_diff::Diff::compute(Algorithm::Histogram, &input);
     let mut builder =
         OffsetUnifiedDiffBuilder::new(&input, old_start_line, new_start_line, context_lines);
     for hunk in diff.hunks() {
@@ -346,7 +355,7 @@ fn diff_internal(
     let mut new_offset = 0;
     let mut old_token_ix = 0;
     let mut new_token_ix = 0;
-    let diff = Diff::compute(Algorithm::Histogram, input);
+    let diff = imara_diff::Diff::compute(Algorithm::Histogram, input);
     for hunk in diff.hunks() {
         let old_tokens = hunk.before;
         let new_tokens = hunk.after;

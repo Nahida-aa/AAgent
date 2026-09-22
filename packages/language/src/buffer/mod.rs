@@ -28,8 +28,14 @@ pub use file::{DiskState, File, LocalFile};
 pub use highlighted_text::{HighlightedText, HighlightedTextBuilder};
 pub use indent::{IndentKind, IndentSize};
 pub use snapshot::BufferSnapshot;
-pub use text::EditedBufferSnapshot;
 pub use words::WordsQuery;
+
+/// Wrapper combining an edited text snapshot with a buffer snapshot
+/// (mirrors zed's `crates/buffer` `EditedBufferSnapshot`).
+pub struct EditedBufferSnapshot {
+    pub text: text::EditedBufferSnapshot,
+    pub snapshot: BufferSnapshot,
+}
 
 #[cfg(any(test, feature = "test-support"))]
 pub use test_support::TestFile;

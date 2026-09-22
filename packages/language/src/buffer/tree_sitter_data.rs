@@ -7,9 +7,9 @@ use super::*;
 /// bracket matching can be cached and invalidated at chunk granularity.
 #[derive(Debug)]
 pub struct TreeSitterData {
-    chunks: RowChunks,
-    brackets_by_chunks: Mutex<HashMap<RowChunkId, Vec<BracketMatch>>>,
-    highlights_by_chunks: ChunkHighlightCache,
+    pub(crate) chunks: RowChunks,
+    pub(crate) brackets_by_chunks: Mutex<HashMap<RowChunkId, Vec<BracketMatch>>>,
+    pub(crate) highlights_by_chunks: ChunkHighlightCache,
 }
 
 pub(crate) const MAX_ROWS_IN_A_CHUNK: u32 = 50;

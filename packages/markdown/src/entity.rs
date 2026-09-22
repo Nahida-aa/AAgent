@@ -203,7 +203,7 @@ impl Markdown {
 
         let theme_subscription = if options.render_mermaid_diagrams {
             Some(
-                cx.observe_global::<aa_gpui_kit_theme::GlobalTheme>(|this: &mut Self, cx| {
+                cx.observe_global::<theme::GlobalTheme>(|this: &mut Self, cx| {
                     this.invalidate_mermaid_cache(cx);
                 }),
             )

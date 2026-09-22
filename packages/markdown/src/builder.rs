@@ -4,7 +4,7 @@ use std::ops::Range;
 use std::rc::Rc;
 use std::sync::Arc;
 
-use aa_gpui_kit_theme::SyntaxTheme;
+use theme::SyntaxTheme;
 use aa_gpui_kit_ui::{Checkbox, ToggleState, Tooltip, WithScrollbar, prelude::*};
 use gpui::{
     AnyElement, AnyView, App, Bounds, Div, Hsla, IntoElement, Length, ParentElement, Pixels,

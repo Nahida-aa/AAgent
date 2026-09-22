@@ -246,6 +246,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "aa_env_vars"
+version = "0.1.0"
+dependencies = [
+ "env_vars",
+]
+
+[[package]]
 name = "aa_gpui_base"
 version = "0.1.0"
 dependencies = [
@@ -3445,6 +3452,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "env_vars"
+version = "0.1.0"
+dependencies = [
+ "gpui_shared_string",
+]
+
+[[package]]
 name = "equator"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3638,6 +3652,35 @@ dependencies = [
 [[package]]
 name = "feature_flags"
 version = "0.1.0"
+dependencies = [
+ "collections",
+ "feature_flags_macros",
+ "fs",
+ "gpui",
+ "inventory",
+ "schemars",
+ "serde_json",
+ "settings",
+]
+
+[[package]]
+name = "feature_flags_macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
+name = "file_icons"
+version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "gpui",
+ "settings_content",
+ "util 0.1.0",
+]
 
 [[package]]
 name = "filedescriptor"
@@ -14494,3 +14537,7 @@ dependencies = [
  "syn 3.0.6",
  "winnow 1.0.4",
 ]
+
+[[patch.unused]]
+name = "aa_icons"
+version = "0.1.0"

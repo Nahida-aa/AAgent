@@ -1,8 +1,13 @@
 use std::sync::Arc;
+use std::time::Duration;
 
-use futures::{FutureExt as _, StreamExt as _};
-use gpui::AsyncApp;
-use util::ResultExt as _;
+use anyhow::anyhow;
+use futures::{FutureExt as _, StreamExt as _, channel::oneshot};
+use gpui::{AsyncApp, Task};
+use http_client::{HttpClientWithUrl, http};
+use serde::{Deserialize, Serialize};
+use url::Url;
+use util::{ConnectionResult, ResultExt as _};
 
 use crate::credentials::Credentials;
 use crate::env::{ADMIN_API_TOKEN, IMPERSONATE_LOGIN, USE_WEB_LOGIN};

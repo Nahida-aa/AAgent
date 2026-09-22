@@ -1,12 +1,18 @@
 use std::sync::Arc;
+use std::sync::atomic::AtomicU64;
 use std::sync::atomic::Ordering::SeqCst;
 
 use clock::SystemClock;
+use cloud_api_client::CloudApiClient;
+use credentials_provider::CredentialsProvider;
 use gpui::{App, AppContext as _, AsyncApp};
 use http_client::HttpClientWithUrl;
-use rpc::{AnyProtoClient, Peer};
+use parking_lot::Mutex;
+use postage::watch;
+use rpc::{AnyProtoClient, Peer, PeerId};
 
 use crate::settings::ClientSettings;
+use crate::status::Status;
 use crate::subscription::GlobalClient;
 
 use super::{Client, ClientState};

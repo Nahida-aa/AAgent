@@ -14,7 +14,7 @@ use std::sync::{Arc, OnceLock};
 use std::time::Duration;
 
 use crate::parser::{CodeBlockKind, MarkdownEvent, MarkdownTag};
-use aa_gpui_kit_theme as theme;
+use theme as theme;
 use settings::Settings as _;
 use theme_settings::ThemeSettings;
 

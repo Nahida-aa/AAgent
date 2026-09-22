@@ -5,6 +5,7 @@ use std::time::{Duration, Instant};
 use futures::{FutureExt as _, StreamExt as _};
 use gpui::{AsyncApp, Context};
 use rand::prelude::*;
+use util::ConnectionResult;
 
 use crate::constants::{INITIAL_RECONNECTION_DELAY, MAX_RECONNECTION_DELAY};
 use crate::status::Status;

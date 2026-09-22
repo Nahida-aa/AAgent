@@ -1,10 +1,18 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use anyhow::anyhow;
 use futures::{FutureExt as _, StreamExt as _, TryStreamExt as _};
-use gpui::AsyncApp;
+use gpui::{AsyncApp, Task};
+use http_client::{HttpClientWithUrl, http, http::HeaderValue};
+use release_channel::{AppVersion, ReleaseChannel};
 use rpc::proto;
-use rpc::{Connection, Peer};
+use rpc::{Connection, Peer, TypedEnvelope};
+use tokio::net::TcpStream;
+use url::Url;
+use util::ConnectionResult;
+
+use crate::proxy::{connect_proxy_stream, excluded_from_proxy};
 
 use crate::constants::CONNECTION_TIMEOUT;
 use crate::error::EstablishConnectionError;

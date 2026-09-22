@@ -4,19 +4,6 @@ use super::*;
 pub struct PathProgress<'a> {
     pub max_path: &'a RelPath,
 }
-impl TraversalProgress<'_> {
-    fn count(&self, include_files: bool, include_dirs: bool, include_ignored: bool) -> usize {
-        match (include_files, include_dirs, include_ignored) {
-            (true, true, true) => self.count,
-            (true, true, false) => self.non_ignored_count,
-            (true, false, true) => self.file_count,
-            (true, false, false) => self.non_ignored_file_count,
-            (false, true, true) => self.count - self.file_count,
-            (false, true, false) => self.non_ignored_count - self.non_ignored_file_count,
-            (false, false, _) => 0,
-        }
-    }
-}
 
 #[derive(Clone, Debug)]
 pub struct PathSummary<S> {
@@ -186,7 +173,7 @@ pub(crate) struct TraversalProgress<'a> {
 }
 
 impl TraversalProgress<'_> {
-    fn count(&self, include_files: bool, include_dirs: bool, include_ignored: bool) -> usize {
+    pub(crate) fn count(&self, include_files: bool, include_dirs: bool, include_ignored: bool) -> usize {
         match (include_files, include_dirs, include_ignored) {
             (true, true, true) => self.count,
             (true, true, false) => self.non_ignored_count,

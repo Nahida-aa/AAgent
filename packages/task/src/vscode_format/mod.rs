@@ -224,7 +224,7 @@ mod tests {
 
     #[test]
     fn can_deserialize_gulp_tasks() {
-        const GULP_TASKS: &str = include_str!("../test_data/tasks-gulp.json");
+        const GULP_TASKS: &str = include_str!("../../test_data/tasks-gulp.json");
         let vscode_definitions: VsCodeTaskFile = serde_json_lenient::from_str(GULP_TASKS).unwrap();
 
         let expected = vec![VsCodeTaskDefinition {
@@ -256,7 +256,7 @@ mod tests {
 
     #[test]
     fn can_deserialize_npm_tasks() {
-        const NPM_TASKS: &str = include_str!("../test_data/tasks-npm.json");
+        const NPM_TASKS: &str = include_str!("../../test_data/tasks-npm.json");
         let vscode_definitions: VsCodeTaskFile = serde_json_lenient::from_str(NPM_TASKS).unwrap();
 
         let expected = vec![
@@ -350,7 +350,7 @@ mod tests {
 
     #[test]
     fn can_deserialize_shell_tasks() {
-        const SHELL_TASKS: &str = include_str!("../test_data/tasks-shell.json");
+        const SHELL_TASKS: &str = include_str!("../../test_data/tasks-shell.json");
         let vscode_definitions: VsCodeTaskFile = serde_json_lenient::from_str(SHELL_TASKS).unwrap();
         let expected = vec![
             VsCodeTaskDefinition {
@@ -413,7 +413,7 @@ mod tests {
 
     #[test]
     fn can_deserialize_rust_analyzer_tasks() {
-        const RUST_ANALYZER_TASKS: &str = include_str!("../test_data/rust-analyzer.json");
+        const RUST_ANALYZER_TASKS: &str = include_str!("../../test_data/rust-analyzer.json");
         let vscode_definitions: VsCodeTaskFile =
             serde_json_lenient::from_str(RUST_ANALYZER_TASKS).unwrap();
         let expected = vec![
@@ -520,7 +520,8 @@ mod tests {
 
     #[test]
     fn can_deserialize_tasks_without_labels() {
-        const TASKS_WITHOUT_LABELS: &str = include_str!("../test_data/tasks-without-labels.json");
+        const TASKS_WITHOUT_LABELS: &str =
+            include_str!("../../test_data/tasks-without-labels.json");
         let vscode_definitions: VsCodeTaskFile =
             serde_json_lenient::from_str(TASKS_WITHOUT_LABELS).unwrap();
 

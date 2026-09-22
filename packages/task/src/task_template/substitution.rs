@@ -6,7 +6,7 @@ use util::truncate_and_remove_front;
 
 use crate::{TaskContext, VariableName, ZED_VARIABLE_NAME_PREFIX};
 
-const MAX_DISPLAY_VARIABLE_LENGTH: usize = 15;
+pub(crate) const MAX_DISPLAY_VARIABLE_LENGTH: usize = 15;
 
 pub(crate) fn truncate_variables(
     task_variables: &HashMap<String, &str>,

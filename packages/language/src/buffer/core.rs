@@ -166,7 +166,7 @@ impl Buffer {
                 .context("missing line_ending")?,
         ));
         this.saved_version = proto::deserialize_version(&message.saved_version);
-        this.saved_mtime = message.saved_mtime.map(|time| fs::MTime(time.into()));
+        this.saved_mtime = message.saved_mtime.map(|time| time.into());
         Ok(this)
     }
 
@@ -178,9 +178,7 @@ impl Buffer {
             base_text: self.base_text().to_string(),
             line_ending: proto::serialize_line_ending(self.line_ending()) as i32,
             saved_version: proto::serialize_version(&self.saved_version),
-            saved_mtime: self
-                .saved_mtime
-                .map(|time| rpc::proto::Timestamp::from(time.0)),
+            saved_mtime: self.saved_mtime.map(|time| time.into()),
         }
     }
 
@@ -1627,7 +1625,7 @@ impl Buffer {
         match file.disk_state() {
             DiskState::New => false,
             DiskState::Present { mtime, .. } => match self.saved_mtime {
-                Some(saved_mtime) => mtime.0 > saved_mtime.0 && self.has_unsaved_edits(),
+                Some(saved_mtime) => mtime.bad_is_greater_than(saved_mtime) && self.has_unsaved_edits(),
                 None => true,
             },
             DiskState::Deleted => false,

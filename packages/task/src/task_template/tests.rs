@@ -5,7 +5,10 @@ use std::{
 
 use collections::{HashMap, HashSet};
 
-use crate::{TaskContext, TaskVariables, VariableName};
+use crate::{
+    ResolvedTask, TaskContext, TaskVariables, VariableName,
+    task_template::substitution::MAX_DISPLAY_VARIABLE_LENGTH,
+};
 
 use super::*;
 

@@ -8,7 +8,10 @@ use anyhow::{Context as _, Result, anyhow};
 use async_channel::{self, Sender};
 use collections::{BTreeMap, HashMap, HashSet, VecDeque};
 use encoding_rs::Encoding;
-use fs::{Fs, MTime, PathEvent, PathEventKind, Watcher};
+use fs::{
+    Fs, MTime, PathEvent, PathEventKind, RemoveOptions, TrashId, Watcher, copy_recursive,
+    read_dir_items,
+};
 use futures::{
     FutureExt as _, Stream, StreamExt,
     channel::{

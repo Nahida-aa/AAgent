@@ -1,6 +1,7 @@
 use std::path::Path;
 
-use crate::{FakeFs, FakeFsEntry, Fs, RemoveOptions, RenameOptions};
+use crate::fake_fs::FakeFsEntry;
+use crate::{FakeFs, Fs, RemoveOptions, RenameOptions};
 use anyhow::{Context as _, Result, bail};
 use async_channel::Sender;
 use collections::{HashMap, HashSet};

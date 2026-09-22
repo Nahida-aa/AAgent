@@ -144,7 +144,7 @@ pub(crate) enum TraversalTarget<'a> {
 impl<'a> TraversalTarget<'a> {
     pub(crate) fn path(path: &'a RelPath) -> Self { Self::Path(PathTarget::Path(path)) }
 
-    fn successor(path: &'a RelPath) -> Self { Self::Path(PathTarget::Successor(path)) }
+    pub(crate) fn successor(path: &'a RelPath) -> Self { Self::Path(PathTarget::Successor(path)) }
 
     fn cmp_progress(&self, progress: &TraversalProgress) -> Ordering {
         match self {

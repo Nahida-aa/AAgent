@@ -213,7 +213,7 @@ impl<T> Outline<T> {
         if query.is_empty() {
             return Vec::new();
         }
-        let mut matches = fuzzy_nucleo::match_strings_async(
+        let mut matches = aa_gpui_fuzzy::match_strings_async(
             &self.candidates,
             query,
             Case::Smart,

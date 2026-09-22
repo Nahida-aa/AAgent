@@ -1,5 +1,6 @@
 use std::ffi::OsStr;
 use std::fmt::Debug;
+use std::ops::Range;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
@@ -10,7 +11,7 @@ use futures::Future;
 use futures::future::FutureExt as _;
 use futures::future::LocalBoxFuture;
 use futures::lock::OwnedMutexGuard;
-use gpui::{App, AsyncApp, EntityId};
+use gpui::{App, AsyncApp, Entity, EntityId};
 use http_client::HttpClient;
 use lsp::{
     CodeActionKind, InitializeParams, LanguageServerBinary, LanguageServerBinaryOptions, Uri,
@@ -18,10 +19,11 @@ use lsp::{
 use semver::Version;
 use serde_json::Value;
 use settings::WorktreeId;
+use text::Anchor;
 use util::rel_path::RelPath;
 
 use crate::{
-    BinaryStatus, CodeLabel, Diagnostic, Language, LanguageName, LanguageServerId,
+    BinaryStatus, Buffer, CodeLabel, Diagnostic, Language, LanguageName, LanguageServerId,
     LanguageServerName, Symbol, Toolchain,
 };
 
@@ -610,8 +612,8 @@ pub struct PromptResponseContext {
     pub selected_action: lsp::MessageActionItem,
 }
 
-type ServerBinaryCache = futures::lock::Mutex<Option<(bool, LanguageServerBinary)>>;
-type DownloadableLanguageServerBinary = LocalBoxFuture<'static, Result<LanguageServerBinary>>;
+pub type ServerBinaryCache = futures::lock::Mutex<Option<(bool, LanguageServerBinary)>>;
+pub type DownloadableLanguageServerBinary = LocalBoxFuture<'static, Result<LanguageServerBinary>>;
 pub type LanguageServerBinaryLocations = LocalBoxFuture<
     'static,
     (

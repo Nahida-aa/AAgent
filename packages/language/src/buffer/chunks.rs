@@ -79,7 +79,7 @@ struct BufferChunkHighlights<'a> {
     highlight_maps: Vec<HighlightMap>,
 }
 
-type HighlightRun = (Range<usize>, HighlightId);
+pub type HighlightRun = (Range<usize>, HighlightId);
 
 struct CachedChunkHighlightsIter {
     runs: Vec<HighlightRun>,

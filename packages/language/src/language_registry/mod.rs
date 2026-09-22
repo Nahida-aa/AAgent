@@ -12,7 +12,6 @@ pub use language_core::{
     QueryFileContents, QueryFiles, ServerHealth,
 };
 use settings::{AllLanguageSettingsContent, LanguageSettingsContent};
-use util::maybe;
 
 use futures::{
     Future,

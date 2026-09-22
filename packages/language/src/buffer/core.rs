@@ -6,6 +6,7 @@ use crate::{
     language_settings::LanguageSettings,
     syntax_map::SyntaxMap,
 };
+use ::util::debug_panic;
 use aa_clock::{self as clock, Lamport, ReplicaId};
 use collections::HashMap;
 use encoding_rs::Encoding;
@@ -42,7 +43,6 @@ use text::{
     SelectionGoal, Subscription, TextDimension, TextSummary, ToOffset, ToOffsetUtf16, ToPoint,
     ToPointUtf16, Transaction, TransactionId, Unclipped, operation_queue::OperationQueue,
 };
-use util::debug_panic;
 
 /// An in-memory representation of a source code file, including its text,
 /// syntax trees, git status, and diagnostics.

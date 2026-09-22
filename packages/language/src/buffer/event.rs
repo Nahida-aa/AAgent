@@ -98,6 +98,26 @@ pub enum BufferEvent {
     CapabilityChanged,
 }
 
+impl text::operation_queue::Operation for Operation {
+    fn lamport_timestamp(&self) -> clock::Lamport {
+        match self {
+            Operation::Buffer(operation) => operation.lamport_timestamp(),
+            Operation::UpdateDiagnostics {
+                lamport_timestamp, ..
+            }
+            | Operation::UpdateSelections {
+                lamport_timestamp, ..
+            }
+            | Operation::UpdateCompletionTriggers {
+                lamport_timestamp, ..
+            }
+            | Operation::UpdateLineEnding {
+                lamport_timestamp, ..
+            } => *lamport_timestamp,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct DiagnosticEndpoint {
     pub(crate) offset: usize,

@@ -4,6 +4,8 @@
 //! 简化版：保留核心 Builder API（push_styled / push_plain / build）和 first_line_preview，
 //! 去掉依赖 syntax highlighting 的 `from_buffer_range` / `add_text_from_buffer_range`。
 
+use super::*;
+
 use std::fmt::Write;
 use std::ops::Range;
 

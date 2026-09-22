@@ -9,17 +9,17 @@ mod event;
 mod file;
 mod highlighted_text;
 mod indent;
-mod snapshot;
 mod test_support; // #[cfg(any(test, feature="test-support"))]
 mod util;
 mod words;
 
 pub mod row_chunk;
+pub(crate) mod snapshot;
 mod tree_sitter_data;
 // 对外导出
 pub use bracket_ranges::BracketMatch;
 pub use char_classifier::{CharClassifier, CharKind, CharScopeContext};
-pub use chunks::{BufferChunks, Chunk, LanguageAwareStyling};
+pub use chunks::{BufferChunks, Chunk, HighlightRun, LanguageAwareStyling};
 pub use core::Buffer;
 pub use edit::{AutoIndentExclusion, AutoindentMode};
 pub use edit_preview::EditPreview;

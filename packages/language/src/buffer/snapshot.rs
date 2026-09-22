@@ -1,7 +1,7 @@
 use super::*;
+use ::util::maybe;
 use aa_clock::{self as clock, ReplicaId};
 use std::sync::Arc;
-use util::maybe;
 
 /// An immutable, cheaply cloneable representation of a fixed
 /// state of a buffer.

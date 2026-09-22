@@ -15,6 +15,7 @@ mod tests;
 // 这些函数原本是 transport 模块的私有项，被 ssh / wsl / docker 等
 // 子模块通过 `super::xxx` 引用。为了让这些子模块的调用点不变，
 // 在 mod.rs 里 `pub(crate) use` 一下即可。
+#[cfg(any(debug_assertions, feature = "build-remote-server-binary"))]
 pub(crate) use build_server::build_remote_server_from_source;
 pub(crate) use platform::{
     os_version_command, parse_os_version, parse_platform, parse_windows_version,

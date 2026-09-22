@@ -1,12 +1,12 @@
 #[cfg(any(debug_assertions, feature = "build-remote-server-binary"))]
 use crate::remote_client::RemoteOs;
 #[cfg(any(debug_assertions, feature = "build-remote-server-binary"))]
-use anyhow::Result;
+use anyhow::{Context as _, Result};
 #[cfg(any(debug_assertions, feature = "build-remote-server-binary"))]
 use gpui::{AppContext as _, AsyncApp};
 
 #[cfg(any(debug_assertions, feature = "build-remote-server-binary"))]
-async fn build_remote_server_from_source(
+pub(crate) async fn build_remote_server_from_source(
     platform: &crate::RemotePlatform,
     delegate: &dyn crate::RemoteClientDelegate,
     binary_exists_on_server: bool,

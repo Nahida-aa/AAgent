@@ -6,7 +6,7 @@ use futures::{
     FutureExt as _,
     future::{Shared, WeakShared},
 };
-use gpui::{App, AppContext as _, AsyncApp, BorrowAppContext, Global};
+use gpui::{App, AppContext as _, AsyncApp, BorrowAppContext, Global, Task};
 use rpc::AnyProtoClient;
 
 use crate::transport::{
@@ -28,7 +28,7 @@ pub async fn connect(
         })
     })
     .await
-    .map_err(|e| e.cloned())
+    .map_err(|e| anyhow::Error::msg(e.to_string()))
 }
 
 /// Returns `true` if the global [`ConnectionPool`] already has a live

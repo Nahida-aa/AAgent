@@ -1,6 +1,9 @@
-use std::collections::HashMap;
+use collections::HashMap;
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicU64, Ordering::SeqCst};
+use std::sync::{
+    Arc,
+    atomic::{AtomicU64, Ordering::SeqCst},
+};
 
 use anyhow::Result;
 use async_trait::async_trait;

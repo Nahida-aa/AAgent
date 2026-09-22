@@ -7,7 +7,7 @@ use crate::remote_client::{
 #[cfg(any(test, feature = "test-support"))]
 use crate::transport::mock::ConnectGuard;
 
-use std::collections::HashMap;
+use collections::HashMap;
 use std::ops::ControlFlow;
 use std::path::PathBuf;
 use std::sync::{
@@ -33,9 +33,10 @@ use gpui::{
     EventEmitter, FutureExt, Task, TaskExt, WeakEntity,
 };
 use rpc::{
-    AnyProtoClient, RequestMessage,
-    proto::{self, Envelope, PeerId},
+    AnyProtoClient,
+    proto::{self, Envelope, PeerId, RequestMessage},
 };
+use util::ResultExt as _;
 use util::paths::{PathStyle, RemotePathBuf};
 
 use super::channel_client::ChannelClient;
@@ -345,7 +346,7 @@ impl RemoteClient {
                         pool.connect(connection_options, delegate.clone(), cx)
                     })
                     .await
-                    .map_err(|error| error.cloned())?;
+                    .map_err(|error| anyhow::Error::msg(error.to_string()))?;
 
                 let io_task = remote_connection.start_proxy(
                     unique_identifier,

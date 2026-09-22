@@ -17,11 +17,9 @@ mod wsl_path;
 mod tests;
 
 pub use channel_client::ChannelClient;
-pub use client::{
-    ConnectionIdentifier, RemoteClient, RemoteClientEvent, connect, has_active_connection,
-};
-pub use connect::{ConnectionPool, ConnectionPoolEntry};
-pub use connection::RemoteConnection;
+pub use client::{RemoteClient, RemoteClientEvent};
+pub use connect::{ConnectionPool, ConnectionPoolEntry, connect, has_active_connection};
+pub use connection::{ConnectionIdentifier, RemoteConnection};
 pub use delegate::RemoteClientDelegate;
 pub use options::RemoteConnectionOptions;
 pub use platform::{CommandTemplate, Interactive, RemoteArch, RemoteOs, RemotePlatform};

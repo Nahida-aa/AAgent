@@ -62,8 +62,9 @@ pub use crate::{
         CommandPaletteSettingsContent, DebuggerSettingsContent, FileFinderSettingsContent,
         GitPanelSettingsContent, ImageViewerSettingsContent, InstrumentationSettingsContent,
         JournalSettingsContent, MarkdownPreviewSettingsContent, OutlinePanelSettingsContent,
-        PanelSettingsContent, RemoteSettingsContent, ReplSettingsContent, TelemetrySettingsContent,
-        VimSettingsContent, WhichKeySettingsContent,
+        PanelSettingsContent, RemoteSettingsContent, ReplSettingsContent, SshConnection,
+        SshPortForwardOption, TelemetrySettingsContent, VimSettingsContent,
+        WhichKeySettingsContent, WslConnection,
     },
     editor::{
         CurrentLineHighlight, EditorSettingsContent, GutterContent, InactiveOpacity,

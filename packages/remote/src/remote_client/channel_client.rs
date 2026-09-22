@@ -11,14 +11,17 @@ use anyhow::{Context as _, Result};
 use collections::HashMap as _;
 use futures::{
     Future, FutureExt as _, StreamExt as _,
-    channel::{mpsc, oneshot},
-    future::Shared,
+    channel::{
+        mpsc::{self, UnboundedReceiver, UnboundedSender},
+        oneshot,
+    },
+    future::{BoxFuture, Shared},
     stream::BoxStream,
 };
 use gpui::{App, AppContext as _, AsyncApp, BackgroundExecutor, Task};
 use parking_lot::Mutex;
 use rpc::{
-    ErrorExt, ProtoClient, ProtoMessageHandlerSet, RpcError,
+    AnyProtoClient, ErrorExt, ProtoClient, ProtoMessageHandlerSet, RpcError,
     proto::{self, Envelope, EnvelopedMessage, PeerId, RequestMessage, build_typed_envelope},
 };
 

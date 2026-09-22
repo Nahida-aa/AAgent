@@ -14,7 +14,7 @@ use crate::protocol::{
     MESSAGE_LEN_SIZE, message_len_from_buffer, read_message_with_len, write_message,
 };
 
-fn handle_rpc_messages_over_child_process_stdio(
+pub(crate) fn handle_rpc_messages_over_child_process_stdio(
     mut remote_proxy_process: Child,
     incoming_tx: UnboundedSender<Envelope>,
     mut outgoing_rx: UnboundedReceiver<Envelope>,

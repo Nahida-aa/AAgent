@@ -1976,7 +1976,7 @@ checksum = "af491d569909a7e4dee0ad7db7f5341fef5c614d5b8ec8cf765732aba3cff681"
 dependencies = [
  "serde",
  "termcolor",
- "unicode-width 0.1.14",
+ "unicode-width 0.2.2",
 ]
 
 [[package]]
@@ -2119,6 +2119,32 @@ dependencies = [
 [[package]]
 name = "context_server"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-channel 2.5.0",
+ "async-trait",
+ "base64",
+ "collections",
+ "futures",
+ "futures-lite",
+ "gpui",
+ "http_client 0.1.0",
+ "log",
+ "net",
+ "oauth_callback_server",
+ "parking_lot",
+ "postage",
+ "rand 0.9.5",
+ "schemars",
+ "serde",
+ "serde_json",
+ "settings",
+ "sha2 0.10.9",
+ "slotmap",
+ "tempfile",
+ "url",
+ "util",
+]
 
 [[package]]
 name = "convert_case"
@@ -6438,6 +6464,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "oauth_callback_server"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f#f6838a7c4afecd7c212c43c70165588b92a5a11f"
+dependencies = [
+ "anyhow",
+ "futures",
+ "log",
+ "tiny_http",
+ "url",
+]
+
+[[package]]
 name = "objc"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7662,7 +7700,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "03da047801ff44bb6a4d407d4860c05fd70bb81714e6b2f3812603d5b145b042"
 dependencies = [
  "heck 0.5.0",
- "itertools 0.10.5",
+ "itertools 0.14.0",
  "log",
  "multimap",
  "petgraph 0.8.3",
@@ -7681,7 +7719,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b570b25f7617e43d59005d0990ccb79e950a423952cea19671b7a876da390adf"
 dependencies = [
  "anyhow",
- "itertools 0.10.5",
+ "itertools 0.14.0",
  "proc-macro2",
  "quote",
  "syn 2.0.119",

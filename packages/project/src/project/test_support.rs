@@ -1,3 +1,5 @@
+use super::*;
+
 #![cfg(feature = "test-support")]
 
 use std::path::Path;

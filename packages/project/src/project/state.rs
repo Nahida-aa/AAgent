@@ -1,3 +1,5 @@
+use super::*;
+
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -8,16 +10,32 @@ use worktree::Worktree;
 
 use crate::lsp_store::LanguageServerName;
 
+/// 构造 Project 时的本地化开关（对齐 zed `LocalProjectFlags`）。
+#[derive(Clone, Copy, Debug)]
+pub struct LocalProjectFlags {
+    pub init_worktree_trust: bool,
+    pub watch_global_configs: bool,
+}
+
+impl Default for LocalProjectFlags {
+    fn default() -> Self {
+        Self {
+            init_worktree_trust: true,
+            watch_global_configs: true,
+        }
+    }
+}
+
 /// Message ordered with respect to buffer operations
 #[derive(Debug)]
 pub(crate) enum BufferOrderedMessage {
     Operation {
         buffer_id: language::BufferId,
-        operation: proto::Operation,
+        operation: rpc::proto::Operation,
     },
     LanguageServerUpdate {
         language_server_id: language::LanguageServerId,
-        message: proto::update_language_server::Variant,
+        message: rpc::proto::update_language_server::Variant,
         name: Option<LanguageServerName>,
     },
     Resync,
@@ -71,8 +89,8 @@ impl Drop for RemotelyCreatedModelGuard {
 }
 
 pub enum DebugAdapterClientState {
-    Starting(gpui::Task<Option<Arc<dap::client::DebugAdapterClient>>>),
-    Running(Arc<dap::client::DebugAdapterClient>),
+    Starting(gpui::Task<Option<Arc<::dap::client::DebugAdapterClient>>>),
+    Running(Arc<::dap::client::DebugAdapterClient>),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

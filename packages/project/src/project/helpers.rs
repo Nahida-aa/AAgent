@@ -1,3 +1,5 @@
+use super::*;
+
 use std::sync::Arc;
 
 use gpui::{App, AsyncApp, Context, Entity};
@@ -42,14 +44,14 @@ impl Project {
     pub(crate) fn respond_to_open_buffer_request(
         this: Entity<Self>,
         buffer: Entity<language::Buffer>,
-        peer_id: proto::PeerId,
+        peer_id: rpc::proto::PeerId,
         cx: &mut AsyncApp,
-    ) -> anyhow::Result<proto::OpenBufferResponse> { /* 原样 */ }
+    ) -> anyhow::Result<rpc::proto::OpenBufferResponse> { /* 原样 */ }
 
     pub(crate) fn create_buffer_for_peer(
         &mut self,
         buffer: &Entity<language::Buffer>,
-        peer_id: proto::PeerId,
+        peer_id: rpc::proto::PeerId,
         cx: &mut App,
     ) -> language::BufferId { /* 原样 */ }
 }

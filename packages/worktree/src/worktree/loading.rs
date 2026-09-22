@@ -211,7 +211,7 @@ fn push_normalized(rope: &mut Rope, text: &str, scratch: &mut String) {
     scratch.push_str(&text[start..]);
     rope.push(scratch);
 }
-pub(crate) fn decode_byte_header(prefix: &[u8]) -> (Option<&'static Encoding>, ByteContent) {
+pub fn decode_byte_header(prefix: &[u8]) -> (Option<&'static Encoding>, ByteContent) {
     if let Some((encoding, _bom_len)) = Encoding::for_bom(prefix) {
         return (Some(encoding), ByteContent::Unknown);
     }

@@ -8,4 +8,4 @@ license.workspace = true
 default = []
 
 [dependencies]
-env_vars.workspace = true
+env_var.workspace = true

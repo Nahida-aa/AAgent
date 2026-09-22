@@ -4,7 +4,7 @@ use lsp::LanguageServer;
 
 use crate::LspStore;
 
-const LOGGER: zlog::Logger = zlog::scoped!("json-schema");
+const LOGGER: a_log::Logger = a_log::scoped!("json-schema");
 
 /// https://github.com/Microsoft/vscode/blob/main/extensions/json-language-features/server/README.md#schema-content-request
 ///
@@ -43,7 +43,7 @@ impl lsp::notification::Notification for SchemaContentsChanged {
 }
 
 pub fn notify_schemas_changed(lsp_store: Entity<LspStore>, uris: &[String], cx: &App) {
-    zlog::trace!(LOGGER => "Notifying schema changes for URIs: {:?}", uris);
+    a_log::trace!(LOGGER => "Notifying schema changes for URIs: {:?}", uris);
     let servers = lsp_store.read_with(cx, |lsp_store, _| {
         let mut servers = Vec::new();
         let Some(local) = lsp_store.as_local() else {
@@ -64,12 +64,12 @@ pub fn notify_schemas_changed(lsp_store: Entity<LspStore>, uris: &[String], cx: 
     });
     for server in servers {
         for uri in uris {
-            zlog::trace!(LOGGER => "Notifying server {NAME} (id {ID:?}) of schema change for URI: {uri:?}",
+            a_log::trace!(LOGGER => "Notifying server {NAME} (id {ID:?}) of schema change for URI: {uri:?}",
                 NAME = server.name(),
                 ID = server.server_id()
             );
             if let Err(error) = server.notify::<SchemaContentsChanged>(uri.clone()) {
-                zlog::error!(
+                a_log::error!(
                     LOGGER => "Failed to notify server {NAME} (id {ID:?}) of schema change for URI {uri:?}: {error:#}",
                         NAME = server.name(),
                         ID = server.server_id(),
@@ -93,11 +93,11 @@ pub fn register_requests(lsp_store: WeakEntity<LspStore>, language_server: &Lang
                 handle_schema_request(lsp_store, uri, &mut cx).await
             };
             async move {
-                zlog::trace!(LOGGER => "Handling schema request for {:?}", &params);
+                a_log::trace!(LOGGER => "Handling schema request for {:?}", &params);
                 let result = resolution.await;
                 match &result {
-                    Ok(content) => {zlog::trace!(LOGGER => "Schema request resolved with {}B schema", content.len());},
-                    Err(err) => {zlog::warn!(LOGGER => "Schema request failed: {}", err);},
+                    Ok(content) => {a_log::trace!(LOGGER => "Schema request resolved with {}B schema", content.len());},
+                    Err(err) => {a_log::warn!(LOGGER => "Schema request failed: {}", err);},
                 }
                 result
             }

@@ -98,7 +98,7 @@ impl LspStore {
         });
         if let Some((downstream_client, project_id)) = self.downstream_client.as_ref() {
             downstream_client
-                .send(proto::RefreshDocumentLinks {
+                .send(rpc::proto::RefreshDocumentLinks {
                     project_id: *project_id,
                     server_id: for_server.map(|server_id| server_id.to_proto()),
                 })
@@ -109,14 +109,14 @@ impl LspStore {
 
     pub(super) async fn handle_refresh_document_links(
         lsp_store: Entity<Self>,
-        envelope: TypedEnvelope<proto::RefreshDocumentLinks>,
+        envelope: TypedEnvelope<rpc::proto::RefreshDocumentLinks>,
         mut cx: AsyncApp,
-    ) -> anyhow::Result<proto::Ack> {
+    ) -> anyhow::Result<rpc::proto::Ack> {
         lsp_store.update(&mut cx, |lsp_store, cx| {
             let server_id = envelope.payload.server_id.map(LanguageServerId::from_proto);
             lsp_store.refresh_document_links(server_id, cx);
         });
-        Ok(proto::Ack {})
+        Ok(rpc::proto::Ack {})
     }
 
     /// `Some(..)` means the underlying state was actually refreshed; `None`
@@ -459,7 +459,7 @@ impl LspStore {
         }
 
         if let Some((upstream_client, project_id)) = self.upstream_client() {
-            let request = proto::ResolveDocumentLink {
+            let request = rpc::proto::ResolveDocumentLink {
                 project_id,
                 buffer_id: buffer_id.into(),
                 language_server_id: server_id.0 as u64,
@@ -509,9 +509,9 @@ impl LspStore {
 
     pub(super) async fn handle_resolve_document_link(
         lsp_store: Entity<Self>,
-        envelope: TypedEnvelope<proto::ResolveDocumentLink>,
+        envelope: TypedEnvelope<rpc::proto::ResolveDocumentLink>,
         mut cx: AsyncApp,
-    ) -> anyhow::Result<proto::ResolveDocumentLinkResponse> {
+    ) -> anyhow::Result<rpc::proto::ResolveDocumentLinkResponse> {
         let lsp_link: lsp::DocumentLink = serde_json::from_slice(&envelope.payload.lsp_link)
             .context("deserializing document link to resolve")?;
         let server_id = LanguageServerId::from_proto(envelope.payload.language_server_id);
@@ -527,7 +527,7 @@ impl LspStore {
         })?;
         let resolved = resolve_task.await.into_response()?;
 
-        Ok(proto::ResolveDocumentLinkResponse {
+        Ok(rpc::proto::ResolveDocumentLinkResponse {
             lsp_link: serde_json::to_vec(&resolved)
                 .context("serializing resolved document link")?,
         })

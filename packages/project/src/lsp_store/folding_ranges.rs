@@ -74,7 +74,7 @@ impl LspStore {
         });
         if let Some((downstream_client, project_id)) = self.downstream_client.as_ref() {
             downstream_client
-                .send(proto::RefreshFoldingRanges {
+                .send(rpc::proto::RefreshFoldingRanges {
                     project_id: *project_id,
                     server_id: for_server.map(|server_id| server_id.to_proto()),
                 })
@@ -85,14 +85,14 @@ impl LspStore {
 
     pub(super) async fn handle_refresh_folding_ranges(
         lsp_store: Entity<Self>,
-        envelope: TypedEnvelope<proto::RefreshFoldingRanges>,
+        envelope: TypedEnvelope<rpc::proto::RefreshFoldingRanges>,
         mut cx: AsyncApp,
-    ) -> anyhow::Result<proto::Ack> {
+    ) -> anyhow::Result<rpc::proto::Ack> {
         lsp_store.update(&mut cx, |lsp_store, cx| {
             let server_id = envelope.payload.server_id.map(LanguageServerId::from_proto);
             lsp_store.refresh_folding_ranges(server_id, cx);
         });
-        Ok(proto::Ack {})
+        Ok(rpc::proto::Ack {})
     }
 
     /// Returns a task that resolves to the folding ranges for the given buffer.

@@ -1,3 +1,5 @@
+use super::*;
+
 use anyhow::{Context as _, Result, anyhow};
 use gpui::{AsyncApp, Context};
 
@@ -7,10 +9,10 @@ use super::Project;
 impl Project {
     pub(crate) fn release(&mut self, cx: &mut gpui::App) { /* 原样 */ }
     pub(crate) fn shared(&mut self, project_id: u64, cx: &mut Context<Self>) -> Result<()> { /* 原样 */ }
-    pub(crate) fn reshared(&mut self, message: proto::ResharedProject, cx: &mut Context<Self>) -> Result<()> { /* 原样 */ }
+    pub(crate) fn reshared(&mut self, message: rpc::proto::ResharedProject, cx: &mut Context<Self>) -> Result<()> { /* 原样 */ }
     pub(crate) fn rejoined(
         &mut self,
-        message: proto::RejoinedProject,
+        message: rpc::proto::RejoinedProject,
         message_id: u32,
         cx: &mut Context<Self>,
     ) -> Result<()> { /* 原样 */ }
@@ -18,7 +20,7 @@ impl Project {
     pub(crate) fn unshare_internal(&mut self, cx: &mut gpui::App) -> Result<()> { /* 原样 */ }
     pub(crate) fn disconnected_from_host(&mut self, cx: &mut Context<Self>) { /* 原样 */ }
     pub(crate) fn disconnected_from_host_internal(&mut self, cx: &mut gpui::App) { /* 原样 */ }
-    pub(crate) fn set_role(&mut self, role: proto::ChannelRole, cx: &mut Context<Self>) { /* 原样 */ }
+    pub(crate) fn set_role(&mut self, role: rpc::proto::ChannelRole, cx: &mut Context<Self>) { /* 原样 */ }
     #[inline] pub(crate) fn close(&mut self, cx: &mut Context<Self>) { /* 原样 */ }
     #[inline] pub(crate) fn is_disconnected(&self, cx: &gpui::App) -> bool { /* 原样 */ }
     #[inline] pub(crate) fn capability(&self) -> language::Capability { /* 原样 */ }

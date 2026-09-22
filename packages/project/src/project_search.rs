@@ -292,13 +292,13 @@ impl Search {
                         let cancel_ongoing_search = util::defer({
                             let client = client.clone();
                             move || {
-                                _ = client.send(proto::FindSearchCandidatesCancelled {
+                                _ = client.send(rpc::proto::FindSearchCandidatesCancelled {
                                     project_id: remote_id,
                                     handle,
                                 });
                             }
                         });
-                        let request = client.request(proto::FindSearchCandidates {
+                        let request = client.request(rpc::proto::FindSearchCandidates {
                             project_id: remote_id,
                             query: Some(query.to_proto()),
                             limit: self.limit as _,

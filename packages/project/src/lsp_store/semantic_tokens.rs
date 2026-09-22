@@ -426,7 +426,7 @@ impl LspStore {
         cx.emit(LspStoreEvent::RefreshSemanticTokens { server_id });
         if let Some((client, project_id)) = self.downstream_client.as_ref() {
             client
-                .send(proto::RefreshSemanticTokens {
+                .send(rpc::proto::RefreshSemanticTokens {
                     project_id: *project_id,
                     server_id: server_id.to_proto(),
                     request_id: Some(super::next_wire_refresh_request_id()),
@@ -437,16 +437,16 @@ impl LspStore {
 
     pub(crate) async fn handle_refresh_semantic_tokens(
         lsp_store: Entity<Self>,
-        envelope: TypedEnvelope<proto::RefreshSemanticTokens>,
+        envelope: TypedEnvelope<rpc::proto::RefreshSemanticTokens>,
         mut cx: AsyncApp,
-    ) -> Result<proto::Ack> {
+    ) -> Result<rpc::proto::Ack> {
         lsp_store.update(&mut cx, |lsp_store, cx| {
             lsp_store.refresh_semantic_tokens(
                 LanguageServerId::from_proto(envelope.payload.server_id),
                 cx,
             );
         });
-        Ok(proto::Ack {})
+        Ok(rpc::proto::Ack {})
     }
 
     #[cfg(any(test, feature = "test-support"))]

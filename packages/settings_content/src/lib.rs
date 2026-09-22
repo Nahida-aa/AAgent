@@ -45,7 +45,10 @@ pub use merge_from::MergeFrom;
 
 // ---------- 各子模块 re-export ----------
 
-pub use agent::{SidebarDockPosition, SidebarSide};
+pub use agent::{
+    AgentConfigOptionValue, CustomAgentServerSettings, LanguageModelSelection, SidebarDockPosition,
+    SidebarSide,
+};
 pub use language_model::{Config, McpConfig, McpServerDef, ProviderConfig, ResolvedConfig};
 use schemars::JsonSchema;
 use serde::{Serialize, de::DeserializeOwned};

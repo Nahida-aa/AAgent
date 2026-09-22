@@ -4,6 +4,7 @@
 
 pub mod alacritty;
 mod builder;
+pub use builder::TerminalBuilder;
 mod cmd;
 mod events;
 mod hyperlink;
@@ -39,6 +40,7 @@ mod cwd;
 mod event_loop;
 mod mappings;
 mod mode;
+pub use mode::TerminalMode;
 mod modes;
 mod process_info;
 mod pty_resources;
@@ -46,6 +48,7 @@ mod render;
 mod scroll;
 mod selection;
 mod shell;
+pub use shell::insert_zed_terminal_env;
 mod startup_marker;
 use crate::alacritty::{
     AlacrittyTermConfig, AlacrittyTermLock, HyperlinkMatch, PtySender, RegexSearches,

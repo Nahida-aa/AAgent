@@ -14,7 +14,7 @@ use language::Buffer;
 use sum_tree::SumTree;
 use text::BufferId;
 use util::ResultExt;
-use ztracing::instrument;
+use a_tracing::instrument;
 
 use crate::{
     ConflictSet,

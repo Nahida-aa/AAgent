@@ -1,8 +1,11 @@
+use super::*;
+
 use std::collections::HashSet;
 use std::ops::Range;
 use std::sync::Arc;
 
 use anyhow::Result;
+use anyhow::anyhow;
 use gpui::{App, AppContext, Context, Entity, Task, TaskExt};
 use language::{
     Anchor, Buffer, Language, Location, PointUtf16, ToOffset, ToPointUtf16, Transaction, Unclipped,
@@ -368,7 +371,7 @@ impl Project {
 
     pub fn open_local_buffer_via_lsp(
         &mut self,
-        abs_path: lsp::Uri,
+        abs_path: ::lsp::Uri,
         language_server_id: LanguageServerId,
         cx: &mut Context<Self>,
     ) -> Task<Result<Entity<Buffer>>> {
@@ -555,8 +558,8 @@ impl Project {
         cx: &mut Context<Self>,
     ) -> Task<Result<R::Response>>
     where
-        <R::LspRequest as lsp::request::Request>::Result: Send,
-        <R::LspRequest as lsp::request::Request>::Params: Send,
+        <R::LspRequest as ::lsp::request::Request>::Result: Send,
+        <R::LspRequest as ::lsp::request::Request>::Params: Send,
     {
         let guard = self.retain_remotely_created_models(cx);
         let task = self.lsp_store.update(cx, |lsp_store, cx| {

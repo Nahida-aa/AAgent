@@ -1,3 +1,5 @@
+use super::*;
+
 use std::collections::{BTreeSet, HashMap};
 use std::sync::Arc;
 
@@ -8,11 +10,12 @@ use node_runtime::NodeRuntime;
 use util::rel_path::RelPath;
 
 use super::state::ProjectClientState;
-use super::{LocalProjectFlags, Project};
-use crate::constants::{CURRENT_PROJECT_FEATURES, DEFAULT_COMPLETION_CONTEXT};
+use super::state::LocalProjectFlags;
+use super::Project;
+use crate::constants::CURRENT_PROJECT_FEATURES;
 use crate::directory::DirectoryLister;
 use crate::lsp_store::LspStore;
-use crate::settings::DisableAiSettings;
+use crate::DisableAiSettings;
 use crate::types::*;
 use crate::{Event, ProjectEnvironmentEvent, ToastLink};
 

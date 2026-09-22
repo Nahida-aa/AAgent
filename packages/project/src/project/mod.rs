@@ -25,45 +25,60 @@ mod worktrees;
 #[cfg(feature = "test-support")]
 mod test_support;
 
-pub use state::{
+pub(crate) use state::{
     AgentLocation, BufferOrderedMessage, DebugAdapterClientState, DownloadingFile,
-    ProjectClientState, RemotelyCreatedModelGuard, RemotelyCreatedModels,
+    LocalProjectFlags, ProjectClientState, RemotelyCreatedModelGuard, RemotelyCreatedModels,
 };
 
-use std::collections::{BTreeSet, HashMap, HashSet, IndexSet};
+
+// ---- 供 project/ 各子模块经 `use super::*;` 取用 ----
+// zed 的 project.rs 是 crate 根，子模块用的裸名天然可见；拆分后在这里统一转发。
+pub(crate) use crate::lsp_store::{LanguageServerToQuery, LspStoreEvent, ProgressToken};
+pub(crate) use crate::search::{SearchQuery, SearchResult};
+pub(crate) use crate::search_history::SearchHistory;
+pub(crate) use crate::Event;
+pub(crate) use client::Collaborator;
+pub(crate) use fs::Fs;
+pub(crate) use gpui::Context;
+pub(crate) use ::rpc::{ErrorCode, proto};
+pub(crate) use settings::WorktreeId;
+pub(crate) use util::rel_path::RelPath;
+pub(crate) use worktree::ProjectEntryId;
+
+use std::collections::{BTreeSet, HashMap, HashSet};
+use collections::IndexSet;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use buffer_store::BufferStore;
+pub(crate) use crate::buffer_store::BufferStore;
 use client::{Client, UserStore};
-use clock::ReplicaId;
-use collections::HashMap as _;
-use context_server_store::ContextServerStore;
-use dap::client::DebugAdapterClient;
-use dap::inline_value::VariableLookupKind;
-use debounced_delay::DebouncedDelay;
-use debugger::{
+pub(crate) use clock::ReplicaId;
+pub(crate) use crate::context_server_store::ContextServerStore;
+pub(crate) use ::dap::client::DebugAdapterClient;
+pub(crate) use ::dap::inline_value::VariableLookupKind;
+pub(crate) use crate::debounced_delay::DebouncedDelay;
+pub(crate) use crate::debugger::{
     breakpoint_store::{ActiveStackFrame, BreakpointStore},
     dap_store::DapStore,
     session::Session,
 };
 use futures::channel::mpsc;
 use gpui::{App, Entity, EventEmitter, SharedString, Task, WeakEntity};
-use image_store::{ImageItem, ImageStore};
+pub(crate) use crate::image_store::{ImageItem, ImageStore};
 use itertools::{Either, Itertools};
 use language::{Buffer, BufferId, Language, LanguageRegistry, Toolchain, ToolchainMetadata};
-use lsp_store::LspStore;
+pub(crate) use crate::lsp_store::LspStore;
 use node_runtime::NodeRuntime;
 use parking_lot::Mutex;
 use remote::RemoteClient;
-use rpc::AnyProtoClient;
-use settings::SettingsStore;
+pub(crate) use ::rpc::AnyProtoClient;
+pub(crate) use settings::SettingsStore;
 use snippet_provider::SnippetProvider;
-use task_store::TaskStore;
-use terminals::Terminals;
-use toolchain_store::ToolchainStore;
+pub(crate) use crate::task_store::TaskStore;
+pub(crate) use crate::terminals::Terminals;
+pub(crate) use crate::toolchain_store::ToolchainStore;
 use util::path_list::PathList;
-use worktree_store::{WorktreeIdCounter, WorktreeStore, WorktreeStoreEvent};
+pub(crate) use crate::worktree_store::{WorktreeIdCounter, WorktreeStore, WorktreeStoreEvent};
 
 use crate::bookmark_store::BookmarkStore;
 use crate::git_store::GitStore;
@@ -77,7 +92,7 @@ pub struct Project {
     pub(crate) buffer_ordered_messages_tx: mpsc::UnboundedSender<BufferOrderedMessage>,
     pub(crate) languages: Arc<LanguageRegistry>,
     pub(crate) dap_store: Entity<DapStore>,
-    pub(crate) agent_server_store: Entity<AgentServerStore>,
+    pub(crate) agent_server_store: Entity<crate::AgentServerStore>,
 
     pub(crate) bookmark_store: Entity<BookmarkStore>,
     pub(crate) breakpoint_store: Entity<BreakpointStore>,
@@ -89,7 +104,7 @@ pub struct Project {
     pub(crate) remote_client: Option<Entity<RemoteClient>>,
     pub(crate) client_state: ProjectClientState,
     pub(crate) git_store: Entity<GitStore>,
-    pub(crate) collaborators: HashMap<proto::PeerId, Collaborator>,
+    pub(crate) collaborators: HashMap<::rpc::proto::PeerId, Collaborator>,
     pub(crate) client_subscriptions: Vec<client::Subscription>,
     pub(crate) worktree_store: Entity<WorktreeStore>,
     pub(crate) buffer_store: Entity<BufferStore>,
@@ -127,7 +142,7 @@ impl Project {
     #[inline] pub fn context_server_store(&self) -> Entity<ContextServerStore> { self.context_server_store.clone() }
     #[inline] pub fn buffer_store(&self) -> &Entity<BufferStore> { &self.buffer_store }
     #[inline] pub fn git_store(&self) -> &Entity<GitStore> { &self.git_store }
-    #[inline] pub fn agent_server_store(&self) -> &Entity<AgentServerStore> { &self.agent_server_store }
+    #[inline] pub fn agent_server_store(&self) -> &Entity<crate::AgentServerStore> { &self.agent_server_store }
     #[inline] pub fn task_store(&self) -> &Entity<TaskStore> { &self.task_store }
     #[inline] pub fn snippets(&self) -> &Entity<SnippetProvider> { &self.snippets }
     #[inline] pub fn languages(&self) -> &Arc<LanguageRegistry> { &self.languages }
@@ -138,7 +153,7 @@ impl Project {
     #[inline] pub fn fs(&self) -> &Arc<dyn Fs> { &self.fs }
     #[inline] pub fn environment(&self) -> &Entity<ProjectEnvironment> { &self.environment }
     #[inline] pub fn active_entry(&self) -> Option<ProjectEntryId> { self.active_entry }
-    #[inline] pub fn collaborators(&self) -> &HashMap<proto::PeerId, Collaborator> { &self.collaborators }
+    #[inline] pub fn collaborators(&self) -> &HashMap<::rpc::proto::PeerId, Collaborator> { &self.collaborators }
     #[inline] pub fn host(&self) -> Option<&Collaborator> {  self.collaborators.values().find(|c| c.is_host)}
     // ... 其余所有一行/几行的访问器全部保留在此
 }

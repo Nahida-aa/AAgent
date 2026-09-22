@@ -21,7 +21,8 @@ use rpc::{AnyProtoClient, TypedEnvelope, proto};
 use schemars::JsonSchema;
 use semver::Version;
 use serde::{Deserialize, Serialize};
-use settings::{AgentConfigOptionValue, RegisterSetting, SettingsStore, update_settings_file};
+use settings::agent::AgentConfigOptionValue;
+use settings::{RegisterSetting, SettingsStore, update_settings_file};
 use sha2::{Digest, Sha256};
 use url::Url;
 use util::{ResultExt as _, debug_panic};
@@ -475,7 +476,7 @@ impl AgentServerStore {
 
         if let Some((project_id, downstream_client)) = downstream_client {
             downstream_client
-                .send(proto::ExternalAgentsUpdated {
+                .send(rpc::proto::ExternalAgentsUpdated {
                     project_id: *project_id,
                     names: self
                         .external_agents
@@ -565,7 +566,7 @@ impl AgentServerStore {
                             .collect()
                     })?;
                     client
-                        .send(proto::ExternalAgentsUpdated { project_id, names })
+                        .send(rpc::proto::ExternalAgentsUpdated { project_id, names })
                         .log_err();
                     anyhow::Ok(())
                 })
@@ -612,9 +613,9 @@ impl AgentServerStore {
 
     async fn handle_get_agent_server_command(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::GetAgentServerCommand>,
+        envelope: TypedEnvelope<rpc::proto::GetAgentServerCommand>,
         mut cx: AsyncApp,
-    ) -> Result<proto::AgentServerCommand> {
+    ) -> Result<rpc::proto::AgentServerCommand> {
         let command = this
             .update(&mut cx, |this, cx| {
                 let AgentServerStoreState::Local {
@@ -643,7 +644,7 @@ impl AgentServerStore {
                                         new_version_available_rx.recv().await.ok().flatten()
                                     {
                                         downstream_client.send(
-                                            proto::NewExternalAgentVersionAvailable {
+                                            rpc::proto::NewExternalAgentVersionAvailable {
                                                 project_id,
                                                 name: name.clone(),
                                                 version,
@@ -666,7 +667,7 @@ impl AgentServerStore {
                                 async move |_, _| {
                                     while let Ok(status) = loading_status_rx.recv().await {
                                         downstream_client.send(
-                                            proto::ExternalAgentLoadingStatusUpdated {
+                                            rpc::proto::ExternalAgentLoadingStatusUpdated {
                                                 project_id,
                                                 name: name.clone(),
                                                 status,
@@ -692,7 +693,7 @@ impl AgentServerStore {
                 anyhow::Ok(agent.get_command(vec![], extra_env, &mut cx.to_async()))
             })?
             .await?;
-        Ok(proto::AgentServerCommand {
+        Ok(rpc::proto::AgentServerCommand {
             path: command.path.to_string_lossy().into_owned(),
             args: command.args,
             env: command
@@ -709,7 +710,7 @@ impl AgentServerStore {
 
     async fn handle_external_agents_updated(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::ExternalAgentsUpdated>,
+        envelope: TypedEnvelope<rpc::proto::ExternalAgentsUpdated>,
         mut cx: AsyncApp,
     ) -> Result<()> {
         this.update(&mut cx, |this, cx| {
@@ -787,7 +788,7 @@ impl AgentServerStore {
 
     async fn handle_loading_status_updated(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::ExternalAgentLoadingStatusUpdated>,
+        envelope: TypedEnvelope<rpc::proto::ExternalAgentLoadingStatusUpdated>,
         mut cx: AsyncApp,
     ) -> Result<()> {
         this.update(&mut cx, |this, _| {
@@ -803,7 +804,7 @@ impl AgentServerStore {
 
     async fn handle_new_version_available(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::NewExternalAgentVersionAvailable>,
+        envelope: TypedEnvelope<rpc::proto::NewExternalAgentVersionAvailable>,
         mut cx: AsyncApp,
     ) -> Result<()> {
         this.update(&mut cx, |this, _| {
@@ -866,7 +867,7 @@ impl ExternalAgentServer for RemoteExternalAgentServer {
                 .update(cx, |upstream_client, _| {
                     upstream_client
                         .proto_client()
-                        .request(proto::GetAgentServerCommand {
+                        .request(rpc::proto::GetAgentServerCommand {
                             project_id,
                             name,
                             root_dir,

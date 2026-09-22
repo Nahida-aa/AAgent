@@ -95,8 +95,8 @@ pub use file_content::{
 pub use lsp::{LanguageServerId, LanguageServerName};
 pub use text::{
     Anchor, AnchorRangeExt, Bias, BufferId, Edit, LineEnding, OffsetRangeExt, OffsetUtf16, Patch,
-    Point, PointUtf16, Rope, Selection, SelectionGoal, ToOffset, ToPoint, ToPointUtf16,
-    Transaction, TransactionId, Unclipped,
+    Point, PointUtf16, Rope, Selection, SelectionGoal, ToOffset, ToOffsetUtf16, ToPoint,
+    ToPointUtf16, Transaction, TransactionId, Unclipped,
 };
 pub use tree_sitter::{Node, Parser, QueryCapture, Tree, TreeCursor};
 

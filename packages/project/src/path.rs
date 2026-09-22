@@ -20,15 +20,15 @@ impl ProjectPath {
         }
     }
 
-    pub fn from_proto(p: proto::ProjectPath) -> Option<Self> {
+    pub fn from_proto(p: rpc::proto::ProjectPath) -> Option<Self> {
         Some(Self {
             worktree_id: WorktreeId::from_proto(p.worktree_id),
             path: RelPath::from_unix_str(&p.path).log_err()?.into(),
         })
     }
 
-    pub fn to_proto(&self) -> proto::ProjectPath {
-        proto::ProjectPath {
+    pub fn to_proto(&self) -> rpc::proto::ProjectPath {
+        rpc::proto::ProjectPath {
             worktree_id: self.worktree_id.to_proto(),
             path: self.path.as_ref().as_unix_str().to_owned(),
         }

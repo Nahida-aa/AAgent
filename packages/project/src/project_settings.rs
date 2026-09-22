@@ -883,7 +883,7 @@ impl SettingsObserver {
                                             &settings_observer.downstream_client
                                         {
                                             downstream_client
-                                                .send(proto::UpdateWorktreeSettings {
+                                                .send(rpc::proto::UpdateWorktreeSettings {
                                                     project_id: settings_observer.project_id,
                                                     worktree_id: worktree_id.to_proto(),
                                                     path: path.to_proto(),
@@ -988,7 +988,7 @@ impl SettingsObserver {
                             {
                                 user_settings = Some(new_settings.clone());
                                 upstream_client
-                                    .send(proto::UpdateUserSettings {
+                                    .send(rpc::proto::UpdateUserSettings {
                                         project_id: REMOTE_SERVER_PROJECT_ID,
                                         contents: new_settings_string,
                                     })
@@ -1038,7 +1038,7 @@ impl SettingsObserver {
             for (path, content) in store.local_settings(worktree.read(cx).id()) {
                 let content = serde_json::to_string(&content).unwrap();
                 downstream_client
-                    .send(proto::UpdateWorktreeSettings {
+                    .send(rpc::proto::UpdateWorktreeSettings {
                         project_id,
                         worktree_id,
                         path: path.as_unix_str().to_owned(),
@@ -1056,7 +1056,7 @@ impl SettingsObserver {
                 .local_editorconfig_settings(worktree.read(cx).id())
             {
                 downstream_client
-                    .send(proto::UpdateWorktreeSettings {
+                    .send(rpc::proto::UpdateWorktreeSettings {
                         project_id,
                         worktree_id,
                         path: path.to_proto(),
@@ -1077,14 +1077,14 @@ impl SettingsObserver {
 
     async fn handle_update_worktree_settings(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::UpdateWorktreeSettings>,
+        envelope: TypedEnvelope<rpc::proto::UpdateWorktreeSettings>,
         mut cx: AsyncApp,
     ) -> anyhow::Result<()> {
         let kind = match envelope.payload.kind {
-            Some(kind) => proto::LocalSettingsKind::try_from(kind)
+            Some(kind) => rpc::proto::LocalSettingsKind::try_from(kind)
                 .ok()
                 .with_context(|| format!("unknown kind {kind}"))?,
-            None => proto::LocalSettingsKind::Settings,
+            None => rpc::proto::LocalSettingsKind::Settings,
         };
 
         let path = LocalSettingsPath::from_proto(
@@ -1122,7 +1122,7 @@ impl SettingsObserver {
 
     async fn handle_update_user_settings(
         _: Entity<Self>,
-        envelope: TypedEnvelope<proto::UpdateUserSettings>,
+        envelope: TypedEnvelope<rpc::proto::UpdateUserSettings>,
         cx: AsyncApp,
     ) -> anyhow::Result<()> {
         cx.update_global(|settings_store: &mut SettingsStore, cx| {
@@ -1458,7 +1458,7 @@ impl SettingsObserver {
             if applied {
                 if let Some(downstream_client) = &self.downstream_client {
                     downstream_client
-                        .send(proto::UpdateWorktreeSettings {
+                        .send(rpc::proto::UpdateWorktreeSettings {
                             project_id: self.project_id,
                             worktree_id: remote_worktree_id.to_proto(),
                             path: directory_path.to_proto(),
@@ -1589,21 +1589,21 @@ fn apply_local_settings(
     })
 }
 
-pub fn local_settings_kind_from_proto(kind: proto::LocalSettingsKind) -> LocalSettingsKind {
+pub fn local_settings_kind_from_proto(kind: rpc::proto::LocalSettingsKind) -> LocalSettingsKind {
     match kind {
-        proto::LocalSettingsKind::Settings => LocalSettingsKind::Settings,
-        proto::LocalSettingsKind::Tasks => LocalSettingsKind::Tasks,
-        proto::LocalSettingsKind::Editorconfig => LocalSettingsKind::Editorconfig,
-        proto::LocalSettingsKind::Debug => LocalSettingsKind::Debug,
+        rpc::proto::LocalSettingsKind::Settings => LocalSettingsKind::Settings,
+        rpc::proto::LocalSettingsKind::Tasks => LocalSettingsKind::Tasks,
+        rpc::proto::LocalSettingsKind::Editorconfig => LocalSettingsKind::Editorconfig,
+        rpc::proto::LocalSettingsKind::Debug => LocalSettingsKind::Debug,
     }
 }
 
-pub fn local_settings_kind_to_proto(kind: LocalSettingsKind) -> proto::LocalSettingsKind {
+pub fn local_settings_kind_to_proto(kind: LocalSettingsKind) -> rpc::proto::LocalSettingsKind {
     match kind {
-        LocalSettingsKind::Settings => proto::LocalSettingsKind::Settings,
-        LocalSettingsKind::Tasks => proto::LocalSettingsKind::Tasks,
-        LocalSettingsKind::Editorconfig => proto::LocalSettingsKind::Editorconfig,
-        LocalSettingsKind::Debug => proto::LocalSettingsKind::Debug,
+        LocalSettingsKind::Settings => rpc::proto::LocalSettingsKind::Settings,
+        LocalSettingsKind::Tasks => rpc::proto::LocalSettingsKind::Tasks,
+        LocalSettingsKind::Editorconfig => rpc::proto::LocalSettingsKind::Editorconfig,
+        LocalSettingsKind::Debug => rpc::proto::LocalSettingsKind::Debug,
     }
 }
 

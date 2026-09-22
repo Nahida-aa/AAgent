@@ -1,3 +1,5 @@
+use super::*;
+
 use std::sync::Arc;
 
 use anyhow::{Context as _, Result};
@@ -11,7 +13,7 @@ use util::ResultExt as _;
 use super::Project;
 use crate::buffer_store::BufferStore;
 use crate::lsp_store::CompletionDocumentation;
-use crate::project_search::SearchResultsHandle;
+use crate::crate::project_search::SearchResultsHandle;
 use crate::worktree_store::WorktreeStore;
 use crate::{Event, ProjectPath};
 
@@ -338,7 +340,7 @@ impl Project {
             let results = this.update(cx, |this, cx| {
                 this.search_impl(query, cx).matching_buffers(cx)
             });
-            let (batcher, batches) = project_search::AdaptiveBatcher::new(cx.background_executor());
+            let (batcher, batches) = crate::project_search::AdaptiveBatcher::new(cx.background_executor());
             let mut new_matches = Box::pin(results.rx);
 
             let sender_task = cx.background_executor().spawn({

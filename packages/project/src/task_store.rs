@@ -65,9 +65,9 @@ impl TaskStore {
 
     async fn handle_task_context_for_location(
         store: Entity<Self>,
-        envelope: TypedEnvelope<proto::TaskContextForLocation>,
+        envelope: TypedEnvelope<rpc::proto::TaskContextForLocation>,
         mut cx: AsyncApp,
-    ) -> anyhow::Result<proto::TaskContext> {
+    ) -> anyhow::Result<rpc::proto::TaskContext> {
         let location = envelope
             .payload
             .location
@@ -146,7 +146,7 @@ impl TaskStore {
             store.task_context_for_location(captured_variables, location, cx)
         });
         let task_context = context_task.await?.unwrap_or_default();
-        Ok(proto::TaskContext {
+        Ok(rpc::proto::TaskContext {
             project_env: task_context.project_env.into_iter().collect(),
             cwd: task_context
                 .cwd
@@ -389,9 +389,9 @@ fn remote_task_context_for_location(
         remote_context.extend(captured_variables);
 
         let buffer_id = cx.update(|cx| location.buffer.read(cx).remote_id().to_proto());
-        let context_task = upstream_client.request(proto::TaskContextForLocation {
+        let context_task = upstream_client.request(rpc::proto::TaskContextForLocation {
             project_id,
-            location: Some(proto::Location {
+            location: Some(rpc::proto::Location {
                 buffer_id,
                 start: Some(serialize_anchor(&location.range.start)),
                 end: Some(serialize_anchor(&location.range.end)),

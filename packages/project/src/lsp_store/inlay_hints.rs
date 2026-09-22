@@ -270,7 +270,7 @@ impl LspStore {
         }
 
         if let Some((upstream_client, project_id)) = self.upstream_client() {
-            let request = proto::ResolveInlayHint {
+            let request = rpc::proto::ResolveInlayHint {
                 project_id,
                 buffer_id: buffer.read(cx).remote_id().into(),
                 language_server_id: server_id.0 as u64,
@@ -331,7 +331,7 @@ impl LspStore {
         self.mark_inlay_hints_refresh_pending(server_id, cx);
         if let Some((downstream_client, project_id)) = self.downstream_client.as_ref() {
             downstream_client
-                .send(proto::RefreshInlayHints {
+                .send(rpc::proto::RefreshInlayHints {
                     project_id: *project_id,
                     server_id: server_id.to_proto(),
                     request_id: Some(super::next_wire_refresh_request_id()),
@@ -372,21 +372,21 @@ impl LspStore {
 
     pub(super) async fn handle_refresh_inlay_hints(
         lsp_store: Entity<Self>,
-        envelope: TypedEnvelope<proto::RefreshInlayHints>,
+        envelope: TypedEnvelope<rpc::proto::RefreshInlayHints>,
         mut cx: AsyncApp,
-    ) -> Result<proto::Ack> {
+    ) -> Result<rpc::proto::Ack> {
         lsp_store.update(&mut cx, |lsp_store, cx| {
             lsp_store
                 .refresh_inlay_hints(LanguageServerId::from_proto(envelope.payload.server_id), cx);
         });
-        Ok(proto::Ack {})
+        Ok(rpc::proto::Ack {})
     }
 
     pub(super) async fn handle_resolve_inlay_hint(
         lsp_store: Entity<Self>,
-        envelope: TypedEnvelope<proto::ResolveInlayHint>,
+        envelope: TypedEnvelope<rpc::proto::ResolveInlayHint>,
         mut cx: AsyncApp,
-    ) -> Result<proto::ResolveInlayHintResponse> {
+    ) -> Result<rpc::proto::ResolveInlayHintResponse> {
         let proto_hint = envelope
             .payload
             .hint
@@ -408,7 +408,7 @@ impl LspStore {
             })
             .await
             .context("inlay hints fetch")?;
-        Ok(proto::ResolveInlayHintResponse {
+        Ok(rpc::proto::ResolveInlayHintResponse {
             hint: Some(InlayHints::project_to_proto_hint(response_hint)),
         })
     }

@@ -210,7 +210,7 @@ impl BreakpointStore {
 
     async fn handle_breakpoints_for_file(
         this: Entity<Self>,
-        message: TypedEnvelope<proto::BreakpointsForFile>,
+        message: TypedEnvelope<rpc::proto::BreakpointsForFile>,
         mut cx: AsyncApp,
     ) -> Result<()> {
         if message.payload.breakpoints.is_empty() {
@@ -272,9 +272,9 @@ impl BreakpointStore {
 
     async fn handle_toggle_breakpoint(
         this: Entity<Self>,
-        message: TypedEnvelope<proto::ToggleBreakpoint>,
+        message: TypedEnvelope<rpc::proto::ToggleBreakpoint>,
         mut cx: AsyncApp,
-    ) -> Result<proto::Ack> {
+    ) -> Result<rpc::proto::Ack> {
         let path = this
             .update(&mut cx, |this, cx| {
                 this.worktree_store
@@ -311,13 +311,13 @@ impl BreakpointStore {
                 cx,
             );
         });
-        Ok(proto::Ack {})
+        Ok(rpc::proto::Ack {})
     }
 
     pub(crate) fn broadcast(&self) {
         if let Some((client, project_id)) = &self.downstream_client {
             for (path, breakpoint_set) in &self.breakpoints {
-                let _ = client.send(proto::BreakpointsForFile {
+                let _ = client.send(rpc::proto::BreakpointsForFile {
                     project_id: *project_id,
                     path: path.to_string_lossy().into_owned(),
                     breakpoints: breakpoint_set
@@ -575,7 +575,7 @@ impl BreakpointStore {
                     .bp
                     .to_proto(&abs_path, &breakpoint.position, &HashMap::default())
             {
-                cx.background_spawn(remote.upstream_client.request(proto::ToggleBreakpoint {
+                cx.background_spawn(remote.upstream_client.request(rpc::proto::ToggleBreakpoint {
                     project_id: remote.upstream_project_id,
                     path: abs_path.to_string_lossy().into_owned(),
                     breakpoint: Some(breakpoint),
@@ -599,7 +599,7 @@ impl BreakpointStore {
                 })
                 .unwrap_or_default();
 
-            let _ = client.send(proto::BreakpointsForFile {
+            let _ = client.send(rpc::proto::BreakpointsForFile {
                 project_id: *project_id,
                 path: abs_path.to_string_lossy().into_owned(),
                 breakpoints,
@@ -1004,8 +1004,8 @@ impl Breakpoint {
         Some(client::proto::Breakpoint {
             position: Some(serialize_text_anchor(position)),
             state: match self.state {
-                BreakpointState::Enabled => proto::BreakpointState::Enabled.into(),
-                BreakpointState::Disabled => proto::BreakpointState::Disabled.into(),
+                BreakpointState::Enabled => rpc::proto::BreakpointState::Enabled.into(),
+                BreakpointState::Disabled => rpc::proto::BreakpointState::Disabled.into(),
             },
             message: self.message.as_ref().map(|s| String::from(s.as_ref())),
             condition: self.condition.as_ref().map(|s| String::from(s.as_ref())),
@@ -1018,7 +1018,7 @@ impl Breakpoint {
                 .map(|(session_id, state)| {
                     (
                         session_id.to_proto(),
-                        proto::BreakpointSessionState {
+                        rpc::proto::BreakpointSessionState {
                             id: state.id,
                             verified: state.verified,
                         },
@@ -1030,9 +1030,9 @@ impl Breakpoint {
 
     fn from_proto(breakpoint: client::proto::Breakpoint) -> Option<Self> {
         Some(Self {
-            state: match proto::BreakpointState::try_from(breakpoint.state).ok() {
-                Some(proto::BreakpointState::Disabled) => BreakpointState::Disabled,
-                None | Some(proto::BreakpointState::Enabled) => BreakpointState::Enabled,
+            state: match rpc::proto::BreakpointState::try_from(breakpoint.state).ok() {
+                Some(rpc::proto::BreakpointState::Disabled) => BreakpointState::Disabled,
+                None | Some(rpc::proto::BreakpointState::Enabled) => BreakpointState::Enabled,
             },
             message: breakpoint.message.map(Into::into),
             condition: breakpoint.condition.map(Into::into),

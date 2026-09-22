@@ -1,3 +1,5 @@
+use super::*;
+
 use anyhow::{Context as _, Result, anyhow};
 use futures::future::join_all;
 use gpui::{App, AppContext as _, Context, Entity, Task, TaskExt as _};
@@ -27,7 +29,7 @@ impl Project {
     pub fn remove_worktree_for_main_worktree_path(&mut self, path: impl AsRef<std::path::Path>, cx: &mut Context<Self>) { /* 原样 */ }
     pub fn move_worktree(&mut self, source: worktree::WorktreeId, destination: worktree::WorktreeId, cx: &mut Context<Self>) -> Result<()> { /* 原样 */ }
     pub(crate) fn add_worktree(&mut self, worktree: &Entity<worktree::Worktree>, cx: &mut Context<Self>) { /* 原样 */ }
-    pub fn worktree_metadata_protos(&self, cx: &App) -> Vec<proto::WorktreeMetadata> { /* 原样 */ }
+    pub fn worktree_metadata_protos(&self, cx: &App) -> Vec<rpc::proto::WorktreeMetadata> { /* 原样 */ }
     pub fn worktree_paths(&self, cx: &App) -> WorktreePaths { /* 原样 */ }
     pub fn path_style(&self, cx: &App) -> util::paths::PathStyle { /* 原样 */ }
     pub fn contains_local_settings_file(&self, worktree_id: worktree::WorktreeId, rel_path: &RelPath, cx: &App) -> bool { /* 原样 */ }
@@ -35,7 +37,7 @@ impl Project {
     pub(crate) fn on_worktree_store_event(&mut self, _: Entity<WorktreeStore>, event: &WorktreeStoreEvent, cx: &mut Context<Self>) { /* 原样 */ }
     fn on_worktree_added(&mut self, worktree: &Entity<worktree::Worktree>, _: &mut Context<Self>) { /* 原样 */ }
     fn on_worktree_released(&mut self, id_to_remove: worktree::WorktreeId, cx: &mut Context<Self>) { /* 原样 */ }
-    fn set_worktrees_from_proto(&mut self, worktrees: Vec<proto::WorktreeMetadata>, cx: &mut Context<Project>) -> Result<()> { /* 原样 */ }
+    fn set_worktrees_from_proto(&mut self, worktrees: Vec<rpc::proto::WorktreeMetadata>, cx: &mut Context<Project>) -> Result<()> { /* 原样 */ }
     pub fn create_entry(&mut self, project_path: impl Into<ProjectPath>, is_directory: bool, cx: &mut Context<Self>) -> Task<Result<worktree::CreatedEntry>> { /* 原样 */ }
     pub fn copy_entry(&mut self, entry_id: worktree::ProjectEntryId, new_project_path: ProjectPath, cx: &mut Context<Self>) -> Task<Result<Option<worktree::Entry>>> { /* 原样 */ }
     pub fn rename_entry(&mut self, entry_id: worktree::ProjectEntryId, new_path: ProjectPath, cx: &mut Context<Self>) -> Task<Result<worktree::CreatedEntry>> { /* 原样 */ }

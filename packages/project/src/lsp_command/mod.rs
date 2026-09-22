@@ -91,7 +91,7 @@ pub(crate) fn make_lsp_text_document_position(
 pub trait LspCommand: 'static + Sized + Send + std::fmt::Debug {
     type Response: 'static + Default + Send + std::fmt::Debug;
     type LspRequest: 'static + Send + lsp::request::Request;
-    type ProtoRequest: 'static + Send + proto::RequestMessage;
+    type ProtoRequest: 'static + Send + rpc::proto::RequestMessage;
 
     fn display_name(&self) -> &str;
 
@@ -145,11 +145,11 @@ pub trait LspCommand: 'static + Sized + Send + std::fmt::Debug {
         peer_id: PeerId,
         buffer_version: &clock::Global,
         cx: &mut App,
-    ) -> <Self::ProtoRequest as proto::RequestMessage>::Response;
+    ) -> <Self::ProtoRequest as rpc::proto::RequestMessage>::Response;
 
     async fn response_from_proto(
         self,
-        message: <Self::ProtoRequest as proto::RequestMessage>::Response,
+        message: <Self::ProtoRequest as rpc::proto::RequestMessage>::Response,
         lsp_store: Entity<LspStore>,
         buffer: Entity<Buffer>,
         cx: AsyncApp,
@@ -403,8 +403,8 @@ fn call_hierarchy_item_to_lsp(
 fn call_hierarchy_item_to_proto(
     item: &CallHierarchyItem,
     buffer_id: BufferId,
-) -> proto::CallHierarchyItem {
-    proto::CallHierarchyItem {
+) -> rpc::proto::CallHierarchyItem {
+    rpc::proto::CallHierarchyItem {
         name: item.name.clone(),
         kind: lsp_to_symbol_kind(item.kind).to_proto(),
         detail: item.detail.clone(),
@@ -423,7 +423,7 @@ fn call_hierarchy_item_response_to_proto(
     lsp_store: &mut LspStore,
     peer_id: PeerId,
     cx: &mut App,
-) -> proto::CallHierarchyItem {
+) -> rpc::proto::CallHierarchyItem {
     lsp_store
         .buffer_store()
         .update(cx, |buffer_store, cx| {
@@ -435,7 +435,7 @@ fn call_hierarchy_item_response_to_proto(
 }
 
 fn call_hierarchy_item_fields_from_proto(
-    item: proto::CallHierarchyItem,
+    item: rpc::proto::CallHierarchyItem,
     buffer: Entity<Buffer>,
 ) -> Result<CallHierarchyItem> {
     let range = item
@@ -464,7 +464,7 @@ fn call_hierarchy_item_fields_from_proto(
 }
 
 async fn call_hierarchy_item_from_proto(
-    item: proto::CallHierarchyItem,
+    item: rpc::proto::CallHierarchyItem,
     lsp_store: &Entity<LspStore>,
     cx: &mut AsyncApp,
 ) -> Result<CallHierarchyItem> {
@@ -492,7 +492,7 @@ async fn call_hierarchy_item_from_proto(
 impl LspCommand for PrepareCallHierarchy {
     type Response = Vec<CallHierarchyItem>;
     type LspRequest = lsp::request::CallHierarchyPrepare;
-    type ProtoRequest = proto::PrepareCallHierarchy;
+    type ProtoRequest = rpc::proto::PrepareCallHierarchy;
 
     fn display_name(&self) -> &str {
         "Prepare call hierarchy"
@@ -537,8 +537,8 @@ impl LspCommand for PrepareCallHierarchy {
         Ok(items)
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::PrepareCallHierarchy {
-        proto::PrepareCallHierarchy {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::PrepareCallHierarchy {
+        rpc::proto::PrepareCallHierarchy {
             project_id,
             buffer_id: buffer.remote_id().into(),
             position: Some(serialize_anchor(&buffer.anchor_before(self.position))),
@@ -547,7 +547,7 @@ impl LspCommand for PrepareCallHierarchy {
     }
 
     async fn from_proto(
-        message: proto::PrepareCallHierarchy,
+        message: rpc::proto::PrepareCallHierarchy,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -572,8 +572,8 @@ impl LspCommand for PrepareCallHierarchy {
         peer_id: PeerId,
         _: &clock::Global,
         cx: &mut App,
-    ) -> proto::PrepareCallHierarchyResponse {
-        proto::PrepareCallHierarchyResponse {
+    ) -> rpc::proto::PrepareCallHierarchyResponse {
+        rpc::proto::PrepareCallHierarchyResponse {
             items: response
                 .iter()
                 .map(|item| call_hierarchy_item_response_to_proto(item, lsp_store, peer_id, cx))
@@ -583,7 +583,7 @@ impl LspCommand for PrepareCallHierarchy {
 
     async fn response_from_proto(
         self,
-        message: proto::PrepareCallHierarchyResponse,
+        message: rpc::proto::PrepareCallHierarchyResponse,
         lsp_store: Entity<LspStore>,
         _: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -595,7 +595,7 @@ impl LspCommand for PrepareCallHierarchy {
         Ok(items)
     }
 
-    fn buffer_id_from_proto(message: &proto::PrepareCallHierarchy) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::PrepareCallHierarchy) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -622,14 +622,14 @@ fn location_to_proto(
     lsp_store: &mut LspStore,
     peer_id: PeerId,
     cx: &mut App,
-) -> proto::Location {
+) -> rpc::proto::Location {
     lsp_store
         .buffer_store()
         .update(cx, |buffer_store, cx| {
             buffer_store.create_buffer_for_peer(&location.buffer, peer_id, cx)
         })
         .detach_and_log_err(cx);
-    proto::Location {
+    rpc::proto::Location {
         buffer_id: location.buffer.read(cx).remote_id().into(),
         start: Some(serialize_anchor(&location.range.start)),
         end: Some(serialize_anchor(&location.range.end)),
@@ -637,7 +637,7 @@ fn location_to_proto(
 }
 
 async fn location_from_proto(
-    location: proto::Location,
+    location: rpc::proto::Location,
     lsp_store: &Entity<LspStore>,
     cx: &mut AsyncApp,
 ) -> Result<Location> {
@@ -668,7 +668,7 @@ async fn location_from_proto(
 impl LspCommand for GetIncomingCalls {
     type Response = Vec<IncomingCall>;
     type LspRequest = lsp::request::CallHierarchyIncomingCalls;
-    type ProtoRequest = proto::GetIncomingCalls;
+    type ProtoRequest = rpc::proto::GetIncomingCalls;
 
     fn display_name(&self) -> &str {
         "Get incoming calls"
@@ -720,8 +720,8 @@ impl LspCommand for GetIncomingCalls {
         Ok(calls)
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetIncomingCalls {
-        proto::GetIncomingCalls {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetIncomingCalls {
+        rpc::proto::GetIncomingCalls {
             project_id,
             buffer_id: buffer.remote_id().into(),
             item: Some(call_hierarchy_item_to_proto(&self.item, buffer.remote_id())),
@@ -730,7 +730,7 @@ impl LspCommand for GetIncomingCalls {
     }
 
     async fn from_proto(
-        message: proto::GetIncomingCalls,
+        message: rpc::proto::GetIncomingCalls,
         _lsp_store: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -754,11 +754,11 @@ impl LspCommand for GetIncomingCalls {
         peer_id: PeerId,
         _buffer_version: &clock::Global,
         cx: &mut App,
-    ) -> proto::GetIncomingCallsResponse {
-        proto::GetIncomingCallsResponse {
+    ) -> rpc::proto::GetIncomingCallsResponse {
+        rpc::proto::GetIncomingCallsResponse {
             calls: response
                 .into_iter()
-                .map(|call| proto::CallHierarchyIncomingCall {
+                .map(|call| rpc::proto::CallHierarchyIncomingCall {
                     from: Some(call_hierarchy_item_response_to_proto(
                         &call.from, lsp_store, peer_id, cx,
                     )),
@@ -774,7 +774,7 @@ impl LspCommand for GetIncomingCalls {
 
     async fn response_from_proto(
         self,
-        message: proto::GetIncomingCallsResponse,
+        message: rpc::proto::GetIncomingCallsResponse,
         lsp_store: Entity<LspStore>,
         _buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -796,7 +796,7 @@ impl LspCommand for GetIncomingCalls {
         Ok(calls)
     }
 
-    fn buffer_id_from_proto(message: &proto::GetIncomingCalls) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetIncomingCalls) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -810,7 +810,7 @@ pub struct GetOutgoingCalls {
 impl LspCommand for GetOutgoingCalls {
     type Response = Vec<OutgoingCall>;
     type LspRequest = lsp::request::CallHierarchyOutgoingCalls;
-    type ProtoRequest = proto::GetOutgoingCalls;
+    type ProtoRequest = rpc::proto::GetOutgoingCalls;
 
     fn display_name(&self) -> &str {
         "Get outgoing calls"
@@ -861,8 +861,8 @@ impl LspCommand for GetOutgoingCalls {
         Ok(calls)
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetOutgoingCalls {
-        proto::GetOutgoingCalls {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetOutgoingCalls {
+        rpc::proto::GetOutgoingCalls {
             project_id,
             buffer_id: buffer.remote_id().into(),
             item: Some(call_hierarchy_item_to_proto(&self.item, buffer.remote_id())),
@@ -871,7 +871,7 @@ impl LspCommand for GetOutgoingCalls {
     }
 
     async fn from_proto(
-        message: proto::GetOutgoingCalls,
+        message: rpc::proto::GetOutgoingCalls,
         _lsp_store: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -895,11 +895,11 @@ impl LspCommand for GetOutgoingCalls {
         peer_id: PeerId,
         _buffer_version: &clock::Global,
         cx: &mut App,
-    ) -> proto::GetOutgoingCallsResponse {
-        proto::GetOutgoingCallsResponse {
+    ) -> rpc::proto::GetOutgoingCallsResponse {
+        rpc::proto::GetOutgoingCallsResponse {
             calls: response
                 .into_iter()
-                .map(|call| proto::CallHierarchyOutgoingCall {
+                .map(|call| rpc::proto::CallHierarchyOutgoingCall {
                     to: Some(call_hierarchy_item_response_to_proto(
                         &call.to, lsp_store, peer_id, cx,
                     )),
@@ -915,7 +915,7 @@ impl LspCommand for GetOutgoingCalls {
 
     async fn response_from_proto(
         self,
-        message: proto::GetOutgoingCallsResponse,
+        message: rpc::proto::GetOutgoingCallsResponse,
         lsp_store: Entity<LspStore>,
         _buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -934,7 +934,7 @@ impl LspCommand for GetOutgoingCalls {
         Ok(calls)
     }
 
-    fn buffer_id_from_proto(message: &proto::GetOutgoingCalls) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetOutgoingCalls) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -943,7 +943,7 @@ impl LspCommand for GetOutgoingCalls {
 impl LspCommand for PrepareRename {
     type Response = PrepareRenameResponse;
     type LspRequest = lsp::request::PrepareRenameRequest;
-    type ProtoRequest = proto::PrepareRename;
+    type ProtoRequest = rpc::proto::PrepareRename;
 
     fn display_name(&self) -> &str {
         "Prepare rename"
@@ -1025,8 +1025,8 @@ impl LspCommand for PrepareRename {
         })
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::PrepareRename {
-        proto::PrepareRename {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::PrepareRename {
+        rpc::proto::PrepareRename {
             project_id,
             buffer_id: buffer.remote_id().into(),
             position: Some(language::proto::serialize_anchor(
@@ -1037,7 +1037,7 @@ impl LspCommand for PrepareRename {
     }
 
     async fn from_proto(
-        message: proto::PrepareRename,
+        message: rpc::proto::PrepareRename,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -1063,12 +1063,12 @@ impl LspCommand for PrepareRename {
         _: PeerId,
         buffer_version: &clock::Global,
         _: &mut App,
-    ) -> proto::PrepareRenameResponse {
+    ) -> rpc::proto::PrepareRenameResponse {
         match response {
             PrepareRenameResponse::Success {
                 range,
                 language_server_id,
-            } => proto::PrepareRenameResponse {
+            } => rpc::proto::PrepareRenameResponse {
                 can_rename: true,
                 only_unprepared_rename_supported: false,
                 start: Some(language::proto::serialize_anchor(&range.start)),
@@ -1076,7 +1076,7 @@ impl LspCommand for PrepareRename {
                 version: serialize_version(buffer_version),
                 language_server_id: language_server_id.map(LanguageServerId::to_proto),
             },
-            PrepareRenameResponse::OnlyUnpreparedRenameSupported => proto::PrepareRenameResponse {
+            PrepareRenameResponse::OnlyUnpreparedRenameSupported => rpc::proto::PrepareRenameResponse {
                 can_rename: false,
                 only_unprepared_rename_supported: true,
                 start: None,
@@ -1084,7 +1084,7 @@ impl LspCommand for PrepareRename {
                 version: vec![],
                 language_server_id: None,
             },
-            PrepareRenameResponse::InvalidPosition => proto::PrepareRenameResponse {
+            PrepareRenameResponse::InvalidPosition => rpc::proto::PrepareRenameResponse {
                 can_rename: false,
                 only_unprepared_rename_supported: false,
                 start: None,
@@ -1097,7 +1097,7 @@ impl LspCommand for PrepareRename {
 
     async fn response_from_proto(
         self,
-        message: proto::PrepareRenameResponse,
+        message: rpc::proto::PrepareRenameResponse,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -1130,7 +1130,7 @@ impl LspCommand for PrepareRename {
         }
     }
 
-    fn buffer_id_from_proto(message: &proto::PrepareRename) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::PrepareRename) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -1139,7 +1139,7 @@ impl LspCommand for PrepareRename {
 impl LspCommand for PerformRename {
     type Response = ProjectTransaction;
     type LspRequest = lsp::request::Rename;
-    type ProtoRequest = proto::PerformRename;
+    type ProtoRequest = rpc::proto::PerformRename;
 
     fn display_name(&self) -> &str {
         "Rename"
@@ -1194,8 +1194,8 @@ impl LspCommand for PerformRename {
         }
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::PerformRename {
-        proto::PerformRename {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::PerformRename {
+        rpc::proto::PerformRename {
             project_id,
             buffer_id: buffer.remote_id().into(),
             position: Some(language::proto::serialize_anchor(
@@ -1208,7 +1208,7 @@ impl LspCommand for PerformRename {
     }
 
     async fn from_proto(
-        message: proto::PerformRename,
+        message: rpc::proto::PerformRename,
         lsp_store: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -1249,18 +1249,18 @@ impl LspCommand for PerformRename {
         peer_id: PeerId,
         _: &clock::Global,
         cx: &mut App,
-    ) -> proto::PerformRenameResponse {
+    ) -> rpc::proto::PerformRenameResponse {
         let transaction = lsp_store.buffer_store().update(cx, |buffer_store, cx| {
             buffer_store.serialize_project_transaction_for_peer(response, peer_id, cx)
         });
-        proto::PerformRenameResponse {
+        rpc::proto::PerformRenameResponse {
             transaction: Some(transaction),
         }
     }
 
     async fn response_from_proto(
         self,
-        message: proto::PerformRenameResponse,
+        message: rpc::proto::PerformRenameResponse,
         lsp_store: Entity<LspStore>,
         _: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -1275,7 +1275,7 @@ impl LspCommand for PerformRename {
             .await
     }
 
-    fn buffer_id_from_proto(message: &proto::PerformRename) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::PerformRename) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -1284,7 +1284,7 @@ impl LspCommand for PerformRename {
 impl LspCommand for GetDefinitions {
     type Response = Vec<LocationLink>;
     type LspRequest = lsp::request::GotoDefinition;
-    type ProtoRequest = proto::GetDefinition;
+    type ProtoRequest = rpc::proto::GetDefinition;
 
     fn display_name(&self) -> &str {
         "Get definition"
@@ -1326,8 +1326,8 @@ impl LspCommand for GetDefinitions {
         location_links_from_lsp(message, lsp_store, buffer, server_id, cx).await
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetDefinition {
-        proto::GetDefinition {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetDefinition {
+        rpc::proto::GetDefinition {
             project_id,
             buffer_id: buffer.remote_id().into(),
             position: Some(language::proto::serialize_anchor(
@@ -1338,7 +1338,7 @@ impl LspCommand for GetDefinitions {
     }
 
     async fn from_proto(
-        message: proto::GetDefinition,
+        message: rpc::proto::GetDefinition,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -1363,14 +1363,14 @@ impl LspCommand for GetDefinitions {
         peer_id: PeerId,
         _: &clock::Global,
         cx: &mut App,
-    ) -> proto::GetDefinitionResponse {
+    ) -> rpc::proto::GetDefinitionResponse {
         let links = location_links_to_proto(response, lsp_store, peer_id, cx);
-        proto::GetDefinitionResponse { links }
+        rpc::proto::GetDefinitionResponse { links }
     }
 
     async fn response_from_proto(
         self,
-        message: proto::GetDefinitionResponse,
+        message: rpc::proto::GetDefinitionResponse,
         lsp_store: Entity<LspStore>,
         _: Entity<Buffer>,
         cx: AsyncApp,
@@ -1378,7 +1378,7 @@ impl LspCommand for GetDefinitions {
         location_links_from_proto(message.links, lsp_store, cx).await
     }
 
-    fn buffer_id_from_proto(message: &proto::GetDefinition) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetDefinition) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -1387,7 +1387,7 @@ impl LspCommand for GetDefinitions {
 impl LspCommand for GetEditPredictionDefinitions {
     type Response = Vec<EditPredictionDefinition>;
     type LspRequest = lsp::request::GotoDefinition;
-    type ProtoRequest = proto::GetEditPredictionDefinition;
+    type ProtoRequest = rpc::proto::GetEditPredictionDefinition;
 
     fn display_name(&self) -> &str {
         "Get edit prediction definition"
@@ -1429,8 +1429,8 @@ impl LspCommand for GetEditPredictionDefinitions {
         edit_prediction_definitions_from_lsp(message, lsp_store, cx)
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetEditPredictionDefinition {
-        proto::GetEditPredictionDefinition {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetEditPredictionDefinition {
+        rpc::proto::GetEditPredictionDefinition {
             project_id,
             buffer_id: buffer.remote_id().into(),
             position: Some(language::proto::serialize_anchor(
@@ -1441,7 +1441,7 @@ impl LspCommand for GetEditPredictionDefinitions {
     }
 
     async fn from_proto(
-        message: proto::GetEditPredictionDefinition,
+        message: rpc::proto::GetEditPredictionDefinition,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -1463,15 +1463,15 @@ impl LspCommand for GetEditPredictionDefinitions {
         _: PeerId,
         _: &clock::Global,
         _: &mut App,
-    ) -> proto::GetEditPredictionDefinitionResponse {
-        proto::GetEditPredictionDefinitionResponse {
+    ) -> rpc::proto::GetEditPredictionDefinitionResponse {
+        rpc::proto::GetEditPredictionDefinitionResponse {
             definitions: edit_prediction_definitions_to_proto(response),
         }
     }
 
     async fn response_from_proto(
         self,
-        message: proto::GetEditPredictionDefinitionResponse,
+        message: rpc::proto::GetEditPredictionDefinitionResponse,
         _: Entity<LspStore>,
         _: Entity<Buffer>,
         _: AsyncApp,
@@ -1479,7 +1479,7 @@ impl LspCommand for GetEditPredictionDefinitions {
         edit_prediction_definitions_from_proto(message.definitions)
     }
 
-    fn buffer_id_from_proto(message: &proto::GetEditPredictionDefinition) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetEditPredictionDefinition) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -1488,7 +1488,7 @@ impl LspCommand for GetEditPredictionDefinitions {
 impl LspCommand for GetDeclarations {
     type Response = Vec<LocationLink>;
     type LspRequest = lsp::request::GotoDeclaration;
-    type ProtoRequest = proto::GetDeclaration;
+    type ProtoRequest = rpc::proto::GetDeclaration;
 
     fn display_name(&self) -> &str {
         "Get declaration"
@@ -1531,8 +1531,8 @@ impl LspCommand for GetDeclarations {
         location_links_from_lsp(message, lsp_store, buffer, server_id, cx).await
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetDeclaration {
-        proto::GetDeclaration {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetDeclaration {
+        rpc::proto::GetDeclaration {
             project_id,
             buffer_id: buffer.remote_id().into(),
             position: Some(language::proto::serialize_anchor(
@@ -1543,7 +1543,7 @@ impl LspCommand for GetDeclarations {
     }
 
     async fn from_proto(
-        message: proto::GetDeclaration,
+        message: rpc::proto::GetDeclaration,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -1568,14 +1568,14 @@ impl LspCommand for GetDeclarations {
         peer_id: PeerId,
         _: &clock::Global,
         cx: &mut App,
-    ) -> proto::GetDeclarationResponse {
+    ) -> rpc::proto::GetDeclarationResponse {
         let links = location_links_to_proto(response, lsp_store, peer_id, cx);
-        proto::GetDeclarationResponse { links }
+        rpc::proto::GetDeclarationResponse { links }
     }
 
     async fn response_from_proto(
         self,
-        message: proto::GetDeclarationResponse,
+        message: rpc::proto::GetDeclarationResponse,
         lsp_store: Entity<LspStore>,
         _: Entity<Buffer>,
         cx: AsyncApp,
@@ -1583,7 +1583,7 @@ impl LspCommand for GetDeclarations {
         location_links_from_proto(message.links, lsp_store, cx).await
     }
 
-    fn buffer_id_from_proto(message: &proto::GetDeclaration) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetDeclaration) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -1592,7 +1592,7 @@ impl LspCommand for GetDeclarations {
 impl LspCommand for GetImplementations {
     type Response = Vec<LocationLink>;
     type LspRequest = lsp::request::GotoImplementation;
-    type ProtoRequest = proto::GetImplementation;
+    type ProtoRequest = rpc::proto::GetImplementation;
 
     fn display_name(&self) -> &str {
         "Get implementation"
@@ -1634,8 +1634,8 @@ impl LspCommand for GetImplementations {
         location_links_from_lsp(message, lsp_store, buffer, server_id, cx).await
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetImplementation {
-        proto::GetImplementation {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetImplementation {
+        rpc::proto::GetImplementation {
             project_id,
             buffer_id: buffer.remote_id().into(),
             position: Some(language::proto::serialize_anchor(
@@ -1646,7 +1646,7 @@ impl LspCommand for GetImplementations {
     }
 
     async fn from_proto(
-        message: proto::GetImplementation,
+        message: rpc::proto::GetImplementation,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -1671,14 +1671,14 @@ impl LspCommand for GetImplementations {
         peer_id: PeerId,
         _: &clock::Global,
         cx: &mut App,
-    ) -> proto::GetImplementationResponse {
+    ) -> rpc::proto::GetImplementationResponse {
         let links = location_links_to_proto(response, lsp_store, peer_id, cx);
-        proto::GetImplementationResponse { links }
+        rpc::proto::GetImplementationResponse { links }
     }
 
     async fn response_from_proto(
         self,
-        message: proto::GetImplementationResponse,
+        message: rpc::proto::GetImplementationResponse,
         project: Entity<LspStore>,
         _: Entity<Buffer>,
         cx: AsyncApp,
@@ -1686,7 +1686,7 @@ impl LspCommand for GetImplementations {
         location_links_from_proto(message.links, project, cx).await
     }
 
-    fn buffer_id_from_proto(message: &proto::GetImplementation) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetImplementation) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -1695,7 +1695,7 @@ impl LspCommand for GetImplementations {
 impl LspCommand for GetTypeDefinitions {
     type Response = Vec<LocationLink>;
     type LspRequest = lsp::request::GotoTypeDefinition;
-    type ProtoRequest = proto::GetTypeDefinition;
+    type ProtoRequest = rpc::proto::GetTypeDefinition;
 
     fn display_name(&self) -> &str {
         "Get type definition"
@@ -1733,8 +1733,8 @@ impl LspCommand for GetTypeDefinitions {
         location_links_from_lsp(message, project, buffer, server_id, cx).await
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetTypeDefinition {
-        proto::GetTypeDefinition {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetTypeDefinition {
+        rpc::proto::GetTypeDefinition {
             project_id,
             buffer_id: buffer.remote_id().into(),
             position: Some(language::proto::serialize_anchor(
@@ -1745,7 +1745,7 @@ impl LspCommand for GetTypeDefinitions {
     }
 
     async fn from_proto(
-        message: proto::GetTypeDefinition,
+        message: rpc::proto::GetTypeDefinition,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -1770,14 +1770,14 @@ impl LspCommand for GetTypeDefinitions {
         peer_id: PeerId,
         _: &clock::Global,
         cx: &mut App,
-    ) -> proto::GetTypeDefinitionResponse {
+    ) -> rpc::proto::GetTypeDefinitionResponse {
         let links = location_links_to_proto(response, lsp_store, peer_id, cx);
-        proto::GetTypeDefinitionResponse { links }
+        rpc::proto::GetTypeDefinitionResponse { links }
     }
 
     async fn response_from_proto(
         self,
-        message: proto::GetTypeDefinitionResponse,
+        message: rpc::proto::GetTypeDefinitionResponse,
         project: Entity<LspStore>,
         _: Entity<Buffer>,
         cx: AsyncApp,
@@ -1785,7 +1785,7 @@ impl LspCommand for GetTypeDefinitions {
         location_links_from_proto(message.links, project, cx).await
     }
 
-    fn buffer_id_from_proto(message: &proto::GetTypeDefinition) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetTypeDefinition) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -1794,7 +1794,7 @@ impl LspCommand for GetTypeDefinitions {
 impl LspCommand for GetEditPredictionTypeDefinitions {
     type Response = Vec<EditPredictionDefinition>;
     type LspRequest = lsp::request::GotoTypeDefinition;
-    type ProtoRequest = proto::GetEditPredictionTypeDefinition;
+    type ProtoRequest = rpc::proto::GetEditPredictionTypeDefinition;
 
     fn display_name(&self) -> &str {
         "Get edit prediction type definition"
@@ -1832,8 +1832,8 @@ impl LspCommand for GetEditPredictionTypeDefinitions {
         edit_prediction_definitions_from_lsp(message, lsp_store, cx)
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetEditPredictionTypeDefinition {
-        proto::GetEditPredictionTypeDefinition {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetEditPredictionTypeDefinition {
+        rpc::proto::GetEditPredictionTypeDefinition {
             project_id,
             buffer_id: buffer.remote_id().into(),
             position: Some(language::proto::serialize_anchor(
@@ -1844,7 +1844,7 @@ impl LspCommand for GetEditPredictionTypeDefinitions {
     }
 
     async fn from_proto(
-        message: proto::GetEditPredictionTypeDefinition,
+        message: rpc::proto::GetEditPredictionTypeDefinition,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -1866,15 +1866,15 @@ impl LspCommand for GetEditPredictionTypeDefinitions {
         _: PeerId,
         _: &clock::Global,
         _: &mut App,
-    ) -> proto::GetEditPredictionTypeDefinitionResponse {
-        proto::GetEditPredictionTypeDefinitionResponse {
+    ) -> rpc::proto::GetEditPredictionTypeDefinitionResponse {
+        rpc::proto::GetEditPredictionTypeDefinitionResponse {
             definitions: edit_prediction_definitions_to_proto(response),
         }
     }
 
     async fn response_from_proto(
         self,
-        message: proto::GetEditPredictionTypeDefinitionResponse,
+        message: rpc::proto::GetEditPredictionTypeDefinitionResponse,
         _: Entity<LspStore>,
         _: Entity<Buffer>,
         _: AsyncApp,
@@ -1882,7 +1882,7 @@ impl LspCommand for GetEditPredictionTypeDefinitions {
         edit_prediction_definitions_from_proto(message.definitions)
     }
 
-    fn buffer_id_from_proto(message: &proto::GetEditPredictionTypeDefinition) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetEditPredictionTypeDefinition) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -1905,7 +1905,7 @@ fn language_server_for_buffer(
 }
 
 pub async fn location_links_from_proto(
-    proto_links: Vec<proto::LocationLink>,
+    proto_links: Vec<rpc::proto::LocationLink>,
     lsp_store: Entity<LspStore>,
     mut cx: AsyncApp,
 ) -> Result<Vec<LocationLink>> {
@@ -1919,7 +1919,7 @@ pub async fn location_links_from_proto(
 }
 
 pub fn location_link_from_proto(
-    link: proto::LocationLink,
+    link: rpc::proto::LocationLink,
     lsp_store: Entity<LspStore>,
     cx: &mut AsyncApp,
 ) -> Task<Result<LocationLink>> {
@@ -2099,8 +2099,8 @@ fn edit_prediction_definitions_from_lsp(
 }
 
 async fn edit_prediction_position_from_proto(
-    position: Option<proto::Anchor>,
-    version: Vec<proto::VectorClockEntry>,
+    position: Option<rpc::proto::Anchor>,
+    version: Vec<rpc::proto::VectorClockEntry>,
     buffer: Entity<Buffer>,
     cx: &mut AsyncApp,
 ) -> Result<PointUtf16> {
@@ -2171,7 +2171,7 @@ pub fn location_links_to_proto(
     lsp_store: &mut LspStore,
     peer_id: PeerId,
     cx: &mut App,
-) -> Vec<proto::LocationLink> {
+) -> Vec<rpc::proto::LocationLink> {
     links
         .into_iter()
         .map(|definition| location_link_to_proto(definition, lsp_store, peer_id, cx))
@@ -2183,7 +2183,7 @@ pub fn location_link_to_proto(
     lsp_store: &mut LspStore,
     peer_id: PeerId,
     cx: &mut App,
-) -> proto::LocationLink {
+) -> rpc::proto::LocationLink {
     let origin = location.origin.map(|origin| {
         lsp_store
             .buffer_store()
@@ -2193,7 +2193,7 @@ pub fn location_link_to_proto(
             .detach_and_log_err(cx);
 
         let buffer_id = origin.buffer.read(cx).remote_id().into();
-        proto::Location {
+        rpc::proto::Location {
             start: Some(serialize_anchor(&origin.range.start)),
             end: Some(serialize_anchor(&origin.range.end)),
             buffer_id,
@@ -2208,13 +2208,13 @@ pub fn location_link_to_proto(
         .detach_and_log_err(cx);
 
     let buffer_id = location.target.buffer.read(cx).remote_id().into();
-    let target = proto::Location {
+    let target = rpc::proto::Location {
         start: Some(serialize_anchor(&location.target.range.start)),
         end: Some(serialize_anchor(&location.target.range.end)),
         buffer_id,
     };
 
-    proto::LocationLink {
+    rpc::proto::LocationLink {
         origin,
         target: Some(target),
     }
@@ -2222,17 +2222,17 @@ pub fn location_link_to_proto(
 
 fn edit_prediction_definitions_to_proto(
     definitions: Vec<EditPredictionDefinition>,
-) -> Vec<proto::EditPredictionDefinition> {
+) -> Vec<rpc::proto::EditPredictionDefinition> {
     definitions
         .into_iter()
-        .map(|definition| proto::EditPredictionDefinition {
+        .map(|definition| rpc::proto::EditPredictionDefinition {
             worktree_id: definition.path.worktree_id.to_proto(),
             path: definition.path.path.as_ref().as_unix_str().to_owned(),
-            start: Some(proto::PointUtf16 {
+            start: Some(rpc::proto::PointUtf16 {
                 row: definition.range.start.0.row,
                 column: definition.range.start.0.column,
             }),
-            end: Some(proto::PointUtf16 {
+            end: Some(rpc::proto::PointUtf16 {
                 row: definition.range.end.0.row,
                 column: definition.range.end.0.column,
             }),
@@ -2241,7 +2241,7 @@ fn edit_prediction_definitions_to_proto(
 }
 
 fn edit_prediction_definitions_from_proto(
-    definitions: Vec<proto::EditPredictionDefinition>,
+    definitions: Vec<rpc::proto::EditPredictionDefinition>,
 ) -> Result<Vec<EditPredictionDefinition>> {
     definitions
         .into_iter()
@@ -2266,7 +2266,7 @@ fn edit_prediction_definitions_from_proto(
 impl LspCommand for GetReferences {
     type Response = Vec<Location>;
     type LspRequest = lsp::request::References;
-    type ProtoRequest = proto::GetReferences;
+    type ProtoRequest = rpc::proto::GetReferences;
 
     fn display_name(&self) -> &str {
         "Find all references"
@@ -2343,8 +2343,8 @@ impl LspCommand for GetReferences {
         Ok(references)
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetReferences {
-        proto::GetReferences {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetReferences {
+        rpc::proto::GetReferences {
             project_id,
             buffer_id: buffer.remote_id().into(),
             position: Some(language::proto::serialize_anchor(
@@ -2355,7 +2355,7 @@ impl LspCommand for GetReferences {
     }
 
     async fn from_proto(
-        message: proto::GetReferences,
+        message: rpc::proto::GetReferences,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -2380,7 +2380,7 @@ impl LspCommand for GetReferences {
         peer_id: PeerId,
         _: &clock::Global,
         cx: &mut App,
-    ) -> proto::GetReferencesResponse {
+    ) -> rpc::proto::GetReferencesResponse {
         let locations = response
             .into_iter()
             .map(|definition| {
@@ -2391,19 +2391,19 @@ impl LspCommand for GetReferences {
                     })
                     .detach_and_log_err(cx);
                 let buffer_id = definition.buffer.read(cx).remote_id();
-                proto::Location {
+                rpc::proto::Location {
                     start: Some(serialize_anchor(&definition.range.start)),
                     end: Some(serialize_anchor(&definition.range.end)),
                     buffer_id: buffer_id.into(),
                 }
             })
             .collect();
-        proto::GetReferencesResponse { locations }
+        rpc::proto::GetReferencesResponse { locations }
     }
 
     async fn response_from_proto(
         self,
-        message: proto::GetReferencesResponse,
+        message: rpc::proto::GetReferencesResponse,
         project: Entity<LspStore>,
         _: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -2435,7 +2435,7 @@ impl LspCommand for GetReferences {
         Ok(locations)
     }
 
-    fn buffer_id_from_proto(message: &proto::GetReferences) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetReferences) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -2444,7 +2444,7 @@ impl LspCommand for GetReferences {
 impl LspCommand for GetDocumentHighlights {
     type Response = Vec<DocumentHighlight>;
     type LspRequest = lsp::request::DocumentHighlightRequest;
-    type ProtoRequest = proto::GetDocumentHighlights;
+    type ProtoRequest = rpc::proto::GetDocumentHighlights;
 
     fn display_name(&self) -> &str {
         "Get document highlights"
@@ -2503,8 +2503,8 @@ impl LspCommand for GetDocumentHighlights {
         }))
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetDocumentHighlights {
-        proto::GetDocumentHighlights {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetDocumentHighlights {
+        rpc::proto::GetDocumentHighlights {
             project_id,
             buffer_id: buffer.remote_id().into(),
             position: Some(language::proto::serialize_anchor(
@@ -2515,7 +2515,7 @@ impl LspCommand for GetDocumentHighlights {
     }
 
     async fn from_proto(
-        message: proto::GetDocumentHighlights,
+        message: rpc::proto::GetDocumentHighlights,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -2540,26 +2540,26 @@ impl LspCommand for GetDocumentHighlights {
         _: PeerId,
         _: &clock::Global,
         _: &mut App,
-    ) -> proto::GetDocumentHighlightsResponse {
+    ) -> rpc::proto::GetDocumentHighlightsResponse {
         let highlights = response
             .into_iter()
-            .map(|highlight| proto::DocumentHighlight {
+            .map(|highlight| rpc::proto::DocumentHighlight {
                 start: Some(serialize_anchor(&highlight.range.start)),
                 end: Some(serialize_anchor(&highlight.range.end)),
                 kind: match highlight.kind {
-                    DocumentHighlightKind::TEXT => proto::document_highlight::Kind::Text.into(),
-                    DocumentHighlightKind::WRITE => proto::document_highlight::Kind::Write.into(),
-                    DocumentHighlightKind::READ => proto::document_highlight::Kind::Read.into(),
-                    _ => proto::document_highlight::Kind::Text.into(),
+                    DocumentHighlightKind::TEXT => rpc::proto::document_highlight::Kind::Text.into(),
+                    DocumentHighlightKind::WRITE => rpc::proto::document_highlight::Kind::Write.into(),
+                    DocumentHighlightKind::READ => rpc::proto::document_highlight::Kind::Read.into(),
+                    _ => rpc::proto::document_highlight::Kind::Text.into(),
                 },
             })
             .collect();
-        proto::GetDocumentHighlightsResponse { highlights }
+        rpc::proto::GetDocumentHighlightsResponse { highlights }
     }
 
     async fn response_from_proto(
         self,
-        message: proto::GetDocumentHighlightsResponse,
+        message: rpc::proto::GetDocumentHighlightsResponse,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -2577,10 +2577,10 @@ impl LspCommand for GetDocumentHighlights {
             buffer
                 .update(&mut cx, |buffer, _| buffer.wait_for_anchors([start, end]))
                 .await?;
-            let kind = match proto::document_highlight::Kind::try_from(highlight.kind).ok() {
-                Some(proto::document_highlight::Kind::Text) => DocumentHighlightKind::TEXT,
-                Some(proto::document_highlight::Kind::Read) => DocumentHighlightKind::READ,
-                Some(proto::document_highlight::Kind::Write) => DocumentHighlightKind::WRITE,
+            let kind = match rpc::proto::document_highlight::Kind::try_from(highlight.kind).ok() {
+                Some(rpc::proto::document_highlight::Kind::Text) => DocumentHighlightKind::TEXT,
+                Some(rpc::proto::document_highlight::Kind::Read) => DocumentHighlightKind::READ,
+                Some(rpc::proto::document_highlight::Kind::Write) => DocumentHighlightKind::WRITE,
                 None => DocumentHighlightKind::TEXT,
             };
             highlights.push(DocumentHighlight {
@@ -2591,7 +2591,7 @@ impl LspCommand for GetDocumentHighlights {
         Ok(highlights)
     }
 
-    fn buffer_id_from_proto(message: &proto::GetDocumentHighlights) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetDocumentHighlights) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -2600,7 +2600,7 @@ impl LspCommand for GetDocumentHighlights {
 impl LspCommand for GetDocumentSymbols {
     type Response = Vec<DocumentSymbol>;
     type LspRequest = lsp::request::DocumentSymbolRequest;
-    type ProtoRequest = proto::GetDocumentSymbols;
+    type ProtoRequest = rpc::proto::GetDocumentSymbols;
 
     fn display_name(&self) -> &str {
         "Get document symbols"
@@ -2675,8 +2675,8 @@ impl LspCommand for GetDocumentSymbols {
         Ok(symbols)
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetDocumentSymbols {
-        proto::GetDocumentSymbols {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetDocumentSymbols {
+        rpc::proto::GetDocumentSymbols {
             project_id,
             buffer_id: buffer.remote_id().into(),
             version: serialize_version(&buffer.version()),
@@ -2684,7 +2684,7 @@ impl LspCommand for GetDocumentSymbols {
     }
 
     async fn from_proto(
-        message: proto::GetDocumentSymbols,
+        message: rpc::proto::GetDocumentSymbols,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -2703,27 +2703,27 @@ impl LspCommand for GetDocumentSymbols {
         _: PeerId,
         _: &clock::Global,
         _: &mut App,
-    ) -> proto::GetDocumentSymbolsResponse {
+    ) -> rpc::proto::GetDocumentSymbolsResponse {
         let symbols = response
             .into_iter()
             .map(|symbol| {
-                fn convert_symbol_to_proto(symbol: DocumentSymbol) -> proto::DocumentSymbol {
-                    proto::DocumentSymbol {
+                fn convert_symbol_to_proto(symbol: DocumentSymbol) -> rpc::proto::DocumentSymbol {
+                    rpc::proto::DocumentSymbol {
                         name: symbol.name.clone(),
                         kind: symbol.kind.to_proto(),
-                        start: Some(proto::PointUtf16 {
+                        start: Some(rpc::proto::PointUtf16 {
                             row: symbol.range.start.0.row,
                             column: symbol.range.start.0.column,
                         }),
-                        end: Some(proto::PointUtf16 {
+                        end: Some(rpc::proto::PointUtf16 {
                             row: symbol.range.end.0.row,
                             column: symbol.range.end.0.column,
                         }),
-                        selection_start: Some(proto::PointUtf16 {
+                        selection_start: Some(rpc::proto::PointUtf16 {
                             row: symbol.selection_range.start.0.row,
                             column: symbol.selection_range.start.0.column,
                         }),
-                        selection_end: Some(proto::PointUtf16 {
+                        selection_end: Some(rpc::proto::PointUtf16 {
                             row: symbol.selection_range.end.0.row,
                             column: symbol.selection_range.end.0.column,
                         }),
@@ -2738,12 +2738,12 @@ impl LspCommand for GetDocumentSymbols {
             })
             .collect::<Vec<_>>();
 
-        proto::GetDocumentSymbolsResponse { symbols }
+        rpc::proto::GetDocumentSymbolsResponse { symbols }
     }
 
     async fn response_from_proto(
         self,
-        message: proto::GetDocumentSymbolsResponse,
+        message: rpc::proto::GetDocumentSymbolsResponse,
         _: Entity<LspStore>,
         _: Entity<Buffer>,
         _: AsyncApp,
@@ -2751,7 +2751,7 @@ impl LspCommand for GetDocumentSymbols {
         let mut symbols = Vec::with_capacity(message.symbols.len());
         for serialized_symbol in message.symbols {
             fn deserialize_symbol_with_children(
-                serialized_symbol: proto::DocumentSymbol,
+                serialized_symbol: rpc::proto::DocumentSymbol,
             ) -> Result<DocumentSymbol> {
                 let kind = language::SymbolKind::from_proto(serialized_symbol.kind);
 
@@ -2789,7 +2789,7 @@ impl LspCommand for GetDocumentSymbols {
         Ok(symbols)
     }
 
-    fn buffer_id_from_proto(message: &proto::GetDocumentSymbols) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetDocumentSymbols) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -2798,7 +2798,7 @@ impl LspCommand for GetDocumentSymbols {
 impl LspCommand for GetSignatureHelp {
     type Response = Option<SignatureHelp>;
     type LspRequest = lsp::SignatureHelpRequest;
-    type ProtoRequest = proto::GetSignatureHelp;
+    type ProtoRequest = rpc::proto::GetSignatureHelp;
 
     fn display_name(&self) -> &str {
         "Get signature help"
@@ -2848,7 +2848,7 @@ impl LspCommand for GetSignatureHelp {
 
     fn to_proto(&self, project_id: u64, buffer: &Buffer) -> Self::ProtoRequest {
         let offset = buffer.point_utf16_to_offset(self.position);
-        proto::GetSignatureHelp {
+        rpc::proto::GetSignatureHelp {
             project_id,
             buffer_id: buffer.remote_id().to_proto(),
             position: Some(serialize_anchor(&buffer.anchor_after(offset))),
@@ -2884,8 +2884,8 @@ impl LspCommand for GetSignatureHelp {
         _: PeerId,
         _: &Global,
         _: &mut App,
-    ) -> proto::GetSignatureHelpResponse {
-        proto::GetSignatureHelpResponse {
+    ) -> rpc::proto::GetSignatureHelpResponse {
+        rpc::proto::GetSignatureHelpResponse {
             signature_help: response
                 .map(|signature_help| lsp_to_proto_signature(signature_help.original_data)),
         }
@@ -2893,7 +2893,7 @@ impl LspCommand for GetSignatureHelp {
 
     async fn response_from_proto(
         self,
-        response: proto::GetSignatureHelpResponse,
+        response: rpc::proto::GetSignatureHelpResponse,
         lsp_store: Entity<LspStore>,
         _: Entity<Buffer>,
         cx: AsyncApp,
@@ -2922,7 +2922,7 @@ impl LspCommand for GetSignatureHelp {
 impl LspCommand for GetHover {
     type Response = Option<Hover>;
     type LspRequest = lsp::request::HoverRequest;
-    type ProtoRequest = proto::GetHover;
+    type ProtoRequest = rpc::proto::GetHover;
 
     fn display_name(&self) -> &str {
         "Get hover"
@@ -3021,7 +3021,7 @@ impl LspCommand for GetHover {
     }
 
     fn to_proto(&self, project_id: u64, buffer: &Buffer) -> Self::ProtoRequest {
-        proto::GetHover {
+        rpc::proto::GetHover {
             project_id,
             buffer_id: buffer.remote_id().into(),
             position: Some(language::proto::serialize_anchor(
@@ -3057,7 +3057,7 @@ impl LspCommand for GetHover {
         _: PeerId,
         _: &clock::Global,
         _: &mut App,
-    ) -> proto::GetHoverResponse {
+    ) -> rpc::proto::GetHoverResponse {
         if let Some(response) = response {
             let (start, end) = if let Some(range) = response.range {
                 (
@@ -3071,7 +3071,7 @@ impl LspCommand for GetHover {
             let contents = response
                 .contents
                 .into_iter()
-                .map(|block| proto::HoverBlock {
+                .map(|block| rpc::proto::HoverBlock {
                     text: block.text,
                     is_markdown: block.kind == HoverBlockKind::Markdown,
                     language: if let HoverBlockKind::Code { language } = block.kind {
@@ -3082,13 +3082,13 @@ impl LspCommand for GetHover {
                 })
                 .collect();
 
-            proto::GetHoverResponse {
+            rpc::proto::GetHoverResponse {
                 start,
                 end,
                 contents,
             }
         } else {
-            proto::GetHoverResponse {
+            rpc::proto::GetHoverResponse {
                 start: None,
                 end: None,
                 contents: Vec::new(),
@@ -3098,7 +3098,7 @@ impl LspCommand for GetHover {
 
     async fn response_from_proto(
         self,
-        message: proto::GetHoverResponse,
+        message: rpc::proto::GetHoverResponse,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -3162,7 +3162,7 @@ impl GetCompletions {
 impl LspCommand for GetCompletions {
     type Response = CoreCompletionResponse;
     type LspRequest = lsp::request::Completion;
-    type ProtoRequest = proto::GetCompletions;
+    type ProtoRequest = rpc::proto::GetCompletions;
 
     fn display_name(&self) -> &str {
         "Get completion"
@@ -3381,9 +3381,9 @@ impl LspCommand for GetCompletions {
         })
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetCompletions {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetCompletions {
         let anchor = buffer.anchor_after(self.position);
-        proto::GetCompletions {
+        rpc::proto::GetCompletions {
             project_id,
             buffer_id: buffer.remote_id().into(),
             position: Some(language::proto::serialize_anchor(&anchor)),
@@ -3393,7 +3393,7 @@ impl LspCommand for GetCompletions {
     }
 
     async fn from_proto(
-        message: proto::GetCompletions,
+        message: rpc::proto::GetCompletions,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -3429,8 +3429,8 @@ impl LspCommand for GetCompletions {
         _: PeerId,
         buffer_version: &clock::Global,
         _: &mut App,
-    ) -> proto::GetCompletionsResponse {
-        proto::GetCompletionsResponse {
+    ) -> rpc::proto::GetCompletionsResponse {
+        rpc::proto::GetCompletionsResponse {
             completions: response
                 .completions
                 .iter()
@@ -3443,7 +3443,7 @@ impl LspCommand for GetCompletions {
 
     async fn response_from_proto(
         self,
-        message: proto::GetCompletionsResponse,
+        message: rpc::proto::GetCompletionsResponse,
         _project: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -3466,7 +3466,7 @@ impl LspCommand for GetCompletions {
         })
     }
 
-    fn buffer_id_from_proto(message: &proto::GetCompletions) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetCompletions) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -3526,7 +3526,7 @@ pub(crate) fn parse_completion_text_edit(
 impl LspCommand for GetCodeActions {
     type Response = Vec<CodeAction>;
     type LspRequest = lsp::request::CodeActionRequest;
-    type ProtoRequest = proto::GetCodeActions;
+    type ProtoRequest = rpc::proto::GetCodeActions;
 
     fn display_name(&self) -> &str {
         "Get code actions"
@@ -3662,8 +3662,8 @@ impl LspCommand for GetCodeActions {
             .collect())
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetCodeActions {
-        proto::GetCodeActions {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetCodeActions {
+        rpc::proto::GetCodeActions {
             project_id,
             buffer_id: buffer.remote_id().into(),
             start: Some(language::proto::serialize_anchor(&self.range.start)),
@@ -3673,7 +3673,7 @@ impl LspCommand for GetCodeActions {
     }
 
     async fn from_proto(
-        message: proto::GetCodeActions,
+        message: rpc::proto::GetCodeActions,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -3704,8 +3704,8 @@ impl LspCommand for GetCodeActions {
         _: PeerId,
         buffer_version: &clock::Global,
         _: &mut App,
-    ) -> proto::GetCodeActionsResponse {
-        proto::GetCodeActionsResponse {
+    ) -> rpc::proto::GetCodeActionsResponse {
+        rpc::proto::GetCodeActionsResponse {
             actions: code_actions
                 .iter()
                 .map(LspStore::serialize_code_action)
@@ -3716,7 +3716,7 @@ impl LspCommand for GetCodeActions {
 
     async fn response_from_proto(
         self,
-        message: proto::GetCodeActionsResponse,
+        message: rpc::proto::GetCodeActionsResponse,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -3733,7 +3733,7 @@ impl LspCommand for GetCodeActions {
             .collect()
     }
 
-    fn buffer_id_from_proto(message: &proto::GetCodeActions) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetCodeActions) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -3788,7 +3788,7 @@ impl OnTypeFormatting {
 impl LspCommand for OnTypeFormatting {
     type Response = Option<Transaction>;
     type LspRequest = lsp::request::OnTypeFormatting;
-    type ProtoRequest = proto::OnTypeFormatting;
+    type ProtoRequest = rpc::proto::OnTypeFormatting;
 
     fn display_name(&self) -> &str {
         "Formatting on typing"
@@ -3838,8 +3838,8 @@ impl LspCommand for OnTypeFormatting {
         }
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::OnTypeFormatting {
-        proto::OnTypeFormatting {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::OnTypeFormatting {
+        rpc::proto::OnTypeFormatting {
             project_id,
             buffer_id: buffer.remote_id().into(),
             position: Some(language::proto::serialize_anchor(
@@ -3851,7 +3851,7 @@ impl LspCommand for OnTypeFormatting {
     }
 
     async fn from_proto(
-        message: proto::OnTypeFormatting,
+        message: rpc::proto::OnTypeFormatting,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -3884,8 +3884,8 @@ impl LspCommand for OnTypeFormatting {
         _: PeerId,
         _: &clock::Global,
         _: &mut App,
-    ) -> proto::OnTypeFormattingResponse {
-        proto::OnTypeFormattingResponse {
+    ) -> rpc::proto::OnTypeFormattingResponse {
+        rpc::proto::OnTypeFormattingResponse {
             transaction: response
                 .map(|transaction| language::proto::serialize_transaction(&transaction)),
         }
@@ -3893,7 +3893,7 @@ impl LspCommand for OnTypeFormatting {
 
     async fn response_from_proto(
         self,
-        message: proto::OnTypeFormattingResponse,
+        message: rpc::proto::OnTypeFormattingResponse,
         _: Entity<LspStore>,
         _: Entity<Buffer>,
         _: AsyncApp,
@@ -3904,7 +3904,7 @@ impl LspCommand for OnTypeFormatting {
         Ok(Some(language::proto::deserialize_transaction(transaction)?))
     }
 
-    fn buffer_id_from_proto(message: &proto::OnTypeFormatting) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::OnTypeFormatting) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -3999,13 +3999,13 @@ impl InlayHints {
         Ok(label)
     }
 
-    pub fn project_to_proto_hint(response_hint: InlayHint) -> proto::InlayHint {
+    pub fn project_to_proto_hint(response_hint: InlayHint) -> rpc::proto::InlayHint {
         let position = response_hint.position;
         let (state, lsp_resolve_state) = match response_hint.resolve_state {
             ResolveState::Resolved => (0, None),
             ResolveState::CanResolve(server_id, resolve_data) => (
                 1,
-                Some(proto::resolve_state::LspResolveState {
+                Some(rpc::proto::resolve_state::LspResolveState {
                     server_id: server_id.0 as u64,
                     value: resolve_data.map(|json_data| {
                         serde_json::to_string(&json_data)
@@ -4015,34 +4015,34 @@ impl InlayHints {
             ),
             ResolveState::Resolving => (2, None),
         };
-        let resolve_state = Some(proto::ResolveState {
+        let resolve_state = Some(rpc::proto::ResolveState {
             state,
             lsp_resolve_state,
         });
-        proto::InlayHint {
+        rpc::proto::InlayHint {
             position: Some(language::proto::serialize_anchor(&response_hint.position)),
             padding_left: response_hint.padding_left,
             padding_right: response_hint.padding_right,
-            label: Some(proto::InlayHintLabel {
+            label: Some(rpc::proto::InlayHintLabel {
                 label: Some(match response_hint.label {
-                    InlayHintLabel::String(s) => proto::inlay_hint_label::Label::Value(s),
+                    InlayHintLabel::String(s) => rpc::proto::inlay_hint_label::Label::Value(s),
                     InlayHintLabel::LabelParts(label_parts) => {
-                        proto::inlay_hint_label::Label::LabelParts(proto::InlayHintLabelParts {
+                        rpc::proto::inlay_hint_label::Label::LabelParts(rpc::proto::InlayHintLabelParts {
                             parts: label_parts.into_iter().map(|label_part| {
                                 let location_url = label_part.location.as_ref().map(|(_, location)| location.uri.to_string());
-                                let location_range_start = label_part.location.as_ref().map(|(_, location)| point_from_lsp(location.range.start).0).map(|point| proto::PointUtf16 { row: point.row, column: point.column });
-                                let location_range_end = label_part.location.as_ref().map(|(_, location)| point_from_lsp(location.range.end).0).map(|point| proto::PointUtf16 { row: point.row, column: point.column });
-                                proto::InlayHintLabelPart {
+                                let location_range_start = label_part.location.as_ref().map(|(_, location)| point_from_lsp(location.range.start).0).map(|point| rpc::proto::PointUtf16 { row: point.row, column: point.column });
+                                let location_range_end = label_part.location.as_ref().map(|(_, location)| point_from_lsp(location.range.end).0).map(|point| rpc::proto::PointUtf16 { row: point.row, column: point.column });
+                                rpc::proto::InlayHintLabelPart {
                                 value: label_part.value,
                                 tooltip: label_part.tooltip.map(|tooltip| {
                                     let proto_tooltip = match tooltip {
-                                        InlayHintLabelPartTooltip::String(s) => proto::inlay_hint_label_part_tooltip::Content::Value(s),
-                                        InlayHintLabelPartTooltip::MarkupContent(markup_content) => proto::inlay_hint_label_part_tooltip::Content::MarkupContent(proto::MarkupContent {
+                                        InlayHintLabelPartTooltip::String(s) => rpc::proto::inlay_hint_label_part_tooltip::Content::Value(s),
+                                        InlayHintLabelPartTooltip::MarkupContent(markup_content) => rpc::proto::inlay_hint_label_part_tooltip::Content::MarkupContent(rpc::proto::MarkupContent {
                                             is_markdown: markup_content.kind == HoverBlockKind::Markdown,
                                             value: markup_content.value,
                                         }),
                                     };
-                                    proto::InlayHintLabelPartTooltip {content: Some(proto_tooltip)}
+                                    rpc::proto::InlayHintLabelPartTooltip {content: Some(proto_tooltip)}
                                 }),
                                 location_url,
                                 location_range_start,
@@ -4062,15 +4062,15 @@ impl InlayHints {
             kind: response_hint.kind.map(|kind| kind.name().to_string()),
             tooltip: response_hint.tooltip.map(|response_tooltip| {
                 let proto_tooltip = match response_tooltip {
-                    InlayHintTooltip::String(s) => proto::inlay_hint_tooltip::Content::Value(s),
+                    InlayHintTooltip::String(s) => rpc::proto::inlay_hint_tooltip::Content::Value(s),
                     InlayHintTooltip::MarkupContent(markup_content) => {
-                        proto::inlay_hint_tooltip::Content::MarkupContent(proto::MarkupContent {
+                        rpc::proto::inlay_hint_tooltip::Content::MarkupContent(rpc::proto::MarkupContent {
                             is_markdown: markup_content.kind == HoverBlockKind::Markdown,
                             value: markup_content.value,
                         })
                     }
                 };
-                proto::InlayHintTooltip {
+                rpc::proto::InlayHintTooltip {
                     content: Some(proto_tooltip),
                 }
             }),
@@ -4078,7 +4078,7 @@ impl InlayHints {
         }
     }
 
-    pub fn proto_to_project_hint(message_hint: proto::InlayHint) -> anyhow::Result<InlayHint> {
+    pub fn proto_to_project_hint(message_hint: rpc::proto::InlayHint) -> anyhow::Result<InlayHint> {
         let resolve_state = message_hint.resolve_state.as_ref().unwrap_or_else(|| {
             panic!("incorrect proto inlay hint message: no resolve state in hint {message_hint:?}",)
         });
@@ -4117,18 +4117,18 @@ impl InlayHints {
                 .and_then(|label| label.label)
                 .context("missing label")?
             {
-                proto::inlay_hint_label::Label::Value(s) => InlayHintLabel::String(s),
-                proto::inlay_hint_label::Label::LabelParts(parts) => {
+                rpc::proto::inlay_hint_label::Label::Value(s) => InlayHintLabel::String(s),
+                rpc::proto::inlay_hint_label::Label::LabelParts(parts) => {
                     let mut label_parts = Vec::new();
                     for part in parts.parts {
                         label_parts.push(InlayHintLabelPart {
                             value: part.value,
                             tooltip: part.tooltip.map(|tooltip| match tooltip.content {
-                                Some(proto::inlay_hint_label_part_tooltip::Content::Value(s)) => {
+                                Some(rpc::proto::inlay_hint_label_part_tooltip::Content::Value(s)) => {
                                     InlayHintLabelPartTooltip::String(s)
                                 }
                                 Some(
-                                    proto::inlay_hint_label_part_tooltip::Content::MarkupContent(
+                                    rpc::proto::inlay_hint_label_part_tooltip::Content::MarkupContent(
                                         markup_content,
                                     ),
                                 ) => InlayHintLabelPartTooltip::MarkupContent(MarkupContent {
@@ -4203,8 +4203,8 @@ impl InlayHints {
                 .and_then(InlayHintKind::from_name),
             tooltip: message_hint.tooltip.and_then(|tooltip| {
                 Some(match tooltip.content? {
-                    proto::inlay_hint_tooltip::Content::Value(s) => InlayHintTooltip::String(s),
-                    proto::inlay_hint_tooltip::Content::MarkupContent(markup_content) => {
+                    rpc::proto::inlay_hint_tooltip::Content::Value(s) => InlayHintTooltip::String(s),
+                    rpc::proto::inlay_hint_tooltip::Content::MarkupContent(markup_content) => {
                         InlayHintTooltip::MarkupContent(MarkupContent {
                             kind: if markup_content.is_markdown {
                                 HoverBlockKind::Markdown
@@ -4319,7 +4319,7 @@ impl InlayHints {
 impl LspCommand for InlayHints {
     type Response = Vec<InlayHint>;
     type LspRequest = lsp::InlayHintRequest;
-    type ProtoRequest = proto::InlayHints;
+    type ProtoRequest = rpc::proto::InlayHints;
 
     fn display_name(&self) -> &str {
         "Inlay hints"
@@ -4401,8 +4401,8 @@ impl LspCommand for InlayHints {
             .context("lsp to project inlay hints conversion")
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::InlayHints {
-        proto::InlayHints {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::InlayHints {
+        rpc::proto::InlayHints {
             project_id,
             buffer_id: buffer.remote_id().into(),
             start: Some(language::proto::serialize_anchor(&self.range.start)),
@@ -4412,7 +4412,7 @@ impl LspCommand for InlayHints {
     }
 
     async fn from_proto(
-        message: proto::InlayHints,
+        message: rpc::proto::InlayHints,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -4440,8 +4440,8 @@ impl LspCommand for InlayHints {
         _: PeerId,
         buffer_version: &clock::Global,
         _: &mut App,
-    ) -> proto::InlayHintsResponse {
-        proto::InlayHintsResponse {
+    ) -> rpc::proto::InlayHintsResponse {
+        rpc::proto::InlayHintsResponse {
             hints: response
                 .into_iter()
                 .map(InlayHints::project_to_proto_hint)
@@ -4452,7 +4452,7 @@ impl LspCommand for InlayHints {
 
     async fn response_from_proto(
         self,
-        message: proto::InlayHintsResponse,
+        message: rpc::proto::InlayHintsResponse,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -4471,7 +4471,7 @@ impl LspCommand for InlayHints {
         Ok(hints)
     }
 
-    fn buffer_id_from_proto(message: &proto::InlayHints) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::InlayHints) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -4480,7 +4480,7 @@ impl LspCommand for InlayHints {
 impl LspCommand for SemanticTokensFull {
     type Response = SemanticTokensResponse;
     type LspRequest = lsp::SemanticTokensFullRequest;
-    type ProtoRequest = proto::SemanticTokens;
+    type ProtoRequest = rpc::proto::SemanticTokens;
 
     fn display_name(&self) -> &str {
         "Semantic tokens full"
@@ -4545,8 +4545,8 @@ impl LspCommand for SemanticTokensFull {
         }
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::SemanticTokens {
-        proto::SemanticTokens {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::SemanticTokens {
+        rpc::proto::SemanticTokens {
             project_id,
             buffer_id: buffer.remote_id().into(),
             version: serialize_version(&buffer.version()),
@@ -4555,7 +4555,7 @@ impl LspCommand for SemanticTokensFull {
     }
 
     async fn from_proto(
-        message: proto::SemanticTokens,
+        message: rpc::proto::SemanticTokens,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -4579,19 +4579,19 @@ impl LspCommand for SemanticTokensFull {
         _: PeerId,
         buffer_version: &clock::Global,
         _: &mut App,
-    ) -> proto::SemanticTokensResponse {
+    ) -> rpc::proto::SemanticTokensResponse {
         match response {
-            SemanticTokensResponse::Full { data, result_id } => proto::SemanticTokensResponse {
+            SemanticTokensResponse::Full { data, result_id } => rpc::proto::SemanticTokensResponse {
                 data,
                 edits: Vec::new(),
                 result_id: result_id.map(|s| s.to_string()),
                 version: serialize_version(buffer_version),
             },
-            SemanticTokensResponse::Delta { edits, result_id } => proto::SemanticTokensResponse {
+            SemanticTokensResponse::Delta { edits, result_id } => rpc::proto::SemanticTokensResponse {
                 data: Vec::new(),
                 edits: edits
                     .into_iter()
-                    .map(|edit| proto::SemanticTokensEdit {
+                    .map(|edit| rpc::proto::SemanticTokensEdit {
                         start: edit.start,
                         delete_count: edit.delete_count,
                         data: edit.data,
@@ -4605,7 +4605,7 @@ impl LspCommand for SemanticTokensFull {
 
     async fn response_from_proto(
         self,
-        message: proto::SemanticTokensResponse,
+        message: rpc::proto::SemanticTokensResponse,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -4622,7 +4622,7 @@ impl LspCommand for SemanticTokensFull {
         })
     }
 
-    fn buffer_id_from_proto(message: &proto::SemanticTokens) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::SemanticTokens) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -4631,7 +4631,7 @@ impl LspCommand for SemanticTokensFull {
 impl LspCommand for SemanticTokensDelta {
     type Response = SemanticTokensResponse;
     type LspRequest = lsp::SemanticTokensFullDeltaRequest;
-    type ProtoRequest = proto::SemanticTokens;
+    type ProtoRequest = rpc::proto::SemanticTokens;
 
     fn display_name(&self) -> &str {
         "Semantic tokens delta"
@@ -4713,12 +4713,12 @@ impl LspCommand for SemanticTokensDelta {
         }
     }
 
-    fn to_proto(&self, _: u64, _: &Buffer) -> proto::SemanticTokens {
+    fn to_proto(&self, _: u64, _: &Buffer) -> rpc::proto::SemanticTokens {
         unimplemented!("Delta requests are never initialted on the remote client side")
     }
 
     async fn from_proto(
-        _: proto::SemanticTokens,
+        _: rpc::proto::SemanticTokens,
         _: Entity<LspStore>,
         _: Entity<Buffer>,
         _: AsyncApp,
@@ -4732,19 +4732,19 @@ impl LspCommand for SemanticTokensDelta {
         _: PeerId,
         buffer_version: &clock::Global,
         _: &mut App,
-    ) -> proto::SemanticTokensResponse {
+    ) -> rpc::proto::SemanticTokensResponse {
         match response {
-            SemanticTokensResponse::Full { data, result_id } => proto::SemanticTokensResponse {
+            SemanticTokensResponse::Full { data, result_id } => rpc::proto::SemanticTokensResponse {
                 data,
                 edits: Vec::new(),
                 result_id: result_id.map(|s| s.to_string()),
                 version: serialize_version(buffer_version),
             },
-            SemanticTokensResponse::Delta { edits, result_id } => proto::SemanticTokensResponse {
+            SemanticTokensResponse::Delta { edits, result_id } => rpc::proto::SemanticTokensResponse {
                 data: Vec::new(),
                 edits: edits
                     .into_iter()
-                    .map(|edit| proto::SemanticTokensEdit {
+                    .map(|edit| rpc::proto::SemanticTokensEdit {
                         start: edit.start,
                         delete_count: edit.delete_count,
                         data: edit.data,
@@ -4758,7 +4758,7 @@ impl LspCommand for SemanticTokensDelta {
 
     async fn response_from_proto(
         self,
-        message: proto::SemanticTokensResponse,
+        message: rpc::proto::SemanticTokensResponse,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -4775,7 +4775,7 @@ impl LspCommand for SemanticTokensDelta {
         })
     }
 
-    fn buffer_id_from_proto(message: &proto::SemanticTokens) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::SemanticTokens) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -4784,7 +4784,7 @@ impl LspCommand for SemanticTokensDelta {
 impl LspCommand for GetCodeLens {
     type Response = Vec<CodeAction>;
     type LspRequest = lsp::CodeLensRequest;
-    type ProtoRequest = proto::GetCodeLens;
+    type ProtoRequest = rpc::proto::GetCodeLens;
 
     fn display_name(&self) -> &str {
         "Code Lens"
@@ -4842,8 +4842,8 @@ impl LspCommand for GetCodeLens {
             .collect())
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetCodeLens {
-        proto::GetCodeLens {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetCodeLens {
+        rpc::proto::GetCodeLens {
             project_id,
             buffer_id: buffer.remote_id().into(),
             version: serialize_version(&buffer.version()),
@@ -4851,7 +4851,7 @@ impl LspCommand for GetCodeLens {
     }
 
     async fn from_proto(
-        message: proto::GetCodeLens,
+        message: rpc::proto::GetCodeLens,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -4870,8 +4870,8 @@ impl LspCommand for GetCodeLens {
         _: PeerId,
         buffer_version: &clock::Global,
         _: &mut App,
-    ) -> proto::GetCodeLensResponse {
-        proto::GetCodeLensResponse {
+    ) -> rpc::proto::GetCodeLensResponse {
+        rpc::proto::GetCodeLensResponse {
             lens_actions: response
                 .iter()
                 .map(LspStore::serialize_code_action)
@@ -4882,7 +4882,7 @@ impl LspCommand for GetCodeLens {
 
     async fn response_from_proto(
         self,
-        message: proto::GetCodeLensResponse,
+        message: rpc::proto::GetCodeLensResponse,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -4900,7 +4900,7 @@ impl LspCommand for GetCodeLens {
             .context("deserializing proto code lens response")
     }
 
-    fn buffer_id_from_proto(message: &proto::GetCodeLens) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetCodeLens) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -4922,7 +4922,7 @@ impl LinkedEditingRange {
 impl LspCommand for LinkedEditingRange {
     type Response = Vec<Range<Anchor>>;
     type LspRequest = lsp::request::LinkedEditingRange;
-    type ProtoRequest = proto::LinkedEditingRange;
+    type ProtoRequest = rpc::proto::LinkedEditingRange;
 
     fn display_name(&self) -> &str {
         "Linked editing range"
@@ -4973,8 +4973,8 @@ impl LspCommand for LinkedEditingRange {
         }
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::LinkedEditingRange {
-        proto::LinkedEditingRange {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::LinkedEditingRange {
+        rpc::proto::LinkedEditingRange {
             project_id,
             buffer_id: buffer.remote_id().to_proto(),
             position: Some(serialize_anchor(&self.position)),
@@ -4983,7 +4983,7 @@ impl LspCommand for LinkedEditingRange {
     }
 
     async fn from_proto(
-        message: proto::LinkedEditingRange,
+        message: rpc::proto::LinkedEditingRange,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -5007,11 +5007,11 @@ impl LspCommand for LinkedEditingRange {
         _: PeerId,
         buffer_version: &clock::Global,
         _: &mut App,
-    ) -> proto::LinkedEditingRangeResponse {
-        proto::LinkedEditingRangeResponse {
+    ) -> rpc::proto::LinkedEditingRangeResponse {
+        rpc::proto::LinkedEditingRangeResponse {
             items: response
                 .into_iter()
-                .map(|range| proto::AnchorRange {
+                .map(|range| rpc::proto::AnchorRange {
                     start: Some(serialize_anchor(&range.start)),
                     end: Some(serialize_anchor(&range.end)),
                 })
@@ -5022,7 +5022,7 @@ impl LspCommand for LinkedEditingRange {
 
     async fn response_from_proto(
         self,
-        message: proto::LinkedEditingRangeResponse,
+        message: rpc::proto::LinkedEditingRangeResponse,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -5051,14 +5051,14 @@ impl LspCommand for LinkedEditingRange {
         Ok(items)
     }
 
-    fn buffer_id_from_proto(message: &proto::LinkedEditingRange) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::LinkedEditingRange) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
 
 impl GetDocumentDiagnostics {
     pub fn diagnostics_from_proto(
-        response: proto::GetDocumentDiagnosticsResponse,
+        response: rpc::proto::GetDocumentDiagnosticsResponse,
     ) -> Vec<LspPullDiagnostics> {
         response
             .pulled_diagnostics
@@ -5091,7 +5091,7 @@ impl GetDocumentDiagnostics {
             .collect()
     }
 
-    pub fn deserialize_lsp_diagnostic(diagnostic: proto::LspDiagnostic) -> Result<lsp::Diagnostic> {
+    pub fn deserialize_lsp_diagnostic(diagnostic: rpc::proto::LspDiagnostic) -> Result<lsp::Diagnostic> {
         let start = diagnostic.start.context("invalid start range")?;
         let end = diagnostic.end.context("invalid end range")?;
 
@@ -5132,9 +5132,9 @@ impl GetDocumentDiagnostics {
         let tags = diagnostic
             .tags
             .into_iter()
-            .filter_map(|tag| match proto::LspDiagnosticTag::try_from(tag).ok() {
-                Some(proto::LspDiagnosticTag::Unnecessary) => Some(lsp::DiagnosticTag::UNNECESSARY),
-                Some(proto::LspDiagnosticTag::Deprecated) => Some(lsp::DiagnosticTag::DEPRECATED),
+            .filter_map(|tag| match rpc::proto::LspDiagnosticTag::try_from(tag).ok() {
+                Some(rpc::proto::LspDiagnosticTag::Unnecessary) => Some(lsp::DiagnosticTag::UNNECESSARY),
+                Some(rpc::proto::LspDiagnosticTag::Deprecated) => Some(lsp::DiagnosticTag::DEPRECATED),
                 _ => None,
             })
             .collect::<Vec<_>>();
@@ -5152,16 +5152,16 @@ impl GetDocumentDiagnostics {
 
         Ok(lsp::Diagnostic {
             range: language::range_to_lsp(range)?,
-            severity: match proto::lsp_diagnostic::Severity::try_from(diagnostic.severity)
+            severity: match rpc::proto::lsp_diagnostic::Severity::try_from(diagnostic.severity)
                 .ok()
                 .unwrap()
             {
-                proto::lsp_diagnostic::Severity::Error => Some(lsp::DiagnosticSeverity::ERROR),
-                proto::lsp_diagnostic::Severity::Warning => Some(lsp::DiagnosticSeverity::WARNING),
-                proto::lsp_diagnostic::Severity::Information => {
+                rpc::proto::lsp_diagnostic::Severity::Error => Some(lsp::DiagnosticSeverity::ERROR),
+                rpc::proto::lsp_diagnostic::Severity::Warning => Some(lsp::DiagnosticSeverity::WARNING),
+                rpc::proto::lsp_diagnostic::Severity::Information => {
                     Some(lsp::DiagnosticSeverity::INFORMATION)
                 }
-                proto::lsp_diagnostic::Severity::Hint => Some(lsp::DiagnosticSeverity::HINT),
+                rpc::proto::lsp_diagnostic::Severity::Hint => Some(lsp::DiagnosticSeverity::HINT),
                 _ => None,
             },
             code,
@@ -5178,7 +5178,7 @@ impl GetDocumentDiagnostics {
         })
     }
 
-    pub fn serialize_lsp_diagnostic(diagnostic: lsp::Diagnostic) -> Result<proto::LspDiagnostic> {
+    pub fn serialize_lsp_diagnostic(diagnostic: lsp::Diagnostic) -> Result<rpc::proto::LspDiagnostic> {
         let range = language::range_from_lsp(diagnostic.range);
         let (message, markup_message_kind) = match diagnostic.message {
             lsp::DiagnosticMessage::String(message) => (message, None),
@@ -5195,13 +5195,13 @@ impl GetDocumentDiagnostics {
                     point_from_lsp(related_information.location.range.start).0;
                 let location_range_end = point_from_lsp(related_information.location.range.end).0;
 
-                Ok(proto::LspDiagnosticRelatedInformation {
+                Ok(rpc::proto::LspDiagnosticRelatedInformation {
                     location_url: Some(related_information.location.uri.to_string()),
-                    location_range_start: Some(proto::PointUtf16 {
+                    location_range_start: Some(rpc::proto::PointUtf16 {
                         row: location_range_start.row,
                         column: location_range_start.column,
                     }),
-                    location_range_end: Some(proto::PointUtf16 {
+                    location_range_end: Some(rpc::proto::PointUtf16 {
                         row: location_range_end.row,
                         column: location_range_end.column,
                     }),
@@ -5215,29 +5215,29 @@ impl GetDocumentDiagnostics {
             .unwrap_or_default()
             .into_iter()
             .map(|tag| match tag {
-                lsp::DiagnosticTag::UNNECESSARY => proto::LspDiagnosticTag::Unnecessary,
-                lsp::DiagnosticTag::DEPRECATED => proto::LspDiagnosticTag::Deprecated,
-                _ => proto::LspDiagnosticTag::None,
+                lsp::DiagnosticTag::UNNECESSARY => rpc::proto::LspDiagnosticTag::Unnecessary,
+                lsp::DiagnosticTag::DEPRECATED => rpc::proto::LspDiagnosticTag::Deprecated,
+                _ => rpc::proto::LspDiagnosticTag::None,
             } as i32)
             .collect();
 
-        Ok(proto::LspDiagnostic {
-            start: Some(proto::PointUtf16 {
+        Ok(rpc::proto::LspDiagnostic {
+            start: Some(rpc::proto::PointUtf16 {
                 row: range.start.0.row,
                 column: range.start.0.column,
             }),
-            end: Some(proto::PointUtf16 {
+            end: Some(rpc::proto::PointUtf16 {
                 row: range.end.0.row,
                 column: range.end.0.column,
             }),
             severity: match diagnostic.severity {
-                Some(lsp::DiagnosticSeverity::ERROR) => proto::lsp_diagnostic::Severity::Error,
-                Some(lsp::DiagnosticSeverity::WARNING) => proto::lsp_diagnostic::Severity::Warning,
+                Some(lsp::DiagnosticSeverity::ERROR) => rpc::proto::lsp_diagnostic::Severity::Error,
+                Some(lsp::DiagnosticSeverity::WARNING) => rpc::proto::lsp_diagnostic::Severity::Warning,
                 Some(lsp::DiagnosticSeverity::INFORMATION) => {
-                    proto::lsp_diagnostic::Severity::Information
+                    rpc::proto::lsp_diagnostic::Severity::Information
                 }
-                Some(lsp::DiagnosticSeverity::HINT) => proto::lsp_diagnostic::Severity::Hint,
-                _ => proto::lsp_diagnostic::Severity::None,
+                Some(lsp::DiagnosticSeverity::HINT) => rpc::proto::lsp_diagnostic::Severity::Hint,
+                _ => rpc::proto::lsp_diagnostic::Severity::None,
             } as i32,
             code: diagnostic.code.as_ref().map(|code| match code {
                 lsp::NumberOrString::Number(code) => code.to_string(),
@@ -5373,7 +5373,7 @@ fn process_unchanged_workspace_diagnostics_report(
 impl LspCommand for GetDocumentDiagnostics {
     type Response = Vec<LspPullDiagnostics>;
     type LspRequest = lsp::request::DocumentDiagnosticRequest;
-    type ProtoRequest = proto::GetDocumentDiagnostics;
+    type ProtoRequest = rpc::proto::GetDocumentDiagnostics;
 
     fn display_name(&self) -> &str {
         "Get diagnostics"
@@ -5477,8 +5477,8 @@ impl LspCommand for GetDocumentDiagnostics {
         Ok(pulled_diagnostics.into_values().collect())
     }
 
-    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> proto::GetDocumentDiagnostics {
-        proto::GetDocumentDiagnostics {
+    fn to_proto(&self, project_id: u64, buffer: &Buffer) -> rpc::proto::GetDocumentDiagnostics {
+        rpc::proto::GetDocumentDiagnostics {
             project_id,
             buffer_id: buffer.remote_id().into(),
             version: serialize_version(&buffer.version()),
@@ -5486,13 +5486,13 @@ impl LspCommand for GetDocumentDiagnostics {
     }
 
     async fn from_proto(
-        _: proto::GetDocumentDiagnostics,
+        _: rpc::proto::GetDocumentDiagnostics,
         _: Entity<LspStore>,
         _: Entity<Buffer>,
         _: AsyncApp,
     ) -> Result<Self> {
         anyhow::bail!(
-            "proto::GetDocumentDiagnostics is not expected to be converted from proto directly, as it needs `previous_result_id` fetched first"
+            "rpc::proto::GetDocumentDiagnostics is not expected to be converted from proto directly, as it needs `previous_result_id` fetched first"
         )
     }
 
@@ -5502,7 +5502,7 @@ impl LspCommand for GetDocumentDiagnostics {
         _: PeerId,
         _: &clock::Global,
         _: &mut App,
-    ) -> proto::GetDocumentDiagnosticsResponse {
+    ) -> rpc::proto::GetDocumentDiagnosticsResponse {
         let pulled_diagnostics = response
             .into_iter()
             .filter_map(|diagnostics| match diagnostics {
@@ -5524,7 +5524,7 @@ impl LspCommand for GetDocumentDiagnostics {
                             (diagnostics, result_id)
                         }
                     };
-                    Some(proto::PulledDiagnostics {
+                    Some(rpc::proto::PulledDiagnostics {
                         changed,
                         result_id: result_id.map(|id| id.to_string()),
                         uri: uri.to_string(),
@@ -5543,12 +5543,12 @@ impl LspCommand for GetDocumentDiagnostics {
             })
             .collect();
 
-        proto::GetDocumentDiagnosticsResponse { pulled_diagnostics }
+        rpc::proto::GetDocumentDiagnosticsResponse { pulled_diagnostics }
     }
 
     async fn response_from_proto(
         self,
-        response: proto::GetDocumentDiagnosticsResponse,
+        response: rpc::proto::GetDocumentDiagnosticsResponse,
         _: Entity<LspStore>,
         _: Entity<Buffer>,
         _: AsyncApp,
@@ -5556,7 +5556,7 @@ impl LspCommand for GetDocumentDiagnostics {
         Ok(Self::diagnostics_from_proto(response))
     }
 
-    fn buffer_id_from_proto(message: &proto::GetDocumentDiagnostics) -> Result<BufferId> {
+    fn buffer_id_from_proto(message: &rpc::proto::GetDocumentDiagnostics) -> Result<BufferId> {
         BufferId::new(message.buffer_id)
     }
 }
@@ -5565,7 +5565,7 @@ impl LspCommand for GetDocumentDiagnostics {
 impl LspCommand for GetDocumentColor {
     type Response = Vec<DocumentColor>;
     type LspRequest = lsp::request::DocumentColor;
-    type ProtoRequest = proto::GetDocumentColor;
+    type ProtoRequest = rpc::proto::GetDocumentColor;
 
     fn display_name(&self) -> &str {
         "Document color"
@@ -5617,7 +5617,7 @@ impl LspCommand for GetDocumentColor {
     }
 
     fn to_proto(&self, project_id: u64, buffer: &Buffer) -> Self::ProtoRequest {
-        proto::GetDocumentColor {
+        rpc::proto::GetDocumentColor {
             project_id,
             buffer_id: buffer.remote_id().to_proto(),
             version: serialize_version(&buffer.version()),
@@ -5639,23 +5639,23 @@ impl LspCommand for GetDocumentColor {
         _: PeerId,
         buffer_version: &clock::Global,
         _: &mut App,
-    ) -> proto::GetDocumentColorResponse {
-        proto::GetDocumentColorResponse {
+    ) -> rpc::proto::GetDocumentColorResponse {
+        rpc::proto::GetDocumentColorResponse {
             colors: response
                 .into_iter()
                 .map(|color| {
                     let start = point_from_lsp(color.lsp_range.start).0;
                     let end = point_from_lsp(color.lsp_range.end).0;
-                    proto::ColorInformation {
+                    rpc::proto::ColorInformation {
                         red: color.color.red,
                         green: color.color.green,
                         blue: color.color.blue,
                         alpha: color.color.alpha,
-                        lsp_range_start: Some(proto::PointUtf16 {
+                        lsp_range_start: Some(rpc::proto::PointUtf16 {
                             row: start.row,
                             column: start.column,
                         }),
-                        lsp_range_end: Some(proto::PointUtf16 {
+                        lsp_range_end: Some(rpc::proto::PointUtf16 {
                             row: end.row,
                             column: end.column,
                         }),
@@ -5668,7 +5668,7 @@ impl LspCommand for GetDocumentColor {
 
     async fn response_from_proto(
         self,
-        message: proto::GetDocumentColorResponse,
+        message: rpc::proto::GetDocumentColorResponse,
         _: Entity<LspStore>,
         _: Entity<Buffer>,
         _: AsyncApp,
@@ -5708,7 +5708,7 @@ impl LspCommand for GetDocumentColor {
 impl LspCommand for GetFoldingRanges {
     type Response = Vec<LspFoldingRange>;
     type LspRequest = lsp::request::FoldingRangeRequest;
-    type ProtoRequest = proto::GetFoldingRanges;
+    type ProtoRequest = rpc::proto::GetFoldingRanges;
 
     fn display_name(&self) -> &str {
         "Folding ranges"
@@ -5781,7 +5781,7 @@ impl LspCommand for GetFoldingRanges {
     }
 
     fn to_proto(&self, project_id: u64, buffer: &Buffer) -> Self::ProtoRequest {
-        proto::GetFoldingRanges {
+        rpc::proto::GetFoldingRanges {
             project_id,
             buffer_id: buffer.remote_id().to_proto(),
             version: serialize_version(&buffer.version()),
@@ -5803,7 +5803,7 @@ impl LspCommand for GetFoldingRanges {
         _: PeerId,
         buffer_version: &clock::Global,
         _: &mut App,
-    ) -> proto::GetFoldingRangesResponse {
+    ) -> rpc::proto::GetFoldingRangesResponse {
         let mut ranges = Vec::with_capacity(response.len());
         let mut collapsed_texts = Vec::with_capacity(response.len());
         for folding_range in response {
@@ -5815,7 +5815,7 @@ impl LspCommand for GetFoldingRanges {
                     .unwrap_or_default(),
             );
         }
-        proto::GetFoldingRangesResponse {
+        rpc::proto::GetFoldingRangesResponse {
             ranges,
             collapsed_texts,
             version: serialize_version(buffer_version),
@@ -5824,7 +5824,7 @@ impl LspCommand for GetFoldingRanges {
 
     async fn response_from_proto(
         self,
-        message: proto::GetFoldingRangesResponse,
+        message: rpc::proto::GetFoldingRangesResponse,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,
@@ -5864,7 +5864,7 @@ impl LspCommand for GetFoldingRanges {
 impl LspCommand for GetDocumentLinks {
     type Response = Vec<LspDocumentLink>;
     type LspRequest = lsp::request::DocumentLinkRequest;
-    type ProtoRequest = proto::GetDocumentLinks;
+    type ProtoRequest = rpc::proto::GetDocumentLinks;
 
     fn display_name(&self) -> &str {
         "Document links"
@@ -5930,7 +5930,7 @@ impl LspCommand for GetDocumentLinks {
     }
 
     fn to_proto(&self, project_id: u64, buffer: &Buffer) -> Self::ProtoRequest {
-        proto::GetDocumentLinks {
+        rpc::proto::GetDocumentLinks {
             project_id,
             buffer_id: buffer.remote_id().to_proto(),
             version: serialize_version(&buffer.version()),
@@ -5952,11 +5952,11 @@ impl LspCommand for GetDocumentLinks {
         _: PeerId,
         buffer_version: &clock::Global,
         _: &mut App,
-    ) -> proto::GetDocumentLinksResponse {
-        proto::GetDocumentLinksResponse {
+    ) -> rpc::proto::GetDocumentLinksResponse {
+        rpc::proto::GetDocumentLinksResponse {
             links: response
                 .into_iter()
-                .map(|link| proto::DocumentLinkProto {
+                .map(|link| rpc::proto::DocumentLinkProto {
                     range: Some(serialize_anchor_range(link.range)),
                     target: link.target.map(String::from),
                     tooltip: link.tooltip.map(String::from),
@@ -5971,7 +5971,7 @@ impl LspCommand for GetDocumentLinks {
 
     async fn response_from_proto(
         self,
-        message: proto::GetDocumentLinksResponse,
+        message: rpc::proto::GetDocumentLinksResponse,
         _: Entity<LspStore>,
         buffer: Entity<Buffer>,
         mut cx: AsyncApp,

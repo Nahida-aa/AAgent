@@ -942,7 +942,7 @@ impl ContextServerStore {
                 .update(cx, |client, _| {
                     client
                         .proto_client()
-                        .request(proto::GetContextServerCommand {
+                        .request(rpc::proto::GetContextServerCommand {
                             project_id,
                             server_id: id.0.to_string(),
                             root_dir: root_dir.clone(),
@@ -1065,9 +1065,9 @@ impl ContextServerStore {
 
     async fn handle_get_context_server_command(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::GetContextServerCommand>,
+        envelope: TypedEnvelope<rpc::proto::GetContextServerCommand>,
         mut cx: AsyncApp,
-    ) -> Result<proto::ContextServerCommand> {
+    ) -> Result<rpc::proto::ContextServerCommand> {
         let server_id = ContextServerId(envelope.payload.server_id.into());
 
         let (settings_entry, registry, worktree_store) =
@@ -1113,7 +1113,7 @@ impl ContextServerStore {
             .command()
             .context("context server has no command (HTTP servers don't need RPC)")?;
 
-        Ok(proto::ContextServerCommand {
+        Ok(rpc::proto::ContextServerCommand {
             path: command.path.display().to_string(),
             args: command.args.clone(),
             env: command

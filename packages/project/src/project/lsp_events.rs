@@ -1,5 +1,7 @@
+use super::*;
+
 use gpui::{Context, Entity};
-use proto;
+use rpc::proto;
 use crate::lsp_store::LspStoreEvent;
 use crate::types::*;
 use crate::{Event, Project};

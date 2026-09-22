@@ -1,8 +1,10 @@
+use super::*;
+
 use std::ops::Range;
 
 use anyhow::Result;
 use dap::inline_value::{InlineValueLocation, VariableLookupKind, VariableScope};
-use debugger::{
+use crate::debugger::{
     breakpoint_store::ActiveStackFrame,
     dap_store::DapStoreEvent,
     session::Session,

@@ -30,6 +30,7 @@ pub mod yarn;
 
 mod constants;
 mod directory;
+mod environment;
 mod event;
 mod fuzzy;
 mod group_key;
@@ -48,7 +49,7 @@ mod tests;
 // ---- 子模块 re-export ----
 pub use agent_registry_store::{AgentRegistryStore, RegistryAgent};
 pub use agent_server_store::{AgentId, AgentServerStore, AgentServersUpdated, ExternalAgentSource};
-pub use buffer_store::ProjectTransaction;
+pub use buffer_store::{BufferStore, BufferStoreEvent, ProjectTransaction};
 pub use constants::{CURRENT_PROJECT_FEATURES, MAX_PROJECT_SEARCH_HISTORY_SIZE};
 #[cfg(feature = "test-support")]
 pub use constants::DEFAULT_COMPLETION_CONTEXT;
@@ -69,7 +70,10 @@ pub use lsp_store::{
 };
 pub use path::{ProjectPath, ResolvedPath};
 pub use project::*;
-pub use project::{AgentLocation, ProjectGroupKey};
+
+// zed 的 project.rs 即 crate 根，这些辅助函数天然在根上；拆分后需显式转发
+// 供 `crate::make_*` 形式引用（它们本身是 pub(crate)）。
+pub(crate) use lsp_command::{make_lsp_text_document_position, make_text_document_identifier};
 pub use settings::DisableAiSettings;
 pub use task_inventory::{
     BasicContextProvider, ContextProviderWithTasks, DebugScenarioContext, GIT_COMMAND_TASK_TAG,
@@ -77,6 +81,14 @@ pub use task_inventory::{
 };
 pub use toast::ToastLink;
 pub use toolchain_store::{ToolchainStore, Toolchains};
+
+// zed 的 project.rs 就是 crate 根，这些名字天然可见；拆分后要在根上转发，
+// 否则 `crate::Xxx` 形式的引用会找不到。
+pub(crate) use context_server_store::ContextServerStore;
+pub(crate) use task_store::TaskStore;
+pub(crate) use terminals::Terminals;
+pub(crate) use worktree_store::{WorktreeStore, WorktreeIdCounter};
+pub use language::LanguageServerId;
 pub use types::*;
 
 // ---- 保持原有 re-export ----

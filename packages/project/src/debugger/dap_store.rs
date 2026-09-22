@@ -308,7 +308,7 @@ impl DapStore {
             DapStoreMode::Remote(remote) => {
                 let request = remote
                     .upstream_client
-                    .request(proto::GetDebugAdapterBinary {
+                    .request(rpc::proto::GetDebugAdapterBinary {
                         session_id: session_id.to_proto(),
                         project_id: remote.upstream_project_id,
                         worktree_id: worktree.read(cx).id().to_proto(),
@@ -424,7 +424,7 @@ impl DapStore {
                 }
             }
             DapStoreMode::Remote(remote) => {
-                let request = remote.upstream_client.request(proto::RunDebugLocators {
+                let request = remote.upstream_client.request(rpc::proto::RunDebugLocators {
                     project_id: remote.upstream_project_id,
                     build_command: Some(build_command.to_proto()),
                     locator: locator_name.to_owned(),
@@ -574,7 +574,7 @@ impl DapStore {
     #[allow(dead_code)]
     async fn handle_ignore_breakpoint_state(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::IgnoreBreakpointState>,
+        envelope: TypedEnvelope<rpc::proto::IgnoreBreakpointState>,
         mut cx: AsyncApp,
     ) -> Result<()> {
         let session_id = SessionId::from_proto(envelope.payload.session_id);
@@ -806,9 +806,9 @@ impl DapStore {
 
     async fn handle_run_debug_locator(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::RunDebugLocators>,
+        envelope: TypedEnvelope<rpc::proto::RunDebugLocators>,
         mut cx: AsyncApp,
-    ) -> Result<proto::DebugRequest> {
+    ) -> Result<rpc::proto::DebugRequest> {
         let task = envelope
             .payload
             .build_command
@@ -826,9 +826,9 @@ impl DapStore {
 
     async fn handle_get_debug_adapter_binary(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::GetDebugAdapterBinary>,
+        envelope: TypedEnvelope<rpc::proto::GetDebugAdapterBinary>,
         mut cx: AsyncApp,
-    ) -> Result<proto::DebugAdapterBinary> {
+    ) -> Result<rpc::proto::DebugAdapterBinary> {
         let definition = DebugTaskDefinition::from_proto(
             envelope.payload.definition.context("missing definition")?,
         )?;
@@ -841,7 +841,7 @@ impl DapStore {
                     this.read_with(cx, |this, _| {
                         if let Some((downstream, project_id)) = this.downstream_client.clone() {
                             downstream
-                                .send(proto::LogToDebugConsole {
+                                .send(rpc::proto::LogToDebugConsole {
                                     project_id,
                                     session_id,
                                     message,
@@ -877,7 +877,7 @@ impl DapStore {
 
     async fn handle_log_to_debug_console(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::LogToDebugConsole>,
+        envelope: TypedEnvelope<rpc::proto::LogToDebugConsole>,
         mut cx: AsyncApp,
     ) -> Result<()> {
         let session_id = SessionId::from_proto(envelope.payload.session_id);

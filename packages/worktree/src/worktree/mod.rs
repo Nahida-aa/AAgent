@@ -119,6 +119,7 @@ pub(crate) use git::{
     discover_ancestor_git_repo, discover_git_paths, discover_root_repo_common_dir,
     discover_root_repo_metadata, is_dot_git, watch_dir_tree, watch_git_dir_subdirectories,
 };
+pub use loading::decode_byte_header;
 pub(crate) use loading::{decode_file_text, decode_file_text_to_rope};
 pub(crate) use scanner::{
     BackgroundScanner, BackgroundScannerPhase, BackgroundScannerState, EventRoot, RemovedEntries,

@@ -79,7 +79,7 @@ impl LspStore {
         });
         if let Some((downstream_client, project_id)) = self.downstream_client.as_ref() {
             downstream_client
-                .send(proto::RefreshDocumentColors {
+                .send(rpc::proto::RefreshDocumentColors {
                     project_id: *project_id,
                     server_id: for_server.map(|server_id| server_id.to_proto()),
                 })
@@ -90,14 +90,14 @@ impl LspStore {
 
     pub(super) async fn handle_refresh_document_colors(
         lsp_store: Entity<Self>,
-        envelope: TypedEnvelope<proto::RefreshDocumentColors>,
+        envelope: TypedEnvelope<rpc::proto::RefreshDocumentColors>,
         mut cx: AsyncApp,
-    ) -> Result<proto::Ack> {
+    ) -> Result<rpc::proto::Ack> {
         lsp_store.update(&mut cx, |lsp_store, cx| {
             let server_id = envelope.payload.server_id.map(LanguageServerId::from_proto);
             lsp_store.refresh_document_colors(server_id, cx);
         });
-        Ok(proto::Ack {})
+        Ok(rpc::proto::Ack {})
     }
 
     pub fn document_colors(
@@ -250,20 +250,20 @@ impl LspStore {
         if let Some((upstream_client, project_id)) = self.upstream_client() {
             let start = color.lsp_range.start;
             let end = color.lsp_range.end;
-            let request = proto::GetColorPresentation {
+            let request = rpc::proto::GetColorPresentation {
                 project_id,
                 server_id: server_id.to_proto(),
                 buffer_id: buffer.read(cx).remote_id().into(),
-                color: Some(proto::ColorInformation {
+                color: Some(rpc::proto::ColorInformation {
                     red: color.color.red,
                     green: color.color.green,
                     blue: color.color.blue,
                     alpha: color.color.alpha,
-                    lsp_range_start: Some(proto::PointUtf16 {
+                    lsp_range_start: Some(rpc::proto::PointUtf16 {
                         row: start.line,
                         column: start.character,
                     }),
-                    lsp_range_end: Some(proto::PointUtf16 {
+                    lsp_range_end: Some(rpc::proto::PointUtf16 {
                         row: end.line,
                         column: end.character,
                     }),
@@ -430,9 +430,9 @@ impl LspStore {
 
     pub(super) async fn handle_get_color_presentation(
         lsp_store: Entity<Self>,
-        envelope: TypedEnvelope<proto::GetColorPresentation>,
+        envelope: TypedEnvelope<rpc::proto::GetColorPresentation>,
         mut cx: AsyncApp,
-    ) -> Result<proto::GetColorPresentationResponse> {
+    ) -> Result<rpc::proto::GetColorPresentationResponse> {
         let buffer_id = BufferId::new(envelope.payload.buffer_id)?;
         let buffer = lsp_store.update(&mut cx, |lsp_store, cx| {
             lsp_store.buffer_store.read(cx).get_existing(buffer_id)
@@ -475,11 +475,11 @@ impl LspStore {
             .await
             .context("resolving color presentation")?;
 
-        Ok(proto::GetColorPresentationResponse {
+        Ok(rpc::proto::GetColorPresentationResponse {
             presentations: resolved_color
                 .color_presentations
                 .into_iter()
-                .map(|presentation| proto::ColorPresentation {
+                .map(|presentation| rpc::proto::ColorPresentation {
                     label: presentation.label.to_string(),
                     text_edit: presentation.text_edit.map(serialize_lsp_edit),
                     additional_text_edits: presentation

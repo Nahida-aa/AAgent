@@ -1,9 +1,11 @@
+use super::*;
+
 use gpui::{Context, Entity};
 use remote::RemoteClientEvent;
 
 use super::Project;
 use crate::project_settings::{SettingsObserver, SettingsObserverEvent};
-use crate::settings::DisableAiSettings;
+use crate::DisableAiSettings;
 use crate::{Event, ToastLink};
 
 impl Project {

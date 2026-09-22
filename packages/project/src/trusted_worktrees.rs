@@ -91,7 +91,7 @@ pub fn track_worktree_trust(
                         .collect::<Vec<_>>();
                     if !trusted_paths.is_empty() {
                         upstream_client
-                            .send(proto::TrustWorktrees {
+                            .send(rpc::proto::TrustWorktrees {
                                 project_id: upstream_project_id.0,
                                 trusted_paths,
                             })
@@ -197,27 +197,27 @@ pub enum PathTrust {
 }
 
 impl PathTrust {
-    fn to_proto(&self) -> proto::PathTrust {
+    fn to_proto(&self) -> rpc::proto::PathTrust {
         match self {
-            Self::Worktree(worktree_id) => proto::PathTrust {
-                content: Some(proto::path_trust::Content::WorktreeId(
+            Self::Worktree(worktree_id) => rpc::proto::PathTrust {
+                content: Some(rpc::proto::path_trust::Content::WorktreeId(
                     worktree_id.to_proto(),
                 )),
             },
-            Self::AbsPath(path_buf) => proto::PathTrust {
-                content: Some(proto::path_trust::Content::AbsPath(
+            Self::AbsPath(path_buf) => rpc::proto::PathTrust {
+                content: Some(rpc::proto::path_trust::Content::AbsPath(
                     path_buf.to_string_lossy().to_string(),
                 )),
             },
         }
     }
 
-    pub fn from_proto(proto: proto::PathTrust) -> Option<Self> {
+    pub fn from_proto(proto: rpc::proto::PathTrust) -> Option<Self> {
         Some(match proto.content? {
-            proto::path_trust::Content::WorktreeId(id) => {
+            rpc::proto::path_trust::Content::WorktreeId(id) => {
                 Self::Worktree(WorktreeId::from_proto(id))
             }
-            proto::path_trust::Content::AbsPath(path) => Self::AbsPath(PathBuf::from(path)),
+            rpc::proto::path_trust::Content::AbsPath(path) => Self::AbsPath(PathBuf::from(path)),
         })
     }
 }
@@ -407,7 +407,7 @@ impl TrustedWorktreesStore {
                     .collect::<Vec<_>>();
                 if !trusted_paths.is_empty() {
                     upstream_client
-                        .send(proto::TrustWorktrees {
+                        .send(rpc::proto::TrustWorktrees {
                             project_id: upstream_project_id.0,
                             trusted_paths,
                         })
@@ -531,7 +531,7 @@ impl TrustedWorktreesStore {
             if let Some((downstream_client, downstream_project_id)) = &store_data.downstream_client
             {
                 downstream_client
-                    .send(proto::RestrictWorktrees {
+                    .send(rpc::proto::RestrictWorktrees {
                         project_id: downstream_project_id.0,
                         worktree_ids: vec![worktree_id.to_proto()],
                     })
@@ -539,7 +539,7 @@ impl TrustedWorktreesStore {
             }
             if let Some((upstream_client, upstream_project_id)) = &store_data.upstream_client {
                 upstream_client
-                    .send(proto::RestrictWorktrees {
+                    .send(rpc::proto::RestrictWorktrees {
                         project_id: upstream_project_id.0,
                         worktree_ids: vec![worktree_id.to_proto()],
                     })

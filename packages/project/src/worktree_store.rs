@@ -304,7 +304,7 @@ impl WorktreeStore {
         async move {
             match strategy {
                 Either::Left(client) => Ok(client
-                    .request(proto::AllocateWorktreeId {
+                    .request(rpc::proto::AllocateWorktreeId {
                         project_id: REMOTE_SERVER_PROJECT_ID,
                     })
                     .await?
@@ -585,7 +585,7 @@ impl WorktreeStore {
                 upstream_project_id,
                 ..
             } => {
-                let response = upstream_client.request(proto::CopyProjectEntry {
+                let response = upstream_client.request(rpc::proto::CopyProjectEntry {
                     project_id: *upstream_project_id,
                     entry_id: entry_id.to_proto(),
                     new_path: new_project_path.path.as_unix_str().to_owned(),
@@ -740,7 +740,7 @@ impl WorktreeStore {
                 upstream_project_id,
                 ..
             } => {
-                let response = upstream_client.request(proto::RenameProjectEntry {
+                let response = upstream_client.request(rpc::proto::RenameProjectEntry {
                     project_id: *upstream_project_id,
                     entry_id: entry_id.to_proto(),
                     new_path: new_project_path.path.as_unix_str().to_owned(),
@@ -876,7 +876,7 @@ impl WorktreeStore {
 
             let path = RemotePathBuf::new(abs_path, path_style);
             let response = client
-                .request(proto::AddWorktree {
+                .request(rpc::proto::AddWorktree {
                     project_id: REMOTE_SERVER_PROJECT_ID,
                     path: path.to_proto(),
                     visible,
@@ -899,7 +899,7 @@ impl WorktreeStore {
                 Worktree::remote(
                     REMOTE_SERVER_PROJECT_ID,
                     ReplicaId::REMOTE_SERVER,
-                    proto::WorktreeMetadata {
+                    rpc::proto::WorktreeMetadata {
                         id: response.worktree_id,
                         root_name,
                         visible,
@@ -1065,7 +1065,7 @@ impl WorktreeStore {
 
     pub fn set_worktrees_from_proto(
         &mut self,
-        worktrees: Vec<proto::WorktreeMetadata>,
+        worktrees: Vec<rpc::proto::WorktreeMetadata>,
         replica_id: ReplicaId,
         cx: &mut Context<Self>,
     ) -> Result<()> {
@@ -1173,7 +1173,7 @@ impl WorktreeStore {
             return;
         };
 
-        let update = proto::UpdateProject {
+        let update = rpc::proto::UpdateProject {
             project_id,
             worktrees: self.worktree_metadata_protos(cx),
         };
@@ -1222,11 +1222,11 @@ impl WorktreeStore {
         .detach_and_log_err(cx);
     }
 
-    pub fn worktree_metadata_protos(&self, cx: &App) -> Vec<proto::WorktreeMetadata> {
+    pub fn worktree_metadata_protos(&self, cx: &App) -> Vec<rpc::proto::WorktreeMetadata> {
         self.worktrees()
             .map(|worktree| {
                 let worktree = worktree.read(cx);
-                proto::WorktreeMetadata {
+                rpc::proto::WorktreeMetadata {
                     id: worktree.id().to_proto(),
                     root_name: worktree.root_name_str().to_owned(),
                     visible: worktree.is_visible(),
@@ -1289,9 +1289,9 @@ impl WorktreeStore {
 
     pub async fn handle_create_project_entry(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::CreateProjectEntry>,
+        envelope: TypedEnvelope<rpc::proto::CreateProjectEntry>,
         mut cx: AsyncApp,
-    ) -> Result<proto::ProjectEntryResponse> {
+    ) -> Result<rpc::proto::ProjectEntryResponse> {
         let worktree = this.update(&mut cx, |this, cx| {
             let worktree_id = WorktreeId::from_proto(envelope.payload.worktree_id);
             this.worktree_for_id(worktree_id, cx)
@@ -1302,9 +1302,9 @@ impl WorktreeStore {
 
     pub async fn handle_copy_project_entry(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::CopyProjectEntry>,
+        envelope: TypedEnvelope<rpc::proto::CopyProjectEntry>,
         mut cx: AsyncApp,
-    ) -> Result<proto::ProjectEntryResponse> {
+    ) -> Result<rpc::proto::ProjectEntryResponse> {
         let entry_id = ProjectEntryId::from_proto(envelope.payload.entry_id);
         let new_worktree_id = WorktreeId::from_proto(envelope.payload.new_worktree_id);
         let new_project_path = (
@@ -1332,7 +1332,7 @@ impl WorktreeStore {
             ))
         })?;
         let entry = entry.await?;
-        Ok(proto::ProjectEntryResponse {
+        Ok(rpc::proto::ProjectEntryResponse {
             entry: entry.as_ref().map(|entry| entry.into()),
             worktree_scan_id: scan_id as u64,
         })
@@ -1340,9 +1340,9 @@ impl WorktreeStore {
 
     pub async fn handle_trash_project_entry(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::TrashProjectEntry>,
+        envelope: TypedEnvelope<rpc::proto::TrashProjectEntry>,
         mut cx: AsyncApp,
-    ) -> Result<proto::TrashProjectEntryResponse> {
+    ) -> Result<rpc::proto::TrashProjectEntryResponse> {
         let entry_id = ProjectEntryId::from_proto(envelope.payload.entry_id);
         let worktree = this.update(&mut cx, |this, cx| {
             let Some((_, project_id)) = this.downstream_client else {
@@ -1362,9 +1362,9 @@ impl WorktreeStore {
 
     pub async fn handle_delete_project_entry(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::DeleteProjectEntry>,
+        envelope: TypedEnvelope<rpc::proto::DeleteProjectEntry>,
         mut cx: AsyncApp,
-    ) -> Result<proto::ProjectEntryResponse> {
+    ) -> Result<rpc::proto::ProjectEntryResponse> {
         let entry_id = ProjectEntryId::from_proto(envelope.payload.entry_id);
         let worktree = this.update(&mut cx, |this, cx| {
             let Some((_, project_id)) = this.downstream_client else {
@@ -1384,9 +1384,9 @@ impl WorktreeStore {
 
     pub async fn handle_restore_project_entry(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::RestoreProjectEntry>,
+        envelope: TypedEnvelope<rpc::proto::RestoreProjectEntry>,
         mut cx: AsyncApp,
-    ) -> Result<proto::RestoreProjectEntryResponse> {
+    ) -> Result<rpc::proto::RestoreProjectEntryResponse> {
         let worktree_id = WorktreeId::from_proto(envelope.payload.worktree_id);
 
         let worktree = this.update(&mut cx, |this, cx| {
@@ -1399,9 +1399,9 @@ impl WorktreeStore {
 
     pub async fn handle_rename_project_entry(
         this: Entity<Self>,
-        request: proto::RenameProjectEntry,
+        request: rpc::proto::RenameProjectEntry,
         mut cx: AsyncApp,
-    ) -> Result<proto::ProjectEntryResponse> {
+    ) -> Result<rpc::proto::ProjectEntryResponse> {
         let entry_id = ProjectEntryId::from_proto(request.entry_id);
         let new_worktree_id = WorktreeId::from_proto(request.new_worktree_id);
         let rel_path = RelPath::from_unix_str(&request.new_path)
@@ -1429,7 +1429,7 @@ impl WorktreeStore {
                 this.rename_entry(entry_id, (new_worktree_id, rel_path).into(), cx),
             ))
         })?;
-        Ok(proto::ProjectEntryResponse {
+        Ok(rpc::proto::ProjectEntryResponse {
             entry: match &task.await? {
                 CreatedEntry::Included(entry) => Some(entry.into()),
                 CreatedEntry::Excluded { .. } => None,
@@ -1440,9 +1440,9 @@ impl WorktreeStore {
 
     pub async fn handle_expand_project_entry(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::ExpandProjectEntry>,
+        envelope: TypedEnvelope<rpc::proto::ExpandProjectEntry>,
         mut cx: AsyncApp,
-    ) -> Result<proto::ExpandProjectEntryResponse> {
+    ) -> Result<rpc::proto::ExpandProjectEntryResponse> {
         let entry_id = ProjectEntryId::from_proto(envelope.payload.entry_id);
         let worktree = this
             .update(&mut cx, |this, cx| this.worktree_for_entry(entry_id, cx))
@@ -1452,9 +1452,9 @@ impl WorktreeStore {
 
     pub async fn handle_expand_all_for_project_entry(
         this: Entity<Self>,
-        envelope: TypedEnvelope<proto::ExpandAllForProjectEntry>,
+        envelope: TypedEnvelope<rpc::proto::ExpandAllForProjectEntry>,
         mut cx: AsyncApp,
-    ) -> Result<proto::ExpandAllForProjectEntryResponse> {
+    ) -> Result<rpc::proto::ExpandAllForProjectEntryResponse> {
         let entry_id = ProjectEntryId::from_proto(envelope.payload.entry_id);
         let worktree = this
             .update(&mut cx, |this, cx| this.worktree_for_entry(entry_id, cx))
@@ -1464,11 +1464,11 @@ impl WorktreeStore {
 
     pub async fn handle_allocate_worktree_id(
         _this: Entity<Self>,
-        _envelope: TypedEnvelope<proto::AllocateWorktreeId>,
+        _envelope: TypedEnvelope<rpc::proto::AllocateWorktreeId>,
         cx: AsyncApp,
-    ) -> Result<proto::AllocateWorktreeIdResponse> {
+    ) -> Result<rpc::proto::AllocateWorktreeIdResponse> {
         let worktree_id = cx.update(|cx| WorktreeIdCounter::get(cx).next());
-        Ok(proto::AllocateWorktreeIdResponse { worktree_id })
+        Ok(rpc::proto::AllocateWorktreeIdResponse { worktree_id })
     }
 
     pub fn fs(&self) -> Option<Arc<dyn Fs>> {

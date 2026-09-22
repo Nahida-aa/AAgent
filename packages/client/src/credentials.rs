@@ -27,7 +27,7 @@ pub(crate) struct ClientCredentialsProvider {
 impl ClientCredentialsProvider {
     pub fn new(cx: &App) -> Self {
         Self {
-            provider: zed_credentials_provider::global(cx),
+            provider: ad_credentials_provider::global(cx),
         }
     }
 

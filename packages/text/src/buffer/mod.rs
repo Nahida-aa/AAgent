@@ -40,7 +40,7 @@ pub use snapshot::BufferSnapshot;
 
 /// Identifier for an undo/redo transaction, identical to the lamport timestamp
 /// that ticked it.
-pub type TransactionId = aa_clock::Lamport;
+pub type TransactionId = clock::Lamport;
 
 // Keep the original `debug::…` path working. Previously this was an inline
 // `pub mod debug` inside `lib.rs`; now it lives in its own file.

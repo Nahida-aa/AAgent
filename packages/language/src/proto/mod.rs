@@ -4,7 +4,7 @@ use crate::{
     CursorShape, Diagnostic, DiagnosticMessage, DiagnosticSourceKind,
     diagnostic_set::DiagnosticEntry,
 };
-use aa_clock::{self as clock, ReplicaId};
+use clock::{ReplicaId};
 use anyhow::{Context as _, Result};
 use gpui::SharedString;
 use lsp::{DiagnosticSeverity, LanguageServerId};

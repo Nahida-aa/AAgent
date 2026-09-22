@@ -1,5 +1,4 @@
 use crate::{BufferSnapshot, ToOffset, ToPoint, ToPointUtf16, buffer::BufferId, locator::Locator};
-use aa_clock as clock;
 use rope::{Point, PointUtf16, TextDimension};
 use std::{cmp::Ordering, fmt::Debug, ops::Range};
 use sum_tree::{Bias, Dimensions};

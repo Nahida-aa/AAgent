@@ -10,21 +10,21 @@ use smallvec::SmallVec;
 
 use crate::rendered::RenderedLine;
 
-struct MarkdownHighlights {
+pub(crate) struct MarkdownHighlights {
     /// Search highlights, sorted by range start.
-    search_highlights: Rc<[Range<usize>]>,
-    active_search_highlight: Option<usize>,
-    search_match_color: Hsla,
-    active_search_match_color: Hsla,
-    selection: Option<(Range<usize>, Hsla)>,
+    pub(crate) search_highlights: Rc<[Range<usize>]>,
+    pub(crate) active_search_highlight: Option<usize>,
+    pub(crate) search_match_color: Hsla,
+    pub(crate) active_search_match_color: Hsla,
+    pub(crate) selection: Option<(Range<usize>, Hsla)>,
     /// Index of the first search highlight that may intersect the next line.
-    next_search_highlight_ix: usize,
+    pub(crate) next_search_highlight_ix: usize,
 }
 
 impl MarkdownHighlights {
     /// Returns the highlighted ranges intersecting the given source range,
     /// clamped to it, in paint order.
-    fn highlights_for_line(
+    pub(crate) fn highlights_for_line(
         &mut self,
         source_range: Range<usize>,
     ) -> SmallVec<[(Range<usize>, Hsla); 1]> {
@@ -67,9 +67,9 @@ impl MarkdownHighlights {
 /// Wraps a rendered line's text and paints the line's highlight quads during the
 /// line's own paint, so the ancestor content masks clip them like they clip the
 /// glyphs themselves.
-struct HighlightedLine {
-    text: AnyElement,
-    line: Rc<RenderedLine>,
+pub(crate) struct HighlightedLine {
+    pub(crate) text: AnyElement,
+    pub(crate) line: Rc<RenderedLine>,
 }
 
 impl Element for HighlightedLine {

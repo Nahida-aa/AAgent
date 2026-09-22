@@ -1,7 +1,7 @@
 use super::*;
 use ::util::RangeExt;
 use ::util::maybe;
-use aa_clock::{self as clock, ReplicaId};
+use clock::{ReplicaId};
 use std::sync::Arc;
 
 /// An immutable, cheaply cloneable representation of a fixed

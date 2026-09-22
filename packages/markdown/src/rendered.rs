@@ -4,52 +4,53 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 use gpui::{
-    AnyElement, BorderStyle, Bounds, Edges, Hsla, Pixels, Point, StyledText, TextLayout, TextStyle,
-    WrappedLineLayout, point, px, quad, size,
+    AnyElement, BorderStyle, Bounds, Edges, Hsla, Pixels, Point, SharedString, StyledText,
+    TextAlign, TextLayout, TextStyle, Window, WrappedLineLayout, point, px, quad, size,
 };
+use gpui_util::maybe;
 use language::{CharClassifier, Language};
 use smallvec::SmallVec;
 
 use crate::highlights::HighlightedLine;
 
 pub struct RenderedMarkdown {
-    element: AnyElement,
-    text: RenderedText,
+    pub(crate) element: AnyElement,
+    pub(crate) text: RenderedText,
 }
 
 #[derive(Clone)]
-struct RenderedText {
-    lines: Rc<[Rc<RenderedLine>]>,
-    links: Rc<[RenderedLink]>,
-    image_links: Rc<[RenderedImageLink]>,
-    footnote_refs: Rc<[RenderedFootnoteRef]>,
+pub(crate) struct RenderedText {
+    pub(crate) lines: Rc<[Rc<RenderedLine>]>,
+    pub(crate) links: Rc<[RenderedLink]>,
+    pub(crate) image_links: Rc<[RenderedImageLink]>,
+    pub(crate) footnote_refs: Rc<[RenderedFootnoteRef]>,
 }
 
 struct WrappedLineSegment {
-    start: usize,
-    end: usize,
-    row_top: Pixels,
-    layout: Arc<WrappedLineLayout>,
+    pub(crate) start: usize,
+    pub(crate) end: usize,
+    pub(crate) row_top: Pixels,
+    pub(crate) layout: Arc<WrappedLineLayout>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-struct RenderedLink {
-    source_range: Range<usize>,
-    destination_url: SharedString,
+pub(crate) struct RenderedLink {
+    pub(crate) source_range: Range<usize>,
+    pub(crate) destination_url: SharedString,
 }
 
 #[derive(Clone)]
-struct RenderedImageLink {
+pub(crate) struct RenderedImageLink {
     // Populated once the image's `canvas` overlay is painted; images aren't part of the
     // text layout, so their hit-test region can't be derived from a source range.
-    bounds: Rc<Cell<Option<Bounds<Pixels>>>>,
-    destination_url: SharedString,
+    pub(crate) bounds: Rc<Cell<Option<Bounds<Pixels>>>>,
+    pub(crate) destination_url: SharedString,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-struct RenderedFootnoteRef {
-    source_range: Range<usize>,
-    label: SharedString,
+pub(crate) struct RenderedFootnoteRef {
+    pub(crate) source_range: Range<usize>,
+    pub(crate) label: SharedString,
 }
 
 impl RenderedText {
@@ -77,7 +78,10 @@ impl RenderedText {
         all_bounds
     }
 
-    fn source_index_for_position(&self, position: Point<Pixels>) -> Result<usize, usize> {
+    pub(crate) fn source_index_for_position(
+        &self,
+        position: Point<Pixels>,
+    ) -> Result<usize, usize> {
         let mut lines = self.lines.iter().peekable();
         let mut fallback_line: Option<&Rc<RenderedLine>> = None;
 
@@ -112,7 +116,7 @@ impl RenderedText {
         Err(self.lines.last().map_or(0, |line| line.source_end))
     }
 
-    fn position_for_source_index(&self, source_index: usize) -> Option<(Point<Pixels>, Pixels)> {
+    pub(crate) fn position_for_source_index(&self, source_index: usize) -> Option<(Point<Pixels>, Pixels)> {
         for line in self.lines.iter() {
             if source_index > line.source_end {
                 continue;
@@ -127,7 +131,7 @@ impl RenderedText {
         None
     }
 
-    fn surrounding_word_range(&self, source_index: usize) -> Range<usize> {
+    pub(crate) fn surrounding_word_range(&self, source_index: usize) -> Range<usize> {
         for line in self.lines.iter() {
             if source_index > line.source_end {
                 continue;
@@ -174,7 +178,7 @@ impl RenderedText {
         source_index..source_index
     }
 
-    fn surrounding_line_range(&self, source_index: usize) -> Range<usize> {
+    pub(crate) fn surrounding_line_range(&self, source_index: usize) -> Range<usize> {
         for line in self.lines.iter() {
             if source_index > line.source_end {
                 continue;
@@ -186,7 +190,7 @@ impl RenderedText {
         source_index..source_index
     }
 
-    fn text_for_range(&self, range: Range<usize>) -> String {
+    pub(crate) fn text_for_range(&self, range: Range<usize>) -> String {
         let mut accumulator = String::new();
 
         for line in self.lines.iter() {
@@ -220,13 +224,16 @@ impl RenderedText {
         accumulator
     }
 
-    fn link_for_source_index(&self, source_index: usize) -> Option<&RenderedLink> {
+    pub(crate) fn link_for_source_index(&self, source_index: usize) -> Option<&RenderedLink> {
         self.links
             .iter()
             .find(|link| link.source_range.contains(&source_index))
     }
 
-    fn image_link_for_position(&self, position: Point<Pixels>) -> Option<&RenderedImageLink> {
+    pub(crate) fn image_link_for_position(
+        &self,
+        position: Point<Pixels>,
+    ) -> Option<&RenderedImageLink> {
         self.image_links.iter().find(|image| {
             image
                 .bounds
@@ -235,28 +242,31 @@ impl RenderedText {
         })
     }
 
-    fn footnote_ref_for_source_index(&self, source_index: usize) -> Option<&RenderedFootnoteRef> {
+    pub(crate) fn footnote_ref_for_source_index(
+        &self,
+        source_index: usize,
+    ) -> Option<&RenderedFootnoteRef> {
         self.footnote_refs
             .iter()
             .find(|fref| fref.source_range.contains(&source_index))
     }
 }
 
-struct RenderedLine {
-    layout: TextLayout,
-    source_mappings: Vec<SourceMapping>,
-    source_end: usize,
-    language: Option<Arc<Language>>,
-    text_align: TextAlign,
+pub(crate) struct RenderedLine {
+    pub(crate) layout: TextLayout,
+    pub(crate) source_mappings: Vec<SourceMapping>,
+    pub(crate) source_end: usize,
+    pub(crate) language: Option<Arc<Language>>,
+    pub(crate) text_align: TextAlign,
     /// Highlighted source ranges intersecting this line, in paint order
-    highlights: SmallVec<[(Range<usize>, Hsla); 1]>,
+    pub(crate) highlights: SmallVec<[(Range<usize>, Hsla); 1]>,
     /// Inline code chip ranges intersecting this line, in rendered indices
-    code_chips: SmallVec<[(Range<usize>, Hsla); 1]>,
+    pub(crate) code_chips: SmallVec<[(Range<usize>, Hsla); 1]>,
 }
 
 impl RenderedLine {
     /// Painted before the glyphs so the text renders on top of the chips
-    fn paint_code_chips(&self, window: &mut Window) {
+    pub(crate) fn paint_code_chips(&self, window: &mut Window) {
         const CHIP_CORNER_RADIUS: Pixels = px(4.);
 
         if self.code_chips.is_empty() {
@@ -301,7 +311,7 @@ impl RenderedLine {
         }
     }
 
-    fn paint_highlights(&self, window: &mut Window) {
+    pub(crate) fn paint_highlights(&self, window: &mut Window) {
         if self.highlights.is_empty() {
             return;
         }
@@ -518,7 +528,10 @@ impl RenderedLine {
         }
     }
 
-    fn source_index_for_position(&self, position: Point<Pixels>) -> Result<usize, usize> {
+    pub(crate) fn source_index_for_position(
+        &self,
+        position: Point<Pixels>,
+    ) -> Result<usize, usize> {
         let adjusted_position = maybe!({
             if self.text_align == TextAlign::Left {
                 return None;
@@ -586,12 +599,12 @@ impl RenderedLine {
 }
 
 #[derive(Copy, Clone, Debug, Default)]
-struct SourceMapping {
-    rendered_index: usize,
-    source_index: usize,
+pub(crate) struct SourceMapping {
+    pub(crate) rendered_index: usize,
+    pub(crate) source_index: usize,
 }
 
-fn source_range_for_rendered(
+pub(crate) fn source_range_for_rendered(
     mappings: &[SourceMapping],
     rendered: &Range<usize>,
 ) -> Option<Range<usize>> {
@@ -603,7 +616,10 @@ fn source_range_for_rendered(
     Some(start..end)
 }
 
-fn source_index_for_rendered(mappings: &[SourceMapping], rendered_index: usize) -> Option<usize> {
+pub(crate) fn source_index_for_rendered(
+    mappings: &[SourceMapping],
+    rendered_index: usize,
+) -> Option<usize> {
     let mut last: Option<&SourceMapping> = None;
     for mapping in mappings {
         if mapping.rendered_index <= rendered_index {

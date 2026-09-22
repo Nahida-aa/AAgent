@@ -7,26 +7,33 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use aa_gpui_kit_ui::{
-    Checkbox, CopyButton, Icon, IconButton, IconName, IconSize, Label, ToggleState, Tooltip,
-    prelude::*,
+    Checkbox, CopyButton, Icon, IconButton, IconName, IconSize, Label, ScrollAxes, Scrollbars,
+    ToggleState, Tooltip, VisibleOnHover, WithScrollbar, prelude::*,
 };
 use gpui::{
     AnyElement, App, Bounds, ClipboardItem, CursorStyle, DispatchPhase, Div, Element, ElementId,
-    Entity, GlobalElementId, Hitbox, HitboxBehavior, Hsla, Image, ImageSource, IntoElement,
-    KeyContext, MouseButton, MouseDownEvent, MouseEvent, MouseMoveEvent, MouseUpEvent,
-    ParentElement, Pixels, Point, ScrollHandle, SharedString, Stateful, StyleRefinement, Styled,
-    StyledImage, StyledText, Subscription, Task, TextAlign, TextStyleRefinement, VisualContext,
-    Window, actions, canvas, div, img, point, px, quad, relative, size,
+    Entity, FontStyle, FontWeight, GlobalElementId, Hitbox, HitboxBehavior, Hsla, Image,
+    ImageSource, IntoElement, KeyContext, MouseButton, MouseDownEvent, MouseEvent, MouseMoveEvent,
+    MouseUpEvent, ParentElement, Pixels, Point, ScrollHandle, SharedString, Stateful,
+    StrikethroughStyle, StyleRefinement, Styled, StyledImage, StyledText, Subscription, Task,
+    TextAlign, TextStyleRefinement, VisualContext, Window, actions, canvas, div, img, point, px,
+    quad, rems, relative, size,
 };
-use gpui_util::maybe;
+use gpui_util::{ResultExt as _, maybe};
 use language::{Language, LanguageRegistry, ResolvedHighlights};
-use parser::CodeBlockMetadata;
+use pulldown_cmark::{Alignment, BlockQuoteKind};
 
 use crate::builder::MarkdownElementBuilder;
-use crate::entity::{
-    CheckboxToggleCallback, CodeBlockRenderer, CodeSpanLinkCallback, CopyButtonVisibility,
-    Markdown, MarkdownOptions, MermaidZoomCallback, SourceClickCallback, UrlHoverCallback,
-    WrapButtonVisibility,
+use crate::parser::{CodeBlockKind, CodeBlockMetadata, ParsedMetadataBlock};
+use crate::rendered::RenderedMarkdown;
+use crate::selection::SelectMode;
+use crate::style::HeadingLevelStyles;
+use crate::{
+    CheckboxToggleCallback, CodeSpanLinkCallback, MermaidZoomCallback, SourceClickCallback,
+    UrlHoverCallback,
+};
+use crate::{
+    CodeBlockRenderer, CopyButtonVisibility, Markdown, MarkdownOptions, WrapButtonVisibility,
 };
 use crate::highlights::MarkdownHighlights;
 use crate::mermaid::{MermaidState, render_mermaid_diagram};
@@ -408,7 +415,7 @@ impl MarkdownElement {
                 .child(
                     Icon::new(icon_name)
                         .size(IconSize::Small)
-                        .color(Color::Custom(border_color)),
+                        .color(border_color),
                 )
                 .child(
                     Label::new(label)
@@ -1413,7 +1420,7 @@ impl Element for MarkdownElement {
                             let copy_button_visibility = *copy_button_visibility;
                             let wrap_button_visibility = *wrap_button_visibility;
                             builder.modify_current_div(|el| {
-                                let content_range = parser::extract_code_block_content_range(
+                                let content_range = crate::parser::extract_code_block_content_range(
                                     &parsed_markdown.source()[range.clone()],
                                 );
                                 let content_range = content_range.start + range.start
@@ -1653,7 +1660,7 @@ impl Element for MarkdownElement {
         let mut context = KeyContext::default();
         context.add("Markdown");
         window.set_key_context(context);
-        window.on_action(std::any::TypeId::of::<crate::Copy>(), {
+        window.on_action(std::any::TypeId::of::<crate::entity::Copy>(), {
             let entity = self.markdown.clone();
             let text = rendered_markdown.text.clone();
             move |_, phase, window, cx| {
@@ -1663,7 +1670,7 @@ impl Element for MarkdownElement {
                 }
             }
         });
-        window.on_action(std::any::TypeId::of::<crate::CopyAsMarkdown>(), {
+        window.on_action(std::any::TypeId::of::<crate::entity::CopyAsMarkdown>(), {
             let entity = self.markdown.clone();
             move |_, phase, window, cx| {
                 if phase == DispatchPhase::Bubble {
@@ -1732,7 +1739,7 @@ impl ParentElement for AnyDiv {
 }
 
 #[derive(Default)]
-struct TableState {
+pub(crate) struct TableState {
     alignments: Vec<Alignment>,
     in_head: bool,
     row_index: usize,
@@ -1803,7 +1810,7 @@ fn task_list_marker_for_item(
     }
 }
 
-struct MetadataCellStyle {
+pub(crate) struct MetadataCellStyle {
     row_index: usize,
     is_key: bool,
 }

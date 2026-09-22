@@ -2,7 +2,7 @@ use collections::HashMap;
 use std::ops::{Range, Sub};
 use std::sync::Arc;
 
-use aa_clock::{self as clock, Lamport};
+use clock::{Lamport};
 
 use super::dimensions::FullOffset;
 

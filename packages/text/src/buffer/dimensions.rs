@@ -1,7 +1,6 @@
 use std::cmp;
 use std::ops;
 
-use aa_clock as clock;
 
 use crate::locator::Locator;
 

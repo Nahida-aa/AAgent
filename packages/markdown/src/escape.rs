@@ -38,7 +38,7 @@ impl EscapeAction {
     }
 }
 
-pub(crate) struct MarkdownEscaper {
+pub struct MarkdownEscaper {
     in_leading_whitespace: bool,
 }
 

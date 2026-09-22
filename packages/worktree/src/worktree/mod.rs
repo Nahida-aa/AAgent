@@ -2,7 +2,7 @@
 
 use ::ignore::gitignore::{Gitignore, GitignoreBuilder};
 use crate::{IgnoreKind, IgnoreStack, WorktreeId, WorktreeSettings};
-use aa_clock::ReplicaId;
+use clock::ReplicaId;
 use aa_gpui_fuzzy::CharBag;
 use anyhow::{Context as _, Result, anyhow};
 use async_channel::{self, Sender};

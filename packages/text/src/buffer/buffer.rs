@@ -12,7 +12,7 @@ use std::ops::{Deref, Range};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use aa_clock::{self as clock, Global, Lamport, ReplicaId};
+use clock::{Global, Lamport, ReplicaId};
 use anyhow::Result;
 use postage::{oneshot, prelude::*};
 use sum_tree::{Bias, Dimensions, SumTree, TreeMap, TreeSet};

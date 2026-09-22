@@ -5,14 +5,14 @@ edition.workspace = true
 license.workspace = true
 
 [features]
-test-support = ["aa_clock/test-support", "collections/test-support", "gpui/test-support", "rpc/test-support"]
+test-support = ["clock/test-support", "collections/test-support", "gpui/test-support", "rpc/test-support"]
 
 [dependencies]
 anyhow.workspace = true
 async-channel.workspace = true
 async-tungstenite = { workspace = true, features = ["tokio", "tokio-rustls-manual-roots"] }
 chrono = { workspace = true, features = ["serde"] }
-aa_clock.workspace = true
+clock.workspace = true
 cloud_api_client.workspace = true
 cloud_api_types.workspace = true
 cloud_llm_client.workspace = true
@@ -54,7 +54,7 @@ worktree.workspace = true
 ad_credentials_provider.workspace = true
 
 [dev-dependencies]
-aa_clock = { workspace = true, features = ["test-support"] }
+clock = { workspace = true, features = ["test-support"] }
 collections = { workspace = true, features = ["test-support"] }
 fs.workspace = true
 gpui = { workspace = true, features = ["test-support"] }

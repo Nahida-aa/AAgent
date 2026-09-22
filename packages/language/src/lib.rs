@@ -35,7 +35,6 @@ mod symbol_kind;
 mod tests;
 
 // 让 `clock::` 在整个 crate 内可用（对齐 zed 中名为 `clock` 的外部 crate）。
-extern crate aa_clock as clock;
 
 pub use crate::language_settings::{
     AutoIndentMode, EditPredictionPromptFormat, EditPredictionsMode, IndentGuideSettings,

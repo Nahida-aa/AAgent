@@ -1,4 +1,5 @@
 use crate::parser::{MarkdownEvent, MarkdownTag, MarkdownTagEnd};
+use crate::rendered::RenderedText;
 use std::ops::Range;
 
 struct InlineSpan {
@@ -274,7 +275,7 @@ fn rebalance_delimiters(source: &str, spans: &[InlineSpan], selection: &Range<us
 }
 
 #[derive(Debug, Default, Clone)]
-enum SelectMode {
+pub(crate) enum SelectMode {
     #[default]
     Character,
     Word(Range<usize>),
@@ -283,16 +284,16 @@ enum SelectMode {
 }
 
 #[derive(Clone, Default)]
-struct Selection {
-    start: usize,
-    end: usize,
-    reversed: bool,
-    pending: bool,
-    mode: SelectMode,
+pub(crate) struct Selection {
+    pub(crate) start: usize,
+    pub(crate) end: usize,
+    pub(crate) reversed: bool,
+    pub(crate) pending: bool,
+    pub(crate) mode: SelectMode,
 }
 
 impl Selection {
-    fn set_head(&mut self, head: usize, rendered_text: &RenderedText) {
+    pub(crate) fn set_head(&mut self, head: usize, rendered_text: &RenderedText) {
         match &self.mode {
             SelectMode::Character => {
                 if head < self.tail() {
@@ -342,5 +343,5 @@ impl Selection {
         }
     }
 
-    fn tail(&self) -> usize { if self.reversed { self.end } else { self.start } }
+    pub(crate) fn tail(&self) -> usize { if self.reversed { self.end } else { self.start } }
 }

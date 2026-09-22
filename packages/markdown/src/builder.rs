@@ -1,29 +1,31 @@
+use std::cell::Cell;
 use std::mem;
 use std::ops::Range;
 use std::rc::Rc;
 use std::sync::Arc;
 
 use aa_gpui_kit_theme::SyntaxTheme;
-use aa_gpui_kit_ui::{Checkbox, Tooltip, WithScrollbar, prelude::*};
+use aa_gpui_kit_ui::{Checkbox, ToggleState, Tooltip, WithScrollbar, prelude::*};
 use gpui::{
-    AnyElement, AnyView, App, Div, Hsla, IntoElement, ParentElement, Pixels, SharedString,
-    Stateful, Styled, StyledText, TextRun, TextStyle, TextStyleRefinement, ToggleState, Window,
-    div, px, relative,
+    AnyElement, AnyView, App, Bounds, Div, Hsla, IntoElement, Length, ParentElement, Pixels,
+    SharedString, Stateful, Styled, StyledText, StyleRefinement, TextAlign, TextRun, TextStyle,
+    TextStyleRefinement, Window, div, px, rems, relative,
 };
 use language::{Language, ResolvedHighlights, Rope};
 use smallvec::SmallVec;
 use sum_tree::TreeMap;
 
-use crate::element::{AnyDiv, MetadataCellStyle};
-use crate::entity::CheckboxToggleCallback;
-use crate::highlights::MarkdownHighlights;
+use crate::element::{AnyDiv, MetadataCellStyle, TableState};
+use crate::CheckboxToggleCallback;
+use crate::highlights::{HighlightedLine, MarkdownHighlights};
 use crate::parsed::{CodeBlockHighlights, ParsedMarkdown};
 use crate::rendered::{
-    RenderedFootnoteRef, RenderedImageLink, RenderedLine, RenderedLink, SourceMapping,
+    RenderedFootnoteRef, RenderedImageLink, RenderedLine, RenderedLink, RenderedMarkdown,
+    RenderedText, SourceMapping, source_range_for_rendered,
 };
 use crate::style::MarkdownStyle;
 
-pub(super) struct MarkdownElementBuilder {
+pub(crate) struct MarkdownElementBuilder {
     pub(super) div_stack: Vec<DivStackEntry>,
     rendered_lines: Vec<Rc<RenderedLine>>,
     pending_line: PendingLine,
@@ -323,7 +325,10 @@ impl MarkdownElementBuilder {
                 }
 
                 let run_len = run_range.len();
-                let highlight = self.syntax_theme.get(*highlight_id).cloned();
+                let highlight = self
+                    .syntax_theme
+                    .highlight(usize::from(*highlight_id))
+                    .cloned();
                 if let Some(highlight) = highlight {
                     self.pending_line
                         .runs
@@ -497,8 +502,8 @@ impl MarkdownElementBuilder {
 }
 
 struct DivStackEntry {
-    div: AnyDiv,
-    line_break_mode: LineBreakMode,
+    pub(crate) div: AnyDiv,
+    pub(crate) line_break_mode: LineBreakMode,
 }
 
 #[derive(Clone, Copy, Eq, PartialEq)]
@@ -518,14 +523,14 @@ impl DivStackEntry {
 
 #[derive(Default)]
 struct PendingLine {
-    text: String,
-    runs: Vec<TextRun>,
-    source_mappings: Vec<SourceMapping>,
+    pub(crate) text: String,
+    pub(crate) runs: Vec<TextRun>,
+    pub(crate) source_mappings: Vec<SourceMapping>,
     /// Rendered (not source) indices, so chips hug the glyphs and ignore
     /// unrendered characters like the surrounding backticks
-    code_chips: Vec<(Range<usize>, Hsla)>,
+    pub(crate) code_chips: Vec<(Range<usize>, Hsla)>,
 }
 
-struct ListStackEntry {
-    bullet_index: Option<u64>,
+pub(crate) struct ListStackEntry {
+    pub(crate) bullet_index: Option<u64>,
 }

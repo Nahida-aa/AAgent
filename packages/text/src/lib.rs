@@ -36,4 +36,4 @@ pub use sum_tree::Bias;
 
 // `ReplicaId` is used pervasively alongside `Buffer`, so keep it available at
 // the crate root as well.
-pub use aa_clock::ReplicaId;
+pub use clock::ReplicaId;

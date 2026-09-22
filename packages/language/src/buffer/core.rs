@@ -7,7 +7,7 @@ use crate::{
     syntax_map::SyntaxMap,
 };
 use ::util::debug_panic;
-use aa_clock::{self as clock, Lamport, ReplicaId};
+use clock::{Lamport, ReplicaId};
 use collections::HashMap;
 use encoding_rs::Encoding;
 use fs::MTime;
@@ -56,8 +56,8 @@ pub struct Buffer {
     saved_mtime: Option<MTime>,
     /// The version vector when this buffer was last loaded from
     /// or saved to disk.
-    saved_version: aa_clock::Global,
-    preview_version: aa_clock::Global,
+    saved_version: clock::Global,
+    preview_version: clock::Global,
     transaction_depth: usize,
     was_dirty_before_starting_transaction: Option<bool>,
     reload_task: Option<Task<Result<()>>>,
@@ -73,7 +73,7 @@ pub struct Buffer {
     non_text_state_update_count: usize,
     diagnostics: TreeMap<LanguageServerId, DiagnosticSet>,
     remote_selections: TreeMap<ReplicaId, SelectionSet>,
-    diagnostics_timestamp: aa_clock::Lamport,
+    diagnostics_timestamp: clock::Lamport,
     completion_triggers: BTreeSet<String>,
     completion_triggers_per_language_server: HashMap<LanguageServerId, BTreeSet<String>>,
     completion_triggers_timestamp: clock::Lamport,

@@ -9,7 +9,7 @@ test-support = ["rand", "util/test-support"]
 
 [dependencies]
 anyhow.workspace = true
-aa_clock.workspace = true
+clock.workspace = true
 collections.workspace = true
 log.workspace = true
 parking_lot.workspace = true

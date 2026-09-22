@@ -5,13 +5,10 @@ pub use pulldown_cmark::TagEnd as MarkdownTagEnd;
 use pulldown_cmark::{
     Alignment, CowStr, HeadingLevel, LinkType, MetadataBlockKind, Options, Parser,
 };
-use std::collections::BTreeMap;
 use std::ops::Range;
 use std::sync::Arc;
-use std::{ops::Range, sync::Arc};
 use util::markdown::generate_heading_slug;
 
-use collections::{HashMap, HashSet};
 use language::{Language, ResolvedHighlights, Rope};
 use sum_tree::TreeMap;
 

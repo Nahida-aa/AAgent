@@ -1,5 +1,5 @@
 use crate::{CharClassifier, CharKind, CharScopeContext, LanguageScope};
-use aa_clock::{self as clock, Global};
+use clock::{Global};
 use anyhow::{Context, anyhow};
 use imara_diff::{Algorithm, InternedInput, Interner, Token, sources::lines};
 use std::{fmt::Write, iter, ops::Range, sync::Arc};

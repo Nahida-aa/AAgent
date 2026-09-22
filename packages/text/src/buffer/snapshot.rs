@@ -5,7 +5,7 @@ use crate::locator::Locator;
 use crate::patch::Patch;
 use crate::undo_map::UndoMap;
 use crate::{anchor::Anchor, buffer::LineIndent};
-use aa_clock::{self as clock, Global, ReplicaId};
+use clock::{Global, ReplicaId};
 use rope::{Chunks, OffsetUtf16, Point, PointUtf16, Rope, TextDimension, TextSummary, Unclipped};
 use std::{
     borrow::Cow,

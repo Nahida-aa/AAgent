@@ -3,11 +3,16 @@ use std::sync::Arc;
 use aa_gpui_kit_theme::SyntaxTheme;
 use gpui::{
     AbsoluteLength, App, BorderStyle, DefiniteLength, EdgesRefinement, FontWeight, Hsla, Length,
-    Pixels, Point, Rems, TextStyle, TextStyleRefinement, UnderlineStyle, Window, px, relative,
-    rems,
+    Pixels, Point, Rems, StyleRefinement, TextStyle, TextStyleRefinement, UnderlineStyle, Window,
+    point, px, relative, rems,
 };
+use aa_gpui_kit_theme::ActiveTheme as _;
+use pulldown_cmark::BlockQuoteKind;
+use refineable::Refineable as _;
 use settings::Settings as _;
 use theme_settings::ThemeSettings;
+
+use crate::LinkStyleCallback;
 
 #[derive(Clone, Copy)]
 pub enum MarkdownFont {
@@ -120,7 +125,7 @@ impl MarkdownStyle {
     /// markdown using a theme other than the active editor theme.
     pub fn themed_with_overrides(
         font: MarkdownFont,
-        colors: &theme::ThemeColors,
+        colors: &aa_gpui_kit_theme::ThemeColors,
         syntax: &Arc<SyntaxTheme>,
         window: &Window,
         cx: &App,
@@ -217,7 +222,7 @@ impl MarkdownStyle {
                     font_features: Some(theme_settings.buffer_font.features.clone()),
                     font_size: Some(buffer_font_size.into()),
                     font_weight: Some(buffer_font_weight),
-                    line_height: Some(relative(theme_settings.buffer_line_height.value())),
+                    line_height: Some(relative(theme_settings.buffer_line_height_value())),
                     ..Default::default()
                 },
                 ..Default::default()
@@ -280,7 +285,7 @@ impl MarkdownStyle {
         }
     }
 
-    fn with_preview_overrides(mut self, colors: &theme::ThemeColors) -> Self {
+    fn with_preview_overrides(mut self, colors: &aa_gpui_kit_theme::ThemeColors) -> Self {
         let body_font_size = rems(1.0);
         self.base_text_style.font_size = body_font_size.into();
         self.container_style.text.font_size = Some(body_font_size.into());

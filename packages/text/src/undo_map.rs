@@ -1,5 +1,5 @@
 use crate::UndoOperation;
-use aa_clock::{self as clock, Lamport};
+use clock::{Lamport};
 use std::cmp;
 use sum_tree::{Bias, SumTree};
 

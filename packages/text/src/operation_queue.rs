@@ -1,4 +1,4 @@
-use aa_clock::{self as clock, Lamport};
+use clock::{Lamport};
 use std::{fmt::Debug, ops::Add};
 use sum_tree::{ContextLessSummary, Dimension, Edit, Item, KeyedItem, SumTree};
 

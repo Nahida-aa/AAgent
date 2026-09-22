@@ -1,7 +1,6 @@
 use std::cmp::{self, Ordering, Reverse};
 use std::ops::Range;
 
-use aa_clock as clock;
 use smallvec::SmallVec;
 use sum_tree::{SumTree, Summary};
 

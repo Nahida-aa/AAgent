@@ -19,7 +19,7 @@ test-support = [
 anyhow.workspace = true
 async-channel.workspace = true
 async-lock.workspace = true
-aa_clock.workspace = true
+clock.workspace = true
 collections.workspace = true
 encoding_rs.workspace = true
 fs.workspace = true
@@ -45,7 +45,7 @@ util.workspace = true
 a_tracing.workspace = true
 
 [dev-dependencies]
-aa_clock = { workspace = true, features = ["test-support"] }
+clock = { workspace = true, features = ["test-support"] }
 collections = { workspace = true, features = ["test-support"] }
 gpui = { workspace = true, features = ["test-support"] }
 paths = { workspace = true, features = ["test-support"] }

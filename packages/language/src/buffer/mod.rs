@@ -61,8 +61,7 @@ pub(crate) use util::{contiguous_ranges, offset_in_sub_ranges, trailing_whitespa
 
 // 共享导入桥接：拆分的子模块通过 `use super::*` 复用（原 zed buffer.rs 顶部 import 块）。
 // 注意：这里不 `use text::*`，因为 `text::Buffer` 与本地 `Buffer` 同名会冲突；改为显式列出所需项。
-pub(crate) use aa_clock as clock;
-pub(crate) use aa_clock::{Global, Lamport, ReplicaId};
+pub(crate) use clock::{Global, Lamport, ReplicaId};
 pub(crate) use aa_gpui_kit_theme::SyntaxTheme;
 pub(crate) use anyhow::{Context as _, Result};
 pub(crate) use collections::HashMap;

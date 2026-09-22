@@ -1,6 +1,6 @@
 use std::time::{Duration, Instant};
 
-use aa_clock::{self as clock, Lamport};
+use clock::{Lamport};
 use sum_tree::TreeMap;
 
 use super::operation::Operation;

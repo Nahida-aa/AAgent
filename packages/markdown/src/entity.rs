@@ -1,21 +1,25 @@
 use base64::Engine as _;
 use collections::{HashMap, HashSet};
 use gpui::{
-    App, ClipboardItem, Context, Entity, FocusHandle, Focusable, Hsla, Image, ImageFormat, Pixels,
-    Point, ScrollHandle, SharedString, Subscription, Task, Window, actions, point, px, size,
+    App, ClipboardItem, Context, Div, ElementId, Entity, FocusHandle, Focusable, Hsla, Image,
+    ImageFormat, Pixels, Point, ScrollHandle, SharedString, Subscription, Task, Window, actions,
+    point, px, size,
 };
 use language::{Language, LanguageName, LanguageRegistry, Rope};
 use log::Level;
 use settings::Settings as _;
 use std::borrow::Cow;
 use std::collections::BTreeMap;
+use std::ops::Range;
 use std::path::Path;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::time::Duration;
+use sum_tree::TreeMap;
 use theme_settings::ThemeSettings;
 use util::ResultExt;
 
+use crate::element::AnyDiv;
 use crate::mermaid::{
     MermaidState, ParsedMarkdownMermaidDiagram, extract_mermaid_diagrams, render_mermaid_diagram,
 };
@@ -24,8 +28,10 @@ use crate::parser::{
     CodeBlockKind, CodeBlockMetadata, MarkdownEvent, MarkdownTag, MarkdownTagEnd,
     ParsedMetadataBlock, parse_links_only, parse_markdown_with_options,
 };
+use crate::rendered::{RenderedFootnoteRef, RenderedLink, RenderedText};
 use crate::selection::Selection;
 use crate::style::MarkdownStyle;
+use crate::{MERMAID_MAX_ZOOM, MERMAID_ZOOM_DEBOUNCE, MERMAID_ZOOM_SNAP_TOLERANCE};
 
 /// Per-diagram view state, keyed by source offset in [`Markdown::mermaid_views`].
 struct MermaidViewState {
@@ -197,7 +203,7 @@ impl Markdown {
 
         let theme_subscription = if options.render_mermaid_diagrams {
             Some(
-                cx.observe_global::<theme::GlobalTheme>(|this: &mut Self, cx| {
+                cx.observe_global::<aa_gpui_kit_theme::GlobalTheme>(|this: &mut Self, cx| {
                     this.invalidate_mermaid_cache(cx);
                 }),
             )
@@ -731,7 +737,7 @@ impl Markdown {
         let language_registry = self.language_registry.clone();
         let fallback = self.fallback_code_block_language.clone();
 
-        let parsed = cx.background_spawn(async move {
+        let parsed = cx.background_executor().spawn(async move {
             if should_parse_links_only {
                 return (
                     ParsedMarkdown {

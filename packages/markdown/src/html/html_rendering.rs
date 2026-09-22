@@ -3,6 +3,7 @@ use std::ops::Range;
 use aa_gpui_kit_ui::prelude::*;
 use gpui::{
     App, FontStyle, FontWeight, StrikethroughStyle, TextAlign, TextStyleRefinement, UnderlineStyle,
+    rems,
 };
 use pulldown_cmark::Alignment;
 

@@ -1,4 +1,3 @@
-use aa_clock as clock;
 
 use rope::{Cursor, Rope};
 

@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use aa_clock::ReplicaId;
+use clock::ReplicaId;
 use collections::{BTreeMap, HashSet};
 
 pub struct Network<T: Clone, R: rand::Rng> {

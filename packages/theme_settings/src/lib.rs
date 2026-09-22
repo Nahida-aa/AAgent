@@ -6,6 +6,8 @@
 
 pub mod settings;
 
+pub use settings::ThemeSettings;
+
 use std::borrow::Cow;
 use std::sync::Arc;
 

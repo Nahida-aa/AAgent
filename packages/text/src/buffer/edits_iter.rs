@@ -1,7 +1,6 @@
 use std::cmp;
 use std::ops::{Range, Sub};
 
-use aa_clock as clock;
 use sum_tree::{Bias, FilterCursor};
 
 use crate::anchor::Anchor;

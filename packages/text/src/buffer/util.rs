@@ -1,7 +1,6 @@
 use std::cmp;
 use std::ops::Range;
 
-use aa_clock as clock;
 use sum_tree::Edit as SumTreeEdit;
 
 use crate::locator::Locator;

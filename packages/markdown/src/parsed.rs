@@ -21,7 +21,7 @@ pub struct ParsedMarkdown {
     pub languages_by_name: TreeMap<SharedString, Arc<Language>>,
     pub languages_by_path: TreeMap<Arc<str>, Arc<Language>>,
     pub root_block_starts: Arc<[usize]>,
-    pub(crate) html_blocks: BTreeMap<usize, html::html_parser::ParsedHtmlBlock>,
+    pub(crate) html_blocks: BTreeMap<usize, crate::html::html_parser::ParsedHtmlBlock>,
     pub(crate) metadata_blocks: BTreeMap<usize, ParsedMetadataBlock>,
     pub(crate) mermaid_diagrams: BTreeMap<usize, ParsedMarkdownMermaidDiagram>,
     pub heading_slugs: HashMap<SharedString, usize>,
@@ -150,7 +150,7 @@ struct PendingCodeBlock<'a> {
     texts: Vec<(Range<usize>, &'a str)>,
 }
 
-fn compute_code_block_highlights(parsed: &ParsedMarkdown) -> CodeBlockHighlights {
+pub(crate) fn compute_code_block_highlights(parsed: &ParsedMarkdown) -> CodeBlockHighlights {
     let mut code_block_highlights = CodeBlockHighlights::default();
     let mut pending_block: Option<PendingCodeBlock> = None;
     for (range, event) in parsed.events.iter() {

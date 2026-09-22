@@ -229,7 +229,6 @@ objc2-foundation = { version = "=0.3.2", default-features = false, features = [
     "objc2-core-foundation",
     "std",
 ] }
-quote = "1.0.9"
 
 partial-json-fixer = "0.5.3"
 postage = { version = "0.5", features = ["futures-traits"] }
@@ -241,12 +240,13 @@ prost = "0.14"
 prost-build = "0.14"
 prost-types = "0.14"
 protox = "0.9"
+quick-xml = "0.41"
+quote = "1.0.9"
 
 rayon = "1.8"
 rand = "0.9"
 rsa = "0.9.6"
 rust-embed = { version = "8.11", features = ["include-exclude"] }
-vte = { version = "0.15.0", features = ["ansi"] }
 
 serde = { version = "1.0.221", features = ["derive", "rc"] }
 serde_json = { version = "1.0.144", features = ["preserve_order", "raw_value"] }
@@ -314,9 +314,12 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 thiserror = "2.0.12"
 unicase = "2.6"
 unindent = "0.2.0"
-uuid = { version = "1", features = ["v4"] }
+usvg = { version = "0.46.0", default-features = false }
+uuid = { version = "1.1.2", features = ["v4", "v5", "v7", "serde"] }
 unicode-segmentation = "1.10"
 urlencoding = "2.1.2"
+vte = { version = "0.15.0", features = ["ansi"] }
+
 walkdir = "2.5"
 wasm-encoder = "0.254"
 wasmparser = "0.254"

@@ -1,3 +1,77 @@
+use aho_corasick::{AhoCorasick, AhoCorasickBuilder};
+use anyhow::{Ok, Result};
+use client::proto;
+use fancy_regex::{Captures, Regex, RegexBuilder};
+use gpui::Entity;
+use itertools::Itertools as _;
+use language::{Buffer, BufferSnapshot, CharKind};
+use smol::future::yield_now;
+use std::{
+    borrow::Cow,
+    collections::BTreeSet,
+    io::{BufRead, BufReader, Read},
+    ops::Range,
+    sync::{Arc, LazyLock},
+};
+use text::Anchor;
+use util::{
+    paths::{PathMatcher, PathStyle},
+    rel_path::RelPath,
+};
+
+#[derive(Debug)]
+pub enum SearchResult {
+    Buffer {
+        buffer: Entity<Buffer>,
+        ranges: Vec<Range<Anchor>>,
+    },
+    LimitReached,
+    WaitingForScan,
+    Searching,
+}
+
+#[derive(Clone, Copy, PartialEq)]
+pub enum SearchInputKind {
+    Query,
+    Include,
+    Exclude,
+}
+
+#[derive(Clone, Debug)]
+pub struct SearchInputs {
+    query: Arc<str>,
+    files_to_include: PathMatcher,
+    files_to_exclude: PathMatcher,
+    match_full_paths: bool,
+    buffers: Option<Vec<Entity<Buffer>>>,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum MatchPositionHint {
+    Line(u32),
+    ByteOffset(usize),
+}
+
+impl Default for MatchPositionHint {
+    fn default() -> Self {
+        Self::Line(0)
+    }
+}
+
+impl SearchInputs {
+    pub fn as_str(&self) -> &str {
+        self.query.as_ref()
+    }
+    pub fn files_to_include(&self) -> &PathMatcher {
+        &self.files_to_include
+    }
+    pub fn files_to_exclude(&self) -> &PathMatcher {
+        &self.files_to_exclude
+    }
+    pub fn buffers(&self) -> &Option<Vec<Entity<Buffer>>> {
+        &self.buffers
+    }
+}
 #[derive(Clone, Debug)]
 pub enum SearchQuery {
     Text {
@@ -517,9 +591,13 @@ impl SearchQuery {
         matches
     }
 
-    pub fn is_empty(&self) -> bool { self.as_str().is_empty() }
+    pub fn is_empty(&self) -> bool {
+        self.as_str().is_empty()
+    }
 
-    pub fn as_str(&self) -> &str { self.as_inner().as_str() }
+    pub fn as_str(&self) -> &str {
+        self.as_inner().as_str()
+    }
 
     pub fn whole_word(&self) -> bool {
         match self {
@@ -546,26 +624,38 @@ impl SearchQuery {
         }
     }
 
-    pub fn is_regex(&self) -> bool { matches!(self, Self::Regex { .. }) }
+    pub fn is_regex(&self) -> bool {
+        matches!(self, Self::Regex { .. })
+    }
 
     pub fn replacement_requires_context(&self) -> bool {
         matches!(self, Self::Regex { escaped: false, .. })
     }
 
-    pub fn files_to_include(&self) -> &PathMatcher { self.as_inner().files_to_include() }
+    pub fn files_to_include(&self) -> &PathMatcher {
+        self.as_inner().files_to_include()
+    }
 
-    pub fn files_to_exclude(&self) -> &PathMatcher { self.as_inner().files_to_exclude() }
+    pub fn files_to_exclude(&self) -> &PathMatcher {
+        self.as_inner().files_to_exclude()
+    }
 
-    pub fn buffers(&self) -> Option<&Vec<Entity<Buffer>>> { self.as_inner().buffers.as_ref() }
+    pub fn buffers(&self) -> Option<&Vec<Entity<Buffer>>> {
+        self.as_inner().buffers.as_ref()
+    }
 
-    pub fn is_opened_only(&self) -> bool { self.as_inner().buffers.is_some() }
+    pub fn is_opened_only(&self) -> bool {
+        self.as_inner().buffers.is_some()
+    }
 
     pub fn filters_path(&self) -> bool {
         !(self.files_to_exclude().sources().next().is_none()
             && self.files_to_include().sources().next().is_none())
     }
 
-    pub fn match_full_paths(&self) -> bool { self.as_inner().match_full_paths }
+    pub fn match_full_paths(&self) -> bool {
+        self.as_inner().match_full_paths
+    }
 
     /// Check match full paths to determine whether you're required to pass a fully qualified
     /// project path (starts with a project root).

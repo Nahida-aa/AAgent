@@ -3409,6 +3409,39 @@ dependencies = [
 [[package]]
 name = "extension"
 version = "0.1.0"
+dependencies = [
+ "a_tracing",
+ "anyhow",
+ "async-trait",
+ "cloud_api_types",
+ "collections",
+ "dap",
+ "fs",
+ "futures",
+ "gpui",
+ "heck 0.5.0",
+ "http_client 0.1.0",
+ "indoc",
+ "language",
+ "log",
+ "lsp",
+ "parking_lot",
+ "path",
+ "pretty_assertions",
+ "proto",
+ "semver",
+ "serde",
+ "serde_json",
+ "task",
+ "tempfile",
+ "toml 0.8.23",
+ "tracing",
+ "url",
+ "util 0.1.0",
+ "wasm-encoder 0.254.0",
+ "wasmparser 0.254.0",
+ "which",
+]
 
 [[package]]
 name = "fancy-regex"

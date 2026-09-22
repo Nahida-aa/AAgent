@@ -1,4 +1,6 @@
 #[cfg(any(debug_assertions, feature = "build-remote-server-binary"))]
+use crate::remote_client::RemoteOs;
+#[cfg(any(debug_assertions, feature = "build-remote-server-binary"))]
 use anyhow::Result;
 #[cfg(any(debug_assertions, feature = "build-remote-server-binary"))]
 use gpui::{AppContext as _, AsyncApp};

@@ -43,13 +43,13 @@ pub fn has_active_connection(opts: &RemoteConnectionOptions, cx: &App) -> bool {
     })
 }
 
-pub(crate) enum ConnectionPoolEntry {
+pub enum ConnectionPoolEntry {
     Connecting(WeakShared<gpui::Task<Result<Arc<dyn RemoteConnection>, Arc<anyhow::Error>>>>),
     Connected(Weak<dyn RemoteConnection>),
 }
 
 #[derive(Default)]
-pub(crate) struct ConnectionPool {
+pub struct ConnectionPool {
     pub(crate) connections: HashMap<RemoteConnectionOptions, ConnectionPoolEntry>,
 }
 

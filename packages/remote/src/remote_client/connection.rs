@@ -6,6 +6,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 use futures::channel::mpsc::{Sender, UnboundedReceiver, UnboundedSender};
 use gpui::{App, AsyncApp, Task};
+use release_channel::ReleaseChannel;
 use rpc::proto::Envelope;
 use util::paths::{PathStyle, RemotePathBuf};
 

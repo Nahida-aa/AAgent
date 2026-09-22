@@ -52,6 +52,29 @@ pub fn truncate_and_trailoff(s: &str, max_chars: usize) -> String {
     }
 }
 
+/// Parses the contents of an `os-release` file (as found at `/etc/os-release`
+/// and described by the systemd spec) into a human-readable string such as
+/// `"ubuntu 24.04"`, combining the `ID` and `VERSION_ID` fields.
+///
+/// Returns `None` if no `ID` field is present. When `VERSION_ID` is absent
+/// (e.g. on rolling releases), only the `ID` is returned.
+pub fn parse_os_release(content: &str) -> Option<String> {
+    let mut id = None;
+    let mut version_id = None;
+    for line in content.lines() {
+        match line.split_once('=') {
+            Some(("ID", value)) => id = Some(value.trim_matches('"')),
+            Some(("VERSION_ID", value)) => version_id = Some(value.trim_matches('"')),
+            _ => {}
+        }
+    }
+    let id = id?;
+    Some(match version_id {
+        Some(version) => format!("{id} {version}"),
+        None => id.to_string(),
+    })
+}
+
 /// Re-exports that back [`fs_embed!`] so a caller only needs to depend on `util`,
 /// not on `rust_embed` directly (the macro's dependency is an implementation
 /// detail). Hidden from the public API.

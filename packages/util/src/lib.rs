@@ -87,24 +87,3 @@ pub use util_macros::{line_endings, path, uri};
 pub use self::shell::{
     get_default_system_shell, get_default_system_shell_preferring_bash, get_system_shell,
 };
-
-/// 早期返回 `None` 的便捷宏（对齐 zed `util::maybe`）。
-#[macro_export]
-macro_rules! maybe {
-    ($e:expr) => {
-        match $e {
-            Some(value) => value,
-            None => return None,
-        }
-    };
-}
-
-/// 仅在 debug 构建中 panic（对齐 zed `util::debug_panic`）。
-#[macro_export]
-macro_rules! debug_panic {
-    ($($arg:tt)*) => {
-        if cfg!(debug_assertions) {
-            panic!($($arg)*)
-        }
-    };
-}

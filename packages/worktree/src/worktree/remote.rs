@@ -1,4 +1,5 @@
 use super::*;
+use rpc::proto;
 
 pub struct RemoteWorktree {
     pub(crate) snapshot: Snapshot,

@@ -126,7 +126,7 @@ impl sum_tree::ContextLessSummary for EntrySummary {
 }
 
 #[derive(Clone, Debug)]
-struct PathEntry {
+pub(crate) struct PathEntry {
     id: ProjectEntryId,
     path: Arc<RelPath>,
     is_ignored: bool,
@@ -146,7 +146,7 @@ impl sum_tree::KeyedItem for PathEntry {
 }
 
 #[derive(Clone, Debug, Default)]
-struct PathEntrySummary {
+pub(crate) struct PathEntrySummary {
     max_id: ProjectEntryId,
 }
 
@@ -177,7 +177,7 @@ impl<'a> sum_tree::Dimension<'a, EntrySummary> for PathKey {
 }
 
 #[derive(Clone, Debug)]
-struct TraversalProgress<'a> {
+pub(crate) struct TraversalProgress<'a> {
     max_path: &'a RelPath,
     count: usize,
     non_ignored_count: usize,

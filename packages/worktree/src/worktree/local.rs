@@ -1,4 +1,6 @@
 use super::*;
+use postage::watch;
+use rpc::proto;
 
 pub struct LocalWorktree {
     pub(crate) snapshot: LocalSnapshot,
@@ -23,7 +25,7 @@ pub struct PathPrefixScanRequest {
     done: SmallVec<[barrier::Sender; 1]>,
 }
 
-struct ScanRequest {
+pub struct ScanRequest {
     relative_paths: Vec<Arc<RelPath>>,
     done: SmallVec<[barrier::Sender; 1]>,
 }

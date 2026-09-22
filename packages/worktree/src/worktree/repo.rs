@@ -1,4 +1,5 @@
 use super::*;
+use postage::watch;
 
 /// This path corresponds to the 'content path' of a repository in relation
 /// to Zed's project root.

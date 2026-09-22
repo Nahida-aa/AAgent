@@ -2,7 +2,12 @@ use super::*;
 mod diff;
 mod state;
 
-pub(crate) use state::{BackgroundScannerState, ScanJob, UpdateIgnoreStatusJob};
+pub(crate) use diff::{
+    EventRoot, build_diff, char_bag_for_path, is_beyond_scan_depth, merge_event_roots, swap_to_front,
+};
+pub(crate) use state::{
+    BackgroundScannerState, RemovedEntries, ScanJob, UpdateIgnoreStatusJob,
+};
 
 pub(crate) struct BackgroundScanner {
     pub(crate) state: async_lock::Mutex<BackgroundScannerState>,
@@ -25,7 +30,7 @@ pub(crate) struct BackgroundScanner {
 }
 
 #[derive(Copy, Clone, PartialEq)]
-enum BackgroundScannerPhase {
+pub(crate) enum BackgroundScannerPhase {
     InitialScan,
     EventsReceivedDuringInitialScan,
     Events,

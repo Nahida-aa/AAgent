@@ -1,4 +1,6 @@
 use super::*;
+use postage::watch;
+use rpc::proto;
 
 pub enum Worktree {
     Local(LocalWorktree),

@@ -139,7 +139,7 @@ pub(crate) async fn discover_git_paths(
 /// and, for repositories using the reftable backend, the `reftable` directory. On
 /// platforms with recursive watchers these calls are deduplicated against the existing
 /// recursive registration, making them effectively free.
-async fn watch_git_dir_subdirectories(git_dir_abs_path: &Path, fs: &dyn Fs, watcher: &dyn Watcher) {
+pub(crate) async fn watch_git_dir_subdirectories(git_dir_abs_path: &Path, fs: &dyn Fs, watcher: &dyn Watcher) {
     let reftable_dir_abs_path = git_dir_abs_path.join(REFTABLE_DIR);
     if fs.is_dir(&reftable_dir_abs_path).await {
         watcher
@@ -155,7 +155,7 @@ async fn watch_git_dir_subdirectories(git_dir_abs_path: &Path, fs: &dyn Fs, watc
 ///
 /// Each directory is watched before its children are enumerated, so that a child
 /// created concurrently is either seen by the enumeration or reported by the watch.
-async fn watch_dir_tree(root_abs_path: PathBuf, fs: &dyn Fs, watcher: &dyn Watcher) {
+pub(crate) async fn watch_dir_tree(root_abs_path: PathBuf, fs: &dyn Fs, watcher: &dyn Watcher) {
     let mut dirs_to_watch = vec![root_abs_path];
     while let Some(dir_abs_path) = dirs_to_watch.pop() {
         if !fs.is_dir(&dir_abs_path).await {
@@ -178,7 +178,7 @@ async fn watch_dir_tree(root_abs_path: PathBuf, fs: &dyn Fs, watcher: &dyn Watch
         }
     }
 }
-async fn is_dot_git(path: &Path, fs: &dyn Fs) -> bool {
+pub(crate) async fn is_dot_git(path: &Path, fs: &dyn Fs) -> bool {
     if let Some(file_name) = path.file_name()
         && file_name == DOT_GIT
     {

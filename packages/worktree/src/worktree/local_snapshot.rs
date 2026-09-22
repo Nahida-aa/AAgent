@@ -1,4 +1,5 @@
 use super::*;
+use rpc::proto;
 
 #[derive(Clone)]
 pub struct LocalSnapshot {

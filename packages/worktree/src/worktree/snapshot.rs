@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use aa_gpui_fuzzy::CharBag;
+use rpc::proto;
 use settings::WorktreeId;
 use sum_tree::SumTree;
 use util::{

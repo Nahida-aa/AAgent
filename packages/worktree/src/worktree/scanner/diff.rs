@@ -147,11 +147,11 @@ pub(crate) fn build_diff(
     changes.into()
 }
 
-fn is_beyond_scan_depth(file_scan_depth: Option<u32>, path: &RelPath) -> bool {
+pub(crate) fn is_beyond_scan_depth(file_scan_depth: Option<u32>, path: &RelPath) -> bool {
     file_scan_depth.is_some_and(|depth| path.components().count() >= depth as usize)
 }
 
-fn swap_to_front(child_paths: &mut Vec<PathBuf>, file: &str) {
+pub(crate) fn swap_to_front(child_paths: &mut Vec<PathBuf>, file: &str) {
     let position = child_paths
         .iter()
         .position(|path| path.file_name().unwrap() == file);
@@ -161,7 +161,7 @@ fn swap_to_front(child_paths: &mut Vec<PathBuf>, file: &str) {
     }
 }
 
-fn char_bag_for_path(root_char_bag: CharBag, path: &RelPath) -> CharBag {
+pub(crate) fn char_bag_for_path(root_char_bag: CharBag, path: &RelPath) -> CharBag {
     let mut result = root_char_bag;
     result.extend(path.as_unix_str().chars().map(|c| c.to_ascii_lowercase()));
     result

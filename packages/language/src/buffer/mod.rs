@@ -120,11 +120,15 @@ pub(crate) use language_core::{DebuggerTextObject, Grammar, TextObject};
 pub(crate) use row_chunk::{RowChunkId, RowChunks};
 
 // 子模块用到的、外部 crate 类型
+pub(crate) use crate::Diff;
+pub(crate) use crate::OutlineConfig;
 pub(crate) use crate::ResolvedHighlights;
+pub(crate) use crate::proto;
+pub(crate) use language_core::highlight_cache::ChunkHighlightCache;
 pub(crate) use path::PathStyle;
 pub(crate) use path::rel_path::RelPath;
 pub(crate) use rope::ChunkBitmaps;
-pub(crate) use rpc::proto;
+pub(crate) use text::FromAnchor;
 
 // 子模块用到的、定义在本模块树内的类型
 pub(crate) use edit::{AutoindentRequestEntry, IndentSuggestion};

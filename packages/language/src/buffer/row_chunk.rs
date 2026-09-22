@@ -3,6 +3,7 @@
 
 use std::{collections::BTreeSet, ops::Range};
 
+use aa_clock as clock;
 use collections::HashMap;
 use parking_lot::Mutex;
 use text::{Anchor, Point};

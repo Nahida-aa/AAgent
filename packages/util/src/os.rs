@@ -83,9 +83,9 @@ pub fn increase_open_file_limit() -> Result<()> {
 
 /// Returns a shell escaped path for the current zed executable
 #[cfg(not(target_family = "wasm"))]
-pub fn get_shell_safe_zed_path(shell_kind: shell::ShellKind) -> anyhow::Result<String> {
+pub fn get_shell_safe_zed_path(shell_kind: crate::shell::ShellKind) -> anyhow::Result<String> {
+    use crate::paths::PathExt;
     use anyhow::Context as _;
-    use paths::PathExt;
     let mut zed_path =
         std::env::current_exe().context("Failed to determine current zed executable path.")?;
     if cfg!(target_os = "linux")
@@ -212,9 +212,12 @@ pub async fn load_login_shell_environment() -> Result<()> {
     // into shell's `cd` command (and hooks) to manipulate env.
     // We do this so that we get the env a user would have when spawning a shell
     // in home directory.
-    for (name, value) in shell_env::capture(get_system_shell(), &[], paths::home_dir())
-        .await
-        .with_context(|| format!("capturing environment with {:?}", get_system_shell()))?
+    for (name, value) in
+        crate::shell_env::capture(crate::get_system_shell(), &[], crate::paths::home_dir())
+            .await
+            .with_context(|| {
+                format!("capturing environment with {:?}", crate::get_system_shell())
+            })?
     {
         // Skip SHLVL to prevent it from polluting Zed's process environment.
         // The login shell used for env capture increments SHLVL, and if we propagate it,

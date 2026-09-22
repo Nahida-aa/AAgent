@@ -209,7 +209,7 @@ dependencies = [
  "futures-util",
  "libc",
  "mdns-sd",
- "nix",
+ "nix 0.29.0",
  "serde",
  "serde_json",
  "settings",
@@ -751,7 +751,7 @@ dependencies = [
  "smol",
  "tempfile",
  "util",
- "which 8.0.6",
+ "which",
  "windows 0.62.2",
  "zeroize",
 ]
@@ -2022,6 +2022,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "command-fds"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1b60b5124979fccd9addd89d8b97a1d6eebb4950694520c75ddd722535ea443f"
+dependencies = [
+ "nix 0.31.3",
+ "thiserror 2.0.20",
+]
+
+[[package]]
 name = "compact_str"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3248,12 +3258,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "env_home"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7f84e12ccf0a7ddc17a6c41c93326024c42920d7ee630d04950e6926645c0fe"
-
-[[package]]
 name = "equator"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4247,7 +4251,7 @@ source = "git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c7
 dependencies = [
  "anyhow",
  "log",
- "which 8.0.6",
+ "which",
 ]
 
 [[package]]
@@ -4663,7 +4667,7 @@ dependencies = [
  "libc",
  "percent-encoding",
  "pin-project-lite",
- "socket2 0.5.10",
+ "socket2 0.6.5",
  "tokio",
  "tower-service",
  "tracing",
@@ -5769,7 +5773,7 @@ version = "1.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c0aeb26bf5e836cc1c341c8106051b573f1766dfa05aa87f0b98be5e51b02303"
 dependencies = [
- "nix",
+ "nix 0.29.0",
  "winapi",
 ]
 
@@ -6215,6 +6219,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "nix"
+version = "0.30.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "74523f3a35e05aba87a1d978330aef40f67b0304ac79c1c00b294c9830543db6"
+dependencies = [
+ "bitflags 2.13.2",
+ "cfg-if",
+ "cfg_aliases",
+ "libc",
+]
+
+[[package]]
+name = "nix"
+version = "0.31.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cf20d2fde8ff38632c426f1165ed7436270b44f199fc55284c38276f9db47c3d"
+dependencies = [
+ "bitflags 2.13.2",
+ "cfg-if",
+ "cfg_aliases",
+ "libc",
+]
+
+[[package]]
 name = "no_std_io2"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6243,7 +6271,7 @@ dependencies = [
  "smol",
  "util",
  "watch",
- "which 8.0.6",
+ "which",
 ]
 
 [[package]]
@@ -7679,7 +7707,7 @@ dependencies = [
  "util",
  "watch",
  "wax",
- "which 8.0.6",
+ "which",
  "worktree",
  "zeroize",
 ]
@@ -8453,7 +8481,7 @@ dependencies = [
  "thiserror 2.0.20",
  "urlencoding",
  "util",
- "which 8.0.6",
+ "which",
 ]
 
 [[package]]
@@ -9871,6 +9899,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "take-until"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8bdb6fa0dfa67b38c1e66b7041ba9dcf23b99d8121907cd31c807a332f7a0bbb"
+
+[[package]]
 name = "tao-core-video-sys"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10074,7 +10108,7 @@ dependencies = [
  "libc",
  "log",
  "memmem",
- "nix",
+ "nix 0.29.0",
  "num-derive",
  "num-traits",
  "ordered-float",
@@ -11143,6 +11177,7 @@ dependencies = [
  "async-fs",
  "async_zip",
  "collections",
+ "command-fds",
  "dirs",
  "futures",
  "futures-lite",
@@ -11152,6 +11187,7 @@ dependencies = [
  "libc",
  "log",
  "mach2 0.5.0",
+ "nix 0.30.1",
  "path",
  "percent-encoding",
  "rand 0.9.5",
@@ -11160,14 +11196,16 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
+ "serde_json_lenient",
  "shlex 1.3.0",
  "smol",
+ "take-until",
  "tempfile",
+ "unicase",
  "url",
  "util_macros 0.1.0",
  "walkdir",
- "which 7.0.3",
- "which 8.0.6",
+ "which",
 ]
 
 [[package]]
@@ -12522,18 +12560,6 @@ dependencies = [
 
 [[package]]
 name = "which"
-version = "7.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "24d643ce3fd3e5b54854602a080f34fb10ab75e0b813ee32d00ca2b44fa74762"
-dependencies = [
- "either",
- "env_home",
- "rustix",
- "winsafe",
-]
-
-[[package]]
-name = "which"
 version = "8.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bae2f2b2b816647a1cab1acc91f5bd20812d53cb344382635ec2181940c8034f"
@@ -13034,12 +13060,6 @@ dependencies = [
  "cfg-if",
  "windows-sys 0.59.0",
 ]
-
-[[package]]
-name = "winsafe"
-version = "0.0.19"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d135d17ab770252ad95e9a872d365cf3090e3be864a34ab46f48555993efc904"
 
 [[package]]
 name = "winx"

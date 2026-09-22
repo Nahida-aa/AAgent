@@ -13,6 +13,7 @@ use std::{
     ops::{Range, RangeInclusive},
 };
 mod connection;
+#[cfg(any(test, feature = "test-support"))]
 mod rng;
 pub use connection::ConnectionResult;
 pub mod markdown;

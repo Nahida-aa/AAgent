@@ -32,5 +32,4 @@ impl Project {
             });
         }
     }
-    pub fn inline_values(&mut self, session: Entity<Session>, active_stack_frame: ActiveStackFrame, buffer_handle: Entity<Buffer>, range: Range<Anchor>, cx: &mut Context<Self>) -> Task<Result<Vec<InlayHint>>> { /* 原样 */ }
 }

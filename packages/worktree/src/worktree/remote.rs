@@ -75,7 +75,9 @@ impl RemoteWorktree {
         .detach();
     }
 
-    fn observed_snapshot(&self, scan_id: usize) -> bool { self.completed_scan_id >= scan_id }
+    pub(crate) fn observed_snapshot(&self, scan_id: usize) -> bool {
+        self.completed_scan_id >= scan_id
+    }
 
     pub fn wait_for_snapshot(
         &mut self,

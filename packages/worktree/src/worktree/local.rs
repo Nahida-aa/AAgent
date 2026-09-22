@@ -21,13 +21,13 @@ pub struct LocalWorktree {
 }
 
 pub struct PathPrefixScanRequest {
-    path: Arc<RelPath>,
-    done: SmallVec<[barrier::Sender; 1]>,
+    pub(crate) path: Arc<RelPath>,
+    pub(crate) done: SmallVec<[barrier::Sender; 1]>,
 }
 
 pub struct ScanRequest {
-    relative_paths: Vec<Arc<RelPath>>,
-    done: SmallVec<[barrier::Sender; 1]>,
+    pub(crate) relative_paths: Vec<Arc<RelPath>>,
+    pub(crate) done: SmallVec<[barrier::Sender; 1]>,
 }
 impl LocalWorktree {
     pub fn fs(&self) -> &Arc<dyn Fs> { &self.fs }

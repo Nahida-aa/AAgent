@@ -22,7 +22,7 @@ pub struct Metadata {
 /// Do not derive Ord, PartialOrd, or arithmetic operation traits.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[serde(transparent)]
-pub struct MTime(SystemTime);
+pub struct MTime(pub(crate) SystemTime);
 
 impl MTime {
     /// Conversion intended for persistence and testing.

@@ -144,7 +144,7 @@ impl Snapshot {
         self.entries_by_id.get(&entry_id, ()).is_some()
     }
 
-    fn insert_entry(
+    pub(crate) fn insert_entry(
         &mut self,
         entry: proto::Entry,
         always_included_paths: &PathMatcher,
@@ -166,7 +166,7 @@ impl Snapshot {
         Ok(entry)
     }
 
-    fn delete_entry(&mut self, entry_id: ProjectEntryId) -> Option<Arc<RelPath>> {
+    pub(crate) fn delete_entry(&mut self, entry_id: ProjectEntryId) -> Option<Arc<RelPath>> {
         let removed_entry = self.entries_by_id.remove(&entry_id, ())?;
         self.entries_by_path = {
             let mut cursor = self.entries_by_path.cursor::<TraversalProgress>(());
@@ -187,7 +187,11 @@ impl Snapshot {
         Some(removed_entry.path)
     }
 
-    fn update_abs_path(&mut self, abs_path: Arc<SanitizedPath>, root_name: Arc<RelPath>) {
+    pub(crate) fn update_abs_path(
+        &mut self,
+        abs_path: Arc<SanitizedPath>,
+        root_name: Arc<RelPath>,
+    ) {
         self.abs_path = abs_path;
         if root_name != self.root_name {
             self.root_char_bag = root_name

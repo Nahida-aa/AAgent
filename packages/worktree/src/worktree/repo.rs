@@ -112,7 +112,7 @@ pub(crate) enum ScanState {
 }
 
 pub(crate) struct UpdateObservationState {
-    snapshots_tx: mpsc::UnboundedSender<(LocalSnapshot, UpdatedEntriesSet)>,
-    resume_updates: watch::Sender<()>,
-    _maintain_remote_snapshot: Task<Option<()>>,
+    pub(crate) snapshots_tx: mpsc::UnboundedSender<(LocalSnapshot, UpdatedEntriesSet)>,
+    pub(crate) resume_updates: watch::Sender<()>,
+    pub(crate) _maintain_remote_snapshot: Task<Option<()>>,
 }

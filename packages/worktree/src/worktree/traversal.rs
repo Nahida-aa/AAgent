@@ -105,7 +105,7 @@ pub enum PathTarget<'a> {
     Successor(&'a RelPath),
 }
 impl PathTarget<'_> {
-    fn cmp_path(&self, other: &RelPath) -> Ordering {
+    pub(crate) fn cmp_path(&self, other: &RelPath) -> Ordering {
         match self {
             PathTarget::Path(path) => path.cmp(&other),
             PathTarget::Successor(path) => {
@@ -142,7 +142,7 @@ pub(crate) enum TraversalTarget<'a> {
     },
 }
 impl<'a> TraversalTarget<'a> {
-    fn path(path: &'a RelPath) -> Self { Self::Path(PathTarget::Path(path)) }
+    pub(crate) fn path(path: &'a RelPath) -> Self { Self::Path(PathTarget::Path(path)) }
 
     fn successor(path: &'a RelPath) -> Self { Self::Path(PathTarget::Successor(path)) }
 

@@ -171,7 +171,7 @@ impl sum_tree::KeyedItem for Entry {
 }
 
 #[derive(Clone, Copy, Debug, Default, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct ProjectEntryId(usize);
+pub struct ProjectEntryId(pub(crate) usize);
 
 impl ProjectEntryId {
     pub const MAX: Self = Self(usize::MAX);

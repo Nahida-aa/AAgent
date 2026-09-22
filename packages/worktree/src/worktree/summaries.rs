@@ -127,10 +127,10 @@ impl sum_tree::ContextLessSummary for EntrySummary {
 
 #[derive(Clone, Debug)]
 pub(crate) struct PathEntry {
-    id: ProjectEntryId,
-    path: Arc<RelPath>,
-    is_ignored: bool,
-    scan_id: usize,
+    pub(crate) id: ProjectEntryId,
+    pub(crate) path: Arc<RelPath>,
+    pub(crate) is_ignored: bool,
+    pub(crate) scan_id: usize,
 }
 
 impl sum_tree::Item for PathEntry {
@@ -178,11 +178,11 @@ impl<'a> sum_tree::Dimension<'a, EntrySummary> for PathKey {
 
 #[derive(Clone, Debug)]
 pub(crate) struct TraversalProgress<'a> {
-    max_path: &'a RelPath,
-    count: usize,
-    non_ignored_count: usize,
-    file_count: usize,
-    non_ignored_file_count: usize,
+    pub(crate) max_path: &'a RelPath,
+    pub(crate) count: usize,
+    pub(crate) non_ignored_count: usize,
+    pub(crate) file_count: usize,
+    pub(crate) non_ignored_file_count: usize,
 }
 
 impl TraversalProgress<'_> {

@@ -141,7 +141,7 @@ impl HighlightedTextBuilder {
 
             if let Some(highlight_style) = chunk
                 .syntax_highlight_id
-                .and_then(|id| syntax_theme.get(id).cloned())
+                .and_then(|id| syntax_theme.highlight(usize::from(id)).cloned())
             {
                 let highlight_style = override_style.map_or(highlight_style, |override_style| {
                     highlight_style.highlight(override_style)

@@ -1,6 +1,6 @@
 use std::ffi::OsStr;
 use std::fmt::Debug;
-use std::ops::Range;
+use std::ops::{DerefMut, Range};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 

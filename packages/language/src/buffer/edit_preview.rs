@@ -1,5 +1,7 @@
 use super::*;
 
+use aa_gpui_kit_theme::ActiveTheme as _;
+
 #[derive(Clone)]
 pub struct EditPreview {
     pub(crate) old_snapshot: text::BufferSnapshot,

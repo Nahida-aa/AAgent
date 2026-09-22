@@ -289,7 +289,7 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_theme"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=c712ba162bd10c1a3a62d10c577acd8c06842249#c712ba162bd10c1a3a62d10c577acd8c06842249"
+source = "git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9#cba2f689e57b5f5963e4c6596ec6fca176f58fa9"
 dependencies = [
  "anyhow",
  "gpui",
@@ -3951,10 +3951,61 @@ dependencies = [
 [[package]]
 name = "git"
 version = "0.1.0"
+dependencies = [
+ "a_tracing",
+ "anyhow",
+ "askpass",
+ "async-channel 2.5.0",
+ "async-trait",
+ "collections",
+ "derive_more",
+ "futures",
+ "gpui",
+ "http_client 0.1.0",
+ "itertools 0.14.0",
+ "log",
+ "parking_lot",
+ "pretty_assertions",
+ "rand 0.9.5",
+ "regex",
+ "rope",
+ "schemars",
+ "serde",
+ "serde_json",
+ "smallvec",
+ "smol",
+ "sum_tree",
+ "tempfile",
+ "text",
+ "thiserror 2.0.20",
+ "time",
+ "url",
+ "urlencoding",
+ "util 0.1.0",
+ "uuid",
+]
 
 [[package]]
 name = "git_hosting_providers"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "futures",
+ "git",
+ "gpui",
+ "http_client 0.1.0",
+ "indoc",
+ "itertools 0.14.0",
+ "pretty_assertions",
+ "regex",
+ "serde",
+ "serde_json",
+ "settings",
+ "url",
+ "urlencoding",
+ "util 0.1.0",
+]
 
 [[package]]
 name = "gl_generator"

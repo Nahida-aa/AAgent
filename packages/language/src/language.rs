@@ -339,8 +339,8 @@ pub fn build_highlight_map(capture_names: &[&str], theme: &SyntaxTheme) -> Highl
 /// several nested scopes.
 #[derive(Clone, Debug)]
 pub struct LanguageScope {
-    language: Arc<Language>,
-    override_id: Option<u32>,
+    pub language: Arc<Language>,
+    pub override_id: Option<u32>,
 }
 impl LanguageScope {
     pub fn path_suffixes(&self) -> &[String] { self.language.path_suffixes() }

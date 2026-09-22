@@ -11,7 +11,7 @@ pub const SHORT_SHA_LENGTH: usize = 7;
 const SHA1_BYTE_LENGTH: usize = 20;
 const SHA256_BYTE_LENGTH: usize = 32;
 const SHA1_HEX_LENGTH: usize = SHA1_BYTE_LENGTH * 2;
-const SHA256_HEX_LENGTH: usize = SHA256_BYTE_LENGTH * 2;
+pub const SHA256_HEX_LENGTH: usize = SHA256_BYTE_LENGTH * 2;
 const HEX_DIGITS: &[u8; 16] = b"0123456789abcdef";
 
 #[derive(Clone, Copy, Eq, Hash, PartialEq)]

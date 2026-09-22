@@ -1,6 +1,6 @@
 use std::sync::atomic::AtomicU64;
 
-use util::ShellKind;
+use util::shell::ShellKind;
 
 pub(super) static NEXT_INIT_COMMAND_STARTUP_MARKER_ID: AtomicU64 = AtomicU64::new(1);
 

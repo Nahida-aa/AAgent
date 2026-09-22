@@ -1,6 +1,6 @@
 use collections::{HashMap, VecDeque};
 use gpui::App;
-use util::ShellKind;
+use util::shell::ShellKind;
 /// Process-wide flag set by headless hosts (e.g. the eval CLI) that have no
 /// controlling TTY. In such sandboxes PTY allocation and acquiring a
 /// controlling terminal fail with `ENOTTY`, so when this is set terminals run

@@ -3773,7 +3773,7 @@ async fn untracked_files_for_checkpoint(git: &GitBinary) -> Result<Vec<String>> 
         }
     });
 
-    smol::fs::write(&excludes_file_path, include_str!("./checkpoint.gitignore")).await?;
+    smol::fs::write(&excludes_file_path, include_str!("../blame/checkpoint.gitignore")).await?;
 
     let mut exclude_from_arg = OsString::from("--exclude-from=");
     exclude_from_arg.push(&excludes_file_path);

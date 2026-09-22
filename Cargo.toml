@@ -60,6 +60,7 @@ language_model_core = { path = "packages/language_model_core" }
 lsp = { path = "packages/lsp" }
 migrator = { path = "packages/migrator" }
 markdown = { path = "packages/markdown" }
+mermaid_render = { path = "packages/mermaid_render" }
 node_runtime = { path = "packages/node_runtime" }
 terminal = { path = "packages/terminal" }
 terminal_view = { path = "packages/terminal_view" }

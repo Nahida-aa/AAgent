@@ -15,7 +15,7 @@ use settings_content::{
     TerminalLineHeight, VenvSettings, WorkingDirectory,
 };
 use settings_macros::RegisterSetting;
-use util::Shell;
+use util::shell::Shell;
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema, PartialEq, Eq)]
 pub struct Toolbar {

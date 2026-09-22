@@ -40,7 +40,7 @@ use std::{
     borrow::Cow,
     cmp::{self, min},
 };
-use util::{ShellKind, truncate_and_trailoff};
+use util::{shell::ShellKind, truncate_and_trailoff};
 
 use super::{PtyResources, Terminal, TerminalType}; // task_summary 在 task.rs
 use std::process::ExitStatus;

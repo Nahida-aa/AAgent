@@ -31,8 +31,8 @@ use std::path::PathBuf;
 use std::process::ExitStatus;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use util::Shell;
 use util::paths::PathStyle;
+use util::shell::Shell;
 use vte::ansi::{Processor, StdSyncHandler};
 
 pub struct TerminalBuilder {

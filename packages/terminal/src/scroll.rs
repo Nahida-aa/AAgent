@@ -26,7 +26,7 @@ use std::{
     borrow::Cow,
     cmp::{self, min},
 };
-use util::ShellKind;
+use util::shell::ShellKind;
 
 use super::Terminal;
 

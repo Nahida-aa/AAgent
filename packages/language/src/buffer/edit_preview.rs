@@ -2,9 +2,9 @@ use super::*;
 
 #[derive(Clone)]
 pub struct EditPreview {
-    old_snapshot: text::BufferSnapshot,
-    applied_edits_snapshot: text::BufferSnapshot,
-    syntax_snapshot: SyntaxSnapshot,
+    pub(crate) old_snapshot: text::BufferSnapshot,
+    pub(crate) applied_edits_snapshot: text::BufferSnapshot,
+    pub(crate) syntax_snapshot: SyntaxSnapshot,
 }
 
 impl EditPreview {

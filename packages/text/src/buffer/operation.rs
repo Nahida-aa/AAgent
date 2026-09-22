@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use collections::HashMap;
 use std::ops::{Range, Sub};
 use std::sync::Arc;
 

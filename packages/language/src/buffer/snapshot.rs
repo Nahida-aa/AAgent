@@ -7,15 +7,15 @@ use std::sync::Arc;
 pub struct BufferSnapshot {
     pub text: text::BufferSnapshot,
     pub(crate) syntax: SyntaxSnapshot,
-    tree_sitter_data: Arc<TreeSitterData>,
-    diagnostics: TreeMap<LanguageServerId, DiagnosticSet>,
-    remote_selections: TreeMap<ReplicaId, SelectionSet>,
-    language: Option<Arc<Language>>,
-    file: Option<Arc<dyn File>>,
-    non_text_state_update_count: usize,
+    pub(crate) tree_sitter_data: Arc<TreeSitterData>,
+    pub(crate) diagnostics: TreeMap<LanguageServerId, DiagnosticSet>,
+    pub(crate) remote_selections: TreeMap<ReplicaId, SelectionSet>,
+    pub(crate) language: Option<Arc<Language>>,
+    pub(crate) file: Option<Arc<dyn File>>,
+    pub(crate) non_text_state_update_count: usize,
     pub capability: Capability,
-    modeline: Option<Arc<ModelineSettings>>,
-    resolved_settings: Option<Arc<LanguageSettings>>,
+    pub(crate) modeline: Option<Arc<ModelineSettings>>,
+    pub(crate) resolved_settings: Option<Arc<LanguageSettings>>,
 }
 
 #[derive(Clone, Debug)]
@@ -134,7 +134,7 @@ impl BufferSnapshot {
     /// Like [`Self::indent_size_for_line`], but reports the indentation a row
     /// logically sits at, which differs from its physical indentation on the
     /// closing line of a block comment. See [`Self::block_comment_closing_indent`].
-    fn logical_indent_size_for_line(&self, row: u32) -> IndentSize {
+    pub(crate) fn logical_indent_size_for_line(&self, row: u32) -> IndentSize {
         self.block_comment_closing_indent(Point::new(row, self.line_len(row)))
             .unwrap_or_else(|| self.indent_size_for_line(row))
     }
@@ -183,7 +183,7 @@ impl BufferSnapshot {
         result
     }
 
-    fn suggest_autoindents(
+    pub(crate) fn suggest_autoindents(
         &self,
         row_range: Range<u32>,
     ) -> Option<impl Iterator<Item = Option<IndentSuggestion>> + '_> {

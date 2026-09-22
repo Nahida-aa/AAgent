@@ -6,8 +6,8 @@
 //! [`Operation`] into the history and publishes a [`Patch`] on
 //! `self.subscriptions`.
 
+use collections::{HashMap, HashSet};
 use std::cmp::{self, Reverse};
-use std::collections::{HashMap, HashSet};
 use std::ops::{Deref, Range};
 use std::sync::Arc;
 use std::time::{Duration, Instant};

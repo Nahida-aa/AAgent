@@ -33,22 +33,22 @@ pub enum AutoindentMode {
 
 #[derive(Clone)]
 pub(crate) struct AutoindentRequest {
-    before_edit: BufferSnapshot,
-    entries: Vec<AutoindentRequestEntry>,
-    is_block_mode: bool,
-    ignore_empty_lines: bool,
+    pub(crate) before_edit: BufferSnapshot,
+    pub(crate) entries: Vec<AutoindentRequestEntry>,
+    pub(crate) is_block_mode: bool,
+    pub(crate) ignore_empty_lines: bool,
 }
 
 #[derive(Debug, Clone)]
 pub(crate) struct AutoindentRequestEntry {
     /// A range of the buffer whose indentation should be adjusted.
-    range: Range<Anchor>,
+    pub(crate) range: Range<Anchor>,
     /// The row of the edit start in the buffer before the edit was applied.
     /// This is stored here because the anchor in range is created after
     /// the edit, so it cannot be used with the before_edit snapshot.
-    old_row: Option<u32>,
-    indent_size: IndentSize,
-    original_indent_column: Option<u32>,
+    pub(crate) old_row: Option<u32>,
+    pub(crate) indent_size: IndentSize,
+    pub(crate) original_indent_column: Option<u32>,
 }
 
 #[derive(Debug)]

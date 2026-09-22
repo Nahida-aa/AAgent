@@ -508,6 +508,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "acp_thread"
+version = "0.1.0"
+
+[[package]]
+name = "action_log"
+version = "0.1.0"
+
+[[package]]
 name = "ad_credentials_provider"
 version = "0.1.0"
 dependencies = [
@@ -555,6 +563,22 @@ dependencies = [
  "cpufeatures 0.2.17",
  "zeroize",
 ]
+
+[[package]]
+name = "agent"
+version = "0.1.0"
+
+[[package]]
+name = "agent_servers"
+version = "0.1.0"
+
+[[package]]
+name = "agent_settings"
+version = "0.1.0"
+
+[[package]]
+name = "agent_skills"
+version = "0.1.0"
 
 [[package]]
 name = "agent_ui"

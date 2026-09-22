@@ -54,9 +54,10 @@ pub use constants::{CURRENT_PROJECT_FEATURES, MAX_PROJECT_SEARCH_HISTORY_SIZE};
 pub use constants::DEFAULT_COMPLETION_CONTEXT;
 pub use directory::{DirectoryItem, DirectoryLister};
 pub use event::{Event, OpenedBufferEvent};
-pub use fuzzy::{
-    Candidates, PathMatchCandidateSet, PathMatchCandidateSetIter, PathMatchCandidateSetNucleoIter,
-};
+// zed 这里同时导出 `PathMatchCandidateSetNucleoIter`（它把 fuzzy / fuzzy_nucleo
+// 当两个 crate 各实现一遍）。我们的 `aa_gpui_fuzzy` 已经统一到 nucleo 终态，
+// 只有一套 trait，故只保留 `PathMatchCandidateSetIter`。
+pub use fuzzy::{Candidates, PathMatchCandidateSet, PathMatchCandidateSetIter};
 pub use group_key::{ProjectGroupKey, path_suffix};
 pub use item::ProjectItem;
 pub use lsp_command::{CallHierarchyItem, IncomingCall, OutgoingCall};

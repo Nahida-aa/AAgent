@@ -1,3 +1,7 @@
+//! `RandomCharIter` — a biased random char iterator, used by tests and test-support.
+
+#![cfg(any(test, feature = "test-support"))]
+
 use rand::prelude::*;
 
 pub struct RandomCharIter<T: Rng> {

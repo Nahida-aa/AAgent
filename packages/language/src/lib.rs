@@ -62,15 +62,17 @@ pub use language_registry::{
 pub use manifest::{ManifestDelegate, ManifestName, ManifestProvider, ManifestQuery};
 pub use modeline::{ModelineSettings, parse_modeline};
 pub use outline::*;
-pub use runnable::{ResolvedRunnable, RunnableMatchCapture, RunnableRange, RunnableResolver};
+pub use runnable::{
+    ResolvedRunnable, Runnable, RunnableMatchCapture, RunnableRange, RunnableResolver, RunnableTag,
+};
 pub use syntax_map::{
     OwnedSyntaxLayer, SyntaxLayer, SyntaxMapMatches, ToTreeSitterPoint, TreeSitterOptions,
 };
 pub use task_context::{ContextLocation, ContextProvider};
 pub use text_diff::{
-    DiffOptions, apply_diff_patch, apply_reversed_diff_patch, char_diff, line_diff, text_diff,
-    text_diff_with_options, unified_diff, unified_diff_with_context, unified_diff_with_offsets,
-    word_diff_ranges,
+    Diff, DiffOptions, apply_diff_patch, apply_reversed_diff_patch, char_diff, line_diff,
+    text_diff, text_diff_with_options, unified_diff, unified_diff_with_context,
+    unified_diff_with_offsets, word_diff_ranges,
 };
 pub use toolchain::{
     LanguageToolchainStore, LocalLanguageToolchainStore, Toolchain, ToolchainList, ToolchainLister,
@@ -79,6 +81,7 @@ pub use toolchain::{
 
 pub use available_languages::AvailableLanguage;
 pub use buffer::Operation;
+pub use buffer::snapshot::CursorShape;
 pub use buffer::*;
 pub use diagnostic::{
     Diagnostic, DiagnosticMessage, DiagnosticSourceKind, RelatedInformation, RelatedLocation,
@@ -88,7 +91,11 @@ pub use file_content::{
     ByteContent, DecodedText, FILE_ANALYSIS_BYTES, analyze_byte_content, decode_text, encode_text,
 };
 pub use lsp::{LanguageServerId, LanguageServerName};
-pub use text::{AnchorRangeExt, LineEnding};
+pub use text::{
+    Anchor, AnchorRangeExt, Bias, BufferId, Edit, LineEnding, OffsetRangeExt, OffsetUtf16, Patch,
+    Point, PointUtf16, Rope, Selection, SelectionGoal, ToOffset, ToPoint, ToPointUtf16,
+    Transaction, TransactionId, Unclipped,
+};
 pub use tree_sitter::{Node, Parser, QueryCapture, Tree, TreeCursor};
 
 // 拆分出来的模块的公开导出
@@ -115,3 +122,5 @@ pub(crate) fn to_settings_soft_wrap(value: language_core::SoftWrap) -> settings:
         language_core::SoftWrap::Bounded => settings::SoftWrap::Bounded,
     }
 }
+
+pub(crate) use parser_pool::QUERY_CURSORS;

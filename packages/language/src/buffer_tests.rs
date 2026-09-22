@@ -39,7 +39,7 @@ pub static TRAILING_WHITESPACE_REGEX: LazyLock<regex::Regex> = LazyLock::new(|| 
 
 #[cfg(test)]
 #[ctor::ctor(unsafe)]
-fn init_logger() { zlog::init_test(); }
+fn init_logger() { a_log::init_test(); }
 
 #[gpui::test]
 fn test_line_endings(cx: &mut gpui::App) {

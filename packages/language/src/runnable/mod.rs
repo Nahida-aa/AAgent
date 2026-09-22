@@ -6,7 +6,21 @@ use text::BufferId;
 use tree_sitter::QueryCapture;
 use util::RangeExt;
 
-use crate::{BufferSnapshot, Language, Runnable, RunnableCapture, RunnableConfig, RunnableTag};
+use crate::{BufferSnapshot, Language, RunnableCapture, RunnableConfig};
+
+use gpui::SharedString;
+
+/// A tag applied to a [`Runnable`], e.g. the captured name of a test/command.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct RunnableTag(pub SharedString);
+
+/// A runnable is a set of data about a region that could be resolved into a task.
+#[derive(Clone, Debug)]
+pub struct Runnable {
+    pub tags: SmallVec<[RunnableTag; 1]>,
+    pub language: Arc<Language>,
+    pub buffer: BufferId,
+}
 
 pub struct RunnableRange {
     pub buffer_id: BufferId,

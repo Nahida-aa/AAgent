@@ -42,6 +42,7 @@ use text::{
     SelectionGoal, Subscription, TextDimension, TextSummary, ToOffset, ToOffsetUtf16, ToPoint,
     ToPointUtf16, Transaction, TransactionId, Unclipped, operation_queue::OperationQueue,
 };
+use util::debug_panic;
 
 /// An in-memory representation of a source code file, including its text,
 /// syntax trees, git status, and diagnostics.

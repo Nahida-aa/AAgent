@@ -1,6 +1,7 @@
 use super::*;
 use aa_clock::{self as clock, ReplicaId};
 use std::sync::Arc;
+use util::maybe;
 
 /// An immutable, cheaply cloneable representation of a fixed
 /// state of a buffer.
@@ -48,13 +49,6 @@ impl From<settings::CursorShape> for CursorShape {
             settings::CursorShape::Hollow => CursorShape::Hollow,
         }
     }
-}
-
-/// A runnable is a set of data about a region that could be resolved into a task
-pub struct Runnable {
-    pub tags: SmallVec<[RunnableTag; 1]>,
-    pub language: Arc<Language>,
-    pub buffer: BufferId,
 }
 
 impl BufferSnapshot {

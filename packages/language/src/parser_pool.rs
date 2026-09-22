@@ -8,7 +8,7 @@ use tree_sitter::{self, Parser, QueryCursor, Tree, WasmStore, wasmtime};
 
 use crate::syntax_map::QueryCursorHandle;
 
-static QUERY_CURSORS: Mutex<Vec<QueryCursor>> = Mutex::new(vec![]);
+pub(crate) static QUERY_CURSORS: Mutex<Vec<QueryCursor>> = Mutex::new(vec![]);
 static PARSERS: Mutex<Vec<Parser>> = Mutex::new(vec![]);
 
 static WASM_ENGINE: LazyLock<wasmtime::Engine> = LazyLock::new(|| {
@@ -47,7 +47,7 @@ where
     func(cursor.deref_mut())
 }
 
-pub(crate) fn parse_text(grammar: &Grammar, text: &Rope, old_tree: Option<Tree>) -> Tree {
+pub fn parse_text(grammar: &Grammar, text: &Rope, old_tree: Option<Tree>) -> Tree {
     with_parser(|parser| {
         parser
             .set_language(&grammar.ts_language)

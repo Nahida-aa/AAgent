@@ -1,10 +1,13 @@
-//! Task template 策略枚举。
-//!
-//! 对齐 Zed `task::RevealStrategy` / `HideStrategy` / `SaveStrategy` / `TaskHook`
-//! (crates/task/src/task_template.rs:95-137)。
-
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+
+/// What to do with the terminal pane and tab, after the command was started.
+#[derive(Clone, Copy, Debug, PartialEq, Hash, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum TaskHook {
+    #[serde(alias = "create_git_worktree")]
+    CreateWorktree,
+}
 
 /// What to do with the terminal pane and tab, after the command was started.
 #[derive(Default, Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
@@ -43,13 +46,4 @@ pub enum SaveStrategy {
     #[default]
     /// Don't save any buffers.
     None,
-}
-
-/// Task hook — 特殊 task actions，不是普通 shell 命令。
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum TaskHook {
-    /// Create a new git worktree before running the task.
-    #[serde(alias = "create_git_worktree")]
-    CreateWorktree,
 }

@@ -1,46 +1,32 @@
-//! SpawnInTerminal — 启动终端任务所需的完整参数。
-//!
-//! 对齐 Zed `crates/task/src/task.rs::SpawnInTerminal`（行 42）。
-//!
-//! Shell quoting / command 构造逻辑委托 `util::shell_builder::ShellBuilder`。
-
-use aagent_actions::RevealTarget;
-use collections::HashMap;
 use std::path::PathBuf;
 
-use util::shell::Shell;
+use collections::HashMap;
 
-use crate::{HideStrategy, RevealStrategy, SaveStrategy};
+use crate::{HideStrategy, RevealStrategy, RevealTarget, SaveStrategy, Shell};
 
-/// 任务唯一标识。
-#[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
-pub struct TaskId(pub String);
-
-/// 启动终端时需要的完整参数。
-///
-/// 对齐 Zed `task::SpawnInTerminal`，精简版：目前没有 reveal/hide 策略、
-/// shell 等完整任务配置字段——那些等 TaskTemplate resolve 时再加。
+/// Contains all information needed by Zed to spawn a new terminal tab for the given task.
 #[derive(Default, Debug, Clone, PartialEq, Eq)]
 pub struct SpawnInTerminal {
     /// Id of the task to use when determining task tab affinity.
-    pub id: TaskId,
+    pub id: crate::TaskId,
     /// Full unshortened form of `label` field.
     pub full_label: String,
     /// Human readable name of the terminal tab.
     pub label: String,
-    /// Executable command to spawn. None = 启动交互式 shell。
+    /// Executable command to spawn.
     pub command: Option<String>,
-    /// Arguments to the command.
+    /// Arguments to the command, potentially unsubstituted,
+    /// to let the shell that spawns the command to do the substitution, if needed.
     pub args: Vec<String>,
     /// A human-readable label, containing command and all of its arguments, joined and substituted.
     pub command_label: String,
     /// Current working directory to spawn the command into.
     pub cwd: Option<PathBuf>,
-    /// Env overrides for the command.
+    /// Env overrides for the command, will be appended to the terminal's environment from the settings.
     pub env: HashMap<String, String>,
-    /// Whether to use a new terminal tab or reuse the existing one.
+    /// Whether to use a new terminal tab or reuse the existing one to spawn the process.
     pub use_new_terminal: bool,
-    /// Whether to allow multiple instances of the same task.
+    /// Whether to allow multiple instances of the same task to be run, or rather wait for the existing ones to finish.
     pub allow_concurrent_runs: bool,
     /// What to do with the terminal pane and tab, after the command was started.
     pub reveal: RevealStrategy,
@@ -48,7 +34,7 @@ pub struct SpawnInTerminal {
     pub reveal_target: RevealTarget,
     /// What to do with the terminal pane and tab, after the command had finished.
     pub hide: HideStrategy,
-    /// Shell configuration。后续接入 ShellBuilder 时用。
+    /// Which shell to use when spawning the task.
     pub shell: Shell,
     /// Whether to show the task summary line in the task output (success/failure).
     pub show_summary: bool,
@@ -61,23 +47,31 @@ pub struct SpawnInTerminal {
 }
 
 impl SpawnInTerminal {
-    /// 从 command + args 拼出人类可读的完整命令行标签。
-    ///
-    /// 对齐 Zed `SpawnInTerminal::command_label`（task_template.rs:281）。
-    pub fn build_command_label(command: Option<&str>, args: &[String]) -> String {
-        let Some(cmd) = command else {
-            return String::new();
-        };
-        args.iter().fold(cmd.to_string(), |mut label, arg| {
-            label.push(' ');
-            label.push_str(arg);
-            label
-        })
+    pub fn to_proto(&self) -> proto::SpawnInTerminal {
+        proto::SpawnInTerminal {
+            label: self.label.clone(),
+            command: self.command.clone(),
+            args: self.args.clone(),
+            env: self
+                .env
+                .iter()
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect(),
+            cwd: self
+                .cwd
+                .clone()
+                .map(|cwd| cwd.to_string_lossy().into_owned()),
+        }
     }
 
-    /// 返回最终要执行的 command（如果有）+ args。
-    /// 等价于直接读 `self.command` 和 `self.args`，但语义更明确。
-    pub fn parts(&self) -> (Option<String>, Vec<String>) {
-        (self.command.clone(), self.args.clone())
+    pub fn from_proto(proto: proto::SpawnInTerminal) -> Self {
+        Self {
+            label: proto.label.clone(),
+            command: proto.command.clone(),
+            args: proto.args.clone(),
+            env: proto.env.into_iter().collect(),
+            cwd: proto.cwd.map(PathBuf::from),
+            ..Default::default()
+        }
     }
 }

@@ -14,13 +14,15 @@ use std::path::PathBuf;
 #[cfg(windows)]
 use std::sync::LazyLock;
 
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 // ---------- Shell ----------
 
 /// Runtime shell configuration. 与 settings_content::Shell 同构但带 runtime 方法 + Hash。
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Hash, JsonSchema)]
 #[serde(rename_all = "snake_case")]
+#[schemars(rename_all = "snake_case")]
 pub enum Shell {
     #[default]
     System,

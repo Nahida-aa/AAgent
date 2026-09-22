@@ -5,3 +5,10 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+anyhow.workspace = true
+credentials_provider.workspace = true
+futures.workspace = true
+gpui.workspace = true
+paths.workspace = true
+release_channel.workspace = true
+serde_json.workspace = true

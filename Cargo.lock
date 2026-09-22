@@ -438,6 +438,15 @@ dependencies = [
 [[package]]
 name = "ad_credentials_provider"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "credentials_provider",
+ "futures",
+ "gpui",
+ "paths",
+ "release_channel",
+ "serde_json",
+]
 
 [[package]]
 name = "addr2line"
@@ -940,6 +949,7 @@ dependencies = [
  "async-global-executor",
  "async-io",
  "async-lock",
+ "async-process",
  "crossbeam-utils",
  "futures-channel",
  "futures-core",
@@ -5299,10 +5309,12 @@ dependencies = [
  "log",
  "lsp",
  "parking_lot",
+ "path",
  "postage",
  "pretty_assertions",
  "rand 0.9.5",
  "regex",
+ "rope",
  "rpc",
  "semver",
  "serde",
@@ -6214,6 +6226,25 @@ dependencies = [
 [[package]]
 name = "node_runtime"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-compression",
+ "async-std",
+ "async-tar",
+ "async-trait",
+ "chrono",
+ "futures",
+ "http_client 0.1.0",
+ "log",
+ "paths",
+ "semver",
+ "serde",
+ "serde_json",
+ "smol",
+ "util",
+ "watch",
+ "which 8.0.6",
+]
 
 [[package]]
 name = "nom"
@@ -9864,8 +9895,19 @@ dependencies = [
  "aagent_actions",
  "anyhow",
  "collections",
+ "futures",
+ "gpui",
+ "hex",
+ "log",
+ "parking_lot",
+ "pretty_assertions",
+ "proto",
  "schemars",
  "serde",
+ "serde_json",
+ "serde_json_lenient",
+ "sha2 0.10.9",
+ "shellexpand",
  "util",
 ]
 

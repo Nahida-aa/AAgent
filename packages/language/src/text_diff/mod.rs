@@ -1,7 +1,11 @@
 use crate::{CharClassifier, CharKind, CharScopeContext, LanguageScope};
 use anyhow::{Context, anyhow};
-use imara_diff::{Algorithm, Diff, InternedInput, Interner, Token, sources::lines};
+use imara_diff::{Algorithm, InternedInput, Interner, Token, sources::lines};
 use std::{fmt::Write, iter, ops::Range, sync::Arc};
+
+/// The diff type produced by [`imara_diff`], re-exported for callers (e.g. the
+/// buffer's `diff`/`ensure_final_newline` helpers) that reference `Diff`.
+pub use imara_diff::Diff;
 
 const MAX_WORD_DIFF_LEN: usize = 512;
 const MAX_WORD_DIFF_LINE_COUNT: usize = 8;

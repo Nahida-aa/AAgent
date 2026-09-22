@@ -1,5 +1,3 @@
-use crate::LspQuery;
-use crate::lsp_query::Request;
 
 impl LspQuery {
     pub fn query_name_and_write_permissions(&self) -> (&str, bool) {

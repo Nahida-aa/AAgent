@@ -1,6 +1,3 @@
-use prost::{DecodeError, Message};
-
-use crate::Envelope;
 
 impl Envelope {
     #[inline(never)]

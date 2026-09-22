@@ -744,7 +744,7 @@ mod tests {
     use async_tungstenite::tungstenite::Message as WebSocketMessage;
     use gpui::TestAppContext;
 
-    fn init_logger() { zlog::init_test(); }
+    fn init_logger() { a_log::init_test(); }
 
     #[gpui::test(iterations = 50)]
     async fn test_request_response(cx: &mut TestAppContext) {

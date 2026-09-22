@@ -1,72 +1,42 @@
-use std::{
-    any::TypeId,
-    sync::{Arc, atomic::AtomicU64},
+#[cfg(any(test, feature = "test-support"))]
+pub mod test;
+
+mod actions;
+mod client;
+mod constants;
+mod credentials;
+mod env;
+mod error;
+mod settings;
+mod status;
+mod subscription;
+mod zed_link;
+
+mod llm_token;
+mod proxy;
+pub mod telemetry;
+pub mod user;
+pub mod zed_urls;
+
+#[cfg(test)]
+mod tests;
+
+pub use actions::init;
+pub use client::Client;
+pub use constants::{CONNECTION_TIMEOUT, INITIAL_RECONNECTION_DELAY, MAX_RECONNECTION_DELAY};
+pub use credentials::Credentials;
+pub use env::{ADMIN_API_TOKEN, IMPERSONATE_LOGIN, USE_WEB_LOGIN, ZED_ALWAYS_ACTIVE, ZED_APP_PATH};
+pub use error::EstablishConnectionError;
+pub use llm_token::*;
+pub use rpc::*;
+pub use settings::{ClientSettings, ProxySettings, TelemetrySettings};
+pub use status::Status;
+pub use subscription::{
+    GlobalClient, MessageToClientHandler, PendingEntitySubscription, Subscription,
 };
+pub use telemetry_events::Event;
+pub use user::*;
+pub use zed_link::{ZED_URL_SCHEME, ZedLink, parse_zed_link};
 
-pub struct Client {
-    id: AtomicU64,
-    peer: Arc<Peer>,
-    http: Arc<HttpClientWithUrl>,
-    cloud_client: Arc<CloudApiClient>,
-    telemetry: Arc<Telemetry>,
-    credentials_provider: ClientCredentialsProvider,
-    state: RwLock<ClientState>,
-    handler_set: Mutex<ProtoMessageHandlerSet>,
-    message_to_client_handlers: Mutex<Vec<MessageToClientHandler>>,
-    sign_out_tx: Mutex<Option<mpsc::UnboundedSender<()>>>,
-
-    #[allow(clippy::type_complexity)]
-    #[cfg(any(test, feature = "test-support"))]
-    authenticate:
-        RwLock<Option<Box<dyn 'static + Send + Sync + Fn(&AsyncApp) -> Task<Result<Credentials>>>>>,
-
-    #[allow(clippy::type_complexity)]
-    #[cfg(any(test, feature = "test-support"))]
-    establish_connection: RwLock<
-        Option<
-            Box<
-                dyn 'static
-                    + Send
-                    + Sync
-                    + Fn(
-                        &Credentials,
-                        &AsyncApp,
-                    ) -> Task<Result<Connection, EstablishConnectionError>>,
-            >,
-        >,
-    >,
-
-    #[cfg(any(test, feature = "test-support"))]
-    rpc_url: RwLock<Option<Url>>,
-}
-
-pub enum Subscription {
-    Entity {
-        client: Weak<Client>,
-        id: (TypeId, u64),
-    },
-    Message {
-        client: Weak<Client>,
-        id: TypeId,
-    },
-}
-
-impl Drop for Subscription {
-    fn drop(&mut self) {
-        match self {
-            Subscription::Entity { client, id } => {
-                if let Some(client) = client.upgrade() {
-                    let mut state = client.handler_set.lock();
-                    let _ = state.entities_by_type_and_remote_id.remove(id);
-                }
-            }
-            Subscription::Message { client, id } => {
-                if let Some(client) = client.upgrade() {
-                    let mut state = client.handler_set.lock();
-                    let _ = state.entity_types_by_message_type.remove(id);
-                    let _ = state.message_handlers.remove(id);
-                }
-            }
-        }
-    }
-}
+// 私有静态量仍然在 crate 根可见（同名或限定路径）
+pub(crate) use env::{ZED_RPC_URL, ZED_SERVER_URL};

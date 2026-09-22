@@ -17,6 +17,7 @@ use anyhow::Result;
 use postage::{oneshot, prelude::*};
 use sum_tree::{Bias, Dimensions, SumTree, TreeMap, TreeSet};
 
+use crate::anchor::OffsetRangeExt as _;
 use crate::locator::Locator;
 use crate::operation_queue::OperationQueue;
 use crate::subscription::{Subscription, Topic};

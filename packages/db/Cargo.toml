@@ -4,4 +4,23 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
+[features]
+test-support = []
+
 [dependencies]
+anyhow.workspace = true
+gpui.workspace = true
+indoc.workspace = true
+inventory.workspace = true
+log.workspace = true
+paths.workspace = true
+release_channel.workspace = true
+sqlez.workspace = true
+sqlez_macros.workspace = true
+util.workspace = true
+uuid.workspace = true
+aa_env_vars.workspace = true
+
+[dev-dependencies]
+gpui = { workspace = true, features = ["test-support"] }
+tempfile.workspace = true

@@ -1,4 +1,21 @@
 use super::*;
+use std::{
+    any::Any,
+    cell::Cell,
+    cmp::{self, Ordering, Reverse},
+    collections::{BTreeMap, BTreeSet},
+    fmt::Write as _,
+    future::Future,
+    iter::{self, Iterator, Peekable},
+    mem,
+    num::NonZeroU32,
+    ops::{Deref, Range},
+    path::PathBuf,
+    rc,
+    sync::Arc,
+    time::{Duration, Instant},
+    vec,
+};
 
 /// A configuration to use when producing styled text chunks.
 #[derive(Clone, Copy)]
@@ -12,18 +29,18 @@ pub struct LanguageAwareStyling {
 /// An iterator that yields chunks of a buffer's text, along with their
 /// syntax highlights and diagnostic status.
 pub struct BufferChunks<'a> {
-    buffer_snapshot: Option<&'a BufferSnapshot>,
-    range: Range<usize>,
-    chunks: text::Chunks<'a>,
-    diagnostic_endpoints: Option<Peekable<vec::IntoIter<DiagnosticEndpoint>>>,
-    error_depth: usize,
-    warning_depth: usize,
-    information_depth: usize,
-    hint_depth: usize,
-    unnecessary_depth: usize,
-    underline: bool,
-    highlights: Option<BufferChunkHighlights<'a>>,
-    cached_highlights: Option<CachedChunkHighlightsIter>,
+    pub(crate) buffer_snapshot: Option<&'a BufferSnapshot>,
+    pub(crate) range: Range<usize>,
+    pub(crate) chunks: text::Chunks<'a>,
+    pub(crate) diagnostic_endpoints: Option<Peekable<vec::IntoIter<DiagnosticEndpoint>>>,
+    pub(crate) error_depth: usize,
+    pub(crate) warning_depth: usize,
+    pub(crate) information_depth: usize,
+    pub(crate) hint_depth: usize,
+    pub(crate) unnecessary_depth: usize,
+    pub(crate) underline: bool,
+    pub(crate) highlights: Option<BufferChunkHighlights<'a>>,
+    pub(crate) cached_highlights: Option<CachedChunkHighlightsIter>,
 }
 
 /// A chunk of a buffer's text, along with its syntax highlight and
@@ -87,7 +104,7 @@ impl<'a> BufferChunks<'a> {
         Self::init(text, range, highlights, None, diagnostics, buffer_snapshot)
     }
 
-    fn with_cached_highlights(
+    pub(crate) fn with_cached_highlights(
         text: &'a Rope,
         range: Range<usize>,
         runs: Vec<HighlightRun>,

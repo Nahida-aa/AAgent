@@ -1,21 +1,24 @@
-use super::*;
+use std::time::{Duration, Instant};
 
-struct History {
-    base_text: Rope,
-    operations: TreeMap<clock::Lamport, Operation>,
-    undo_stack: Vec<HistoryEntry>,
-    redo_stack: Vec<HistoryEntry>,
-    transaction_depth: usize,
-    group_interval: Duration,
-}
+use aa_clock::{self as clock, Lamport};
+use sum_tree::TreeMap;
+
+use super::operation::Operation;
+use super::{TransactionId, constants::MAX_INSERTION_LEN}; // 若不需要 MAX_INSERTION_LEN 可省
+use rope::Rope;
 
 #[derive(Clone, Debug)]
-pub struct HistoryEntry {/* 原字段 */}
+pub struct HistoryEntry {
+    pub(crate) transaction: Transaction,
+    pub(crate) first_edit_at: Instant,
+    pub(crate) last_edit_at: Instant,
+    pub(crate) suppress_grouping: bool,
+}
 
 #[derive(Clone, Debug)]
 pub struct Transaction {
     pub id: TransactionId,
-    pub edit_ids: Vec<clock::Lamport>,
+    pub edit_ids: Vec<Lamport>,
     pub start: clock::Global,
 }
 
@@ -25,6 +28,15 @@ impl Transaction {
 
 impl HistoryEntry {
     pub fn transaction_id(&self) -> TransactionId { self.transaction.id }
+}
+
+pub(crate) struct History {
+    pub(crate) base_text: Rope,
+    pub(crate) operations: TreeMap<Lamport, Operation>,
+    pub(crate) undo_stack: Vec<HistoryEntry>,
+    pub(crate) redo_stack: Vec<HistoryEntry>,
+    pub(crate) transaction_depth: usize,
+    pub(crate) group_interval: Duration,
 }
 
 impl History {
@@ -44,9 +56,9 @@ impl History {
         }
     }
 
-    fn push(&mut self, op: Operation) { self.operations.insert(op.timestamp(), op); }
+    pub(crate) fn push(&mut self, op: Operation) { self.operations.insert(op.timestamp(), op); }
 
-    fn start_transaction(
+    pub(crate) fn start_transaction(
         &mut self,
         start: clock::Global,
         now: Instant,
@@ -71,7 +83,7 @@ impl History {
         }
     }
 
-    fn end_transaction(&mut self, now: Instant) -> Option<&HistoryEntry> {
+    pub(crate) fn end_transaction(&mut self, now: Instant) -> Option<&HistoryEntry> {
         assert_ne!(self.transaction_depth, 0);
         self.transaction_depth -= 1;
         if self.transaction_depth == 0 {
@@ -96,7 +108,7 @@ impl History {
         }
     }
 
-    fn group(&mut self) -> Option<TransactionId> {
+    pub(crate) fn group(&mut self) -> Option<TransactionId> {
         let mut count = 0;
         let mut entries = self.undo_stack.iter();
         if let Some(mut entry) = entries.next_back() {
@@ -114,7 +126,7 @@ impl History {
         self.group_trailing(count)
     }
 
-    fn group_until(&mut self, transaction_id: TransactionId) {
+    pub(crate) fn group_until(&mut self, transaction_id: TransactionId) {
         let mut count = 0;
         for entry in self.undo_stack.iter().rev() {
             if entry.transaction_id() == transaction_id {
@@ -147,7 +159,7 @@ impl History {
         self.undo_stack.last().map(|e| e.transaction.id)
     }
 
-    fn finalize_last_transaction(&mut self) -> Option<&Transaction> {
+    pub(crate) fn finalize_last_transaction(&mut self) -> Option<&Transaction> {
         self.undo_stack.last_mut().map(|entry| {
             entry.transaction.edit_ids.shrink_to_fit();
             entry.suppress_grouping = true;
@@ -155,7 +167,7 @@ impl History {
         })
     }
 
-    fn push_transaction(&mut self, transaction: Transaction, now: Instant) {
+    pub(crate) fn push_transaction(&mut self, transaction: Transaction, now: Instant) {
         assert_eq!(self.transaction_depth, 0);
         self.undo_stack.push(HistoryEntry {
             transaction,
@@ -176,7 +188,7 @@ impl History {
     /// cleared is to create transactions with the usual `start_transaction` and
     /// `end_transaction` methods and merging the resulting transactions into
     /// the transaction created by this method
-    fn push_empty_transaction(
+    pub(crate) fn push_empty_transaction(
         &mut self,
         start: clock::Global,
         now: Instant,
@@ -198,7 +210,7 @@ impl History {
         id
     }
 
-    fn push_undo(&mut self, op_id: clock::Lamport) {
+    pub(crate) fn push_undo(&mut self, op_id: clock::Lamport) {
         assert_ne!(self.transaction_depth, 0);
         if let Some(Operation::Edit(_)) = self.operations.get(&op_id) {
             let last_transaction = self.undo_stack.last_mut().unwrap();
@@ -206,7 +218,7 @@ impl History {
         }
     }
 
-    fn pop_undo(&mut self) -> Option<&HistoryEntry> {
+    pub(crate) fn pop_undo(&mut self) -> Option<&HistoryEntry> {
         assert_eq!(self.transaction_depth, 0);
         if let Some(entry) = self.undo_stack.pop() {
             self.redo_stack.push(entry);
@@ -216,7 +228,10 @@ impl History {
         }
     }
 
-    fn remove_from_undo(&mut self, transaction_id: TransactionId) -> Option<&HistoryEntry> {
+    pub(crate) fn remove_from_undo(
+        &mut self,
+        transaction_id: TransactionId,
+    ) -> Option<&HistoryEntry> {
         assert_eq!(self.transaction_depth, 0);
 
         let entry_ix = self
@@ -228,7 +243,10 @@ impl History {
         self.redo_stack.last()
     }
 
-    fn remove_from_undo_until(&mut self, transaction_id: TransactionId) -> &[HistoryEntry] {
+    pub(crate) fn remove_from_undo_until(
+        &mut self,
+        transaction_id: TransactionId,
+    ) -> &[HistoryEntry] {
         assert_eq!(self.transaction_depth, 0);
 
         let redo_stack_start_len = self.redo_stack.len();
@@ -243,7 +261,7 @@ impl History {
         &self.redo_stack[redo_stack_start_len..]
     }
 
-    fn forget(&mut self, transaction_id: TransactionId) -> Option<Transaction> {
+    pub(crate) fn forget(&mut self, transaction_id: TransactionId) -> Option<Transaction> {
         assert_eq!(self.transaction_depth, 0);
         if let Some(entry_ix) = self
             .undo_stack
@@ -262,7 +280,7 @@ impl History {
         }
     }
 
-    fn transaction(&self, transaction_id: TransactionId) -> Option<&Transaction> {
+    pub(crate) fn transaction(&self, transaction_id: TransactionId) -> Option<&Transaction> {
         let entry = self
             .undo_stack
             .iter()
@@ -288,7 +306,11 @@ impl History {
         Some(&mut entry.transaction)
     }
 
-    fn merge_transactions(&mut self, transaction: TransactionId, destination: TransactionId) {
+    pub(crate) fn merge_transactions(
+        &mut self,
+        transaction: TransactionId,
+        destination: TransactionId,
+    ) {
         if let Some(transaction) = self.forget(transaction)
             && let Some(destination) = self.transaction_mut(destination)
         {
@@ -296,7 +318,7 @@ impl History {
         }
     }
 
-    fn pop_redo(&mut self) -> Option<&HistoryEntry> {
+    pub(crate) fn pop_redo(&mut self) -> Option<&HistoryEntry> {
         assert_eq!(self.transaction_depth, 0);
         if let Some(entry) = self.redo_stack.pop() {
             self.undo_stack.push(entry);
@@ -306,7 +328,7 @@ impl History {
         }
     }
 
-    fn remove_from_redo(&mut self, transaction_id: TransactionId) -> &[HistoryEntry] {
+    pub(crate) fn remove_from_redo(&mut self, transaction_id: TransactionId) -> &[HistoryEntry] {
         assert_eq!(self.transaction_depth, 0);
 
         let undo_stack_start_len = self.undo_stack.len();

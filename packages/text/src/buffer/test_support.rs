@@ -1,22 +1,26 @@
-use std::ops::Deref;
+#![cfg(any(test, feature = "test-support"))]
+use std::{
+    borrow::Cow,
+    cmp::{self, Ordering, Reverse},
+    fmt::Display,
+    future::Future,
+    iter::Iterator,
+    num::NonZeroU64,
+    ops::{self, Deref, Range, Sub},
+    str,
+    sync::{Arc, LazyLock},
+    time::{Duration, Instant},
+};
 
-use super::fragment::*;
-use super::history::*;
-use super::operation::*;
-use super::*;
+use sum_tree::Bias;
+use util::RandomCharIter;
 
-pub struct Buffer {
-    snapshot: BufferSnapshot,
-    history: History,
-    deferred_ops: OperationQueue<Operation>,
-    deferred_replicas: HashSet<ReplicaId>,
-    pub lamport_clock: clock::Lamport,
-    subscriptions: Topic<usize>,
-    edit_id_resolvers: HashMap<clock::Lamport, Vec<oneshot::Sender<()>>>,
-    wait_for_version_txs: Vec<(clock::Global, oneshot::Sender<()>)>,
-}
+use crate::{
+    Buffer,
+    buffer::{Operation, fragment::InsertionFragmentKey},
+    locator::Locator,
+};
 
-#[cfg(any(test, feature = "test-support"))]
 impl Buffer {
     #[track_caller]
     pub fn edit_via_marked_text(&mut self, marked_string: &str) {
@@ -70,7 +74,6 @@ impl Buffer {
 
         edits
     }
-
     pub fn check_invariants(&self) {
         // Ensure every fragment is ordered by locator in the fragment tree and corresponds
         // to an insertion fragment in the insertions tree.
@@ -191,9 +194,4 @@ impl Buffer {
         }
         ops
     }
-}
-
-impl Deref for Buffer {
-    type Target = BufferSnapshot;
-    fn deref(&self) -> &Self::Target { &self.snapshot }
 }

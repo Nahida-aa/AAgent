@@ -99,4 +99,10 @@ pub enum BufferEvent {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct DiagnosticEndpoint {/* 原字段 */}
+pub(crate) struct DiagnosticEndpoint {
+    pub(crate) offset: usize,
+    pub(crate) is_start: bool,
+    pub(crate) underline: bool,
+    pub(crate) severity: DiagnosticSeverity,
+    pub(crate) is_unnecessary: bool,
+}

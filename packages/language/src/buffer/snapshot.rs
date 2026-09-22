@@ -20,10 +20,10 @@ pub struct BufferSnapshot {
 
 #[derive(Clone, Debug)]
 pub(crate) struct SelectionSet {
-    line_mode: bool,
-    cursor_shape: CursorShape,
-    selections: Arc<[Selection<Anchor>]>,
-    lamport_timestamp: clock::Lamport,
+    pub(crate) line_mode: bool,
+    pub(crate) cursor_shape: CursorShape,
+    pub(crate) selections: Arc<[Selection<Anchor>]>,
+    pub(crate) lamport_timestamp: clock::Lamport,
 }
 /// The shape of a selection cursor.
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
@@ -489,8 +489,11 @@ impl BufferSnapshot {
         self.syntax.captures(range, &self.text, query)
     }
 
-    #[ztracing::instrument(skip_all)]
-    fn get_highlights(&self, range: Range<usize>) -> (SyntaxMapCaptures<'_>, Vec<HighlightMap>) {
+    #[a_tracing::instrument(skip_all)]
+    pub(crate) fn get_highlights(
+        &self,
+        range: Range<usize>,
+    ) -> (SyntaxMapCaptures<'_>, Vec<HighlightMap>) {
         let captures = self.syntax.captures(range, &self.text, |grammar| {
             grammar
                 .highlights_config

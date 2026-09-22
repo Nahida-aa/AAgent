@@ -1,4 +1,6 @@
-use super::*;
+use aa_clock as clock;
+
+use crate::buffer::BufferSnapshot;
 
 pub struct EditedBufferSnapshot {
     pub base_version: clock::Global,

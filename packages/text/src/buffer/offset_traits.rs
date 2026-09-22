@@ -1,37 +1,31 @@
-use super::*;
+use crate::{Anchor, buffer::BufferSnapshot};
+use rope::{OffsetUtf16, Point, PointUtf16, Unclipped};
 
 pub trait ToOffset {
     fn to_offset(&self, snapshot: &BufferSnapshot) -> usize;
-    /// Turns this point into the next offset in the buffer that comes after this, respecting utf8 boundaries.
+
+    /// Turns this point into the next offset in the buffer that comes after this,
+    /// respecting utf8 boundaries.
     fn to_next_offset(&self, snapshot: &BufferSnapshot) -> usize {
         snapshot
             .visible_text
             .ceil_char_boundary(self.to_offset(snapshot) + 1)
     }
-    /// Turns this point into the previous offset in the buffer that comes before this, respecting utf8 boundaries.
+
+    /// Turns this point into the previous offset in the buffer that comes before this,
+    /// respecting utf8 boundaries.
     fn to_previous_offset(&self, snapshot: &BufferSnapshot) -> usize {
         snapshot
             .visible_text
             .floor_char_boundary(self.to_offset(snapshot).saturating_sub(1))
     }
 }
-pub trait ToPoint {
-    fn to_point(&self, snapshot: &BufferSnapshot) -> Point;
-}
-pub trait ToPointUtf16 {
-    fn to_point_utf16(&self, snapshot: &BufferSnapshot) -> PointUtf16;
-}
-pub trait ToOffsetUtf16 {
-    fn to_offset_utf16(&self, snapshot: &BufferSnapshot) -> OffsetUtf16;
-}
-pub trait FromAnchor {
-    fn from_anchor(anchor: &Anchor, snapshot: &BufferSnapshot) -> Self;
-}
 
 impl ToOffset for Point {
     #[inline]
     fn to_offset(&self, snapshot: &BufferSnapshot) -> usize { snapshot.point_to_offset(*self) }
 }
+
 impl ToOffset for usize {
     #[track_caller]
     fn to_offset(&self, snapshot: &BufferSnapshot) -> usize {
@@ -45,10 +39,12 @@ impl ToOffset for usize {
         }
     }
 }
+
 impl ToOffset for Anchor {
     #[inline]
     fn to_offset(&self, snapshot: &BufferSnapshot) -> usize { snapshot.offset_for_anchor(self) }
 }
+
 impl<T: ToOffset> ToOffset for &T {
     #[inline]
     fn to_offset(&self, content: &BufferSnapshot) -> usize { (*self).to_offset(content) }
@@ -66,6 +62,10 @@ impl ToOffset for Unclipped<PointUtf16> {
     fn to_offset(&self, snapshot: &BufferSnapshot) -> usize {
         snapshot.unclipped_point_utf16_to_offset(*self)
     }
+}
+
+pub trait ToPoint {
+    fn to_point(&self, snapshot: &BufferSnapshot) -> Point;
 }
 
 impl ToPoint for Anchor {
@@ -88,6 +88,10 @@ impl ToPoint for Unclipped<PointUtf16> {
     fn to_point(&self, snapshot: &BufferSnapshot) -> Point {
         snapshot.unclipped_point_utf16_to_point(*self)
     }
+}
+
+pub trait ToPointUtf16 {
+    fn to_point_utf16(&self, snapshot: &BufferSnapshot) -> PointUtf16;
 }
 
 impl ToPointUtf16 for Anchor {
@@ -116,6 +120,10 @@ impl ToPointUtf16 for Point {
     }
 }
 
+pub trait ToOffsetUtf16 {
+    fn to_offset_utf16(&self, snapshot: &BufferSnapshot) -> OffsetUtf16;
+}
+
 impl ToOffsetUtf16 for Anchor {
     #[inline]
     fn to_offset_utf16(&self, snapshot: &BufferSnapshot) -> OffsetUtf16 {
@@ -133,6 +141,10 @@ impl ToOffsetUtf16 for usize {
 impl ToOffsetUtf16 for OffsetUtf16 {
     #[inline]
     fn to_offset_utf16(&self, _snapshot: &BufferSnapshot) -> OffsetUtf16 { *self }
+}
+
+pub trait FromAnchor {
+    fn from_anchor(anchor: &Anchor, snapshot: &BufferSnapshot) -> Self;
 }
 
 impl FromAnchor for Anchor {

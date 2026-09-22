@@ -1,14 +1,6 @@
 use super::*;
 
-use std::ops;
-
-use crate::chunk::ChunkSlice;
-use std::{
-    cmp, fmt, io, mem,
-    ops::{self, AddAssign, Range},
-    str,
-};
-use sum_tree::Item;
+use std::{ops, ops::AddAssign, str};
 
 /// 由单个 [`Chunk`] 产出的摘要
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
@@ -67,6 +59,22 @@ impl TextSummary {
         }
     }
 
+    /// 追加一个 `\n`（长度 +1、行数 +1、末行计数清零）。
+    ///
+    /// ⚠️ **疑似 bug（照搬自 zed `crates/rope/src/rope.rs:1330`，未修改，保留原样）**：
+    /// 这一行 `self.len_utf16 += OffsetUtf16(self.len_utf16.0 + 1)` 看起来想写的是
+    /// 「UTF-16 长度 +1」，但 `OffsetUtf16` 的 `AddAssign` 是 `.0` 相加，所以它实际算出的是
+    /// `len_utf16 + (len_utf16 + 1) = 2n + 1`，而不是 `n + 1`。正确写法应当是
+    /// `self.len_utf16 += OffsetUtf16(1);`（对比上面 [`TextSummary::newline`]，那里写的是对的）。
+    ///
+    /// 两点补充，供判断要不要修：
+    /// 1. zed 全仓库目前**零调用点**（2026-09 我 grep 过，只有这一处定义），所以上游也没被这个
+    ///    行为咬到；我们这边同样还没人调用。
+    /// 2. 若 `self.len_utf16 == 0`（例如对空摘要追加首个换行），`2n + 1 == 1`，结果与正确写法一致；
+    ///    只有对**非空**摘要调用才会偏大。也就是说：只在「先加了文本、再 add_newline」的场景下出错。
+    ///
+    /// 结论：调用前确认 `len_utf16` 是否为 0，或直接用 `TextSummary::newline()` 相加
+    /// （`*self += TextSummary::newline()`），别依赖这个函数。
     pub fn add_newline(&mut self) {
         self.len += 1;
         self.len_utf16 += OffsetUtf16(self.len_utf16.0 + 1);

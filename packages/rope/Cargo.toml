@@ -13,3 +13,11 @@ unicode-segmentation.workspace = true
 util.workspace = true
 a_tracing.workspace = true
 tracing.workspace = true
+
+[dev-dependencies]
+ctor.workspace = true
+gpui = { workspace = true, features = ["test-support"] }
+rand.workspace = true
+util = { workspace = true, features = ["test-support"] }
+criterion.workspace = true
+a_log.workspace = true

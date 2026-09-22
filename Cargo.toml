@@ -106,6 +106,7 @@ chrono = { version = "0.4", features = ["serde"] }
 circular-buffer = "1.0"
 clap = { version = "4", features = ["derive"] }
 collections = { version = "0.1.0" }
+criterion = { version = "0.5", features = ["html_reports"] }
 ctor = "1.0.12"
 derive_more = { version = "2.1.1", features = [
     "add",
@@ -271,12 +272,12 @@ which = "8"
 zeroize = "1.8"
 
 # 外部 gpui_learn 共享库（GitHub git 依赖，稳定可复现）
-aa_clock = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "326485e2514f948befd6965ee0f6c8a8c826b484" }
-aa_gpui_fuzzy = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "326485e2514f948befd6965ee0f6c8a8c826b484" }
-aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "326485e2514f948befd6965ee0f6c8a8c826b484" }
-aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "326485e2514f948befd6965ee0f6c8a8c826b484" }
-aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "326485e2514f948befd6965ee0f6c8a8c826b484" }
-aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "326485e2514f948befd6965ee0f6c8a8c826b484" }
+aa_clock = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
+aa_gpui_fuzzy = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
+aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
+aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
+aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
+aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
 
 credentials_provider = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 path = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }

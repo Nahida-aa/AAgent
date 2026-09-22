@@ -5,12 +5,15 @@ pub use gpui_util::*;
 pub mod archive;
 pub use path::rel_path;
 pub mod shell_builder;
+pub mod test;
+
 use std::{
     borrow::Cow,
     cmp,
     ops::{Range, RangeInclusive},
 };
 mod connection;
+mod rng;
 pub use connection::ConnectionResult;
 pub mod markdown;
 pub use shell::{Shell, ShellKind};
@@ -23,6 +26,8 @@ pub mod process;
 pub mod redact;
 pub mod schemars;
 pub mod serde;
+#[cfg(any(test, feature = "test-support"))]
+pub use rng::RandomCharIter;
 
 #[inline]
 pub const fn is_utf8_char_boundary(u8: u8) -> bool {

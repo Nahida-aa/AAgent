@@ -1,22 +1,58 @@
-use super::fragment::*;
-use super::*;
+use crate::Edit;
+use crate::buffer::debug_ranges as debug;
+use crate::buffer::fragment::FragmentBuilder;
+use crate::locator::Locator;
+use crate::patch::Patch;
+use crate::undo_map::UndoMap;
+use crate::{anchor::Anchor, buffer::LineIndent};
+use aa_clock::{self as clock, Global, ReplicaId};
+use rope::{Chunks, OffsetUtf16, Point, PointUtf16, Rope, TextDimension, TextSummary, Unclipped};
+use std::{
+    borrow::Cow,
+    cmp::{self, Ordering, Reverse},
+    fmt::Display,
+    future::Future,
+    iter::Iterator,
+    num::NonZeroU64,
+    ops::{self, Deref, Range, Sub},
+    str,
+    sync::{Arc, LazyLock},
+    time::{Duration, Instant},
+};
+use sum_tree::{Bias, Dimensions, SumTree, TreeMap, TreeSet};
+use util::debug_panic;
+
+use super::buffer_id::BufferId;
+use super::dimensions::{FullOffset, VersionedFullOffset};
+use super::edits_iter::Edits;
+use super::fragment::{
+    Fragment, FragmentSummary, FragmentTextSummary, InsertionFragment, InsertionFragmentKey,
+    InsertionSlice,
+};
+use super::history::Transaction;
+use super::line_ending::{LineEnding, chunks_with_line_ending};
+use super::offset_traits::ToOffset;
+use super::operation::{EditOperation, Operation, UndoOperation};
+use super::rope_builder::RopeBuilder;
+use super::util::push_fragments_for_insertion;
+use super::{BufferId as _BufId, TransactionId};
 
 #[derive(Clone)]
 pub struct BufferSnapshot {
-    visible_text: Rope,
-    deleted_text: Rope,
-    fragments: SumTree<Fragment>,
-    insertions: SumTree<InsertionFragment>,
-    insertion_slices: TreeSet<InsertionSlice>,
-    undo_map: UndoMap,
-    pub version: clock::Global,
-    remote_id: BufferId,
-    replica_id: ReplicaId,
-    line_ending: LineEnding,
+    pub(crate) visible_text: Rope,
+    pub(crate) deleted_text: Rope,
+    pub(crate) fragments: SumTree<Fragment>,
+    pub(crate) insertions: SumTree<InsertionFragment>,
+    pub(crate) insertion_slices: TreeSet<InsertionSlice>,
+    pub(crate) undo_map: UndoMap,
+    pub version: Global,
+    pub(crate) remote_id: BufferId,
+    pub(crate) replica_id: clock::ReplicaId,
+    pub(crate) line_ending: LineEnding,
 }
 
 impl BufferSnapshot {
-    fn apply_edit_internal(
+    pub(crate) fn apply_edit_internal(
         &mut self,
         edits: Vec<(Range<usize>, Arc<str>)>,
         timestamp: clock::Lamport,
@@ -637,12 +673,12 @@ impl BufferSnapshot {
         }
     }
 
-    fn fragment_id_for_anchor(&self, anchor: &Anchor) -> &Locator {
+    pub(crate) fn fragment_id_for_anchor(&self, anchor: &Anchor) -> &Locator {
         self.try_fragment_id_for_anchor(anchor)
             .unwrap_or_else(|| self.panic_bad_anchor(anchor))
     }
 
-    fn try_fragment_id_for_anchor(&self, anchor: &Anchor) -> Option<&Locator> {
+    pub(crate) fn try_fragment_id_for_anchor(&self, anchor: &Anchor) -> Option<&Locator> {
         if anchor.is_min() {
             Some(Locator::min_ref())
         } else if anchor.is_max() {
@@ -656,7 +692,7 @@ impl BufferSnapshot {
         }
     }
 
-    fn try_find_fragment(&self, anchor: &Anchor) -> Option<&InsertionFragment> {
+    pub(crate) fn try_find_fragment(&self, anchor: &Anchor) -> Option<&InsertionFragment> {
         let anchor_key = InsertionFragmentKey {
             timestamp: anchor.timestamp(),
             split_offset: anchor.offset,

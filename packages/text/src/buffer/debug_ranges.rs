@@ -1,9 +1,14 @@
-#![cfg(debug_assertions)]
-
-use super::*;
-use parking_lot::Mutex;
 use std::any::TypeId;
 use std::hash::{Hash, Hasher};
+use std::ops::Range;
+use std::sync::Arc;
+
+use collections::HashMap;
+use parking_lot::Mutex;
+
+use crate::anchor::Anchor;
+use crate::buffer::BufferSnapshot;
+use crate::buffer::offset_traits::ToOffset;
 
 static GLOBAL_DEBUG_RANGES: Mutex<Option<GlobalDebugRanges>> = Mutex::new(None);
 
@@ -12,6 +17,7 @@ pub struct GlobalDebugRanges {
     key_to_occurrence_index: HashMap<Key, usize>,
     next_occurrence_index: usize,
 }
+
 pub struct DebugRange {
     key: Key,
     pub ranges: Vec<Range<Anchor>>,
@@ -107,6 +113,7 @@ impl Key {
 pub trait ToDebugRanges {
     fn to_debug_ranges(&self, snapshot: &BufferSnapshot) -> Vec<Range<usize>>;
 }
+
 impl<T: ToOffset> ToDebugRanges for T {
     fn to_debug_ranges(&self, snapshot: &BufferSnapshot) -> Vec<Range<usize>> {
         [self.to_offset(snapshot)].to_debug_ranges(snapshot)

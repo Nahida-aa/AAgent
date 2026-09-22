@@ -1,6 +1,7 @@
-use std::{fmt::Display, num::NonZeroU64};
+use std::fmt::Display;
+use std::num::NonZeroU64;
 
-use super::*;
+use anyhow::{Context as _, Result};
 
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, Hash, PartialEq, PartialOrd, Ord, Eq)]
@@ -16,7 +17,7 @@ impl From<NonZeroU64> for BufferId {
 
 impl BufferId {
     /// Returns Err if `id` is outside of BufferId domain.
-    pub fn new(id: u64) -> anyhow::Result<Self> {
+    pub fn new(id: u64) -> Result<Self> {
         let id = NonZeroU64::new(id).context("Buffer id cannot be 0.")?;
         Ok(Self(id))
     }

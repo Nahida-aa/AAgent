@@ -9,11 +9,15 @@ use gpui::{App, AppContext as _, AsyncApp};
 use http_client::HttpClientWithUrl;
 use parking_lot::Mutex;
 use postage::watch;
-use rpc::{AnyProtoClient, Peer, PeerId};
+use rpc::proto::PeerId;
+use rpc::{AnyProtoClient, Peer};
+use settings::Settings as _;
 
+use crate::credentials::ClientCredentialsProvider;
 use crate::settings::ClientSettings;
 use crate::status::Status;
 use crate::subscription::GlobalClient;
+use crate::telemetry::Telemetry;
 
 use super::{Client, ClientState};
 

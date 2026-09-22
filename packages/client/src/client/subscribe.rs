@@ -1,9 +1,14 @@
 use std::any::TypeId;
+use std::marker::PhantomData;
 use std::sync::Arc;
 
-use gpui::{AsyncApp, Entity, WeakEntity};
+use anyhow::Result;
+use cloud_api_client::websocket_protocol::MessageToClient;
+use futures::FutureExt as _;
+use gpui::{App, AsyncApp, Entity, WeakEntity};
+use rpc::proto::error::ErrorExt as _;
 use rpc::proto::{EnvelopedMessage, RequestMessage, TypedEnvelope};
-use rpc::{AnyProtoClient, EntityMessageSubscriber};
+use rpc::{AnyProtoClient, EntityMessageSubscriber, Receipt};
 
 use crate::subscription::{PendingEntitySubscription, Subscription};
 

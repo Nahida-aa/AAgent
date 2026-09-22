@@ -11,6 +11,10 @@ mod action;
 pub mod agent;
 
 mod contents;
+// zed 里这些内容 struct 直接写在 settings_content.rs 里、天然在 crate 根；
+// 我们按功能拆进了 `contents/`，所以这里要把它们再导出到根，
+// 否则 `settings::SettingsContent` 那层 `pub use ::settings_content::*` 带不出来。
+pub use contents::*;
 pub mod extension;
 pub mod fallible_options;
 mod feature_flags;

@@ -3,8 +3,10 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use futures::{FutureExt as _, StreamExt as _};
+use anyhow::Result;
 use gpui::{AsyncApp, Context};
 use rand::prelude::*;
+use rpc::ConnectionId;
 use util::ConnectionResult;
 
 use crate::constants::{INITIAL_RECONNECTION_DELAY, MAX_RECONNECTION_DELAY};

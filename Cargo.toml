@@ -12,7 +12,7 @@ members = [
     "packages/server",
     "packages/settings",
     "packages/session",
-    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aagent_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/language_model_core", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/util_macros", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/language_core", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/askpass", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/telemetry", "packages/telemetry_events", "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_vars", "packages/feature_flags_macros", "packages/file_icons",
+    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aagent_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/language_model_core", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/util_macros", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/language_core", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/askpass", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/telemetry", "packages/telemetry_events", "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_vars", "packages/feature_flags_macros", "packages/file_icons", "packages/vim_mode_setting", "packages/json_schema_store", "packages/edit_prediction_types",
 ]
 
 [workspace.package]
@@ -47,6 +47,7 @@ cloud_api_client = { path = "packages/cloud_api_client" }
 cloud_api_types = { path = "packages/cloud_api_types" }
 cloud_llm_client = { path = "packages/cloud_llm_client" }
 dap = { path = "packages/dap" }
+db = { path = "packages/db" }
 editor = { path = "packages/editor" }
 env_vars = { path = "packages/env_vars" }
 extension = { path = "packages/extension" }
@@ -91,7 +92,8 @@ snippet_provider = { path = "packages/snippet_provider" }
 theme_settings = { path = "packages/theme_settings" }
 util = { path = "packages/util" }
 worktree = { path = "packages/worktree" }
-http_client = { path = "packages/http_client" }
+aa_http_client = { path = "packages/http_client" }
+vim_mode_setting = { path = "packages/vim_mode_setting" }
 zeta_prompt = { path = "packages/zeta_prompt" }
 
 aho-corasick = "1.1"
@@ -362,6 +364,7 @@ aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", re
 credentials_provider = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 gpui_tokio = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 grammars  = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
+http_client = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 http_client_tls = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 net = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 oauth_callback_server = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
@@ -459,3 +462,5 @@ aa_gpui_kit_ui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui" }
 # icons 是刚加进 gpui_learn 的新包，还没进上面 git 依赖锁定的那个 rev，
 # 先用本地 path 顶上，等推上去并更新 rev 后可以移除这条。
 aa_icons = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/icons" }
+# clock 补了 utc_now() 别名（让照搬的 zed 代码零改动），同样先走本地。
+aa_clock = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/clock" }

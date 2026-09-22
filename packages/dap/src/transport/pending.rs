@@ -1,7 +1,36 @@
-use anyhow::{Result, bail};
-use dap_types::messages::Response;
-use futures::channel::oneshot;
-use std::collections::HashMap;
+use anyhow::{Context as _, Result, anyhow, bail};
+#[cfg(any(test, feature = "test-support"))]
+use async_pipe::{PipeReader, PipeWriter};
+use dap_types::{
+    ErrorResponse,
+    messages::{Message, Response},
+};
+use futures::{AsyncRead, AsyncReadExt as _, AsyncWrite, FutureExt as _, channel::oneshot, select};
+use gpui::{AppContext as _, AsyncApp, BackgroundExecutor, Task};
+use parking_lot::Mutex;
+use proto::ErrorExt;
+use settings::Settings as _;
+use smallvec::SmallVec;
+use smol::{
+    channel::{Receiver, Sender, unbounded},
+    io::{AsyncBufReadExt as _, AsyncWriteExt, BufReader},
+    net::{TcpListener, TcpStream},
+};
+use std::{
+    collections::HashMap,
+    net::{IpAddr, SocketAddr},
+    process::Stdio,
+    sync::Arc,
+    time::Duration,
+};
+use task::TcpArgumentsTemplate;
+use util::{ConnectionResult, ResultExt, process::Child};
+
+use crate::{
+    adapters::{DebugAdapterBinary, TcpArguments},
+    client::DapMessageHandler,
+    debugger_settings::DebuggerSettings,
+};
 
 pub(crate) struct PendingRequests {
     inner: Option<HashMap<u64, oneshot::Sender<Result<Response>>>>,

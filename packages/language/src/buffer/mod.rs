@@ -37,6 +37,12 @@ pub struct EditedBufferSnapshot {
     pub snapshot: BufferSnapshot,
 }
 
+impl EditedBufferSnapshot {
+    pub fn snapshot(&self) -> &BufferSnapshot { &self.snapshot }
+
+    pub fn base_version(&self) -> &clock::Global { &self.text.base_version }
+}
+
 #[cfg(any(test, feature = "test-support"))]
 pub use test_support::TestFile;
 

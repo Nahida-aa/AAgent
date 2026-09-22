@@ -3,6 +3,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use futures::{FutureExt as _, StreamExt as _};
+use anyhow::Result;
 use gpui::AsyncApp;
 use rand::prelude::*;
 use util::ResultExt as _;

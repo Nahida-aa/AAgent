@@ -1,9 +1,12 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use anyhow::Context as _;
+use anyhow::Result;
 use anyhow::anyhow;
-use futures::{FutureExt as _, StreamExt as _, TryStreamExt as _};
+use futures::{FutureExt as _, SinkExt as _, StreamExt as _, TryStreamExt as _};
 use gpui::{AsyncApp, Task};
+use async_tungstenite::tungstenite::client::IntoClientRequest;
 use http_client::{HttpClientWithUrl, http, http::HeaderValue};
 use release_channel::{AppVersion, ReleaseChannel};
 use rpc::proto;

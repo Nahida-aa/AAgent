@@ -1,10 +1,13 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use anyhow::Context as _;
+use anyhow::Result;
 use anyhow::anyhow;
-use futures::{FutureExt as _, StreamExt as _, channel::oneshot};
-use gpui::{AsyncApp, Task};
-use http_client::{HttpClientWithUrl, http};
+use feature_flags::FeatureFlagAppExt as _;
+use futures::{AsyncReadExt as _, FutureExt as _, StreamExt as _, channel::oneshot};
+use gpui::{AsyncApp, Task, TaskExt as _};
+use http_client::{HttpClientWithUrl, Request, http};
 use serde::{Deserialize, Serialize};
 use url::Url;
 use util::{ConnectionResult, ResultExt as _};

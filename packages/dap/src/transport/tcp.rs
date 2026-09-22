@@ -1,5 +1,5 @@
 use anyhow::{Context as _, Result};
-use futures::{AsyncRead, AsyncWrite, FutureExt as _, select};
+use futures::{AsyncRead, AsyncReadExt as _, AsyncWrite, FutureExt as _, select};
 use gpui::{AppContext as _, AsyncApp, BackgroundExecutor, Task};
 use parking_lot::Mutex;
 use settings::Settings as _;

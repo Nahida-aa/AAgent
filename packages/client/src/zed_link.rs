@@ -1,4 +1,5 @@
 use gpui::App;
+use settings::Settings as _;
 
 use crate::settings::ClientSettings;
 

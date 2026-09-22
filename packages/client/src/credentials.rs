@@ -2,7 +2,9 @@ use std::future::Future;
 use std::pin::Pin;
 
 use credentials_provider::CredentialsProvider;
+use futures::FutureExt as _;
 use gpui::{App, AsyncApp};
+use settings::Settings as _;
 use util::ResultExt as _;
 
 use crate::env::IMPERSONATE_LOGIN;

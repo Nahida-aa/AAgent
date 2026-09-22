@@ -2,57 +2,57 @@ use std::any::Any;
 use std::sync::Arc;
 use std::sync::atomic::Ordering::SeqCst;
 
+use anyhow::Result;
 use futures::future::BoxFuture;
 use futures::stream::BoxStream;
-use futures::{FutureExt as _, Stream, StreamExt as _};
+use futures::{FutureExt as _, Stream, StreamExt as _, TryFutureExt as _};
 use gpui::AsyncApp;
+use parking_lot::Mutex;
+use rpc::proto;
 use rpc::proto::{
     AnyTypedEnvelope, Envelope as ProtoEnvelope, EnvelopedMessage, RequestMessage, TypedEnvelope,
 };
 use rpc::{AnyProtoClient, Peer, ProtoClient, ProtoMessageHandlerSet};
+use util::ResultExt as _;
 
 use super::Client;
 
 impl Client {
-    pub fn send<T: EnvelopedMessage>(&self, message: T) -> anyhow::Result<()> {
-        log::debug!("rpc send. client_id:{}, name:{}", self.id(), message_type);
-        let connection_id = self.connection_id()?;
-        self.peer.send_dynamic(connection_id, envelope)
+    pub fn send<T: EnvelopedMessage>(&self, message: T) -> Result<()> {
+        log::debug!("rpc send. client_id:{}, name:{}", self.id(), T::NAME);
+        self.peer.send(self.connection_id()?, message)
     }
 
     pub fn request<T: RequestMessage>(
         &self,
         request: T,
-    ) -> impl std::future::Future<Output = anyhow::Result<T::Response>> + use<T> {
-        self.request_dynamic(envelope, request_type).boxed()
+    ) -> impl std::future::Future<Output = Result<T::Response>> + use<T> {
+        self.request_envelope(request)
+            .map_ok(|envelope| envelope.payload)
     }
 
     pub fn request_stream<T: RequestMessage>(
         &self,
         request: T,
-    ) -> impl std::future::Future<Output = anyhow::Result<impl Stream<Item = anyhow::Result<T::Response>>>>
-    {
-        let client_id = self.id();
-        let response = self.connection_id().map(|connection_id| {
-            self.peer
-                .request_stream_dynamic(connection_id, envelope, request_type)
-        });
-
+    ) -> impl std::future::Future<Output = Result<impl Stream<Item = Result<T::Response>>>> {
+        let client_id = self.id.load(SeqCst);
+        log::debug!(
+            "rpc request start. client_id:{}. name:{}",
+            client_id,
+            T::NAME
+        );
+        let response = self
+            .connection_id()
+            .map(|conn_id| self.peer.request_stream(conn_id, request));
         async move {
-            log::debug!(
-                "rpc stream request start. client_id:{}. name:{}",
-                client_id,
-                request_type
-            );
             let response = response?.await;
             log::debug!(
-                "rpc stream request opened. client_id:{}. name:{}",
+                "rpc request finish. client_id:{}. name:{}",
                 client_id,
-                request_type
+                T::NAME
             );
             response
         }
-        .boxed()
     }
 
     pub fn request_envelope<T: RequestMessage>(

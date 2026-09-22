@@ -1,3 +1,4 @@
+use std::sync::LazyLock;
 use std::time::Duration;
 
 pub const INITIAL_RECONNECTION_DELAY: Duration = Duration::from_millis(500);

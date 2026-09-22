@@ -9,7 +9,8 @@ mod subscribe;
 
 use std::sync::atomic::AtomicU64;
 use std::sync::atomic::Ordering::SeqCst;
-use std::sync::{Arc, RwLock};
+use parking_lot::RwLock;
+use std::sync::Arc;
 
 use cloud_api_client::CloudApiClient;
 use gpui::{AsyncApp, Task};

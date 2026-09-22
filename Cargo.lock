@@ -238,7 +238,6 @@ dependencies = [
 [[package]]
 name = "aa_clock"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=c712ba162bd10c1a3a62d10c577acd8c06842249#c712ba162bd10c1a3a62d10c577acd8c06842249"
 dependencies = [
  "parking_lot",
  "serde",
@@ -385,6 +384,38 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.119",
+]
+
+[[package]]
+name = "aa_http_client"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-compression",
+ "async-fs",
+ "async-tar",
+ "bytes",
+ "derive_more",
+ "futures",
+ "http",
+ "http-body",
+ "log",
+ "parking_lot",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sha2 0.10.9",
+ "tempfile",
+ "url",
+ "util 0.1.0",
+]
+
+[[package]]
+name = "aa_icons"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "strum 0.28.0",
 ]
 
 [[package]]
@@ -1611,7 +1642,7 @@ dependencies = [
  "cap-primitives",
  "cap-std",
  "io-lifetimes",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -1640,7 +1671,7 @@ dependencies = [
  "maybe-owned",
  "rustix",
  "rustix-linux-procfs",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
  "winx",
 ]
 
@@ -1912,7 +1943,7 @@ dependencies = [
  "futures",
  "gpui",
  "gpui_tokio",
- "http_client 0.1.0",
+ "http_client",
  "http_client_tls",
  "log",
  "objc2-foundation 0.3.2",
@@ -1958,7 +1989,7 @@ dependencies = [
  "futures-lite",
  "gpui",
  "gpui_tokio",
- "http_client 0.1.0",
+ "http_client",
  "parking_lot",
  "serde",
  "serde_json",
@@ -2240,7 +2271,7 @@ dependencies = [
  "futures",
  "futures-lite",
  "gpui",
- "http_client 0.1.0",
+ "http_client",
  "log",
  "net",
  "oauth_callback_server",
@@ -2977,7 +3008,7 @@ dependencies = [
  "fs",
  "futures",
  "gpui",
- "http_client 0.1.0",
+ "http_client",
  "language",
  "log",
  "node_runtime",
@@ -3373,6 +3404,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3b31a881d38439026e3d5dd938ab20328d36e23caca8fd5981c42e4b677f5842"
 
 [[package]]
+name = "edit_prediction_types"
+version = "0.1.0"
+dependencies = [
+ "aa_icons",
+ "client",
+ "gpui",
+ "language",
+ "text",
+]
+
+[[package]]
 name = "editor"
 version = "0.1.0"
 dependencies = [
@@ -3517,7 +3559,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -3596,7 +3638,7 @@ dependencies = [
  "futures",
  "gpui",
  "heck 0.5.0",
- "http_client 0.1.0",
+ "http_client",
  "indoc",
  "language",
  "log",
@@ -3962,7 +4004,7 @@ checksum = "94e7099f6313ecacbe1256e8ff9d617b75d1bcb16a6fddef94866d225a01a14a"
 dependencies = [
  "io-lifetimes",
  "rustix",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -4225,7 +4267,7 @@ dependencies = [
  "derive_more",
  "futures",
  "gpui",
- "http_client 0.1.0",
+ "http_client",
  "itertools 0.14.0",
  "log",
  "parking_lot",
@@ -4258,7 +4300,7 @@ dependencies = [
  "futures",
  "git",
  "gpui",
- "http_client 0.1.0",
+ "http_client",
  "indoc",
  "itertools 0.14.0",
  "pretty_assertions",
@@ -4345,7 +4387,7 @@ dependencies = [
  "log",
  "presser",
  "thiserror 2.0.20",
- "windows 0.56.0",
+ "windows 0.62.2",
 ]
 
 [[package]]
@@ -4394,7 +4436,7 @@ dependencies = [
  "gpui_shared_string",
  "gpui_util",
  "heapless",
- "http_client 0.1.0 (git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f)",
+ "http_client",
  "image",
  "inventory",
  "itertools 0.14.0",
@@ -4481,7 +4523,7 @@ dependencies = [
  "gpui",
  "gpui_util",
  "gpui_wgpu",
- "http_client 0.1.0 (git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f)",
+ "http_client",
  "libc",
  "log",
  "notify-rust",
@@ -4619,7 +4661,7 @@ dependencies = [
  "futures",
  "gpui",
  "gpui_wgpu",
- "http_client 0.1.0 (git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f)",
+ "http_client",
  "js-sys",
  "log",
  "parking_lot",
@@ -4917,6 +4959,7 @@ checksum = "9171a2ea8a68358193d15dd5d70c1c10a2afc3e7e4c5bc92bc9f025cebd7359c"
 [[package]]
 name = "http_client"
 version = "0.1.0"
+source = "git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f#f6838a7c4afecd7c212c43c70165588b92a5a11f"
 dependencies = [
  "anyhow",
  "async-compression",
@@ -4935,27 +4978,7 @@ dependencies = [
  "sha2 0.10.9",
  "tempfile",
  "url",
- "util 0.1.0",
-]
-
-[[package]]
-name = "http_client"
-version = "0.1.0"
-source = "git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f#f6838a7c4afecd7c212c43c70165588b92a5a11f"
-dependencies = [
- "anyhow",
- "async-compression",
- "bytes",
- "derive_more",
- "futures",
- "http",
- "http-body",
- "log",
- "parking_lot",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "url",
+ "util 0.1.0 (git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f)",
 ]
 
 [[package]]
@@ -5046,7 +5069,7 @@ dependencies = [
  "js-sys",
  "log",
  "wasm-bindgen",
- "windows-core 0.56.0",
+ "windows-core 0.62.2",
 ]
 
 [[package]]
@@ -5397,7 +5420,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2285ddfe3054097ef4b2fe909ef8c3bcd1ea52a8f0d274416caebeef39f04a65"
 dependencies = [
  "io-lifetimes",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -5441,7 +5464,7 @@ checksum = "3640c1c38b8e4e43584d8df18be5fc6b0aa314ce6ebf51b53313d4306cca8e46"
 dependencies = [
  "hermit-abi",
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -5623,6 +5646,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "json_schema_store"
+version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "anyhow",
+ "collections",
+ "dap",
+ "extension",
+ "feature_flags",
+ "fs",
+ "gpui",
+ "language",
+ "parking_lot",
+ "paths",
+ "project",
+ "schemars",
+ "serde_json",
+ "settings",
+ "snippet_provider",
+ "task",
+ "util 0.1.0",
+]
+
+[[package]]
 name = "kasuari"
 version = "0.4.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5742,7 +5789,7 @@ dependencies = [
  "globset",
  "gpui",
  "grammars",
- "http_client 0.1.0",
+ "http_client",
  "imara-diff",
  "indoc",
  "itertools 0.14.0",
@@ -5850,7 +5897,7 @@ dependencies = [
  "collections",
  "futures",
  "gpui_shared_string",
- "http_client 0.1.0",
+ "http_client",
  "log",
  "partial-json-fixer",
  "pretty_assertions",
@@ -6878,7 +6925,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "futures",
- "http_client 0.1.0",
+ "http_client",
  "log",
  "paths",
  "semver",
@@ -8298,7 +8345,7 @@ dependencies = [
  "git_hosting_providers",
  "globset",
  "gpui",
- "http_client 0.1.0",
+ "http_client",
  "image",
  "indexmap",
  "itertools 0.14.0",
@@ -8313,6 +8360,8 @@ dependencies = [
  "percent-encoding",
  "postage",
  "prettier",
+ "pretty_assertions",
+ "project",
  "rand 0.9.5",
  "regex",
  "release_channel",
@@ -8336,6 +8385,7 @@ dependencies = [
  "text",
  "toml 0.8.23",
  "tracing",
+ "unindent",
  "url",
  "util 0.1.0",
  "watch",
@@ -8402,7 +8452,7 @@ version = "0.14.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "03da047801ff44bb6a4d407d4860c05fd70bb81714e6b2f3812603d5b145b042"
 dependencies = [
- "heck 0.5.0",
+ "heck 0.4.1",
  "itertools 0.14.0",
  "log",
  "multimap",
@@ -9372,7 +9422,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -9451,7 +9501,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -10730,7 +10780,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -12060,6 +12110,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
+name = "vim_mode_setting"
+version = "0.1.0"
+dependencies = [
+ "gpui",
+ "settings",
+]
+
+[[package]]
 name = "vswhom"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -13359,7 +13417,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -13798,7 +13856,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f3fd376f71958b862e7afb20cfe5a22830e1963462f3a17f49d82a6c1d1f42d"
 dependencies = [
  "bitflags 2.13.2",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -14564,7 +14622,3 @@ dependencies = [
  "syn 3.0.6",
  "winnow 1.0.4",
 ]
-
-[[patch.unused]]
-name = "aa_icons"
-version = "0.1.0"

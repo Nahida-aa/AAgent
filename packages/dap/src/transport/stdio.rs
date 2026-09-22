@@ -1,10 +1,10 @@
 use anyhow::{Context as _, Result, bail};
 use futures::{AsyncRead, AsyncWrite};
-use gpui::{AsyncApp, Task};
+use gpui::{AppContext as _, AsyncApp, Task};
 use parking_lot::Mutex;
 use std::process::Stdio;
 
-use crate::adapters::DebugAdapterBinary;
+use crate::adapters::{DebugAdapterBinary, TcpArguments};
 use util::{ResultExt, process::Child};
 
 use super::delegate::TransportDelegate;

@@ -1,0 +1,12 @@
+[package]
+name = "edit_prediction_types"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+client.workspace = true
+gpui.workspace = true
+icons.workspace = true
+language.workspace = true
+text.workspace = true

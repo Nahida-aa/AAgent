@@ -8087,6 +8087,33 @@ dependencies = [
 [[package]]
 name = "remote"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "askpass",
+ "async-trait",
+ "base64",
+ "collections",
+ "fs",
+ "futures",
+ "gpui",
+ "log",
+ "parking_lot",
+ "paths",
+ "release_channel",
+ "rpc",
+ "schemars",
+ "semver",
+ "serde",
+ "serde_json",
+ "settings",
+ "smol",
+ "telemetry",
+ "tempfile",
+ "thiserror 2.0.20",
+ "urlencoding",
+ "util",
+ "which 8.0.6",
+]
 
 [[package]]
 name = "renderdoc-sys"
@@ -9409,6 +9436,24 @@ dependencies = [
  "thiserror 2.0.20",
  "windows 0.61.3",
  "windows-version",
+]
+
+[[package]]
+name = "telemetry"
+version = "0.1.0"
+dependencies = [
+ "futures",
+ "serde_json",
+ "telemetry_events",
+]
+
+[[package]]
+name = "telemetry_events"
+version = "0.1.0"
+dependencies = [
+ "semver",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

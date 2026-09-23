@@ -1,13 +1,13 @@
 use super::*;
 
-use std::collections::HashSet;
+use collections::HashSet;
 
-use anyhow::{Context as _, Result};
-use gpui::{Context, Entity, Task, WeakEntity};
+use anyhow::{Context as _, Result, anyhow};
+use gpui::{AppContext, Context, Entity, Task, TaskExt, WeakEntity};
 
 use super::Project;
-use crate::image_store::{ImageItem, ImageItemEvent, ImageStoreEvent};
 use crate::ProjectPath;
+use crate::image_store::{ImageItem, ImageItemEvent, ImageStoreEvent};
 
 impl Project {
     pub fn open_image(
@@ -52,7 +52,7 @@ impl Project {
         self.image_store
             .update(cx, |image_store, cx| image_store.reload_images(images, cx))
     }
-    fn on_image_store_event(
+    pub(crate) fn on_image_store_event(
         &mut self,
         _: Entity<ImageStore>,
         event: &ImageStoreEvent,

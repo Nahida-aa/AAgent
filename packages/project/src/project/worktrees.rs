@@ -4,14 +4,15 @@ use ::rpc::proto;
 use anyhow::{Context as _, Result, anyhow};
 use futures::future::join_all;
 use gpui::{App, AppContext as _, Context, Entity, Task, TaskExt as _};
+use util::ResultExt;
 use util::paths::PathStyle;
 use util::rel_path::RelPath;
 use worktree::{CreatedEntry, Entry, ProjectEntryId, Worktree, WorktreeId};
 
 use super::Project;
 use crate::types::*;
+use crate::worktree_store::{WorktreePaths, WorktreeStoreEvent};
 use crate::{Event, ProjectPath};
-use crate::worktree_store::{WorktreeStoreEvent, WorktreePaths};
 
 impl Project {
     /// All worktrees in this project.
@@ -201,7 +202,7 @@ impl Project {
     }
 
     /// Attempts to convert the input path to a WSL path if this is a wsl remote project and the input path is a host windows path.
-    fn add_worktree(&mut self, worktree: &Entity<Worktree>, cx: &mut Context<Self>) {
+    pub(crate) fn add_worktree(&mut self, worktree: &Entity<Worktree>, cx: &mut Context<Self>) {
         self.worktree_store.update(cx, |worktree_store, cx| {
             worktree_store.add(worktree, cx);
         });
@@ -210,17 +211,6 @@ impl Project {
         self.worktree_store.read(cx).worktree_metadata_protos(cx)
     }
 
-    /// Iterator of all open buffers that have unsaved changes
-    pub fn dirty_buffers<'a>(&'a self, cx: &'a App) -> impl Iterator<Item = ProjectPath> + 'a {
-        self.buffer_store.read(cx).buffers().filter_map(|buf| {
-            let buf = buf.read(cx);
-            if buf.is_dirty() {
-                buf.project_path(cx)
-            } else {
-                None
-            }
-        })
-    }
     pub fn worktree_paths(&self, cx: &App) -> WorktreePaths {
         self.worktree_store.read(cx).paths(cx)
     }
@@ -238,7 +228,7 @@ impl Project {
                 worktree.read(cx).entry_for_path(rel_path).is_some()
             })
     }
-    fn emit_group_key_changed_if_needed(&mut self, cx: &mut Context<Self>) {
+    pub(crate) fn emit_group_key_changed_if_needed(&mut self, cx: &mut Context<Self>) {
         let new_worktree_paths = self.worktree_paths(cx);
         if new_worktree_paths != self.last_worktree_paths {
             let old_worktree_paths =
@@ -248,7 +238,7 @@ impl Project {
     }
 
     #[inline]
-    fn on_worktree_store_event(
+    pub(crate) fn on_worktree_store_event(
         &mut self,
         _: Entity<WorktreeStore>,
         event: &WorktreeStoreEvent,
@@ -286,13 +276,17 @@ impl Project {
             }
         }
     }
-    fn on_worktree_added(&mut self, worktree: &Entity<Worktree>, _: &mut Context<Self>) {
+    pub(crate) fn on_worktree_added(&mut self, worktree: &Entity<Worktree>, _: &mut Context<Self>) {
         let mut remotely_created_models = self.remotely_created_models.lock();
         if remotely_created_models.retain_count > 0 {
             remotely_created_models.worktrees.push(worktree.clone())
         }
     }
-    fn on_worktree_released(&mut self, id_to_remove: WorktreeId, cx: &mut Context<Self>) {
+    pub(crate) fn on_worktree_released(
+        &mut self,
+        id_to_remove: WorktreeId,
+        cx: &mut Context<Self>,
+    ) {
         if let Some(remote) = &self.remote_client {
             remote
                 .read(cx)
@@ -303,7 +297,7 @@ impl Project {
                 .log_err();
         }
     }
-    fn set_worktrees_from_proto(
+    pub(crate) fn set_worktrees_from_proto(
         &mut self,
         worktrees: Vec<proto::WorktreeMetadata>,
         cx: &mut Context<Project>,
@@ -522,67 +516,5 @@ impl Project {
                 .read(cx)
                 .absolutize(&project_path.path),
         )
-    }
-
-    pub fn find_project_path(&self, path: impl AsRef<Path>, cx: &App) -> Option<ProjectPath> {
-        let path_style = self.path_style(cx);
-        let path = path.as_ref();
-        let worktree_store = self.worktree_store.read(cx);
-
-        if util::paths::is_absolute(&path.to_string_lossy(), path_style) {
-            for worktree in worktree_store.visible_worktrees(cx) {
-                let worktree_abs_path = worktree.read(cx).abs_path();
-
-                if let Ok(relative_path) = path.strip_prefix(worktree_abs_path)
-                    && let Ok(path) = RelPath::new(relative_path, path_style)
-                {
-                    return Some(ProjectPath {
-                        worktree_id: worktree.read(cx).id(),
-                        path: path.into_arc(),
-                    });
-                }
-            }
-        } else {
-            // First pass: for each worktree, try two interpretations of the path and
-            // return whichever finds an existing entry first:
-            //   (a) Strip the worktree root name as a prefix.
-            //   (b) Treat the path as a literal worktree-relative path.
-            for worktree in worktree_store.visible_worktrees(cx) {
-                let worktree = worktree.read(cx);
-                if let Ok(relative_path) = path.strip_prefix(worktree.root_name().as_std_path())
-                    && let Ok(rel_path) = RelPath::new(relative_path, path_style)
-                    && let Some(entry) = worktree.entry_for_path(&rel_path)
-                {
-                    return Some(ProjectPath {
-                        worktree_id: worktree.id(),
-                        path: entry.path.clone(),
-                    });
-                }
-                if let Ok(rel_path) = RelPath::new(path, path_style)
-                    && let Some(entry) = worktree.entry_for_path(&rel_path)
-                {
-                    return Some(ProjectPath {
-                        worktree_id: worktree.id(),
-                        path: entry.path.clone(),
-                    });
-                }
-            }
-
-            // Second pass: strip the worktree root name prefix without requiring the
-            // entry to exist, to allow resolving paths that don't exist yet.
-            for worktree in worktree_store.visible_worktrees(cx) {
-                let worktree_root_name = worktree.read(cx).root_name();
-                if let Ok(relative_path) = path.strip_prefix(worktree_root_name.as_std_path())
-                    && let Ok(path) = RelPath::new(relative_path, path_style)
-                {
-                    return Some(ProjectPath {
-                        worktree_id: worktree.read(cx).id(),
-                        path: path.into_arc(),
-                    });
-                }
-            }
-        }
-
-        None
     }
 }

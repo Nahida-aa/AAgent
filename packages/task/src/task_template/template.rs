@@ -1,4 +1,4 @@
-use collections::HashMap;
+use collections::{HashMap, HashSet};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use util::serde::default_true;
@@ -72,7 +72,7 @@ pub struct TaskTemplate {
     pub save: SaveStrategy,
     /// Hooks that this task runs when emitted.
     #[serde(default)]
-    pub hooks: std::collections::HashSet<TaskHook>,
+    pub hooks: HashSet<TaskHook>,
 }
 
 /// Use to represent debug request type

@@ -3,11 +3,12 @@ use super::*;
 use ::rpc::proto;
 use anyhow::{Context as _, Result, anyhow};
 use std::path::Path;
+use util::ResultExt;
 
-use gpui::{App, AsyncApp, Context};
+use gpui::{App, AppContext, AsyncApp, BorrowAppContext, Context};
 
-use super::state::ProjectClientState;
 use super::Project;
+use super::state::ProjectClientState;
 
 impl Project {
     pub(crate) fn release(&mut self, cx: &mut App) {
@@ -255,9 +256,7 @@ impl Project {
             }
         }
     }
-    pub fn close(&mut self, cx: &mut Context<Self>) {
-        cx.emit(Event::Closed);
-    }
+    pub fn close(&mut self, cx: &mut Context<Self>) { cx.emit(Event::Closed); }
 
     #[inline]
     pub fn is_disconnected(&self, cx: &App) -> bool {
@@ -274,6 +273,14 @@ impl Project {
     }
 
     #[inline]
+    fn remote_client_is_disconnected(&self, cx: &App) -> bool {
+        self.remote_client
+            .as_ref()
+            .map(|remote| remote.read(cx).is_disconnected())
+            .unwrap_or(false)
+    }
+
+    #[inline]
     pub fn capability(&self) -> Capability {
         match &self.client_state {
             ProjectClientState::Collab { capability, .. } => *capability,
@@ -287,7 +294,8 @@ impl Project {
     }
 
     #[inline]
-    #[inline] pub(crate) fn is_local(&self) -> bool {
+    #[inline]
+    pub(crate) fn is_local(&self) -> bool {
         match &self.client_state {
             ProjectClientState::Local | ProjectClientState::Shared { .. } => {
                 self.remote_client.is_none()
@@ -444,6 +452,4 @@ impl Project {
             worktree_store.disable_scanner();
         });
     }
-
-    #[inline]
 }

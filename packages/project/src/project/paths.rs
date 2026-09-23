@@ -1,18 +1,26 @@
 use super::*;
 
-use std::path::{Path, PathBuf};
-use std::sync::Arc;
-
-use gpui::{App, AsyncApp};
-use util::rel_path::RelPath;
-use util::paths::{PathStyle, SanitizedPath};
-
 use super::Project;
+use crate::ProjectPath;
 use crate::directory::{DirectoryItem, DirectoryLister};
 use crate::path::ResolvedPath;
-use ::rpc::proto::REMOTE_SERVER_PROJECT_ID;
+use ::rpc::proto::{self, REMOTE_SERVER_PROJECT_ID};
+use anyhow::{Context as _, Result, anyhow};
+use futures::{
+    StreamExt,
+    channel::mpsc::{self, UnboundedReceiver},
+    future::try_join_all,
+};
+use gpui::{
+    App, AppContext, AsyncApp, BorrowAppContext, Context, Entity, EventEmitter, Hsla, SharedString,
+    Task, TaskExt, WeakEntity, Window,
+};
+use std::path::{Path, PathBuf};
+use std::sync::Arc;
+use util::ResultExt;
+use util::paths::{PathStyle, SanitizedPath};
+use util::rel_path::RelPath;
 use worktree::Worktree;
-use crate::ProjectPath;
 
 impl Project {
     pub fn find_project_path(&self, path: impl AsRef<Path>, cx: &App) -> Option<ProjectPath> {
@@ -210,13 +218,14 @@ impl Project {
                 })
             })
         } else if let Some(ssh_client) = self.remote_client.as_ref() {
-            let request = ssh_client
-                .read(cx)
-                .proto_client()
-                .request(::rpc::proto::GetPathMetadata {
-                    project_id: REMOTE_SERVER_PROJECT_ID,
-                    path: path.into(),
-                });
+            let request =
+                ssh_client
+                    .read(cx)
+                    .proto_client()
+                    .request(::rpc::proto::GetPathMetadata {
+                        project_id: REMOTE_SERVER_PROJECT_ID,
+                        path: path.into(),
+                    });
             cx.background_spawn(async move {
                 let response = request.await.log_err()?;
                 if response.exists {
@@ -329,30 +338,37 @@ impl Project {
             }
         }
     }
-    pub fn list_directory(&self, path: String, cx: &mut App) -> Task<Result<Vec<DirectoryItem>>> {
-        match self {
-            DirectoryLister::Project(project) => {
-                project.update(cx, |project, cx| project.list_directory(path, cx))
-            }
-            DirectoryLister::Local(_, fs) => {
-                let fs = fs.clone();
-                cx.background_spawn(async move {
-                    let mut results = vec![];
-                    let expanded = shellexpand::tilde(&path);
-                    let query = Path::new(expanded.as_ref());
-                    let mut response = fs.read_dir(query).await?;
-                    while let Some(path) = response.next().await {
-                        let path = path?;
-                        if let Some(file_name) = path.file_name() {
-                            results.push(DirectoryItem {
-                                path: PathBuf::from(file_name.to_os_string()),
-                                is_dir: fs.is_dir(&path).await,
-                            });
-                        }
-                    }
-                    Ok(results)
-                })
-            }
+    pub fn list_directory(
+        &self,
+        query: String,
+        cx: &mut Context<Self>,
+    ) -> Task<Result<Vec<DirectoryItem>>> {
+        if self.is_local() {
+            DirectoryLister::Local(cx.entity(), self.fs.clone()).list_directory(query, cx)
+        } else if let Some(session) = self.remote_client.as_ref() {
+            let request = proto::ListRemoteDirectory {
+                dev_server_id: REMOTE_SERVER_PROJECT_ID,
+                path: query,
+                config: Some(proto::ListRemoteDirectoryConfig { is_dir: true }),
+            };
+
+            let response = session.read(cx).proto_client().request(request);
+            cx.background_spawn(async move {
+                let proto::ListRemoteDirectoryResponse {
+                    entries,
+                    entry_info,
+                } = response.await?;
+                Ok(entries
+                    .into_iter()
+                    .zip(entry_info)
+                    .map(|(entry, info)| DirectoryItem {
+                        path: PathBuf::from(entry),
+                        is_dir: info.is_dir,
+                    })
+                    .collect())
+            })
+        } else {
+            Task::ready(Err(anyhow!("cannot list directory in remote project")))
         }
     }
 }

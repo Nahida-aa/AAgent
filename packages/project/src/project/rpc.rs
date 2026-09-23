@@ -1,21 +1,32 @@
-use super::*;
-
+use std::path::PathBuf;
 use std::sync::Arc;
 
-use anyhow::{Context as _, Result};
-use client::TypedEnvelope;
-use futures::StreamExt;
-use gpui::{AppContext as _, AsyncApp, Entity, WeakEntity};
-use itertools::Itertools;
+use ::rpc;
 use ::rpc::proto;
+use anyhow::{Context as _, Result};
+use client::{Collaborator, TypedEnvelope};
+use collections::{HashMap, HashSet};
+use futures::StreamExt;
+use gpui::{
+    App, AppContext as _, AsyncApp, BorrowAppContext, Context as _, Entity, Task as _, TaskExt,
+    WeakEntity,
+};
+use itertools::Itertools;
+use language::Buffer;
+use parking_lot::Mutex;
+use path::rel_path::RelPath;
+use rpc::ErrorCode;
+use settings::{SettingsStore, WorktreeId};
+use text::BufferId;
 use util::ResultExt as _;
 
 use super::Project;
 use crate::buffer_store::BufferStore;
 use crate::lsp_store::CompletionDocumentation;
 use crate::project_search::SearchResultsHandle;
+use crate::trusted_worktrees::{PathTrust, TrustedWorktrees};
 use crate::worktree_store::WorktreeStore;
-use crate::{Event, ProjectPath};
+use crate::{BufferOrderedMessage, DownloadingFile, Event, ProjectPath, SearchQuery};
 
 impl Project {
     async fn handle_unshare_project(
@@ -127,7 +138,7 @@ impl Project {
         })
     }
 
-    async fn handle_update_project(
+    pub(crate) async fn handle_update_project(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::UpdateProject>,
         mut cx: AsyncApp,
@@ -149,7 +160,7 @@ impl Project {
         })
     }
 
-    async fn handle_toast(
+    pub(crate) async fn handle_toast(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::Toast>,
         mut cx: AsyncApp,
@@ -164,7 +175,7 @@ impl Project {
         })
     }
 
-    async fn handle_telemetry_event(
+    pub(crate) async fn handle_telemetry_event(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::TelemetryEvent>,
         mut cx: AsyncApp,
@@ -200,7 +211,7 @@ impl Project {
         Ok(())
     }
 
-    async fn handle_hide_toast(
+    pub(crate) async fn handle_hide_toast(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::HideToast>,
         mut cx: AsyncApp,
@@ -214,7 +225,7 @@ impl Project {
     }
 
     // Collab sends UpdateWorktree protos as messages
-    async fn handle_update_worktree(
+    pub(crate) async fn handle_update_worktree(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::UpdateWorktree>,
         mut cx: AsyncApp,
@@ -231,7 +242,7 @@ impl Project {
         })
     }
 
-    async fn handle_trust_worktrees(
+    pub(crate) async fn handle_trust_worktrees(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::TrustWorktrees>,
         mut cx: AsyncApp,
@@ -258,7 +269,7 @@ impl Project {
         Ok(proto::Ack {})
     }
 
-    async fn handle_restrict_worktrees(
+    pub(crate) async fn handle_restrict_worktrees(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::RestrictWorktrees>,
         mut cx: AsyncApp,
@@ -285,7 +296,7 @@ impl Project {
     }
 
     // Goes from host to client.
-    async fn handle_find_search_candidates_chunk(
+    pub(crate) async fn handle_find_search_candidates_chunk(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::FindSearchCandidatesChunk>,
         mut cx: AsyncApp,
@@ -295,7 +306,7 @@ impl Project {
     }
 
     // Goes from client to host.
-    async fn handle_find_search_candidates_cancel(
+    pub(crate) async fn handle_find_search_candidates_cancel(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::FindSearchCandidatesCancelled>,
         mut cx: AsyncApp,
@@ -304,7 +315,7 @@ impl Project {
         BufferStore::handle_find_search_candidates_cancel(buffer_store, envelope, cx).await
     }
 
-    async fn handle_create_buffer_for_peer(
+    pub(crate) async fn handle_create_buffer_for_peer(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::CreateBufferForPeer>,
         mut cx: AsyncApp,
@@ -340,7 +351,8 @@ impl Project {
             let results = this.update(cx, |this, cx| {
                 this.search_impl(query, cx).matching_buffers(cx)
             });
-            let (batcher, batches) = crate::project_search::AdaptiveBatcher::new(cx.background_executor());
+            let (batcher, batches) =
+                crate::project_search::AdaptiveBatcher::new(cx.background_executor());
             let mut new_matches = Box::pin(results.rx);
 
             let sender_task = cx.background_executor().spawn({
@@ -476,7 +488,7 @@ impl Project {
         buffer.read(cx).remote_id()
     }
 
-    async fn handle_create_image_for_peer(
+    pub(crate) async fn handle_create_image_for_peer(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::CreateImageForPeer>,
         mut cx: AsyncApp,
@@ -488,7 +500,7 @@ impl Project {
         })
     }
 
-    async fn handle_create_file_for_peer(
+    pub(crate) async fn handle_create_file_for_peer(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::CreateFileForPeer>,
         mut cx: AsyncApp,
@@ -635,5 +647,4 @@ impl Project {
 
         Ok(())
     }
-
 }

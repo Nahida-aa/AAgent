@@ -1,19 +1,18 @@
 use super::*;
 
-use std::collections::HashSet;
-use std::ops::Range;
-use std::sync::Arc;
-
-use anyhow::Result;
-use anyhow::anyhow;
-use gpui::{App, AppContext, Context, Entity, Task, TaskExt};
-use language::{
-    Anchor, Buffer, Language, Location, PointUtf16, ToOffset, ToPointUtf16, Transaction, Unclipped,
-};
 use ::lsp::{
     CodeActionKind, CompletionContext, LanguageServerId, LanguageServerName, LanguageServerSelector,
 };
 use ::rpc::proto::{self, REMOTE_SERVER_PROJECT_ID};
+use anyhow::Result;
+use anyhow::anyhow;
+use collections::{BTreeSet, HashMap, HashSet, IndexSet};
+use gpui::{App, AppContext, Context, Entity, Task, TaskExt};
+use language::{
+    Anchor, Buffer, Language, Location, PointUtf16, ToOffset, ToPointUtf16, Transaction, Unclipped,
+};
+use std::ops::Range;
+use std::sync::Arc;
 use text::{BufferId, Point};
 
 use crate::debugger::{breakpoint_store::ActiveStackFrame, session::Session};
@@ -527,9 +526,7 @@ impl Project {
         let captures =
             snapshot.debug_variables_query(Anchor::min_for_buffer(snapshot.remote_id())..range.end);
 
-        let row = snapshot
-            .summary_for_anchor::<PointUtf16>(&range.end)
-            .row as usize;
+        let row = snapshot.summary_for_anchor::<PointUtf16>(&range.end).row as usize;
 
         let inline_value_locations = provide_inline_values(captures, &snapshot, row);
 
@@ -657,5 +654,4 @@ impl Project {
                 .is_some()
         })
     }
-
 }

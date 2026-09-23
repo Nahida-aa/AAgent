@@ -34,7 +34,7 @@ pub struct InlayHint {
 }
 
 /// The user's intent behind a given completion confirmation.
-#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub enum ResolveState {
     Resolved,
     CanResolve(LanguageServerId, Option<lsp::LSPAny>),

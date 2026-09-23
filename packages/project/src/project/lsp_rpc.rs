@@ -1,16 +1,16 @@
 use super::*;
 
+use ::lsp::MessageActionItem;
+use ::rpc::AnyProtoClient;
+use ::rpc::proto::{self, LanguageServerPromptResponse, REMOTE_SERVER_PROJECT_ID};
 use anyhow::{Context as _, Result};
 use client::TypedEnvelope;
 use futures::StreamExt as _;
 use gpui::{AppContext as _, AsyncApp, TaskExt as _};
 use itertools::Itertools;
-use std::str::FromStr as _;
-use ::lsp::MessageActionItem;
-use ::rpc::AnyProtoClient;
-use ::rpc::proto::{self, LanguageServerPromptResponse, REMOTE_SERVER_PROJECT_ID};
 use std::collections::HashSet;
 use std::pin::pin;
+use std::str::FromStr as _;
 
 use super::Project;
 use crate::lsp_store::log_store::LogKind;
@@ -19,7 +19,7 @@ use crate::types::*;
 use crate::{Event, LanguageServerPromptRequest, LanguageServerShowDocumentRequest};
 
 impl Project {
-    async fn handle_language_server_prompt_request(
+    pub(crate) async fn handle_language_server_prompt_request(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::LanguageServerPromptRequest>,
         mut cx: AsyncApp,
@@ -68,7 +68,7 @@ impl Project {
         })
     }
 
-    async fn handle_language_server_show_document_request(
+    pub(crate) async fn handle_language_server_show_document_request(
         project: Entity<Self>,
         envelope: TypedEnvelope<proto::LanguageServerShowDocumentRequest>,
         mut cx: AsyncApp,
@@ -128,7 +128,7 @@ impl Project {
         BufferStore::handle_update_buffer(buffer_store, envelope, cx).await
     }
 
-    async fn handle_update_buffer_from_remote_server(
+    pub(crate) async fn handle_update_buffer_from_remote_server(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::UpdateBuffer>,
         cx: AsyncApp,

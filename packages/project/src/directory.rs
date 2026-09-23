@@ -1,12 +1,16 @@
+use crate::Project;
+use anyhow::{Context as _, Result, anyhow};
+use fs::Fs;
+use futures::{
+    StreamExt as _,
+    channel::mpsc::{self, UnboundedReceiver},
+    future::try_join_all,
+};
+use gpui::{App, AppContext, Entity, Task};
 use std::borrow::Cow;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-
-use fs::Fs;
-use gpui::{App, Entity, Task};
 use util::paths::PathStyle;
-
-use crate::Project;
 
 pub struct DirectoryItem {
     pub path: PathBuf,
@@ -30,7 +34,6 @@ impl std::fmt::Debug for DirectoryLister {
         }
     }
 }
-
 
 impl DirectoryLister {
     pub fn is_local(&self, cx: &App) -> bool {

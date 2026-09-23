@@ -94,6 +94,7 @@ pub use file_content::{
     ByteContent, DecodedText, FILE_ANALYSIS_BYTES, analyze_byte_content, decode_text, encode_text,
 };
 pub use lsp::{LanguageServerId, LanguageServerName};
+pub use buffer::TextBufferSnapshot;
 pub use text::{
     Anchor, AnchorRangeExt, Bias, BufferId, Edit, LineEnding, OffsetRangeExt, OffsetUtf16, Patch,
     Point, PointUtf16, Rope, Selection, SelectionGoal, ToOffset, ToOffsetUtf16, ToPoint,

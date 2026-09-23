@@ -3,14 +3,15 @@ use super::*;
 use collections::IndexSet;
 use std::collections::BTreeMap;
 use std::path::PathBuf;
+use util::maybe;
 
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use gpui::{App, Context, Entity, Task};
 use language::{LanguageName, LanguageRegistry, Toolchain, ToolchainMetadata, ToolchainScope};
 
 use super::Project;
-use crate::toolchain_store::{ToolchainStore, Toolchains};
 use crate::ProjectPath;
+use crate::toolchain_store::{ToolchainStore, Toolchains};
 
 impl Project {
     pub fn available_toolchains(
@@ -91,9 +92,7 @@ impl Project {
             Task::ready(Err(anyhow!("This project does not support toolchains")))
         }
     }
-    pub fn toolchain_store(&self) -> Option<Entity<ToolchainStore>> {
-        self.toolchain_store.clone()
-    }
+    pub fn toolchain_store(&self) -> Option<Entity<ToolchainStore>> { self.toolchain_store.clone() }
     pub fn activate_toolchain(
         &self,
         path: ProjectPath,

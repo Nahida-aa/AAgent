@@ -6,28 +6,27 @@ use std::time::Duration;
 
 use crate::buffer_store::BufferStore;
 
-use std::collections::HashSet;
+use collections::HashSet;
 
+use ::rpc::ErrorCode;
 use anyhow::{Context as _, Result, anyhow};
 use futures::{
-    FutureExt as _, StreamExt as _,
-    channel::mpsc::UnboundedReceiver,
-    future::try_join_all,
+    FutureExt as _, StreamExt as _, channel::mpsc::UnboundedReceiver, future::try_join_all,
 };
-use gpui::{App, AsyncApp, Context, Entity, Task, WeakEntity};
+use gpui::{App, AppContext, AsyncApp, Context, Entity, Task, TaskExt, WeakEntity};
 use itertools::Either;
 use language::{
-    Buffer, BufferEvent, BufferId, Capability, DiskState, Rope, ToOffset,
-    proto::split_operations,
+    Buffer, BufferEvent, BufferId, Capability, DiskState, Rope, ToOffset, proto::split_operations,
 };
-use ::rpc::ErrorCode;
+use util::ResultExt as _;
 
-use super::state::BufferOrderedMessage;
 use super::Project;
+use super::state::BufferOrderedMessage;
+use crate::ProjectPath;
 use crate::buffer_store::{BufferStoreEvent, ProjectTransaction};
 use crate::project_settings::ProjectSettings;
-use language::File;
-use crate::ProjectPath;
+use settings::{InvalidSettingsError, RegisterSetting, Settings, SettingsLocation, SettingsStore};
+use worktree::File;
 
 impl Project {
     pub fn create_buffer(
@@ -87,8 +86,6 @@ impl Project {
         })
     }
 
-    #[cfg(feature = "test-support")]
-
     pub fn open_buffer(
         &mut self,
         path: impl Into<ProjectPath>,
@@ -102,8 +99,6 @@ impl Project {
             buffer_store.open_buffer(path.into(), cx)
         })
     }
-
-    #[cfg(feature = "test-support")]
 
     pub fn open_buffer_by_id(
         &mut self,
@@ -187,7 +182,11 @@ impl Project {
         })
     }
 
-    fn register_buffer(&mut self, buffer: &Entity<Buffer>, cx: &mut Context<Self>) -> Result<()> {
+    pub(crate) fn register_buffer(
+        &mut self,
+        buffer: &Entity<Buffer>,
+        cx: &mut Context<Self>,
+    ) -> Result<()> {
         {
             let mut remotely_created_models = self.remotely_created_models.lock();
             if remotely_created_models.retain_count > 0 {
@@ -205,7 +204,7 @@ impl Project {
         Ok(())
     }
 
-    fn on_buffer_store_event(
+    pub(crate) fn on_buffer_store_event(
         &mut self,
         _: Entity<BufferStore>,
         event: &BufferStoreEvent,
@@ -284,7 +283,7 @@ impl Project {
         None
     }
 
-    fn request_buffer_diff_recalculation(
+    pub(crate) fn request_buffer_diff_recalculation(
         &mut self,
         buffer: &Entity<Buffer>,
         cx: &mut Context<Self>,
@@ -318,7 +317,7 @@ impl Project {
             });
     }
 
-    fn recalculate_buffer_diffs(&mut self, cx: &mut Context<Self>) -> Task<()> {
+    pub(crate) fn recalculate_buffer_diffs(&mut self, cx: &mut Context<Self>) -> Task<()> {
         cx.spawn(async move |this, cx| {
             loop {
                 let task = this
@@ -348,7 +347,7 @@ impl Project {
         })
     }
 
-    async fn send_buffer_ordered_messages(
+    pub(crate) async fn send_buffer_ordered_messages(
         project: WeakEntity<Self>,
         rx: UnboundedReceiver<BufferOrderedMessage>,
         cx: &mut AsyncApp,
@@ -460,13 +459,19 @@ impl Project {
         Ok(())
     }
 
-    fn enqueue_buffer_ordered_message(&mut self, message: BufferOrderedMessage) -> Result<()> {
+    pub(crate) fn enqueue_buffer_ordered_message(
+        &mut self,
+        message: BufferOrderedMessage,
+    ) -> Result<()> {
         self.buffer_ordered_messages_tx
             .unbounded_send(message)
             .map_err(|e| anyhow!(e))
     }
 
-    fn synchronize_remote_buffers(&mut self, cx: &mut Context<Self>) -> Task<Result<()>> {
+    pub(crate) fn synchronize_remote_buffers(
+        &mut self,
+        cx: &mut Context<Self>,
+    ) -> Task<Result<()>> {
         let project_id = match self.client_state {
             ProjectClientState::Collab {
                 sharing_has_stopped,

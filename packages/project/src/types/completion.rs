@@ -238,7 +238,7 @@ pub(crate) struct CoreCompletionResponse {
 /// A generic completion that can come from different sources.
 #[derive(Clone, Debug)]
 pub(crate) struct CoreCompletion {
-    replace_range: Range<Anchor>,
-    new_text: String,
-    source: CompletionSource,
+    pub(crate) replace_range: Range<Anchor>,
+    pub(crate) new_text: String,
+    pub(crate) source: CompletionSource,
 }

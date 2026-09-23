@@ -1,4 +1,4 @@
-use aa_gpui_kit_ui::Color;
+use ui::Color;
 use gpui::{AnyView, App, SharedString, Window};
 
 #[derive(Clone, Copy, Debug)]

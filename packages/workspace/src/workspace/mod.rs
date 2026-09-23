@@ -1,3 +1,5 @@
+use gpui::Context;
+
 mod actions;
 mod actions_impl;
 mod app_state;
@@ -66,7 +68,7 @@ pub struct Workspace {
     pub(super) suppressed_notifications: HashSet<NotificationId>,
     pub(super) project: Entity<Project>,
     pub(super) follower_states: HashMap<CollaboratorId, FollowerState>,
-    pub(super) last_leaders_by_pane: HashMap<WeakEntity<Pane>, CollaboratorId>,
+    pub(crate) last_leaders_by_pane: HashMap<WeakEntity<Pane>, CollaboratorId>,
     pub(super) auto_watch: AutoWatch,
     pub(super) window_edited: bool,
     pub(super) last_window_title: Option<String>,

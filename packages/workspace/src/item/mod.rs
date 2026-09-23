@@ -30,7 +30,7 @@ pub use weak_handle::*;
 pub mod handle;
 pub mod settings;
 pub mod tab;
-use aa_gpui_kit_ui::{Color, Icon, Label, LabelCommon};
+use ui::{Color, Icon, Label, LabelCommon};
 use gpui::IntoElement;
 pub use handle::{Item, ItemHandle, WeakItemHandle};
 pub use settings::{

@@ -1,6 +1,6 @@
 use std::{path::Path, sync::Arc};
 
-use aa_gpui_kit_ui::{
+use ui::{
     Button, ButtonCommon, ButtonStyle, Clickable, KeyBinding, Label, LabelCommon, LabelSize,
     h_flex, v_flex,
 };

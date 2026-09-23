@@ -49,6 +49,7 @@ cloud_api_types = { path = "packages/cloud_api_types" }
 cloud_llm_client = { path = "packages/cloud_llm_client" }
 dap = { path = "packages/dap" }
 db = { path = "packages/db" }
+agent_settings = { path = "packages/agent_settings" }
 edit_prediction_types = { path = "packages/edit_prediction_types" }
 editor = { path = "packages/editor" }
 env_var = { path = "packages/env_var" }

@@ -1,4 +1,4 @@
-use aa_gpui_kit_ui::{Button, Tooltip, prelude::*};
+use ui::{Button, Tooltip, prelude::*};
 use gpui::{
     App, Context, Empty, EventEmitter, IntoElement, ParentElement, Render, SharedString, Window,
 };

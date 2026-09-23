@@ -1,4 +1,4 @@
-use aa_gpui_kit_ui::prelude::*;
+use ui::prelude::*;
 use gpui::{
     AnyElement, Context, DragMoveEvent, IntoElement, MouseButton, Render, Styled, Window, deferred,
     div, px,

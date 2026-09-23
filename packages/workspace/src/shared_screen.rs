@@ -2,7 +2,7 @@ use crate::{
     ItemNavHistory, WorkspaceId,
     item::{Item, ItemEvent},
 };
-use aa_gpui_kit_ui::{Icon, IconName, prelude::*};
+use ui::{Icon, IconName, prelude::*};
 use client::{User, proto::PeerId};
 use gpui::{
     AnyView, AppContext as _, Entity, EventEmitter, FocusHandle, Focusable, InteractiveElement,

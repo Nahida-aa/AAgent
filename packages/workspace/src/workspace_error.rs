@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
-use aa_gpui_kit_ui::{IconName, IconPosition};
+use ui::{IconName, IconPosition};
 use aagent_actions::OpenBrowser;
 use gpui::{Action, SharedString};
 

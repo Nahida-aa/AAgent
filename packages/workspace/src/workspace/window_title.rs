@@ -304,7 +304,7 @@ impl Workspace {
         }
     }
 
-    fn update_item_dirty_state(
+    pub(crate) fn update_item_dirty_state(
         &mut self,
         item: &dyn ItemHandle,
         window: &mut Window,

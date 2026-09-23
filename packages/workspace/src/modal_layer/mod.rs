@@ -1,4 +1,4 @@
-use aa_gpui_kit_ui::prelude::*;
+use ui::prelude::*;
 use gpui::{
     AnyView, App, DismissEvent, Entity, EventEmitter, FocusHandle, Global, ManagedView,
     MouseButton, Subscription, WeakFocusHandle,

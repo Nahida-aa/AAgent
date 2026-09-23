@@ -2,9 +2,9 @@ use anyhow::Context as _;
 use client::proto;
 use db::kvp::KeyValueStore;
 use gpui::{
-    Action, App, Context, Entity, EntityId, EventEmitter, FocusHandle, Focusable, IntoElement,
-    MouseButton, MouseDownEvent, MouseUpEvent, ParentElement, Pixels, Render, StyleRefinement,
-    Styled, Subscription, WeakEntity, Window, deferred, div, px,
+    Action, App, AppContext, Context, Entity, EntityId, EventEmitter, FocusHandle, Focusable,
+    IntoElement, MouseButton, MouseDownEvent, MouseUpEvent, ParentElement, Pixels, Render,
+    StyleRefinement, Styled, Subscription, WeakEntity, Window, deferred, div, px,
 };
 use settings::{Settings, SettingsStore};
 use std::sync::Arc;

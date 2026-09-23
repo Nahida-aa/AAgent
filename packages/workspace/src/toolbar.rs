@@ -5,7 +5,7 @@
 //! 去掉 `can_navigate`，用 `px(...)` 代替 Zed 的 `DynamicSpacing`。
 
 use crate::ItemHandle;
-use aa_gpui_kit_ui::{h_flex, prelude::*, v_flex};
+use ui::{h_flex, prelude::*, v_flex};
 use gpui::{
     AnyView, App, Context, Div, Entity, EntityId, EventEmitter, Global, KeyContext,
     ParentElement as _, Render, Styled, Window,

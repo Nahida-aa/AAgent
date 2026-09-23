@@ -24,7 +24,7 @@ pub(crate) const RESIZE_HANDLE_SIZE: Pixels = px(6.);
 
 pub(crate) const PANEL_SIZE_STATE_KEY: &str = "dock_panel_size";
 
-use aa_gpui_kit_theme::ActiveTheme;
+use theme::ActiveTheme;
 use gpui::{
     App, Context, Entity, IntoElement, MouseButton, MouseDownEvent, MouseUpEvent, ParentElement,
     Render, Styled, Window, deferred, div, hsla, prelude::*, px,

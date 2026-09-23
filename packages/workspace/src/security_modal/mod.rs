@@ -12,8 +12,8 @@ use gpui::{
     WeakEntity,
 };
 
-use aa_gpui_kit_theme::ActiveTheme;
-use aa_gpui_kit_ui::{
+use theme::ActiveTheme;
+use ui::{
     AlertModal, Checkbox, KeyBinding, ListBulletItem, ToggleState, WithScrollbar, prelude::*,
 };
 use aa_gpui_kit_ui_input::InputField;

@@ -11,7 +11,7 @@ pub use sidebar::handle::SidebarHandle;
 pub use sidebar::render_state::SidebarRenderState;
 pub use task::SpawnInTerminal;
 
-use aa_gpui_kit_theme::ActiveTheme;
+use theme::ActiveTheme;
 use gpui::{
     App, Context, DragMoveEvent, Entity, IntoElement, MouseButton, ParentElement, Render, Styled,
     Window, div, prelude::*, px,

@@ -10,7 +10,7 @@
 
 use crate::Pane;
 use crate::status_bar::HideStatusItem;
-use aa_gpui_kit_ui::IconName;
+use ui::IconName;
 use client::proto;
 use gpui::{
     Action, AnyView, App, Context, Entity, EntityId, EventEmitter, FocusHandle, IntoElement,

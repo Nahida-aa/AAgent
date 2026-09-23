@@ -3,7 +3,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use aa_gpui_kit_ui::{animation::DefaultAnimations, prelude::*};
+use ui::{animation::DefaultAnimations, prelude::*};
 use aagent_actions::toast;
 use gpui::{
     AnyView, DismissEvent, Entity, EntityId, FocusHandle, ManagedView, MouseButton, Subscription,

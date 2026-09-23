@@ -1,6 +1,6 @@
 pub use language::HighlightedText;
 
-use aa_gpui_kit_ui::{Icon, Label, LabelCommon};
+use ui::{Icon, Label, LabelCommon};
 use gpui::{
     Action, AnyElement, AnyEntity, App, Context, Entity, EntityId, EventEmitter, Focusable, Font,
     IntoElement, Pixels, Point, Render, SharedString, Task, WeakEntity, Window,

@@ -1,6 +1,6 @@
 #![allow(unused, dead_code)]
-use aa_gpui_kit_theme::all_theme_colors;
-use aa_gpui_kit_ui::{
+use theme::all_theme_colors;
+use ui::{
     AudioStatus, Avatar, AvatarAudioStatusIndicator, AvatarAvailabilityIndicator, ButtonLike,
     Checkbox, CollaboratorAvailability, DecoratedIcon, ElevationIndex, Facepile, IconDecoration,
     Indicator, KeybindingHint, Switch, TintColor, Tooltip, prelude::*,

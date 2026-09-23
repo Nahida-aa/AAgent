@@ -9,8 +9,8 @@
 //! - [activate_item] — ActivateItem action（带字段的 action 单独放）
 //! - [dragged] — DraggedTab / DraggedSelection drag marker
 
-use aa_gpui_kit_theme::ActiveTheme;
-use aa_gpui_kit_ui::IconName;
+use theme::ActiveTheme;
+use ui::IconName;
 use gpui::{
     App, Context, Entity, EntityId, EventEmitter, FocusHandle, Focusable, IntoElement, Render,
     Window, actions, div, prelude::*, px,

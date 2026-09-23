@@ -13,7 +13,7 @@ use gpui::{
 use gpui::{WeakEntity, linear_color_stop, linear_gradient};
 use menu::{SelectNext, SelectPrevious};
 
-use aa_gpui_kit_ui::{
+use ui::{
     ButtonLike, Divider, DividerColor, IconSize, KeyBinding, Vector, VectorName, prelude::*,
 };
 use aagent_actions::{

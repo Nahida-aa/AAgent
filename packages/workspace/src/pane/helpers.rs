@@ -1,4 +1,4 @@
-use aa_gpui_kit_ui::{
+use ui::{
     ContextMenu, IconButton, IconName, IconSize, PopoverMenu, Tooltip, prelude::*,
 };
 use gpui::{

@@ -10,7 +10,7 @@ use crate::searchable::SearchableItemHandle;
 use crate::toolbar::ToolbarItemLocation;
 use crate::workspace_settings::WorkspaceSettings;
 use crate::{Pane, Workspace, WorkspaceId};
-use aa_gpui_kit_ui::{Icon, IconName};
+use ui::{Icon, IconName};
 use gpui::{
     Action, AnyElement, AnyEntity, AnyView, App, Entity, EntityId, EventEmitter, FocusHandle, Font,
     IntoElement, Pixels, Point, SharedString, Subscription, Task, WeakEntity, Window,

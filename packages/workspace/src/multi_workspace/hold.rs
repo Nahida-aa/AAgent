@@ -11,7 +11,7 @@ pub(super) struct HeldWorkspace {
 }
 
 impl MultiWorkspace {
-    fn held_index(&self, workspace: &Entity<Workspace>) -> Option<usize> {
+    pub(crate) fn held_index(&self, workspace: &Entity<Workspace>) -> Option<usize> {
         self.held
             .iter()
             .position(|held| held.workspace == *workspace)

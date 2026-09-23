@@ -1,3 +1,4 @@
+use aagent_actions::Rerun;
 use gpui::{
     AnyElement, App, AppContext, Context, IntoElement, ParentElement, SharedString, Styled, Task,
     Window,
@@ -6,7 +7,6 @@ use terminal::{TaskState, TaskStatus, Terminal};
 use ui::prelude::*;
 use ui::{Divider, Icon, IconButton, IconName, IconSize, Label, Tooltip};
 use workspace::item::{TabContentParams, TabTooltipContent};
-use zed_actions::Rerun;
 
 use super::TerminalView;
 use super::actions::RerunTask;

@@ -284,7 +284,7 @@ impl MultiWorkspace {
     /// The keys of the other project groups, nearest first, preferring the
     /// following group over the preceding group at equal distances. Without an
     /// index, every group key in display order.
-    fn neighbor_group_keys(&self, group_index: Option<usize>) -> Vec<ProjectGroupKey> {
+    pub(crate) fn neighbor_group_keys(&self, group_index: Option<usize>) -> Vec<ProjectGroupKey> {
         let Some(index) = group_index else {
             return self
                 .project_groups

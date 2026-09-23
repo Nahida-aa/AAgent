@@ -105,8 +105,8 @@ pub(crate) use sum_tree::TreeMap;
 pub use text::{
     Anchor, Bias, BufferId, BufferSnapshot as TextBufferSnapshot, Edit, LineEnding, LineIndent,
     OffsetRangeExt, OffsetUtf16, Patch, Point, PointUtf16, Rope, Selection, SelectionGoal,
-    Subscription, TextSummary, ToOffset, ToPoint, ToPointUtf16, Transaction, TransactionId,
-    Unclipped,
+    Subscription, TextDimension, TextSummary, ToOffset, ToPoint, ToPointUtf16, Transaction,
+    TransactionId, Unclipped,
 };
 
 // crate 内部跨模块类型

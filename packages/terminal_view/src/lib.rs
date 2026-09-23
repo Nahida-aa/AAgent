@@ -8,10 +8,11 @@
 pub mod element;
 pub mod panel;
 mod persistence;
+mod terminal_path_like_target;
 pub mod terminal_scrollbar;
 pub mod view;
-
 pub use panel::TerminalPanel;
+use terminal_path_like_target::{hover_path_like_target, open_path_like_target};
 pub use view::TerminalView;
 
 use gpui::App;

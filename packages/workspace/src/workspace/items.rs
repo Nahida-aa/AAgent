@@ -420,7 +420,7 @@ impl Workspace {
         })
     }
 
-    pub(super) fn load_path(
+    pub(crate) fn load_path(
         &mut self,
         path: ProjectPath,
         window: &mut Window,

@@ -501,3 +501,8 @@ aa_clock = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/clock" }
 # aa_gpui_fuzzy 的路径类型从 std::path::Path 换成了 zed 的 `path::RelPath`，
 # 与 zed crates/fuzzy_nucleo 对齐；project 因此不再需要手写 PathStyle 转换。
 aa_gpui_fuzzy = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/gpui_fuzzy" }
+# ui / ui_input / component 必须同源：ui 走本地 path 后，若 ui_input 还留在 c712ba1，
+# 两者会各拖一份 aa_gpui_kit_component，于是出现两个不同的 `Component` trait，
+# 报 `InputField: Component is not satisfied`（E0277 + 「multiple different versions」）。
+aa_gpui_kit_ui_input = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui_input" }
+aa_gpui_kit_component = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/component" }

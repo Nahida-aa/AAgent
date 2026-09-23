@@ -37,12 +37,12 @@ pub use toolbar::{Toolbar, ToolbarItemEvent, ToolbarItemLocation, ToolbarItemVie
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use aa_gpui_kit_theme::ActiveTheme;
-use aa_gpui_kit_ui::StyledExt;
 use gpui::{
     Action, App, Axis, Bounds, Context, DragMoveEvent, Entity, IntoElement, ParentElement, Render,
     Styled, Window, canvas, div, hsla, prelude::*, px,
 };
+use theme::ActiveTheme;
+use ui::StyledExt;
 
 use dock::buttons::PanelButtons;
 use dock::panel::{
@@ -52,15 +52,11 @@ use dock::{Dock, DraggedDock, RESIZE_HANDLE_SIZE};
 use status_bar::StatusBar;
 
 pub mod active_file_name;
-pub mod dock;
 pub mod history_manager;
 pub mod invalid_item_view;
-pub mod item;
 mod modal_layer;
-mod multi_workspace;
 
 pub mod notifications;
-pub mod pane;
 pub mod path_list {
     pub use util::path_list::{PathList, SerializedPathList};
 }

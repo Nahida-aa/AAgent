@@ -4,9 +4,15 @@ use gpui::{App, SharedString};
 use remote::{RemoteConnectionOptions, same_remote_connection_identity};
 use util::path_list::PathList;
 
-use crate::worktree_store::WorktreePaths;
 use crate::Project;
+use crate::worktree_store::WorktreePaths;
 
+/// Identifies a project group by a set of paths the workspaces in this group
+/// have.
+///
+/// Paths are mapped to their main worktree path first so we can group
+/// workspaces by main repos.
+#[derive(PartialEq, Eq, Hash, Clone, Debug, Default)]
 pub struct ProjectGroupKey {
     /// The paths of the main worktrees for this project group.
     paths: PathList,
@@ -40,9 +46,7 @@ impl ProjectGroupKey {
         }
     }
 
-    pub fn path_list(&self) -> &PathList {
-        &self.paths
-    }
+    pub fn path_list(&self) -> &PathList { &self.paths }
 
     pub fn display_name(
         &self,
@@ -70,9 +74,7 @@ impl ProjectGroupKey {
         }
     }
 
-    pub fn host(&self) -> Option<RemoteConnectionOptions> {
-        self.host.clone()
-    }
+    pub fn host(&self) -> Option<RemoteConnectionOptions> { self.host.clone() }
 
     pub fn matches(&self, other: &ProjectGroupKey) -> bool {
         self.paths == other.paths

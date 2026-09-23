@@ -9,7 +9,7 @@ mod buffer;
 mod buffer_id;
 mod constants;
 #[cfg(debug_assertions)]
-mod debug_ranges;
+pub mod debug_ranges;
 mod dimensions;
 mod edit_snapshot;
 mod edits_iter;

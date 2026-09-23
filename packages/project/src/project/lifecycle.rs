@@ -294,8 +294,7 @@ impl Project {
     }
 
     #[inline]
-    #[inline]
-    pub(crate) fn is_local(&self) -> bool {
+    pub fn is_local(&self) -> bool {
         match &self.client_state {
             ProjectClientState::Local | ProjectClientState::Shared { .. } => {
                 self.remote_client.is_none()

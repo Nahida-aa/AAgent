@@ -32,7 +32,7 @@ serde.workspace = true
 smallvec.workspace = true
 sum_tree.workspace = true
 text.workspace = true
-aa_gpui_kit_theme.workspace = true
+theme.workspace = true
 tree-sitter = { workspace = true, features = ["wasm"] }
 a_tracing.workspace = true
 tracing.workspace = true

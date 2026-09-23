@@ -1,9 +1,9 @@
-use std::process::ExitStatus;
-
 use anyhow::Result;
 use gpui::{App, Task, Window};
+use std::process::ExitStatus;
 use task::SpawnInTerminal;
 use terminal::Terminal;
+use util::{ResultExt, TryFutureExt, defer};
 
 use super::TerminalPanel;
 

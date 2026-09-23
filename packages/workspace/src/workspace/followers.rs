@@ -796,7 +796,7 @@ impl Workspace {
         }
     }
 
-    fn update_followers(
+    pub(crate) fn update_followers(
         &self,
         project_only: bool,
         update: proto::update_followers::Variant,
@@ -817,7 +817,7 @@ impl Workspace {
         })
     }
 
-    fn shared_screen_for_peer(
+    pub(crate) fn shared_screen_for_peer(
         &self,
         peer_id: PeerId,
         pane: &Entity<Pane>,

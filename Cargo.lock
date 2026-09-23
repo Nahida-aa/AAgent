@@ -300,18 +300,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "aa_gpui_kit_component"
-version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=c712ba162bd10c1a3a62d10c577acd8c06842249#c712ba162bd10c1a3a62d10c577acd8c06842249"
-dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
- "gpui",
- "inventory",
- "parking_lot",
- "strum 0.27.2",
-]
-
-[[package]]
 name = "aa_gpui_kit_theme"
 version = "0.1.0"
 dependencies = [
@@ -352,7 +340,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_base",
  "aa_gpui_kit_assets 0.1.0",
- "aa_gpui_kit_component 0.1.0",
+ "aa_gpui_kit_component",
  "aa_gpui_kit_theme 0.1.0",
  "aa_gpui_kit_ui_macros",
  "documented",
@@ -370,9 +358,8 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_ui_input"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=c712ba162bd10c1a3a62d10c577acd8c06842249#c712ba162bd10c1a3a62d10c577acd8c06842249"
 dependencies = [
- "aa_gpui_kit_component 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=c712ba162bd10c1a3a62d10c577acd8c06842249)",
+ "aa_gpui_kit_component",
  "aa_gpui_kit_ui",
  "gpui",
 ]
@@ -9170,6 +9157,18 @@ checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 [[package]]
 name = "platform_title_bar"
 version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_ui",
+ "aagent_actions",
+ "gpui",
+ "project",
+ "settings",
+ "smallvec",
+ "theme_settings",
+ "windows 0.62.2",
+ "workspace",
+]
 
 [[package]]
 name = "plotters"

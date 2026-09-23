@@ -2,11 +2,11 @@ use anyhow::Result;
 use async_recursion::async_recursion;
 use collections::HashSet;
 use futures::future::join_all;
+use gpui::{App, Context, Window};
 use gpui::{AppContext as _, AsyncWindowContext, Axis, Entity, Task, WeakEntity};
 use project::Project;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use ui::{App, Context, Window};
 use util::ResultExt as _;
 
 use db::{

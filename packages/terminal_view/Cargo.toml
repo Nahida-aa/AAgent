@@ -3,15 +3,49 @@ name = "terminal_view"
 version = "0.1.0"
 edition.workspace = true
 
+[features]
+test-support = ["editor/test-support", "gpui/test-support"]
+
 [dependencies]
-task.workspace = true
-terminal.workspace = true
-alacritty_terminal.workspace = true
-gpui.workspace = true
-gpui_util.workspace = true
-aa_gpui_kit_theme.workspace = true
-aa_gpui_kit_ui.workspace = true
-workspace.workspace = true
-tracing.workspace = true
+anyhow.workspace = true
+async-recursion.workspace = true
+breadcrumbs.workspace = true
+collections.workspace = true
+db.workspace = true
+dirs.workspace = true
 editor.workspace = true
+futures.workspace = true
+gpui.workspace = true
+itertools.workspace = true
+language.workspace = true
+log.workspace = true
+menu.workspace = true
+pretty_assertions.workspace = true
 project.workspace = true
+regex.workspace = true
+schemars.workspace = true
+task.workspace = true
+
+serde.workspace = true
+serde_json.workspace = true
+settings.workspace = true
+shellexpand.workspace = true
+shlex.workspace = true
+terminal.workspace = true
+theme.workspace = true
+theme_settings.workspace = true
+ui.workspace = true
+util.workspace = true
+workspace.workspace = true
+aagent_actions.workspace = true
+
+[dev-dependencies]
+editor = { workspace = true, features = ["test-support"] }
+gpui = { workspace = true, features = ["test-support"] }
+project = { workspace = true, features = ["test-support"] }
+remote = { workspace = true, features = ["test-support"] }
+release_channel.workspace = true
+rpc = { workspace = true, features = ["test-support"] }
+semver.workspace = true
+terminal = { workspace = true, features = ["test-support"] }
+workspace = { workspace = true, features = ["test-support"] }

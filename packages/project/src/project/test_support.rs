@@ -1,7 +1,5 @@
 use super::*;
 
-#![cfg(feature = "test-support")]
-
 use std::path::Path;
 
 use gpui::{App, AsyncApp, Context, Entity, TestAppContext};
@@ -10,13 +8,11 @@ use node_runtime::NodeRuntime;
 use util::paths::PathStyle;
 
 use super::Project;
-use crate::types::*;
 use crate::ProjectEnvironmentEvent;
+use crate::types::*;
 
 impl Project {
-    pub fn client_subscriptions(&self) -> &Vec<client::Subscription> {
-        &self.client_subscriptions
-    }
+    pub fn client_subscriptions(&self) -> &Vec<client::Subscription> { &self.client_subscriptions }
 
     #[cfg(feature = "test-support")]
     pub async fn example(

@@ -1,9 +1,10 @@
-use std::path::Path;
 use std::sync::Arc;
 
-use aa_gpui_fuzzy::{PathMatchCandidate, PathMatchCandidateSet as FuzzyPathMatchCandidateSet, PathStyle};
+use aa_gpui_fuzzy::{
+    PathMatchCandidate, PathMatchCandidateSet as FuzzyPathMatchCandidateSet, PathStyle,
+};
 use util::rel_path::RelPath;
-use worktree::{Entry, Snapshot, Traversal};
+use worktree::{Snapshot, Traversal};
 
 pub struct PathMatchCandidateSet {
     pub snapshot: Snapshot,

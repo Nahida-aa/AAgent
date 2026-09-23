@@ -112,6 +112,7 @@ async-std = { version = "1.12", features = ["unstable"] }
 async-trait = "0.1"
 alacritty_terminal = { git = "https://github.com/zed-industries/alacritty", rev = "4c129667ce56611becdc82de6e28218c80e2e88f" }
 async-lock = "3.4.2"
+async-recursion = "1.0.0"
 async-compression = { version = "0.4", features = ["bzip2", "gzip", "futures-io"] }
 async-fs = "2.1"
 async-pipe = { git = "https://github.com/zed-industries/async-pipe-rs", rev = "82d00a04211cf4e1236029aa03e6b6ce2a74c553" }
@@ -490,7 +491,7 @@ libwebrtc = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev =
 # 其余 5 个 crate 仍走 GitHub 的 c712ba1（已推送，本机克隆里这几 crate 内容与 c712ba1 一致）。
 # 仅开发期用；把 gpui_learn 的 cba2f68 推到 GitHub 后即可整段删除。
 [patch."https://github.com/Nahida-aa/gpui_learn.git"]
-aa_gpui_kit_theme = { git = "file:///home/aa/repos/ide_ls/gpui_learn", rev = "cba2f689e57b5f5963e4c6596ec6fca176f58fa9" }
+aa_gpui_kit_theme = { git = "file:///home/aa/repos/ide_ls/gpui_learn", rev = "c4060f4269beb415bc27260a83850dd62a06c555" }
 aa_gpui_kit_ui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui" }
 # icons 是刚加进 gpui_learn 的新包，还没进上面 git 依赖锁定的那个 rev，
 # 先用本地 path 顶上，等推上去并更新 rev 后可以移除这条。

@@ -38,7 +38,7 @@ name = "aa-app"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_assets 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=c712ba162bd10c1a3a62d10c577acd8c06842249)",
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "aa_gpui_kit_ui",
  "anyhow",
  "chrono",
@@ -304,7 +304,7 @@ name = "aa_gpui_kit_component"
 version = "0.1.0"
 source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=c712ba162bd10c1a3a62d10c577acd8c06842249#c712ba162bd10c1a3a62d10c577acd8c06842249"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "gpui",
  "inventory",
  "parking_lot",
@@ -331,7 +331,7 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_theme"
 version = "0.1.0"
-source = "git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9#cba2f689e57b5f5963e4c6596ec6fca176f58fa9"
+source = "git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555#c4060f4269beb415bc27260a83850dd62a06c555"
 dependencies = [
  "anyhow",
  "gpui",
@@ -1416,6 +1416,15 @@ name = "beef"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3a8241f3ebb85c056b509d4327ad0358fbbba6ffb340bf388f26350aeda225b1"
+
+[[package]]
+name = "betlang"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5f89b0929539eaee70109704ae4e345df438be6ab02e4dc8ac060e05098ad1b7"
+dependencies = [
+ "fearless_simd",
+]
 
 [[package]]
 name = "bindgen"
@@ -3652,7 +3661,7 @@ dependencies = [
  "aa_clock",
  "aa_gpui_fuzzy",
  "aa_gpui_kit_assets 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=c712ba162bd10c1a3a62d10c577acd8c06842249)",
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aagent_actions",
@@ -4043,6 +4052,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "fearless_simd"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b97b65636e5b9ef369943878ac74335ba1c55c1cb6adbf1e2c293c624248d693"
+
+[[package]]
 name = "feature_flags"
 version = "0.1.0"
 dependencies = [
@@ -4069,7 +4084,7 @@ dependencies = [
 name = "file_icons"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "gpui",
  "settings_content",
  "util 0.1.0",
@@ -6070,7 +6085,7 @@ dependencies = [
 name = "json_schema_store"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "anyhow",
  "collections",
  "dap",
@@ -6194,7 +6209,7 @@ dependencies = [
  "a_tracing",
  "aa_clock",
  "aa_gpui_fuzzy",
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "anyhow",
  "async-trait",
  "chardetng",
@@ -6307,6 +6322,11 @@ dependencies = [
 [[package]]
 name = "language_detection"
 version = "0.1.0"
+dependencies = [
+ "betlang",
+ "gpui",
+ "language",
+]
 
 [[package]]
 name = "language_model"
@@ -6355,7 +6375,7 @@ dependencies = [
 name = "languages"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "anyhow",
  "async-compression",
  "async-fs",
@@ -6912,7 +6932,7 @@ dependencies = [
 name = "markdown"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "aa_gpui_kit_ui",
  "anyhow",
  "base64",
@@ -7300,7 +7320,7 @@ dependencies = [
  "a_log",
  "a_tracing",
  "aa_clock",
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "anyhow",
  "buffer_diff",
  "collections",
@@ -10350,7 +10370,7 @@ dependencies = [
 name = "remote_connection"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "anyhow",
@@ -11271,7 +11291,7 @@ checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 name = "sidebar"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "aa_gpui_kit_ui",
  "gpui",
  "settings_content",
@@ -12204,7 +12224,7 @@ dependencies = [
 name = "terminal"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "alacritty_terminal",
  "anyhow",
  "async-channel 2.5.0",
@@ -12218,6 +12238,7 @@ dependencies = [
  "log",
  "parking_lot",
  "percent-encoding",
+ "rand 0.9.5",
  "regex",
  "release_channel",
  "schemars",
@@ -12231,23 +12252,48 @@ dependencies = [
  "url",
  "urlencoding",
  "util 0.1.0",
+ "util_macros 0.1.0",
  "vte",
+ "windows 0.62.2",
 ]
 
 [[package]]
 name = "terminal_view"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "aa_gpui_kit_ui",
- "alacritty_terminal",
+ "aagent_actions",
+ "anyhow",
+ "async-recursion",
+ "breadcrumbs",
+ "collections",
+ "db",
+ "dirs",
  "editor",
+ "futures",
  "gpui",
- "gpui_util",
+ "itertools 0.14.0",
+ "language",
+ "log",
+ "menu",
+ "pretty_assertions",
  "project",
+ "regex",
+ "release_channel",
+ "remote",
+ "rpc",
+ "schemars",
+ "semver",
+ "serde",
+ "serde_json",
+ "settings",
+ "shellexpand",
+ "shlex 1.3.0",
  "task",
  "terminal",
- "tracing",
+ "theme_settings",
+ "util 0.1.0",
  "workspace",
 ]
 
@@ -12339,7 +12385,7 @@ dependencies = [
 name = "theme_settings"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "gpui",
  "inventory",
  "serde",
@@ -12522,7 +12568,7 @@ name = "title_bar"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_assets 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=c712ba162bd10c1a3a62d10c577acd8c06842249)",
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "aa_gpui_kit_ui",
  "gpui",
  "gpui_platform",
@@ -14846,7 +14892,7 @@ dependencies = [
  "objc2-metal 0.3.2",
  "objc2-quartz-core 0.3.2",
  "once_cell",
- "ordered-float 4.6.0",
+ "ordered-float 5.5.0",
  "parking_lot",
  "portable-atomic",
  "portable-atomic-util",
@@ -15531,7 +15577,7 @@ name = "workspace"
 version = "0.1.0"
 dependencies = [
  "a_log",
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=cba2f689e57b5f5963e4c6596ec6fca176f58fa9)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aagent_actions",

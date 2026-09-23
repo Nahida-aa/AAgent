@@ -96,4 +96,12 @@ Before editing files for a substantial task:
 - **`Config::resolve()` 正确性**：cli 传 `Option`，不覆盖 provider 默认值（ollama→`http://localhost:11434`）
 - **`RunArgs` 改为 `Option<String>`**：避免 clap default 覆盖 provider 特定默认值
 
-纠错记录见 `.agent/CORRECTIONS.md`。
+纠错记录见 `.agents/CORRECTIONS.md`。
+
+## 从 zed 搬代码
+
+**搬 zed 的包之前，先读 `.agents/zed-port.md`。**
+
+zed 参照仓库在 `~/repos/learn_ls/zed`，单文件 crate 拆分后的可见性转发、
+`collections::` vs `std::collections::`、`RelPath` vs `std::path::Path`、
+模块遮蔽要用 `::rpc::` 绝对路径等坑都记在那儿，照搬时直接套用，别重新推演。

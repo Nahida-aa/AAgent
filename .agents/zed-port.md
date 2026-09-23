@@ -71,14 +71,22 @@ zed 用自己的 `collections` crate（`HashMap` = `FxHashMap`，hasher 是
 不要搬一个方法就推演一次缺什么。整段粘过去 → `cargo check` → 按错误补。
 一批错误常常同源（比如 20 条 `REMOTE_SERVER_PROJECT_ID` 就是缺一行 `use`）。
 
-看错误用短格式，好按文件聚合：
+**只看错误**（warning 常常上百条，淹没真正的错误）：
 
 ```bash
-cargo check -p project --message-format short 2>&1 | grep error | sed 's/:[0-9]*:[0-9]*:.*error/ error/' | sort | uniq -c | sort -rn
+CARGO_BUILD_WARNINGS=allow cargo check -p project
 ```
 
-注意 `grep -c error` 会把 warning 里出现的 "error" 单词（如
-`EstablishConnectionError`）也算进去。**认准 `error[E0xxx]` 或看 exit code。**
+按文件聚合、看哪类错误最多：
+
+```bash
+CARGO_BUILD_WARNINGS=allow cargo check -p project --message-format short 2>&1 \
+  | grep 'error\[' | sed 's/:[0-9]*:[0-9]*:.*error/ error/' | sort | uniq -c | sort -rn
+```
+
+> 别用 `grep -c error` 数错误：warning 文本里的 "error" 单词
+> （如 `EstablishConnectionError`、"will become a hard error"）会被算进去。
+> 认准 `error[E0xxx]`，或看 exit code。
 
 ## 7. 别把「上一轮的旧数字」当基线
 

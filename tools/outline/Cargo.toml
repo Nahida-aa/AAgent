@@ -1,0 +1,25 @@
+[package]
+name = "outline"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "打印源文件的符号大纲（走 zed 的 tree-sitter outline.scm 查询）"
+
+[[bin]]
+name = "outline"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+clap = { workspace = true, features = ["derive"] }
+# outline 的载体 `Buffer` 是 gpui Entity，必须有 App 上下文；
+# 命令行里最省事的是 `TestAppContext`（在 gpui 的 test-support 下）。
+gpui = { workspace = true, features = ["test-support"] }
+# 语言识别 + 语法树 + outline 查询都在 language / grammars 两个 crate。
+# grammars 要开 `load-grammars`，否则 `native_grammars()` 不存在
+# （它把 tree-sitter 语法编译进二进制，zed 在 dev 下也是这么加载的）。
+language.workspace = true
+grammars = { workspace = true, features = ["load-grammars"] }
+futures.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true

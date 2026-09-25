@@ -491,6 +491,13 @@ libwebrtc = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev =
 # 本地开发覆盖：把 aa_gpui_kit_theme 指向本机 clone（含 theme 修复 cba2f68），
 # 其余 5 个 crate 仍走 GitHub 的 c712ba1（已推送，本机克隆里这几 crate 内容与 c712ba1 一致）。
 # 仅开发期用；把 gpui_learn 的 cba2f68 推到 GitHub 后即可整段删除。
+# zed git 源里的 crate 也会拖 zed 自己的 `language_core`，与我们的
+# `packages/language_core` 形成两份 —— 于是 `LanguageConfig` / `LanguageQueries` /
+# `LanguageName` 全都"类型不同"（E0308 + 「multiple different versions」）。
+# 统一指到本地这份。
+[patch."https://github.com/zed-industries/zed"]
+language_core = { path = "packages/language_core" }
+
 [patch."https://github.com/Nahida-aa/gpui_learn.git"]
 aa_gpui_kit_theme = { git = "file:///home/aa/repos/ide_ls/gpui_learn", rev = "c4060f4269beb415bc27260a83850dd62a06c555" }
 aa_gpui_kit_ui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui" }

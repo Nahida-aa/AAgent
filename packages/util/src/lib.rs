@@ -51,7 +51,12 @@ mod tests;
 
 pub use connection::ConnectionResult;
 pub use dev::dev_repo_root;
-pub use embed::{__fs_embed_get, __fs_embed_iter, __rust_embed, asset_str};
+pub use embed::{__rust_embed, asset_str};
+// 这两个只存在于 dev 分支（`#[cfg(all(debug_assertions, not(feature = "debug-embed")))]`）：
+// release 走 rust_embed 的编译期内嵌，根本不调用它们。不加同样的门控的话，
+// `cargo build --release` 会在这一行报 E0432。
+#[cfg(all(debug_assertions, not(feature = "debug-embed")))]
+pub use embed::{__fs_embed_get, __fs_embed_iter};
 pub use json::{
     merge_json_lenient_value_into, merge_json_value_into, merge_non_null_json_value_into,
     union_json_value_into,

@@ -48,5 +48,8 @@ unicode-normalization = "0.1"
 [package.metadata.cargo-shear]
 ignored = ["async-std"]
 
+# 对齐 zed `crates/fs`：`fake_fs` / `fake_git_repo` 要用
+# `BackgroundExecutor::simulate_random_delay`（gpui）、`Oid::random`（git，靠 rand）、
+# 以及 util 的测试辅助，所以三个子 feature 都得开。
 [features]
-test-support = []
+test-support = ["gpui/test-support", "git/test-support", "util/test-support"]

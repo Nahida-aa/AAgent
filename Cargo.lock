@@ -5087,7 +5087,7 @@ version = "0.1.0"
 source = "git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f#f6838a7c4afecd7c212c43c70165588b92a5a11f"
 dependencies = [
  "anyhow",
- "language_core 0.1.0 (git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f)",
+ "language_core",
  "rust-embed",
  "tree-sitter",
  "tree-sitter-bash",
@@ -6216,7 +6216,7 @@ dependencies = [
  "imara-diff",
  "indoc",
  "itertools 0.14.0",
- "language_core 0.1.0",
+ "language_core",
  "log",
  "lsp",
  "parking_lot",
@@ -6262,30 +6262,6 @@ dependencies = [
 [[package]]
 name = "language_core"
 version = "0.1.0"
-dependencies = [
- "anyhow",
- "bitflags 2.13.2",
- "collections",
- "gpui_shared_string",
- "gpui_util",
- "log",
- "lru 0.16.4",
- "parking_lot",
- "path",
- "regex",
- "schemars",
- "serde",
- "serde_json",
- "smallvec",
- "strum 0.28.0",
- "toml 0.8.23",
- "tree-sitter",
-]
-
-[[package]]
-name = "language_core"
-version = "0.1.0"
-source = "git+https://github.com/zed-industries/zed?rev=f6838a7c4afecd7c212c43c70165588b92a5a11f#f6838a7c4afecd7c212c43c70165588b92a5a11f"
 dependencies = [
  "anyhow",
  "bitflags 2.13.2",
@@ -8326,6 +8302,20 @@ checksum = "9aa2b01e1d916879f73a53d01d1d6cee68adbb31d6d9177a8cfce093cced1d50"
 dependencies = [
  "futures-core",
  "pin-project-lite",
+]
+
+[[package]]
+name = "outline"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "futures",
+ "gpui",
+ "grammars",
+ "language",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

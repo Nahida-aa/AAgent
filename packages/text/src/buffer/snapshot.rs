@@ -1,4 +1,8 @@
 use crate::Edit;
+// `debug_ranges` 只在 debug 下存在（`buffer/mod.rs` 里 `#[cfg(debug_assertions)] pub mod`），
+// 用到它的 `debug` / `debug_with_key` 同样有这个门控。release 下这里不导入，
+// 否则 `cargo build --release` 会报 E0432。
+#[cfg(debug_assertions)]
 use crate::buffer::debug_ranges as debug;
 use crate::buffer::fragment::FragmentBuilder;
 use crate::locator::Locator;

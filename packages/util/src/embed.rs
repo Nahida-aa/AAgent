@@ -1,5 +1,7 @@
 use std::borrow::Cow;
 
+// 只被 dev 分支的 `__fs_embed_*` 用到；release（编译期内嵌）下它们不存在。
+#[cfg(all(debug_assertions, not(feature = "debug-embed")))]
 use crate::dev::dev_repo_root;
 
 /// Get an embedded file as a string.

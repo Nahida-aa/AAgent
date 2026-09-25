@@ -36,6 +36,14 @@ struct Args {
     // 不用 `num_args = 1..`：那会把后面的位置参数（文件路径）一并吃掉。
     #[arg(long, value_delimiter = ',')]
     fields: Vec<Field>,
+
+    /// 跳过前 N 个符号（在把所有文件的符号拼成一个扁平列表之后生效）
+    #[arg(long, default_value_t = 0)]
+    offset: usize,
+
+    /// 最多输出 N 个符号；不给就是全部。与 --offset 配合可翻页。
+    #[arg(long)]
+    limit: Option<usize>,
 }
 
 #[derive(Clone, Copy, ValueEnum)]
@@ -152,9 +160,31 @@ fn main() -> Result<()> {
         }
     }
 
+    // 翻页：对扁平化后的总列表切窗。
+    let total = rows.len();
+    let start = args.offset.min(total);
+    let end = start + args.limit.unwrap_or(total - start).min(total - start);
+    let truncated = end < total;
+    let rows = &rows[start..end];
+
+    if args.offset > 0 || args.limit.is_some() {
+        // 翻页时告知全貌，agent 才知道还有没有下一页。
+        eprintln!(
+            "显示 {}-{} / 共 {} 条{}",
+            total.min(start + 1),
+            end,
+            total,
+            if truncated {
+                format!("（还有 {} 条，用 --offset {} 翻页）", total - end, end)
+            } else {
+                String::new()
+            }
+        );
+    }
+
     match args.format {
-        Format::Json => println!("{}", serde_json::to_string_pretty(&rows)?),
-        Format::Text => print_text(&rows, &fields),
+        Format::Json => println!("{}", serde_json::to_string_pretty(rows)?),
+        Format::Text => print_text(rows, &fields),
     }
     Ok(())
 }

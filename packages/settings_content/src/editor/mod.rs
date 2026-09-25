@@ -43,7 +43,7 @@ mod gutter;
 mod jupyter;
 mod lsp;
 mod minimap;
-mod scalars;
+pub mod scalars;
 mod scrollbar;
 mod scrolling;
 mod search;

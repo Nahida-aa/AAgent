@@ -55,7 +55,6 @@ use serde::{Serialize, de::DeserializeOwned};
 use settings_macros::{MergeFrom, with_fallible_options};
 
 mod editor;
-use editor::CenteredPaddingSettings;
 
 mod common;
 mod macros;
@@ -77,7 +76,7 @@ pub use crate::{
         CurrentLineHighlight, EditorSettingsContent, GutterContent, InactiveOpacity,
         MinimapContent, MinimapThumb, MultiCursorModifier, RelativeLineNumbers,
         ScrollbarAxesContent, ScrollbarContent, SearchSettingsContent, SeedQuerySetting,
-        ShowMinimap, StickyScrollContent,
+        ShowMinimap, StickyScrollContent, scalars::CenteredPaddingSettings,
     },
     extension::ExtensionSettingsContent,
     feature_flags::FeatureFlagsMap,
@@ -94,10 +93,12 @@ pub use crate::{
     workspace::{
         ActivePaneModifiers, AutosaveSetting, CloseWindowWhenNoItems, FullscreenMode,
         PreviewTabsSettingsContent, WorkspaceSettingsContent,
-        bar::{StatusBarSettingsContent, TabBarSettingsContent},
+        bar::{EncodingDisplayOptions, StatusBarSettingsContent, TabBarSettingsContent},
         item::{
             ActivateOnClose, ClosePosition, ItemSettingsContent, ShowCloseButton, ShowDiagnostics,
         },
+        opening::{DefaultOpenBehavior, RestoreOnStartupBehavior},
+        pane_split::BottomDockLayout,
         project_panel::{
             ProjectPanelScrollbarSettingsContent, ProjectPanelSettingsContent,
             ProjectPanelSortMode, ProjectPanelSortOrder,

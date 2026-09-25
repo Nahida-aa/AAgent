@@ -2,6 +2,7 @@
 use crate::history_manager::{HistoryManager, HistoryManagerEntry};
 
 impl Workspace {
+    //
     pub(crate) fn update_history(&self, cx: &mut App) {
         let Some(id) = self.database_id() else {
             return;

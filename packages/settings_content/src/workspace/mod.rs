@@ -9,11 +9,11 @@ mod autosave;
 pub mod bar;
 mod centered_layout;
 pub mod item;
-mod pane_split;
+pub mod pane_split;
 mod preview_tabs;
 pub use preview_tabs::PreviewTabsSettingsContent;
 
-mod opening;
+pub mod opening;
 pub mod project_panel;
 mod semantic_tokens;
 mod text_rendering;

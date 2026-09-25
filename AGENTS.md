@@ -14,11 +14,23 @@ Before editing files for a substantial task:
 
 - 修改代码后, 如果认为适合提交, 就自行提交
 
+## Code Navigation
+
+Use `ast-grep outline` before reading full source files when exploring code.
+
+- Use `ast-grep outline <file>` to inspect a candidate file.
+- Use `ast-grep outline <dir> --items exports` to find public entry points.
+
+After finding candidate files, use `ast-grep outline` to decide which source
+range to read. If your agent supports skills, use the `ast-grep-outline`
+skill for more detailed guidance.
+
 ## ⚠️ 主线声明
 
 **GPUI 桌面（packages/app + packages/workspace + packages/ui）是唯一主线。**
 
 以下前端方案是历史遗留或实验性的，**不保证能编译、能运行或与主线兼容**：
+
 - `packages/cli/` — Ratatui TUI（旧 CLI 入口）
 - `packages/tui/` — OpenTUI + Solid.js TUI（Bun）
 - `packages/webui/` — Solid.js Web 前端（TanStack Router）
@@ -78,15 +90,18 @@ Before editing files for a substantial task:
 ## 非主线架构（仅供参考，不保证工作）
 
 ### 旧 CLI（Ratatui）
+
 - `aa run` — 行模式对话
 - `aa` — Ratatui TUI
 
 ### OpenTUI + Solid.js TUI
+
 - 独立 Bun 进程，localhost HTTP/SSE 连 Rust server
 - `@opentui/*` 必须 0.3.4（0.4.1 Solid context 不传播）
 - JSX 通过 Babel 插件转换，需 `bunfig.toml` + `--conditions=browser`
 
 ### WebUI（Solid.js + TanStack）
+
 - 通过 HTTP/SSE 连接 Rust server
 
 ## 已验证

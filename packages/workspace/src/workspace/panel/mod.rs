@@ -128,42 +128,7 @@ impl Workspace {
         dock::Dock::load_persisted_size_state(self, panel_key, cx)
     }
 
-    pub fn add_panel<T: Panel>(
-        &mut self,
-        panel: Entity<T>,
-        window: &mut Window,
-        cx: &mut Context<Self>,
-    ) {
-        let focus_handle = panel.panel_focus_handle(cx);
-        cx.on_focus_in(&focus_handle, window, Self::handle_panel_focused)
-            .detach();
 
-        let dock_position = panel.position(window, cx);
-        let dock = self.dock_at_position(dock_position);
-        let any_panel = panel.to_any();
-        let persisted_size_state =
-            self.persisted_panel_size_state(T::panel_key(), cx)
-                .or_else(|| {
-                    load_legacy_panel_size(T::panel_key(), dock_position, self, cx).map(|size| {
-                        let state = dock::PanelSizeState {
-                            size: Some(size),
-                            flex: None,
-                        };
-                        self.persist_panel_size_state(T::panel_key(), state, cx);
-                        state
-                    })
-                });
-
-        dock.update(cx, |dock, cx| {
-            let index = dock.add_panel(panel.clone(), self.weak_self.clone(), window, cx);
-            if let Some(size_state) = persisted_size_state {
-                dock.set_panel_size_state(&panel, size_state, cx);
-            }
-            index
-        });
-
-        cx.emit(Event::PanelAdded(any_panel));
-    }
 
     pub fn remove_panel<T: Panel>(
         &mut self,
@@ -291,86 +256,6 @@ impl Workspace {
                 }
             })
         }
-    }
-
-    pub fn panel<T: Panel>(&self, cx: &App) -> Option<Entity<T>> {
-        self.all_docks()
-            .iter()
-            .find_map(|dock| dock.read(cx).panel::<T>())
-    }
-
-    pub fn panel_size_state<T: Panel>(&self, cx: &App) -> Option<dock::PanelSizeState> {
-        self.all_docks().into_iter().find_map(|dock| {
-            let dock = dock.read(cx);
-            let panel = dock.panel::<T>()?;
-            dock.stored_panel_size_state(&panel)
-        })
-    }
-
-    pub fn set_panel_size_state<T: Panel>(
-        &mut self,
-        size_state: dock::PanelSizeState,
-        window: &mut Window,
-        cx: &mut Context<Self>,
-    ) -> bool {
-        let Some(panel) = self.panel::<T>(cx) else {
-            return false;
-        };
-
-        let dock = self.dock_at_position(panel.position(window, cx));
-        let did_set = dock.update(cx, |dock, cx| {
-            dock.set_panel_size_state(&panel, size_state, cx)
-        });
-
-        if did_set {
-            self.persist_panel_size_state(T::panel_key(), size_state, cx);
-        }
-
-        did_set
-    }
-
-    pub fn persist_panel_size_state(
-        &self,
-        panel_key: &str,
-        size_state: dock::PanelSizeState,
-        cx: &mut App,
-    ) {
-        let Some(workspace_id) = self
-            .database_id()
-            .map(|id| i64::from(id).to_string())
-            .or(self.session_id())
-        else {
-            return;
-        };
-
-        let kvp = db::kvp::KeyValueStore::global(cx);
-        let panel_key = panel_key.to_string();
-        cx.background_spawn(async move {
-            let scope = kvp.scoped(dock::PANEL_SIZE_STATE_KEY);
-            scope
-                .write(
-                    format!("{workspace_id}:{panel_key}"),
-                    serde_json::to_string(&size_state)?,
-                )
-                .await
-        })
-        .detach_and_log_err(cx);
-    }
-
-    pub fn toggle_dock_panel_flexible_size(
-        &self,
-        dock: &Entity<Dock>,
-        panel: &dyn PanelHandle,
-        window: &mut Window,
-        cx: &mut App,
-    ) {
-        let position = dock.read(cx).position();
-        let current_size = self.dock_size(&dock.read(cx), window, cx);
-        let current_flex =
-            current_size.and_then(|size| self.dock_flex_for_size(position, size, window, cx));
-        dock.update(cx, |dock, cx| {
-            dock.toggle_panel_flexible_size(panel, current_size, current_flex, window, cx);
-        });
     }
 
     pub fn activate_panel_for_proto_id(

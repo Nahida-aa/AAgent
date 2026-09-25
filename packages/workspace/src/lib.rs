@@ -26,11 +26,11 @@ pub mod pane;
 pub mod status_bar;
 pub mod toolbar;
 
+use dock::DockPosition;
 pub use item::{Item, ItemEvent, ItemHandle, WeakItemHandle};
 pub use multi_workspace::{MultiWorkspace, SidebarHandle, SidebarRenderState};
 pub use pane::group::{Member, PaneGroup};
 pub use pane::{DraggedSelection, DraggedTab, Event as PaneEvent, Pane};
-pub use settings_content::DockPosition;
 pub use terminal::{NewCenterTerminal, NewTerminal, OpenTerminal, TerminalProvider};
 pub use toolbar::{Toolbar, ToolbarItemEvent, ToolbarItemLocation, ToolbarItemView};
 
@@ -76,123 +76,90 @@ pub mod welcome;
 pub mod workspace_error;
 mod workspace_settings;
 
-mod workspace;
-pub use workspace::*;
-
-// 保留原来的 pub use dock::Panel; 等
-pub use dock::Panel;
-// pub use multi_workspace::{...};
-pub use path_list::{PathList, SerializedPathList};
-// pub use remote::{...};
-pub use toast_layer::{ToastAction, ToastLayer, ToastView};
-
-pub mod active_file_name;
-pub mod dock;
-pub mod history_manager;
-pub mod invalid_item_view;
-pub mod item;
-mod modal_layer;
-mod multi_workspace;
-
-pub mod focus_follows_mouse;
-pub mod notifications;
-pub mod pane;
-pub mod path_link;
-mod persistence;
-pub mod searchable;
-pub mod security_modal;
-pub mod shared_screen;
-pub mod tasks;
-mod theme_preview;
-mod toast_layer;
-mod toolbar;
-pub mod welcome;
-pub mod workspace_error;
-mod workspace_settings;
-
-pub mod path_list {
-    pub use util::path_list::{PathList, SerializedPathList};
-}
-
-// 新增拆分
-mod decorations;
-mod registries;
-mod shutdown;
-mod startup;
-mod types;
-
-mod workspace;
-
-// ---------- re-export：保持原有对外 API ----------
-
-pub use dock::Panel;
-pub use multi_workspace::{
-    CloseWorkspaceSidebar, DraggedSidebar, FocusWorkspaceSidebar, MoveProjectDown,
-    MoveProjectToNewWindow, MoveProjectUp, MultiWorkspace, MultiWorkspaceEvent, NewThread,
-    NextProject, NextThread, PreviousProject, PreviousThread, ProjectGroup, ProjectGroupKey,
-    RemovalIntent, SerializedProjectGroupState, Sidebar, SidebarEvent, SidebarHandle,
-    SidebarRenderState, SidebarSide, ToggleWorkspaceSidebar, sidebar_side_context_menu,
-};
-pub use path_list::{PathList, SerializedPathList};
-pub use remote::{
-    RemoteConnectionIdentity, remote_connection_identity, same_remote_connection_identity,
-};
-pub use toast_layer::{ToastAction, ToastLayer, ToastView};
-
-pub use history_manager::*;
-pub use item::{
-    FollowableItem, FollowableItemHandle, Item, ItemHandle, ItemSettings, PreviewTabsSettings,
-    ProjectItem, SerializableItem, SerializableItemHandle, WeakItemHandle,
-};
-pub use modal_layer::*;
-pub use pane::{
-    group::{
-        ActivePaneDecorator, HANDLE_HITBOX_SIZE, Member, PaneAxis, PaneGroup, PaneRenderContext,
-        SplitDirection,
-    },
-    *,
+use settings::{
+    CenteredPaddingSettings, DefaultOpenBehavior, Settings, SettingsLocation, SettingsStore,
+    update_settings_file,
 };
 
-pub use persistence::{
-    RecentWorkspace, WorkspaceDb, delete_unloaded_items,
-    model::{
-        DockData, DockStructure, ItemId, MultiWorkspaceState, SerializedMultiWorkspace,
-        SerializedProjectGroup, SerializedWorkspaceLocation, SessionWorkspace,
-    },
-    read_serialized_multi_workspaces,
-};
-pub use status_bar::{HideStatusItem, StatusItemView, add_hide_button_entry};
-pub use toolbar::{
-    PaneSearchBarCallbacks, Toolbar, ToolbarItemEvent, ToolbarItemLocation, ToolbarItemView,
-};
-pub use ui;
 pub use workspace_settings::{
     AccessibleMode, AutosaveSetting, BottomDockLayout, EncodingDisplayOptions, FocusFollowsMouse,
     RestoreOnStartupBehavior, StatusBarSettings, TabBarSettings, WorkspaceSettings,
     closing_last_window_quits_app, observe_accessible_mode,
 };
 
-// 新拆分模块的 re-export
-pub use decorations::{client_side_decorations, resize_edge};
-pub use registries::{
-    FollowableViewRegistry, ProjectItemRegistry, SerializableItemRegistry, register_project_item,
-    register_serializable_item,
-};
-pub use shutdown::{prepare_window_to_close, prepare_windows_to_quit, reload};
-pub use startup::*;
-pub use types::{
-    CloseIntent, OpenMode, OpenOptions, OpenResult, OpenVisible, WorkspaceId, WorkspaceLocation,
-    WorkspaceMatching, WorkspacePosition,
-};
-pub use workspace::actions::*;
-pub use workspace::active_call::{
-    ActiveCallEvent, AnyActiveCall, GlobalAnyActiveCall, ParticipantLocation, RemoteCollaborator,
-};
-pub use workspace::app_state::{ActiveWorktreeCreation, AppState, PreviousWorkspaceState};
-pub use workspace::collab::{FollowerState, ViewId, join_channel, join_in_room_project};
-pub use workspace::permalink::{copy_file_permalink, open_file_permalink};
-pub use workspace::terminal_providers::{DebuggerProvider, TerminalProvider};
-pub use workspace::toast::Toast;
-pub use workspace::window_title::{parse_window_title_format, render_window_title_format};
-pub use workspace::workspace_store::{CollaboratorId, Follower};
-pub use workspace::{AutoWatch, Workspace, WorkspaceHandle, WorkspaceStore};
+mod workspace;
+pub use workspace::{app::initial::init, core::workspace::Workspace};
+
+// // ---------- re-export：保持原有对外 API ----------
+
+// pub use dock::Panel;
+// pub use multi_workspace::{
+//     CloseWorkspaceSidebar, DraggedSidebar, FocusWorkspaceSidebar, MoveProjectDown,
+//     MoveProjectToNewWindow, MoveProjectUp, MultiWorkspace, MultiWorkspaceEvent, NewThread,
+//     NextProject, NextThread, PreviousProject, PreviousThread, ProjectGroup, ProjectGroupKey,
+//     RemovalIntent, SerializedProjectGroupState, Sidebar, SidebarEvent, SidebarHandle,
+//     SidebarRenderState, SidebarSide, ToggleWorkspaceSidebar, sidebar_side_context_menu,
+// };
+// pub use path_list::{PathList, SerializedPathList};
+// pub use remote::{
+//     RemoteConnectionIdentity, remote_connection_identity, same_remote_connection_identity,
+// };
+// pub use toast_layer::{ToastAction, ToastLayer, ToastView};
+
+// pub use history_manager::*;
+// pub use item::{
+//     FollowableItem, FollowableItemHandle, Item, ItemHandle, ItemSettings, PreviewTabsSettings,
+//     ProjectItem, SerializableItem, SerializableItemHandle, WeakItemHandle,
+// };
+// pub use modal_layer::*;
+// pub use pane::{
+//     group::{
+//         ActivePaneDecorator, HANDLE_HITBOX_SIZE, Member, PaneAxis, PaneGroup, PaneRenderContext,
+//         SplitDirection,
+//     },
+//     *,
+// };
+
+// pub use persistence::{
+//     RecentWorkspace, WorkspaceDb, delete_unloaded_items,
+//     model::{
+//         DockData, DockStructure, ItemId, MultiWorkspaceState, SerializedMultiWorkspace,
+//         SerializedProjectGroup, SerializedWorkspaceLocation, SessionWorkspace,
+//     },
+//     read_serialized_multi_workspaces,
+// };
+// pub use status_bar::{HideStatusItem, StatusItemView, add_hide_button_entry};
+// pub use toolbar::{
+//     PaneSearchBarCallbacks, Toolbar, ToolbarItemEvent, ToolbarItemLocation, ToolbarItemView,
+// };
+// pub use ui;
+// pub use workspace_settings::{
+//     AccessibleMode, AutosaveSetting, BottomDockLayout, EncodingDisplayOptions, FocusFollowsMouse,
+//     RestoreOnStartupBehavior, StatusBarSettings, TabBarSettings, WorkspaceSettings,
+//     closing_last_window_quits_app, observe_accessible_mode,
+// };
+
+// // 新拆分模块的 re-export
+// pub use decorations::{client_side_decorations, resize_edge};
+// pub use registries::{
+//     FollowableViewRegistry, ProjectItemRegistry, SerializableItemRegistry, register_project_item,
+//     register_serializable_item,
+// };
+// pub use shutdown::{prepare_window_to_close, prepare_windows_to_quit, reload};
+// pub use startup::*;
+// pub use types::{
+//     CloseIntent, OpenMode, OpenOptions, OpenResult, OpenVisible, WorkspaceId, WorkspaceLocation,
+//     WorkspaceMatching, WorkspacePosition,
+// };
+// pub use workspace::actions::*;
+// pub use workspace::active_call::{
+//     ActiveCallEvent, AnyActiveCall, GlobalAnyActiveCall, ParticipantLocation, RemoteCollaborator,
+// };
+// pub use workspace::app_state::{ActiveWorktreeCreation, AppState, PreviousWorkspaceState};
+// pub use workspace::collab::{FollowerState, ViewId, join_channel, join_in_room_project};
+// pub use workspace::permalink::{copy_file_permalink, open_file_permalink};
+// pub use workspace::terminal_providers::{DebuggerProvider, TerminalProvider};
+// pub use workspace::toast::Toast;
+// pub use workspace::window_title::{parse_window_title_format, render_window_title_format};
+// pub use workspace::workspace_store::{CollaboratorId, Follower};
+// pub use workspace::{AutoWatch, Workspace, WorkspaceHandle, WorkspaceStore};

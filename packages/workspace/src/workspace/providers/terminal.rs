@@ -36,15 +36,10 @@ pub trait TerminalProvider {
 }
 
 impl Workspace {
+    //
     pub fn set_terminal_provider(&mut self, provider: impl TerminalProvider + 'static) {
         self.terminal_provider = Some(Box::new(provider));
     }
 
 
-    pub fn set_titlebar_item(&mut self, item: AnyView, _: &mut Window, cx: &mut Context<Self>) {
-        self.titlebar_item = Some(item);
-        cx.notify();
-    }
-
-    pub fn titlebar_item(&self) -> Option<AnyView> { self.titlebar_item.clone() }
 }

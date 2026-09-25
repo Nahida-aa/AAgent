@@ -38,3 +38,11 @@ impl PartialEq for Toast {
             && self.on_click.is_some() == other.on_click.is_some()
     }
 }
+
+impl Workspace {
+    //
+    pub fn toggle_status_toast<V: ToastView>(&mut self, entity: Entity<V>, cx: &mut App) {
+        self.toast_layer
+            .update(cx, |toast_layer, cx| toast_layer.toggle_toast(cx, entity))
+    }
+}

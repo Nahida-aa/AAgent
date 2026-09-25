@@ -19,9 +19,12 @@
 // Terminal 只实现 Item，不实现 ProjectItem。
 
 // ProjectItemRegistry 注册的是“某类模型用什么 UI 打开”，比如 Buffer → Editor
+// open_item_abs_paths
 mod read;
 mod ops;
 // serialize_items
 mod serialize;
 // open_file_permalink, copy_file_permalink, handle_file_permalink
 mod permalink;
+//
+mod save;

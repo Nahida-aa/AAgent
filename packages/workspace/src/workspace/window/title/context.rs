@@ -31,6 +31,7 @@ impl WindowTitleContext {
 }
 
 impl Workspace {
+    //
     fn window_title_context(
         project: &Project,
         project_path: Option<&ProjectPath>,
@@ -112,5 +113,24 @@ impl Workspace {
             },
             branch,
         }
+    }
+}
+//
+pub(crate) fn project_window_title(project: &Project, cx: &App) -> String {
+    let mut title = String::new();
+
+    for (index, worktree) in project.visible_worktrees(cx).enumerate() {
+        let name = worktree.read(cx).root_name_str();
+        if index > 0 {
+            title.push_str(", ");
+        }
+        title.push_str(name);
+    }
+
+    if title.is_empty() {
+        // Keep the default untitled-window text instead of showing a blank title.
+        "empty project".to_string()
+    } else {
+        title
     }
 }

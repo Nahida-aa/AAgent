@@ -1,5 +1,32 @@
 
 impl Workspace {
+    //
+    pub fn is_edited(&self) -> bool {
+        self.window_edited
+    }
+    // fn owns_window_chrome
+    /// Whether this workspace may write the platform window's title and edited
+    /// indicator.
+    ///
+    /// In a multi-workspace window several workspaces share one platform
+    /// window, so only the active one is allowed to write that chrome —
+    /// otherwise a background workspace's project/item events would clobber the
+    /// active workspace's title. `MultiWorkspace` publishes the active
+    /// workspace's id into the shared `active_workspace_id` cell, which we
+    /// simply compare against our own id. A workspace with no shared cell (e.g.
+    /// a plain test window) owns its window unconditionally.
+    fn owns_window_chrome(&self) -> bool {
+        match &self.active_workspace_id {
+            Some(active_workspace_id) => active_workspace_id.get() == self.weak_self.entity_id(),
+            None => true,
+        }
+    }
+    // fn is_window_edited
+    fn is_window_edited(&self, cx: &App) -> bool {
+        !self.project.read(cx).is_disconnected(cx) && !self.dirty_items.is_empty()
+    }
+
+    // fn update_window_edited
 
     pub(super) fn update_window_edited(&mut self, window: &mut Window, cx: &mut App) {
         if !self.owns_window_chrome() {
@@ -11,6 +38,31 @@ impl Workspace {
             window.set_window_edited(self.window_edited);
         }
     }
+    // pub fn refresh_window_state
+    /// Re-applies this workspace's title and edited indicator to the platform
+    /// window, bypassing the change-detection caches.
+    ///
+    /// Several workspaces can share a single platform window (a multi-workspace
+    /// window). The `last_window_title`/`window_edited` caches assume the
+    /// window's title and edited state reflect *this* workspace, but after the
+    /// active workspace changes those values may have been set by a different
+    /// workspace. Clearing the caches forces the values to be re-applied so the
+    /// window reflects the newly-active workspace.
+    ///
+    /// This is only ever invoked for the workspace that just became active, so
+    /// it writes directly rather than going through `update_window_title` /
+    /// `update_window_edited`, whose change-detection caches would otherwise
+    /// suppress the write when this workspace's computed title/edited state
+    /// matches what *it* last set (even though the shared window currently
+    /// shows a different workspace's state).
+    pub fn refresh_window_state(&mut self, window: &mut Window, cx: &mut App) {
+        self.last_window_title = None;
+        self.apply_window_title(window, cx);
+
+        self.window_edited = self.is_window_edited(cx);
+        window.set_window_edited(self.window_edited);
+    }
+    // fn update_item_dirty_state
     // 它的最终目的是维护“窗口 edited 标记”，函数体结尾就是 self.update_window_edited(window, cx)
     pub(crate) fn update_item_dirty_state(
         &mut self,
@@ -51,5 +103,4 @@ impl Workspace {
         self.dirty_items.insert(item_id, s);
         self.update_window_edited(window, cx);
     }
-    // owns_window_chrome / is_window_edited /  refresh_window_state
 }

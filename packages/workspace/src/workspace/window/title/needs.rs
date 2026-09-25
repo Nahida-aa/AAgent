@@ -24,7 +24,7 @@ impl WindowTitleNeeds {
 
 impl Workspace {
 
-
+    //
     /// Whether the active window-title template references `${branch}`, and so
     /// can be affected by Git repository events.
     pub(crate) fn window_title_needs_branch(&self, cx: &App) -> bool {

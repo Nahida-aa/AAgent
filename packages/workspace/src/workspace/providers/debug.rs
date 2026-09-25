@@ -26,6 +26,7 @@ pub trait DebuggerProvider {
 }
 
 impl Workspace {
+    //
     pub fn set_debugger_provider(&mut self, provider: impl DebuggerProvider + 'static) {
         self.debugger_provider = Some(Arc::new(provider));
     }

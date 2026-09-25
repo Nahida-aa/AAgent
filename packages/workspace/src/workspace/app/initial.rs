@@ -1,3 +1,18 @@
+use gpui::PathPromptOptions;
+use settings::DefaultOpenBehavior;
+use std::sync::Arc;
+use ui::App;
+
+use crate::{
+    WorkspaceSettings, history_manager, theme_preview, toast_layer,
+    workspace::{
+        Workspace,
+        app::state::AppState,
+        core::actions::{CloseWindow, Open, OpenFiles},
+        serialize::flush::flush_windows_serialization_on_quit,
+    },
+};
+
 pub fn init(app_state: Arc<AppState>, cx: &mut App) {
     component::init();
     theme_preview::init(cx);

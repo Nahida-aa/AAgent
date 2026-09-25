@@ -1,4 +1,4 @@
-fn px_with_ui_font_fallback(val: u32, cx: &Context<Workspace>) -> Pixels {
+pub(crate) fn px_with_ui_font_fallback(val: u32, cx: &Context<Workspace>) -> Pixels {
     if val == 0 {
         ThemeSettings::get_global(cx).ui_font_size(cx)
     } else {
@@ -6,7 +6,7 @@ fn px_with_ui_font_fallback(val: u32, cx: &Context<Workspace>) -> Pixels {
     }
 }
 
-fn adjust_active_dock_size_by_px(
+pub(crate) fn adjust_active_dock_size_by_px(
     px: Pixels,
     workspace: &mut Workspace,
     window: &mut Window,
@@ -26,7 +26,7 @@ fn adjust_active_dock_size_by_px(
     workspace.resize_dock(dock.position(), panel_size + px, window, cx);
 }
 
-fn adjust_open_docks_size_by_px(
+pub(crate) fn adjust_open_docks_size_by_px(
     px: Pixels,
     workspace: &mut Workspace,
     window: &mut Window,
@@ -52,7 +52,7 @@ fn adjust_open_docks_size_by_px(
     }
 }
 
-fn notify_if_database_failed(window: WindowHandle<MultiWorkspace>, cx: &mut AsyncApp) {
+pub(crate) fn notify_if_database_failed(window: WindowHandle<MultiWorkspace>, cx: &mut AsyncApp) {
     window
         .update(cx, |multi_workspace, _, cx| {
             let workspace = multi_workspace.workspace().clone();
@@ -80,7 +80,7 @@ fn notify_if_database_failed(window: WindowHandle<MultiWorkspace>, cx: &mut Asyn
         .log_err();
 }
 
-fn serialize_pane_handle(
+pub(crate) fn serialize_pane_handle(
     pane_handle: &Entity<Pane>,
     window: &mut Window,
     cx: &mut App,
@@ -120,49 +120,7 @@ fn serialize_pane_handle(
     SerializedPane::new(items, active, pinned_count)
 }
 
-fn parse_pixel_position_env_var(value: &str) -> Option<Point<Pixels>> {
-    let mut parts = value.split(',');
-    let x: usize = parts.next()?.parse().ok()?;
-    let y: usize = parts.next()?.parse().ok()?;
-    Some(point(px(x as f32), px(y as f32)))
-}
-
-fn parse_pixel_size_env_var(value: &str) -> Option<Size<Pixels>> {
-    let mut parts = value.split(',');
-    let width: usize = parts.next()?.parse().ok()?;
-    let height: usize = parts.next()?.parse().ok()?;
-    Some(size(px(width as f32), px(height as f32)))
-}
-
-fn window_bounds_env_override() -> Option<Bounds<Pixels>> {
-    ZED_WINDOW_POSITION
-        .zip(*ZED_WINDOW_SIZE)
-        .map(|(position, size)| Bounds {
-            origin: position,
-            size,
-        })
-}
-
-fn project_window_title(project: &Project, cx: &App) -> String {
-    let mut title = String::new();
-
-    for (index, worktree) in project.visible_worktrees(cx).enumerate() {
-        let name = worktree.read(cx).root_name_str();
-        if index > 0 {
-            title.push_str(", ");
-        }
-        title.push_str(name);
-    }
-
-    if title.is_empty() {
-        // Keep the default untitled-window text instead of showing a blank title.
-        "empty project".to_string()
-    } else {
-        title
-    }
-}
-
-fn leader_border_for_pane(
+pub(crate) fn leader_border_for_pane(
     follower_states: &HashMap<CollaboratorId, FollowerState>,
     pane: &Entity<Pane>,
     _: &Window,
@@ -201,55 +159,177 @@ fn leader_border_for_pane(
     )
 }
 
-struct DelayedDebouncedEditAction {
-    task: Option<Task<()>>,
-    cancel_channel: Option<oneshot::Sender<()>>,
+pub(crate) fn join_pane_into_active(
+    active_pane: &Entity<Pane>,
+    pane: &Entity<Pane>,
+    window: &mut Window,
+    cx: &mut App,
+) {
+    if pane == active_pane {
+    } else if pane.read(cx).items_len() == 0 {
+        pane.update(cx, |_, cx| {
+            cx.emit(pane::Event::Remove {
+                focus_on_pane: None,
+            });
+        })
+    } else {
+        move_all_items(pane, active_pane, window, cx);
+    }
 }
 
-impl DelayedDebouncedEditAction {
-    fn new() -> DelayedDebouncedEditAction {
-        DelayedDebouncedEditAction {
-            task: None,
-            cancel_channel: None,
-        }
-    }
-
-    fn fire_new<F>(
-        &mut self,
-        delay: Duration,
-        window: &mut Window,
-        cx: &mut Context<Workspace>,
-        func: F,
-    ) where
-        F: 'static
-            + Send
-            + FnOnce(&mut Workspace, &mut Window, &mut Context<Workspace>) -> Task<Result<()>>,
+pub(crate) fn move_all_items(
+    from_pane: &Entity<Pane>,
+    to_pane: &Entity<Pane>,
+    window: &mut Window,
+    cx: &mut App,
+) {
+    let destination_is_different = from_pane != to_pane;
+    let mut moved_items = 0;
+    for (item_ix, item_handle) in from_pane
+        .read(cx)
+        .items()
+        .enumerate()
+        .map(|(ix, item)| (ix, item.clone()))
+        .collect::<Vec<_>>()
     {
-        if let Some(channel) = self.cancel_channel.take() {
-            _ = channel.send(());
+        let ix = item_ix - moved_items;
+        if destination_is_different {
+            // Close item from previous pane
+            from_pane.update(cx, |source, cx| {
+                source.remove_item_and_focus_on_pane(ix, false, to_pane.clone(), window, cx);
+            });
+            moved_items += 1;
         }
 
-        let (sender, mut receiver) = oneshot::channel::<()>();
-        self.cancel_channel = Some(sender);
-
-        let previous_task = self.task.take();
-        self.task = Some(cx.spawn_in(window, async move |workspace, cx| {
-            let mut timer = cx.background_executor().timer(delay).fuse();
-            if let Some(previous_task) = previous_task {
-                previous_task.await;
-            }
-
-            futures::select_biased! {
-                _ = receiver => return,
-                    _ = timer => {}
-            }
-
-            if let Some(result) = workspace
-                .update_in(cx, |workspace, window, cx| (func)(workspace, window, cx))
-                .log_err()
-            {
-                result.await.log_err();
-            }
-        }));
+        // This automatically removes duplicate items in the pane
+        to_pane.update(cx, |destination, cx| {
+            destination.add_item(item_handle, true, true, None, window, cx);
+            window.focus(&destination.focus_handle(cx), cx)
+        });
     }
+}
+
+pub fn move_item(
+    source: &Entity<Pane>,
+    destination: &Entity<Pane>,
+    item_id_to_move: EntityId,
+    destination_index: usize,
+    activate: bool,
+    window: &mut Window,
+    cx: &mut App,
+) {
+    let Some((item_ix, item_handle)) = source
+        .read(cx)
+        .items()
+        .enumerate()
+        .find(|(_, item_handle)| item_handle.item_id() == item_id_to_move)
+        .map(|(ix, item)| (ix, item.clone()))
+    else {
+        // Tab was closed during drag
+        return;
+    };
+
+    if source != destination {
+        // Close item from previous pane
+        source.update(cx, |source, cx| {
+            source.remove_item_and_focus_on_pane(item_ix, false, destination.clone(), window, cx);
+        });
+    }
+
+    // This automatically removes duplicate items in the pane
+    destination.update(cx, |destination, cx| {
+        destination.add_item_inner(
+            item_handle,
+            activate,
+            activate,
+            activate,
+            Some(destination_index),
+            window,
+            cx,
+        );
+        if activate {
+            window.focus(&destination.focus_handle(cx), cx)
+        }
+    });
+}
+
+pub fn move_active_item(
+    source: &Entity<Pane>,
+    destination: &Entity<Pane>,
+    focus_destination: bool,
+    close_if_empty: bool,
+    window: &mut Window,
+    cx: &mut App,
+) {
+    if source == destination {
+        return;
+    }
+    let Some(active_item) = source.read(cx).active_item() else {
+        return;
+    };
+    source.update(cx, |source_pane, cx| {
+        let item_id = active_item.item_id();
+        source_pane.remove_item(item_id, false, close_if_empty, window, cx);
+        destination.update(cx, |target_pane, cx| {
+            target_pane.add_item(
+                active_item,
+                focus_destination,
+                focus_destination,
+                Some(target_pane.items_len()),
+                window,
+                cx,
+            );
+        });
+    });
+}
+
+/// Reads a panel's pixel size from its legacy KVP format and deletes the legacy
+/// key. This migration path only runs once per panel per workspace.
+fn load_legacy_panel_size(
+    panel_key: &str,
+    dock_position: DockPosition,
+    workspace: &Workspace,
+    cx: &mut App,
+) -> Option<Pixels> {
+    #[derive(Deserialize)]
+    struct LegacyPanelState {
+        #[serde(default)]
+        width: Option<Pixels>,
+        #[serde(default)]
+        height: Option<Pixels>,
+    }
+
+    let workspace_id = workspace
+        .database_id()
+        .map(|id| i64::from(id).to_string())
+        .or_else(|| workspace.session_id())?;
+
+    let legacy_key = match panel_key {
+        "ProjectPanel" => {
+            format!("{}-{:?}", "ProjectPanel", workspace_id)
+        }
+        "OutlinePanel" => {
+            format!("{}-{:?}", "OutlinePanel", workspace_id)
+        }
+        "GitPanel" => {
+            format!("{}-{:?}", "GitPanel", workspace_id)
+        }
+        "TerminalPanel" => {
+            format!("{:?}-{:?}", "TerminalPanel", workspace_id)
+        }
+        _ => return None,
+    };
+
+    let kvp = db::kvp::KeyValueStore::global(cx);
+    let json = kvp.read_kvp(&legacy_key).log_err().flatten()?;
+    let state = serde_json::from_str::<LegacyPanelState>(&json).log_err()?;
+    let size = match dock_position {
+        DockPosition::Bottom => state.height,
+        DockPosition::Left | DockPosition::Right => state.width,
+    }?;
+
+    cx.background_spawn(async move { kvp.delete_kvp(legacy_key).await })
+        .detach_and_log_err(cx);
+
+    Some(size)
 }

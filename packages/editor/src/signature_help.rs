@@ -15,9 +15,9 @@ use std::time::Duration;
 use text::Rope;
 use theme_settings::ThemeSettings;
 use ui::{
-    ActiveTheme, AnyElement, ButtonCommon, ButtonStyle, Clickable, FluentBuilder, IconButton,
-    IconButtonShape, IconName, IconSize, InteractiveElement, IntoElement, Label, LabelCommon,
-    LabelSize, ParentElement, Pixels, SharedString, StatefulInteractiveElement, Styled, StyledExt,
+    ActiveTheme, AnyElement, ButtonCommon, ButtonStyle, Clickable, IconButton, IconButtonShape,
+    IconName, IconSize, InteractiveElement, IntoElement, Label, LabelCommon, LabelSize,
+    ParentElement, Pixels, SharedString, StatefulInteractiveElement, Styled, StyledExt,
     WithScrollbar, div, relative,
 };
 
@@ -312,13 +312,9 @@ impl SignatureHelpState {
     }
 
     #[cfg(test)]
-    pub fn popover(&self) -> Option<&SignatureHelpPopover> {
-        self.popover.as_ref()
-    }
+    pub fn popover(&self) -> Option<&SignatureHelpPopover> { self.popover.as_ref() }
 
-    pub fn popover_mut(&mut self) -> Option<&mut SignatureHelpPopover> {
-        self.popover.as_mut()
-    }
+    pub fn popover_mut(&mut self) -> Option<&mut SignatureHelpPopover> { self.popover.as_mut() }
 
     fn set_popover(&mut self, popover: SignatureHelpPopover) {
         self.popover = Some(popover);
@@ -336,9 +332,7 @@ impl SignatureHelpState {
         self.hidden_by == Some(SignatureHelpHiddenBy::Selection)
     }
 
-    pub fn is_shown(&self) -> bool {
-        self.popover.is_some()
-    }
+    pub fn is_shown(&self) -> bool { self.popover.is_some() }
 
     pub fn has_multiple_signatures(&self) -> bool {
         self.popover
@@ -349,9 +343,7 @@ impl SignatureHelpState {
 
 #[cfg(test)]
 impl SignatureHelpState {
-    pub fn task(&self) -> Option<&Task<()>> {
-        self.task.as_ref()
-    }
+    pub fn task(&self) -> Option<&Task<()>> { self.task.as_ref() }
 }
 
 #[derive(Clone, Debug, PartialEq)]

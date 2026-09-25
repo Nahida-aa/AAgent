@@ -1,119 +1,231 @@
-use gpui::Context;
-
+// Workspace struct + 稳定状态的访问器
+// workspace/
+// ├── core.rs                    # Workspace 结构体定义、字段
+// ├── read.rs                    # Workspace 自身字段的只读访问器（见下）
+// │
+// ├── item/
+// │   ├── mod.rs
+// │   ├── read.rs                # active_item / items / item_of_type / pane_for*
+// │   ├── ops.rs                 # open_path / activate_item / close_item_*
+// │   └── serialization.rs       # item 序列化（可选）
+// │
+// ├── pane/
+// │   ├── mod.rs
+// │   ├── read.rs                # panes / active_pane / focused_pane
+// │   ├── ops.rs                 # split_pane / join_all_panes / remove_pane
+// │   ├── navigation.rs          # activate_pane_in_direction / find_pane_in_direction
+// │   └── events.rs              # handle_pane_event / set_active_pane
+// │
+// ├── dock/
+// │   ├── mod.rs
+// │   ├── read.rs                # left_dock / all_docks / dock_at_position / panel
+// │   ├── sizing.rs              # dock_size / dock_flex_for_size / resize_*
+// │   ├── toggle.rs              # toggle_dock / toggle_all_docks
+// │   └── render.rs
+// │
+// ├── navigation/
+// │   ├── mod.rs
+// │   ├── read.rs                # recent_navigation_history / most_recent_active_path
+// │   ├── ops.rs                 # go_back / go_forward / reopen_closed_item
+// │   └── workspace_history.rs   # update_history（全局 HistoryManager）
+// │
+// ├── window/
+// │   ├── title/
+// │   ├── bounds.rs
+// │   └── decorations.rs
+// │
+// ├── opening/
+// ├── registries/
+// ├── providers/
+// ├── follow/
+// ├── collab/
+// ├── worktree/
+// ├── actions/
+// └── tests/
+// 构造与恢复
+mod construct;
+// # worktree 列表 / root_paths
+mod worktree;
+// 序列化与恢复窗口几何
+mod serialize;
+// 「用户触发的事件处理」——名字就是这个意思
+mod user_actions;
+// impl Render for Workspace
+mod render;
+//
 mod actions;
 mod actions_impl;
+mod active_call;
 mod app_state;
 mod close;
-mod collaboration;
-mod docks;
-mod events;
+mod collab;
+
+mod env;
+mod event;
+mod event_handling;
 mod focus;
+mod focus_regions;
 mod followers;
+// ---- 用户操作（保存/关闭/prompt/modal）----
 mod helpers;
 mod history;
-mod items;
+mod lifecycle;
+//  ---- 实体管理（item/pane/dock/panel）----
+mod dock_management;
+mod item_management;
+mod pane_management;
+mod panel_management;
+// ---- 交互与渲染 ----
 mod key_context;
 mod modals;
 mod multi_workspace_helpers;
+mod navigation;
 mod notification_ops;
 mod open;
-mod panels;
-mod panes;
-mod permalinks;
-mod render;
-mod serialize;
+mod permalink;
+
+
 mod terminal_provider;
-mod toasts;
+mod toast;
 mod window_title;
+mod window_title_impl;
 mod workspace_store;
-mod worktree;
+// 只重导出真正需要对外暴露的
+pub use core::{
+    CloseIntent, Event, OpenMode, OpenVisible, Workspace, WorkspaceId,
+};
+pub use opening::{
+    OpenOptions, OpenResult, WorkspaceMatching, open_paths, open_workspace_by_id,
+};
+pub use providers::{
+    AnyActiveCall, DebuggerProvider, GlobalAnyActiveCall, TerminalProvider,
+};
+pub use registries::{register_project_item, register_serializable_item};
+pub use window::title::{WindowTitleContext, WindowTitleNeeds};
+
+use collections::HashMap;
+use gpui::{AppContext, Context, WeakEntity};
+
+pub use crate::collab::AutoWatch;
+pub use crate::workspace_store::WorkspaceStore;
+use crate::{Pane, workspace::followers::CollaboratorId};
+
+use std::cell::{Cell, RefCell};
+use std::collections::{HashMap, HashSet, VecDeque};
+use std::ops::Deref;
+use std::path::PathBuf;
+use std::rc::Rc;
+use std::sync::Arc;
+use std::sync::atomic::AtomicUsize;
+
+use collections::HashMap as _;
+use gpui::{
+    AnyView, App, Bounds, Context, Entity, EntityId, EventEmitter, FocusHandle, Global, Pixels,
+    Point, Subscription, Task, WeakEntity, Window,
+};
+
+use crate::active_call::{ActiveCallEvent, AnyActiveCall, GlobalAnyActiveCall};
+use crate::app_state::{ActiveWorktreeCreation, AppState, PreviousWorkspaceState};
+use crate::collab::{FollowerState, ViewId};
+use crate::dock::Dock;
+use crate::item::{FollowableItemHandle, ItemHandle, WeakItemHandle};
+use crate::modal_layer::ModalLayer;
+use crate::multi_workspace::MultiWorkspace;
+use crate::notifications::{NotificationId, Notifications};
+use crate::pane::{Pane, SplitDirection};
+use crate::pane_group::PaneGroup;
+use crate::persistence::WorkspaceDb;
+use crate::providers::{DebuggerProvider, TerminalProvider};
+use crate::registries::{
+    SerializableItemRegistry, register_project_item, register_serializable_item,
+};
+use crate::status_bar::StatusBar;
+use crate::toast_layer::ToastLayer;
+use crate::types::{
+    CloseIntent, OpenMode, OpenOptions, OpenResult, OpenVisible, WorkspaceId, WorkspaceLocation,
+    WorkspaceMatching,
+};
+use crate::window_title::{WindowTitleContext, WindowTitleNeeds};
+use crate::workspace_store::CollaboratorId;
+
+impl EventEmitter<crate::Event> for Workspace {}
+impl EventEmitter<crate::workspace_error::WorkspaceError> for Workspace {}
+
+pub(crate) struct DelayedDebouncedEditAction {
+    pub(crate) task: Option<Task<()>>,
+    pub(crate) cancel_channel: Option<futures::channel::oneshot::Sender<()>>,
+}
+
+impl DelayedDebouncedEditAction {
+    fn new() -> DelayedDebouncedEditAction {
+        DelayedDebouncedEditAction {
+            task: None,
+            cancel_channel: None,
+        }
+    }
+
+    fn fire_new<F>(
+        &mut self,
+        delay: Duration,
+        window: &mut Window,
+        cx: &mut Context<Workspace>,
+        func: F,
+    ) where
+        F: 'static
+            + Send
+            + FnOnce(&mut Workspace, &mut Window, &mut Context<Workspace>) -> Task<Result<()>>,
+    {
+        if let Some(channel) = self.cancel_channel.take() {
+            _ = channel.send(());
+        }
+
+        let (sender, mut receiver) = oneshot::channel::<()>();
+        self.cancel_channel = Some(sender);
+
+        let previous_task = self.task.take();
+        self.task = Some(cx.spawn_in(window, async move |workspace, cx| {
+            let mut timer = cx.background_executor().timer(delay).fuse();
+            if let Some(previous_task) = previous_task {
+                previous_task.await;
+            }
+
+            futures::select_biased! {
+                _ = receiver => return,
+                    _ = timer => {}
+            }
+
+            if let Some(result) = workspace
+                .update_in(cx, |workspace, window, cx| (func)(workspace, window, cx))
+                .log_err()
+            {
+                result.await.log_err();
+            }
+        }));
+    }
+}
+
+/// Handles a workspace.
+pub trait WorkspaceHandle {
+    fn file_project_paths(&self, cx: &App) -> Vec<ProjectPath>;
+}
+
+impl WorkspaceHandle for Entity<Workspace> {
+    fn file_project_paths(&self, cx: &App) -> Vec<ProjectPath> {
+        self.read(cx)
+            .worktrees(cx)
+            .flat_map(|worktree| {
+                let worktree_id = worktree.read(cx).id();
+                worktree.read(cx).files(true, 0).map(move |f| ProjectPath {
+                    worktree_id,
+                    path: f.path.clone(),
+                })
+            })
+            .collect::<Vec<_>>()
+    }
+}
 pub const SERIALIZATION_THROTTLE_TIME: Duration = Duration::from_millis(200);
 pub const MAX_RECENT_SELECTIONS: usize = 20;
-/// 顶层 Workspace entity。对齐 zed `Workspace` 但做了大幅简化。
-/// Zed 的 Workspace ~3000 行（含 Pane、ItemHandle、ModalLayer、TeleportLayer 等），
-/// AAgent 现阶段只持有 Dock + StatusBar + 中心区域。
-pub struct Workspace {
-    pub(super) weak_self: WeakEntity<Self>,
-    /// 外部注册的 action callback 收集器。
-    /// Zed 用 `Vec<Box<dyn Fn(Div, ...) -> Div>>` 在 render 顶层 div 上应用。
-    /// 我们简化为 `Vec<Box<dyn ActionCallback>>`，render 时 chain on_action。
-    pub(super) workspace_actions:
-        Vec<Box<dyn Fn(Div, &Workspace, &mut Window, &mut Context<Self>) -> Div>>,
-    pub(super) zoomed: Option<AnyWeakView>,
-    /// 对齐 zed `previous_dock_drag_coordinates` — 坐标去重, 避免相同位置重复触发 resize。
-    pub(super) previous_dock_drag_coordinates: Option<Point<Pixels>>,
-    pub(super) zoomed_position: Option<DockPosition>,
-    pub(super) maximized_pane: Option<WeakEntity<Pane>>,
-    /// 中心 PaneGroup — 递归 split 树，装 Pane（每个 Pane 装 items）
-    pub(super) center: PaneGroup,
-    /// 三个 Dock 实例（左/底/右），每个装多个 Panel。
-    pub(super) left_dock: Entity<Dock>,
-    pub(super) bottom_dock: Entity<Dock>,
-    pub(super) right_dock: Entity<Dock>,
-    pub(super) panes: Vec<Entity<Pane>>,
-    pub(super) panes_by_item: HashMap<EntityId, WeakEntity<Pane>>,
-    pub(super) active_pane: Entity<Pane>,
-    pub(super) last_active_center_pane: Option<WeakEntity<Pane>>,
-    pub(super) last_active_view_id: Option<proto::ViewId>,
-    /// 状态栏（含 PanelButtons + 普通状态项）
-    pub(super) status_bar: Entity<StatusBar>,
-    pub(crate) modal_layer: Entity<ModalLayer>, // 原样
-    pub(super) toast_layer: Entity<ToastLayer>,
-    /// 可选的窗口装饰（TitleBar）— 由外部 crate（title-bar）创建后注入。
-    /// 对齐 zed `workspace.rs:1598 titlebar_item: Option<AnyView>`
-    pub(super) titlebar_item: Option<AnyView>,
-    pub(super) titlebar_focus_handle: FocusHandle,
-    pub(super) region_focus_handles: RegionFocusHandles,
-    pub(super) notifications: Notifications,
-    pub(super) suppressed_notifications: HashSet<NotificationId>,
-    pub(super) project: Entity<Project>,
-    pub(super) follower_states: HashMap<CollaboratorId, FollowerState>,
-    pub(crate) last_leaders_by_pane: HashMap<WeakEntity<Pane>, CollaboratorId>,
-    pub(super) auto_watch: AutoWatch,
-    pub(super) window_edited: bool,
-    pub(super) last_window_title: Option<String>,
-    pub(super) last_window_title_settings: Option<(String, String)>,
-    pub(super) dirty_items: HashMap<EntityId, Subscription>,
-    pub(super) active_call: Option<(GlobalAnyActiveCall, Vec<Subscription>)>,
-    pub(super) leader_updates_tx: mpsc::UnboundedSender<(PeerId, proto::UpdateFollowers)>,
-    pub(super) database_id: Option<WorkspaceId>,
-    pub(super) app_state: Arc<AppState>,
-    pub(super) dispatching_keystrokes: Rc<RefCell<DispatchingKeystrokes>>,
-    pub(super) _subscriptions: Vec<Subscription>,
-    pub(super) _apply_leader_updates: Task<Result<()>>,
-    pub(super) _observe_current_user: Task<Result<()>>,
-    pub(super) _schedule_serialize_workspace: Option<Task<()>>,
-    pub(super) _serialize_workspace_task: Option<Task<()>>,
-    pub(super) _schedule_serialize_ssh_paths: Option<Task<()>>,
-    pub(super) pane_history_timestamp: Arc<AtomicUsize>,
-    /// Workspace 边界 — 用于 resize 计算右 dock / 底 dock 的尺寸。
-    /// 通过 canvas element 更新（对齐 zed workspace.rs:L9669-L9706）
-    pub(super) bounds: Bounds<Pixels>,
-    pub centered_layout: bool, // 原样
-    pub(super) bounds_save_task_queued: Option<Task<()>>,
-    pub(super) on_prompt_for_new_path: Option<PromptForNewPath>,
-    pub(super) on_prompt_for_open_path: Option<PromptForOpenPath>,
-    pub(super) terminal_provider: Option<Box<dyn TerminalProvider>>,
-    pub(super) debugger_provider: Option<Arc<dyn DebuggerProvider>>,
-    pub(super) serializable_items_tx: UnboundedSender<Box<dyn SerializableItemHandle>>,
-    pub(super) _items_serializer: Task<Result<()>>,
-    pub(super) session_id: Option<String>,
-    pub(super) scheduled_tasks: Vec<Task<()>>,
-    pub(super) last_open_dock_positions: Vec<DockPosition>,
-    pub(super) removing: bool,
-    pub(super) open_in_dev_container: bool,
-    pub(super) _dev_container_task: Option<Task<Result<()>>>,
-    pub(super) _panels_task: Option<Task<Result<()>>>,
-    pub(super) sidebar_focus_handle: Option<FocusHandle>,
-    pub(super) multi_workspace: Option<WeakEntity<MultiWorkspace>>,
-    pub(super) active_workspace_id: Option<Rc<Cell<EntityId>>>,
-    pub(super) active_worktree_creation: ActiveWorktreeCreation,
-    pub(super) deferred_save_items: Vec<Box<dyn WeakItemHandle>>,
-    pub(super) persisted_recent_navigation_history: Vec<PathBuf>,
-    pub(super) last_active_project_path: Option<ProjectPath>,
-    pub(super) restoring_workspace: bool,
-}
-impl EventEmitter<Event> for Workspace {}
+
 
 impl Workspace {
     pub fn new(

@@ -1,5 +1,5 @@
 use super::Workspace;
-use crate::{dock::Dock, workspace::events::CloseIntent};
+use crate::{dock::Dock, workspace::event::CloseIntent};
 use anyhow::{Context as _, Result, anyhow};
 use gpui::{App, Context, Entity, PromptLevel, Task, Window};
 
@@ -33,7 +33,7 @@ impl Workspace {
             .update(cx, |modal_layer, cx| modal_layer.hide_modal(window, cx))
     }
 
-    fn reopen_last_picker(
+    pub(crate) fn reopen_last_picker(
         &mut self,
         _: &ReopenLastPicker,
         window: &mut Window,

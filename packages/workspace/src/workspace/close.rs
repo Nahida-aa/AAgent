@@ -1,5 +1,5 @@
 use super::Workspace;
-use crate::{dock::Dock, workspace::events::CloseIntent};
+use crate::{dock::Dock, workspace::event::CloseIntent};
 use anyhow::{Context as _, Result, anyhow};
 use gpui::{App, Context, Entity, PromptLevel, Task, Window};
 
@@ -137,7 +137,12 @@ impl Workspace {
         })
     }
 
-    fn save_all(&mut self, action: &SaveAll, window: &mut Window, cx: &mut Context<Self>) {
+    pub(crate) fn save_all(
+        &mut self,
+        action: &SaveAll,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
         self.save_all_internal(
             action.save_intent.unwrap_or(SaveIntent::SaveAll),
             true,

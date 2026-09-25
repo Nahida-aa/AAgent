@@ -9,11 +9,20 @@ use gpui::{
     WindowBounds, WindowHandle, WindowId, WindowOptions, actions, canvas, point, relative, size,
     transparent_black,
 };
+use proto::PeerId;
+
+
+
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+pub(crate) struct Follower {
+    pub project_id: Option<u64>,
+    pub peer_id: PeerId,
+}
 
 pub struct WorkspaceStore {
-    workspaces: HashSet<(gpui::AnyWindowHandle, WeakEntity<Workspace>)>,
-    client: Arc<Client>,
-    _subscriptions: Vec<client::Subscription>,
+    pub(crate) workspaces: HashSet<(gpui::AnyWindowHandle, WeakEntity<Workspace>)>,
+    pub(crate) client: Arc<Client>,
+    pub(crate) _subscriptions: Vec<client::Subscription>,
 }
 
 impl WorkspaceStore {

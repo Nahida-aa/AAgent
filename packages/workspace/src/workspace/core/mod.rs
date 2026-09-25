@@ -14,6 +14,8 @@ pub mod actions;
 pub mod construct;
 pub mod debounce;
 pub mod event;
+mod ids;
+pub use ids::WorkspaceId;
 pub mod keystrokes;
 pub mod workspace;
 // weak_handle

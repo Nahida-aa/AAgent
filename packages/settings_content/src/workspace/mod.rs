@@ -32,7 +32,6 @@ use crate::{
 };
 pub use active_pane::ActivePaneModifiers;
 pub use autosave::AutosaveSetting;
-pub use item::{ActivateOnClose, ClosePosition, ShowCloseButton, ShowDiagnostics};
 pub use window::{
     CloseWindowWhenNoItems, FullscreenMode, OnLastWindowClosed, OnNewWindow, WindowDecorations,
 };

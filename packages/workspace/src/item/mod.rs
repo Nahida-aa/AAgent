@@ -30,14 +30,10 @@ pub use weak_handle::*;
 pub mod handle;
 pub mod settings;
 pub mod tab;
-use ui::{Color, Icon, Label, LabelCommon};
 use gpui::IntoElement;
 pub use handle::{Item, ItemHandle, WeakItemHandle};
-pub use settings::{
-    ActivateOnClose, ClosePosition, ItemSettings, PreviewTabsSettings, ShowCloseButton,
-    ShowDiagnostics,
-};
 pub use tab::{ItemBufferKind, TabContentParams, TabTooltipContent};
+use ui::{Color, Icon, Label, LabelCommon};
 
 use std::time::Duration;
 

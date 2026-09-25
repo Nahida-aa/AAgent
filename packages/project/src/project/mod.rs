@@ -18,14 +18,14 @@ mod lsp_rpc;
 mod paths;
 mod rpc;
 mod search;
-mod state;
+pub mod state;
 mod toolchains;
 mod worktrees;
 
 #[cfg(feature = "test-support")]
 mod test_support;
 
-pub(crate) use state::{
+pub use state::{
     AgentLocation, BufferOrderedMessage, DebugAdapterClientState, DownloadingFile,
     EntitySubscription, LocalProjectFlags, ProjectClientState, RemotelyCreatedModelGuard,
     RemotelyCreatedModels,

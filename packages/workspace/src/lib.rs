@@ -88,7 +88,10 @@ pub use workspace_settings::{
 };
 
 mod workspace;
-pub use workspace::{app::initial::init, core::workspace::Workspace};
+pub use workspace::{
+    app::initial::init,
+    core::{WorkspaceId, workspace::Workspace},
+};
 
 // // ---------- re-export：保持原有对外 API ----------
 

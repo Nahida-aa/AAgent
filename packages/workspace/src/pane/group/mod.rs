@@ -16,9 +16,11 @@ mod member;
 mod render;
 mod split_direction;
 
-pub use group::{PaneGroup, PaneRenderResult};
+pub use group::PaneGroup;
 pub use member::Member;
-pub use render::{ActivePaneDecorator, LeaderDecoration, PaneLeaderDecorator, PaneRenderContext};
+pub use render::{
+    ActivePaneDecorator, LeaderDecoration, PaneLeaderDecorator, PaneRenderContext, PaneRenderResult,
+};
 pub use split_direction::SplitDirection;
 
 pub const HANDLE_HITBOX_SIZE: f32 = 4.0;

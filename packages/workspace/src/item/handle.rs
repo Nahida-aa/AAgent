@@ -10,7 +10,6 @@ use crate::searchable::SearchableItemHandle;
 use crate::toolbar::ToolbarItemLocation;
 use crate::workspace_settings::WorkspaceSettings;
 use crate::{Pane, Workspace, WorkspaceId};
-use ui::{Icon, IconName};
 use gpui::{
     Action, AnyElement, AnyEntity, AnyView, App, Entity, EntityId, EventEmitter, FocusHandle, Font,
     IntoElement, Pixels, Point, SharedString, Subscription, Task, WeakEntity, Window,
@@ -19,6 +18,7 @@ use language::{Capability, HighlightedText};
 use project::{Project, ProjectEntryId, ProjectPath};
 use smallvec::SmallVec;
 use std::any::{Any, TypeId};
+use ui::{Icon, IconName};
 
 use crate::{ItemEvent, ToolbarItemLocation};
 
@@ -162,14 +162,4 @@ impl From<&Box<dyn ItemHandle>> for AnyView {
 
 impl Clone for Box<dyn ItemHandle> {
     fn clone(&self) -> Box<dyn ItemHandle> { self.boxed_clone() }
-}
-
-impl<T: Item> WeakItemHandle for WeakEntity<T> {
-    fn id(&self) -> EntityId { self.entity_id() }
-
-    fn boxed_clone(&self) -> Box<dyn WeakItemHandle> { Box::new(self.clone()) }
-
-    fn upgrade(&self) -> Option<Box<dyn ItemHandle>> {
-        self.upgrade().map(|e| Box::new(e) as Box<dyn ItemHandle>)
-    }
 }

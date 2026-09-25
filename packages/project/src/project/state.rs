@@ -58,7 +58,9 @@ pub(crate) enum BufferOrderedMessage {
 #[derive(Debug)]
 pub(crate) enum ProjectClientState {
     Local,
-    Shared { remote_id: u64 },
+    Shared {
+        remote_id: u64,
+    },
     Collab {
         sharing_has_stopped: bool,
         capability: Capability,

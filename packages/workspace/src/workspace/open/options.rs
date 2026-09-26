@@ -72,3 +72,10 @@ pub struct OpenResult {
     pub workspace: Entity<Workspace>,
     pub opened_items: Vec<Option<anyhow::Result<Box<dyn ItemHandle>>>>,
 }
+
+#[derive(Debug)]
+pub struct WorkspacePosition {
+    pub window_bounds: Option<WindowBounds>,
+    pub display: Option<Uuid>,
+    pub centered_layout: bool,
+}

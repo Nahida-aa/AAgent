@@ -172,11 +172,12 @@ use crate::{
 };
 
 // ========= workspace 嵌套模块的关键类型 =========
+// 这些类型在 Zed 单文件 workspace.rs 里 crate 根可见，我们拆分后需要精确 pub use 过来
 pub use workspace::{
     actions::*,
     app::initial::init,
     app::store::WorkspaceStore,
-    collab::AutoWatch,
+    collab::{AutoWatch, open_remote_project_with_existing_connection},
     core::WorkspaceId,
     core::actions::*,
     core::lifecycle::CloseIntent,
@@ -185,5 +186,5 @@ pub use workspace::{
     notification::toast::Toast,
     open::options::{OpenMode, OpenVisible},
     providers::{DebuggerProvider, TerminalProvider},
-    window::title::WindowTitleContext,
+    window::{client_side_decorations, title::WindowTitleContext},
 };

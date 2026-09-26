@@ -811,9 +811,9 @@ impl Dock {
 
     pub fn toggle_action(&self) -> Box<dyn Action> {
         match self.position {
-            DockPosition::Left => crate::ToggleLeftDock.boxed_clone(),
-            DockPosition::Bottom => crate::ToggleBottomDock.boxed_clone(),
-            DockPosition::Right => crate::ToggleRightDock.boxed_clone(),
+            DockPosition::Left => crate::workspace::ToggleLeftDock.boxed_clone(),
+            DockPosition::Bottom => crate::workspace::ToggleBottomDock.boxed_clone(),
+            DockPosition::Right => crate::workspace::ToggleRightDock.boxed_clone(),
         }
     }
     fn dispatch_context() -> gpui::KeyContext {

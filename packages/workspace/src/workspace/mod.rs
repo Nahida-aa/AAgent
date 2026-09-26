@@ -105,6 +105,7 @@ pub mod window;
 pub mod worktree;
 pub mod actions;
 pub use actions::*;
+pub use core::actions::*;
 pub use crate::workspace::{app::initial::init, core::workspace::Workspace};
 
 use crate::dock::{Dock, DockPosition, Panel, PanelButtons, PanelHandle, PanelSizeState};

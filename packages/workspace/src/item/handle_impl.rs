@@ -4,6 +4,7 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::time::Duration;
 
+use anyhow::Result;
 use client::{Client, proto};
 use futures::channel::mpsc;
 use gpui::{

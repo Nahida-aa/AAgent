@@ -1,6 +1,7 @@
 use std::any::Any;
 use std::sync::Arc;
 
+use anyhow::Result;
 use client::{Client, proto};
 use gpui::{App, Context, Entity, Task, WeakEntity, Window};
 use language::Capability;

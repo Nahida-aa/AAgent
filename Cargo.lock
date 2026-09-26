@@ -15591,6 +15591,7 @@ name = "workspace"
 version = "0.1.0"
 dependencies = [
  "a_log",
+ "aa_clock",
  "aa_gpui_kit_component",
  "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "aa_gpui_kit_ui",
@@ -15604,8 +15605,10 @@ dependencies = [
  "client",
  "collections",
  "db",
+ "dirs",
  "fs",
  "futures",
+ "futures-lite",
  "git",
  "gpui",
  "gpui_util",
@@ -15638,12 +15641,10 @@ dependencies = [
  "task",
  "telemetry",
  "tempfile",
- "terminal",
  "theme_settings",
  "url",
  "util 0.1.0",
  "uuid",
- "worktree",
 ]
 
 [[package]]

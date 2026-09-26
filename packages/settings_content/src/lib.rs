@@ -69,12 +69,6 @@ pub use crate::{
         SshPortForwardOption, TelemetrySettingsContent, VimSettingsContent,
         WhichKeySettingsContent, WslConnection,
     },
-    editor::{
-        CurrentLineHighlight, EditorSettingsContent, GutterContent, InactiveOpacity,
-        MinimapContent, MinimapThumb, MultiCursorModifier, RelativeLineNumbers,
-        ScrollbarAxesContent, ScrollbarContent, SearchSettingsContent, SeedQuerySetting,
-        ShowMinimap, StickyScrollContent, scalars::CenteredPaddingSettings,
-    },
     extension::ExtensionSettingsContent,
     feature_flags::FeatureFlagsMap,
     language_model::AllLanguageModelSettingsContent,
@@ -107,6 +101,9 @@ pub use crate::{
 pub use common::ParseStatus;
 pub use contents::BaseKeymapContent;
 pub use editor::cursor::CursorShape;
+// 对齐 zed settings_content.rs 的 `pub use editor::*;`：editor 那边是一整份 API，
+// 逐个点名必漏（漏一个就让下游 `settings::Xxx` 报 E0432）。
+pub use editor::*;
 pub use overrides::{PlatformOverrides, ReleaseChannelOverrides};
 pub use profiles::ProfileBase;
 pub use project::{

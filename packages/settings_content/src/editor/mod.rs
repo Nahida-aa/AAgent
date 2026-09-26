@@ -1,22 +1,29 @@
 use crate::{
     CursorShape, ShowScrollbar,
     common::DelayMs,
-    editor::{
-        code_lens::CodeLens,
-        completion::{CompletionDetailAlignment, CompletionMenuItemKind, SnippetSortOrder},
-        cursor::CursorAnimationSettingsContent,
-        diff::DiffViewStyle,
-        drag_and_drop::DragAndDropSelectionContent,
-        jupyter::JupyterContent,
-        lsp::{
-            DocumentColorsRenderMode, GoToDefinitionFallback, GoToDefinitionScrollStrategy,
-            OpenResultsIn,
-        },
-        scalars::MinimumContrast,
-        scrolling::ScrollBeyondLastLine,
-        toolbar::ToolbarContent,
-    },
     project::DiagnosticSeverityContent,
+};
+// 这里是 `pub use`：zed 的 settings_content.rs 用 `pub use editor::*;` 把 editor
+// 模块的公开项整批提到 crate 根，settings 再 `pub use ::settings_content::*;`
+// 转出去。我们把 editor.rs 拆成目录后，这些名字必须从这一层公开，调用方写
+// `settings::ScrollbarDiagnostics` 才能解析到（否则 editor crate 报 E0432）。
+pub use crate::editor::{
+    code_lens::CodeLens,
+    completion::{CompletionDetailAlignment, CompletionMenuItemKind, SnippetSortOrder},
+    cursor::CursorAnimationSettingsContent,
+    diff::DiffViewStyle,
+    drag_and_drop::DragAndDropSelectionContent,
+    gutter::GitGutterWidth,
+    jupyter::JupyterContent,
+    lsp::{
+        DocumentColorsRenderMode, GoToDefinitionFallback, GoToDefinitionScrollStrategy,
+        OpenResultsIn,
+    },
+    minimap::{DisplayIn, MinimapThumbBorder},
+    scalars::MinimumContrast,
+    scrolling::ScrollBeyondLastLine,
+    scrollbar::ScrollbarDiagnostics,
+    toolbar::ToolbarContent,
 };
 pub use scalars::{CenteredPaddingSettings, InactiveOpacity};
 

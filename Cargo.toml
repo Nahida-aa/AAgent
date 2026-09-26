@@ -490,9 +490,8 @@ notify = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716
 notify-types = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
 libwebrtc = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev = "0a1c519cfce9b365229026b55de9b9dbdb6fed3c" }
 
-# 本地开发覆盖：把 aa_gpui_kit_theme 指向本机 clone（含 theme 修复 cba2f68），
-# 其余 5 个 crate 仍走 GitHub 的 c712ba1（已推送，本机克隆里这几 crate 内容与 c712ba1 一致）。
-# 仅开发期用；把 gpui_learn 的 cba2f68 推到 GitHub 后即可整段删除。
+# 本地开发覆盖（仅开发期用）：zed 的 crate 用本地 `packages/language_core` 顶上。
+# 等我们不再依赖 zed git 源后即可整段删除。
 # zed git 源里的 crate 也会拖 zed 自己的 `language_core`，与我们的
 # `packages/language_core` 形成两份 —— 于是 `LanguageConfig` / `LanguageQueries` /
 # `LanguageName` 全都"类型不同"（E0308 + 「multiple different versions」）。
@@ -500,6 +499,10 @@ libwebrtc = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev =
 [patch."https://github.com/zed-industries/zed"]
 language_core = { path = "packages/language_core" }
 
+# gpui_learn 的 7 个包**全部走本地 path**：改完 gpui_learn 立即生效，不用 commit + 顶 rev。
+# 别把任何一个改回 `git = ..., rev = ...` —— 那会让它停在旧提交，AAgent 侧报
+# 「找不到刚加的符号」（如 `unresolved import theme::ClientDecorationsExt`），
+# 症状很像代码没写。同源要求见下面 ui_input 那条注释。
 [patch."https://github.com/Nahida-aa/gpui_learn.git"]
 aa_gpui_kit_theme = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/theme" }
 aa_gpui_kit_ui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui" }

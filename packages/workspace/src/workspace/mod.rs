@@ -115,7 +115,7 @@ use crate::item::{FollowableItemHandle, ItemBufferKind, ItemHandle, ProjectItem,
 use crate::modal_layer::ModalLayer;
 use crate::multi_workspace::MultiWorkspace;
 use crate::notifications::{NotificationId, Notifications};
-use crate::pane::{Pane, SaveIntent, NavigationMode, SplitMode, group::{PaneGroup, SplitDirection, Member, AppState, FollowerState}};
+use crate::pane::{Pane, SaveIntent, NavigationMode, SplitMode, group::{PaneGroup, SplitDirection, Member}};
 use crate::persistence::{
     WorkspaceDb, SerializedAxis,
     model::{DockData, DockStructure, ItemId, MultiWorkspaceState, PathList, SerializedItem, SerializedMultiWorkspace, SerializedPane, SerializedPaneGroup, SerializedProjectGroupState, SerializedWorkspace, SerializedWorkspaceLocation},

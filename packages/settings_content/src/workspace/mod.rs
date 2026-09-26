@@ -20,7 +20,7 @@ mod text_rendering;
 mod window; // 包含打开窗口
 
 // Re-export commonly used types from private submodules.
-use crate::{
+pub use crate::{
     CommandAliasTarget, DockPosition, serialize_optional_f32_with_two_decimal_places,
     workspace::{
         centered_layout::CenteredLayoutSettings,

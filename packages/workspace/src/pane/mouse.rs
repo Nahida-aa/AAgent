@@ -1,5 +1,6 @@
 use super::*;
 
+use futures::stream::FuturesUnordered;
 use gpui::{App, Context, FocusOutEvent, Window};
 use project::Project;
 use settings::Settings;

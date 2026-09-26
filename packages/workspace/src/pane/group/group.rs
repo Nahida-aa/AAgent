@@ -1,12 +1,12 @@
 use anyhow::Result;
-use gpui::{App, Axis, Bounds, Entity, IntoElement, Pixels, Point, WeakEntity, Window};
+use gpui::{AnyWeakView, App, Axis, Bounds, Entity, IntoElement, Pixels, Point, WeakEntity, Window};
 use ui::prelude::*;
 
 use crate::Pane;
 
 use super::axis::PaneAxis;
 use super::member::Member;
-use super::render::PaneRenderResult;
+use super::render::{PaneLeaderDecorator, PaneRenderResult};
 use super::split_direction::SplitDirection;
 
 /// One or many panes arranged in horizontal or vertical axis.

@@ -88,8 +88,10 @@ pub use crate::{
     title_bar::TitleBarSettingsContent,
     ui::{HideMouseMode, LineIndicatorFormat, ReduceMotionMode},
     workspace::{
-        ActivePaneModifiers, AutosaveSetting, CloseWindowWhenNoItems, FullscreenMode,
-        PreviewTabsSettingsContent, WorkspaceSettingsContent,
+        ActivePaneModifiers, AutosaveSetting, CenteredLayoutSettings, CloseWindowWhenNoItems,
+        CliDefaultOpenBehavior, FullscreenMode, OnLastWindowClosed, OnNewWindow,
+        PaneSplitDirectionHorizontal, PaneSplitDirectionVertical, PreviewTabsSettingsContent,
+        TextRenderingMode, WindowDecorations, WorkspaceSettingsContent,
         bar::{EncodingDisplayOptions, StatusBarSettingsContent, TabBarSettingsContent},
         item::{
             ActivateOnClose, ClosePosition, ItemSettingsContent, ShowCloseButton, ShowDiagnostics,

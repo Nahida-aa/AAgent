@@ -8,7 +8,8 @@ use std::sync::Arc;
 
 use super::Workspace;
 pub(crate) use crate::dock::{
-    Dock, DockPosition, Panel, PanelButtons, PanelHandle, PanelSizeState, RESIZE_HANDLE_SIZE,
+    Dock, DockPosition, PANEL_SIZE_STATE_KEY, Panel, PanelButtons, PanelHandle, PanelSizeState,
+    RESIZE_HANDLE_SIZE,
 };
 use crate::pane::group::PaneRenderContext;
 use crate::workspace::core::actions::ToggleAllDocks;

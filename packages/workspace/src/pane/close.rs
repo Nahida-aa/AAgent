@@ -8,6 +8,7 @@ use util::debug_panic;
 
 use super::Pane;
 use super::history::{NavigationMode, TagNavigationMode};
+use crate::Workspace;
 use crate::item::{ItemSettings, PreviewTabsSettings};
 use crate::workspace_settings::{FocusFollowsMouse, TabBarSettings, WorkspaceSettings};
 impl Pane {

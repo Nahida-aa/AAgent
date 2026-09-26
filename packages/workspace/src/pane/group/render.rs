@@ -4,6 +4,7 @@ use collections::HashMap;
 use gpui::{
     AnyElement, AnyWeakView, App, Entity, Hsla, IntoElement, MouseButton, WeakEntity, Window,
 };
+use project::Project;
 use ui::prelude::*;
 use util::ResultExt;
 

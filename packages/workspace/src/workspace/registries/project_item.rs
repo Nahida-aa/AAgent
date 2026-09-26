@@ -4,7 +4,7 @@ use collections::TypeIdHashMap;
 type BuildProjectItemFn =
     fn(AnyEntity, Entity<Project>, Option<&Pane>, &mut Window, &mut App) -> Box<dyn ItemHandle>;
 
-    type WorkspaceItemBuilder =
+    pub(crate) type WorkspaceItemBuilder =
         Box<dyn FnOnce(&mut Pane, &mut Window, &mut Context<Pane>) -> Box<dyn ItemHandle>>;
 
 type BuildProjectItemForPathFn =
@@ -17,7 +17,7 @@ type BuildProjectItemForPathFn =
 
 #[derive(Clone, Default)]
 pub(crate) struct ProjectItemRegistry {
-    build_project_item_fns_by_type: TypeIdHashMapp<BuildProjectItemFn>,
+    build_project_item_fns_by_type: TypeIdHashMap<BuildProjectItemFn>,
     build_project_item_for_path_fns: Vec<BuildProjectItemForPathFn>,
 }
 

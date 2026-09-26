@@ -1,4 +1,5 @@
 use super::*;
+use ::remote::RemoteClient;
 pub fn open_remote_project_with_new_connection(
     window: WindowHandle<MultiWorkspace>,
     remote_connection: Arc<dyn RemoteConnection>,

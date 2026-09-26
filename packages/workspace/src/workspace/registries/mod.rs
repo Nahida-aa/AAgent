@@ -6,7 +6,7 @@
 
 use super::*;
 mod followable_view;
-mod project_item;
+pub(crate) mod project_item;
 mod serializable_item;
 
 pub use followable_view::FollowableViewRegistry;

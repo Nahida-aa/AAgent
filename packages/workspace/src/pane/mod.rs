@@ -20,7 +20,7 @@ use gpui::{
 use ui::{
     ButtonSize, ContextMenu, ContextMenuEntry, ContextMenuItem, DecoratedIcon, Headline,
     HeadlineSize, IconButton, IconButtonShape, IconDecoration, IconDecorationKind, IconName,
-    IconSize, Indicator, PopoverMenu, PopoverMenuHandle, Tab, TabBar, TabPosition, Tooltip,
+    IconSize, Indicator, PopoverMenu, PopoverMenuHandle, Tab, TabPosition, Tooltip,
     prelude::*, right_click_menu,
 };
 use git::{CopyFilePermalink, OpenFilePermalink};
@@ -53,10 +53,11 @@ use util::{
 use crate::{
     CloseWindow, NewCenterTerminal, NewFile, NewTerminal, OpenInTerminal, OpenOptions,
     OpenTerminal, OpenVisible, ToggleFileFinder, ToggleProjectSymbols, ToggleZoom,
-    WorkspaceItemBuilder, ZoomIn, ZoomOut, focus_follows_mouse::FocusFollowsMouse as _,
-    item::{ActivateOnClose, ClosePosition, SaveOptions, ShowCloseButton, ShowDiagnostics},
+    Workspace, WorkspaceItemBuilder, ZoomIn, ZoomOut, focus_follows_mouse::FocusFollowsMouse as _,
+    item::SaveOptions,
     move_item,
 };
+use settings::{ActivateOnClose, ClosePosition, ShowCloseButton, ShowDiagnostics};
 
 // === crate 内部转发（公开 API） ===
 pub use crate::item::{

@@ -15645,6 +15645,7 @@ dependencies = [
  "url",
  "util 0.1.0",
  "uuid",
+ "worktree",
 ]
 
 [[package]]

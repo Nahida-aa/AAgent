@@ -30,4 +30,4 @@ pub(crate) mod permalink;
 //
 mod save;
 pub mod close;
-pub use events::{ItemBufferKind};
+pub use crate::item::ItemBufferKind;

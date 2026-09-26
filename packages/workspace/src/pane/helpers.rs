@@ -4,6 +4,7 @@ use project::ProjectPath;
 use ui::{ContextMenu, IconButton, IconName, IconSize, PopoverMenu, Tooltip, prelude::*};
 use util::{markdown::MarkdownInlineCode, paths::PathStyle, truncate_and_remove_front};
 
+use super::actions::{DeploySearch, SplitDown, SplitLeft, SplitMode, SplitRight, SplitUp};
 use super::Pane;
 use crate::{
     CloseWindow, NewCenterTerminal, NewFile, NewTerminal, OpenInTerminal, OpenOptions,
@@ -12,15 +13,15 @@ use crate::{
     focus_follows_mouse::FocusFollowsMouse as _,
     invalid_item_view::InvalidItemView,
     item::{
-        ActivateOnClose, ClosePosition, Item, ItemBufferKind, ItemHandle, ItemSettings,
-        PreviewTabsSettings, ProjectItemKind, SaveOptions, ShowCloseButton, ShowDiagnostics,
-        TabContentParams, TabTooltipContent, WeakItemHandle,
+        Item, ItemBufferKind, ItemHandle, ItemSettings, PreviewTabsSettings, ProjectItemKind,
+        SaveOptions, TabContentParams, TabTooltipContent, WeakItemHandle,
     },
     move_item,
     notifications::NotifyResultExt,
     toolbar::Toolbar,
     workspace_settings::{AutosaveSetting, FocusFollowsMouse, TabBarSettings, WorkspaceSettings},
 };
+use settings::{ActivateOnClose, ClosePosition, ShowCloseButton, ShowDiagnostics};
 
 pub(super) fn dirty_message_for(buffer_path: Option<ProjectPath>, path_style: PathStyle) -> String {
     let path = buffer_path.as_ref().and_then(|p| {

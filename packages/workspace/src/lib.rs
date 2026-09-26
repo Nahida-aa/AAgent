@@ -209,3 +209,11 @@ use workspace::{
     window::{client_side_decorations, title::WindowTitleContext},
 };
 pub(crate) use workspace::pane::ActivateInDirectionTarget;
+// workspace 嵌套模块里定义，但需要 crate 根可见的类型
+pub(crate) use workspace::registries::project_item::WorkspaceItemBuilder;
+pub(crate) use workspace::pane::ops::move_item;
+pub(crate) use workspace::follow::state::FollowerView;
+pub(crate) use workspace::open::options::WorkspacePosition;
+pub(crate) use workspace::collab::participant::RemoteCollaborator;
+// dock constant
+pub(crate) use dock::PANEL_SIZE_STATE_KEY;

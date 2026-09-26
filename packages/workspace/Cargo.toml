@@ -68,6 +68,7 @@ aagent_actions.workspace = true
 path.workspace = true
 remote.workspace = true
 gpui_util.workspace = true
+worktree.workspace = true
 
 [dev-dependencies]
 client = { workspace = true, features = ["test-support"] }

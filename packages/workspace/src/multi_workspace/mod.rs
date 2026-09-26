@@ -23,6 +23,8 @@ use gpui::{
 use project::{DisableAiSettings, Project};
 pub(crate) use project::ProjectGroupKey;
 use remote::RemoteConnectionOptions;
+use agent_settings::AgentSettings;
+use hold::HeldWorkspace;
 use settings::{Settings, SidebarDockPosition};
 use std::{cell::Cell, path::PathBuf, rc::Rc};
 use theme::ActiveTheme;
@@ -45,7 +47,7 @@ mod close;
 mod delegate;
 mod events;
 mod find_workspace;
-mod hold;
+pub(crate) mod hold;
 mod project_group;
 mod project_group_ops;
 mod remove;

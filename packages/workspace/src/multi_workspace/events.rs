@@ -1,6 +1,6 @@
 use super::*;
 
-use gpui::{App, ContextMenu, ElementId, Entity, EntityId, WeakEntity};
+use gpui::{App, ElementId, Entity, EntityId, WeakEntity};
 use settings::Settings;
 use settings::SidebarDockPosition;
 use ui::{ContextMenu, IconPosition, right_click_menu};

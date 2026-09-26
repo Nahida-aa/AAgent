@@ -60,7 +60,7 @@ use gpui::{App, Context, Entity, PromptLevel, Task, Window};
 //
 // workspace/follow/state.rs
 // FollowerState / Follower / FollowerView / ViewId / CollaboratorId
-mod state;
+pub(crate) mod state;
 pub mod agent;
 pub mod auto_watch;
 pub mod follower;

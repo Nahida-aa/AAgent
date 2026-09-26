@@ -1,3 +1,5 @@
+use std::any::TypeId;
+
 use gpui::{App, Context, Entity, FocusHandle, Focusable, Subscription, WeakEntity, Window};
 
 use ui::prelude::*;

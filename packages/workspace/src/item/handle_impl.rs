@@ -10,9 +10,11 @@ use gpui::{
     Action, AnyElement, AnyEntity, AnyView, App, AppContext, Context, Entity, EntityId,
     FocusHandle, Focusable, Font, Pixels, Point, SharedString, Task, TaskExt, Window,
 };
-use language::Capability;
+use language::{Capability, HighlightedText};
 use project::{Project, ProjectEntryId, ProjectPath};
+use settings::SettingsLocation;
 use smallvec::SmallVec;
+use ui::Icon;
 use util::ResultExt;
 
 use super::events::{ItemBufferKind, ItemEvent, SaveOptions, TabContentParams, TabTooltipContent};
@@ -21,6 +23,7 @@ use super::handle::ItemHandle;
 use super::serializable::SerializableItemHandle;
 use super::traits::Item;
 use super::weak_handle::WeakItemHandle;
+use crate::item::LEADER_UPDATE_THROTTLE;
 use crate::searchable::SearchableItemHandle;
 use crate::toolbar::ToolbarItemLocation;
 use crate::workspace_settings::{AutosaveSetting, WorkspaceSettings};

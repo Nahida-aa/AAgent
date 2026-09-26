@@ -9,7 +9,7 @@ use crate::Pane;
 use super::member::Member;
 use super::render::{PaneLeaderDecorator, PaneRenderResult};
 use super::split_direction::SplitDirection;
-use super::{HORIZONTAL_MIN_SIZE, VERTICAL_MIN_SIZE};
+use super::{pane_axis, HORIZONTAL_MIN_SIZE, VERTICAL_MIN_SIZE};
 
 #[derive(Debug, Clone)]
 pub struct PaneAxis {

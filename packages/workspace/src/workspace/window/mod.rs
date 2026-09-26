@@ -25,7 +25,7 @@ mod chrome;
 // FocusablePart / RegionFocusHandles / move_part_focus / move_titlebar_item_focus
 mod regions;
 // on_window_activation_changed, activate_next_window, activate_previous_window, close_global / window switching
-mod activation;
+pub(crate) mod activation;
 // observe_window_bounds / observe_window_appearance / observe_window_activation 的组装
 // mod subscriptions;  // 不存在对应文件，注释掉
 pub mod decorations;

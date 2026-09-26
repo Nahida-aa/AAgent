@@ -49,6 +49,8 @@ mod tests;
 pub use agent_registry_store::{AgentRegistryStore, RegistryAgent};
 pub use agent_server_store::{AgentId, AgentServerStore, AgentServersUpdated, ExternalAgentSource};
 pub use buffer_store::{BufferStore, BufferStoreEvent, ProjectTransaction};
+// 对齐 zed crates/project/src/project.rs:70（zed 只导出这一个类型，不是整个模块）。
+pub use debugger::breakpoint_store::BreakpointWithPosition;
 #[cfg(feature = "test-support")]
 pub use constants::DEFAULT_COMPLETION_CONTEXT;
 pub use constants::{CURRENT_PROJECT_FEATURES, MAX_PROJECT_SEARCH_HISTORY_SIZE};

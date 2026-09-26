@@ -8,6 +8,9 @@ use super::actions::{
 };
 use super::{DraggedSelection, DraggedTab, Event, Pane, SplitMode};
 use crate::{
+    // `FocusFollowsMouse` 提供 `.focus_follows_mouse(..)`（zed workspace 的扩展
+    // trait，见 crates/workspace/src/focus_follows_mouse.rs）；不在 gpui 里。
+    focus_follows_mouse::FocusFollowsMouse,
     SplitDirection,
     item::{
         ActivateOnClose, ClosePosition, Item, ItemBufferKind, ItemHandle, ItemSettings,
@@ -18,6 +21,8 @@ use crate::{
 use anyhow::Result;
 
 use project::{DirectoryLister, Project, ProjectEntryId, ProjectPath, WorktreeId};
+// `Settings` 必须在作用域里：`ThemeSettings::get_global(cx)` 是它的关联函数。
+use settings::Settings;
 use theme_settings::ThemeSettings;
 use ui::{
     ContextMenu, ContextMenuEntry, ContextMenuItem, DecoratedIcon, IconButtonShape, IconDecoration,

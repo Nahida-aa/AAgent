@@ -1,4 +1,7 @@
 use super::*;
+// `Settings` 必须在作用域里：`ThemeSettings::get_global(cx)` 是它的关联函数。
+use settings::Settings;
+
 impl Workspace {
     // set_sidebar_focus_handle   // setter，但只是字段写，可放这里
     pub fn set_sidebar_focus_handle(&mut self, handle: Option<FocusHandle>) {

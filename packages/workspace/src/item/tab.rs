@@ -3,6 +3,7 @@
 //! 对齐 Zed `TabContentParams` + `TabTooltipContent` + `ItemBufferKind`。
 
 use gpui::{AnyView, App, SharedString, Window};
+use ui::Color;
 
 /// Tab 渲染的上下文参数 — 对齐 Zed `TabContentParams`。
 ///
@@ -27,17 +28,21 @@ pub struct TabContentParams {
 }
 
 impl TabContentParams {
-    /// 根据 selected + deemphasized 算 tab 文字颜色。
-    /// 对齐 Zed TabContentParams::text_color()。
-    /// AAgent 没 Color enum（用 hsla），先返回 bool 给 caller 做判断。
-    pub fn use_dimmed_text(&self) -> bool {
+    /// Tab 文字颜色（对齐 zed `TabContentParams::text_color`）。
+    ///
+    /// zed 返回语义色 `Color`；`Label::color` / `Icon::color` 都收它
+    /// （语义色在渲染时才按主题解析）。
+    pub fn text_color(&self) -> Color {
         if self.deemphasized {
-            true
+            if self.selected {
+                Color::Muted
+            } else {
+                Color::Hidden
+            }
         } else if self.selected {
-            false
+            Color::Default
         } else {
-            // 未选中非弱化 — 也要 dim 一下
-            true
+            Color::Muted
         }
     }
 }

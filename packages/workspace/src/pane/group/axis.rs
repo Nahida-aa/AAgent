@@ -1,7 +1,14 @@
 use std::sync::Arc;
 
 use anyhow::Result;
-use gpui::{Along, AnyWeakView, App, Axis, Bounds, Entity, Pixels, Point, WeakEntity, Window, px};
+// `IntoElement` / `ParentElement` 必须在作用域里：`result.element.into_any_element()`
+// 与 `pane_axis(..).children(..)` 都是这两个 trait 的方法，不由 `ui::prelude::*`
+// 带进来。缺 `ParentElement` 时 `.children(..)` 会被解析成 `PaneAxisElement` 的
+// 私有同名字段，报 "private field, not a method"（很误导）。
+use gpui::{
+    Along, AnyWeakView, App, Axis, Bounds, Entity, IntoElement, ParentElement, Pixels, Point,
+    WeakEntity, Window, px,
+};
 use parking_lot::Mutex;
 
 use crate::Pane;

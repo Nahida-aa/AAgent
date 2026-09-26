@@ -13,7 +13,9 @@ use gpui::{
 };
 use language::{Capability, HighlightedText};
 use project::{Project, ProjectEntryId, ProjectPath};
-use settings::SettingsLocation;
+// `Settings` 必须在作用域里：`WorkspaceSettings::get_global(cx)` / `::get(..)`
+// 都是它的关联函数。
+use settings::{Settings, SettingsLocation};
 use smallvec::SmallVec;
 use ui::Icon;
 use util::ResultExt;

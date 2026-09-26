@@ -10,7 +10,7 @@
 
 // OpenOptions / OpenResult / OpenMode, OpenVisible
 use super::*;
-mod options;
+pub mod options;
 // prompt_and_open_paths, prompt_for_open_path_and_open, PromptForNewPath, PromptForOpenPath
 mod prompt;
 pub mod file;

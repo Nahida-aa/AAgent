@@ -16,6 +16,7 @@ mod member;
 mod render;
 mod split_direction;
 
+pub use axis::PaneAxis;
 pub use group::PaneGroup;
 pub use member::Member;
 pub use render::{

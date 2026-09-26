@@ -31,4 +31,5 @@ mod activation;
 pub mod decorations;
 pub mod title;
 pub mod titlebar;
+pub use decorations::client_side_decorations;
 pub use regions::{PartBehavior, RegionFocusHandles};

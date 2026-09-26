@@ -122,7 +122,8 @@ use sqlez::{
     statement::Statement,
 };
 use status_bar::StatusBar;
-pub use status_bar::{HideStatusItem, StatusItemView, add_hide_button_entry};
+pub use status_bar::{HideStatusItem, StatusItemView};
+use status_bar::add_hide_button_entry;
 use std::{
     any::TypeId,
     borrow::Cow,
@@ -141,7 +142,7 @@ use std::{
     time::Duration,
 };
 use task::{DebugScenario, SharedTaskContext, SpawnInTerminal};
-use theme::{ActiveTheme, ClientDecorationsExt, SystemAppearance};
+use theme::{ActiveTheme, SystemAppearance};
 use theme_settings::ThemeSettings;
 pub use toolbar::{
     PaneSearchBarCallbacks, Toolbar, ToolbarItemEvent, ToolbarItemLocation, ToolbarItemView,
@@ -186,6 +187,6 @@ use workspace::{
     dock::render::DraggedDock,
     notification::toast::Toast,
     open::options::{OpenMode, OpenVisible},
-    providers::{DebuggerProvider, TerminalProvider},
+    providers::TerminalProvider,
     window::{client_side_decorations, title::WindowTitleContext},
 };

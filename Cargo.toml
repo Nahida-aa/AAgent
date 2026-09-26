@@ -501,7 +501,7 @@ libwebrtc = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev =
 language_core = { path = "packages/language_core" }
 
 [patch."https://github.com/Nahida-aa/gpui_learn.git"]
-aa_gpui_kit_theme = { git = "file:///home/aa/repos/ide_ls/gpui_learn", rev = "7dba1c91a4e99896472286a22a26800162f2864e" }
+aa_gpui_kit_theme = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/theme" }
 aa_gpui_kit_ui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui" }
 # icons 是刚加进 gpui_learn 的新包，还没进上面 git 依赖锁定的那个 rev，
 # 先用本地 path 顶上，等推上去并更新 rev 后可以移除这条。

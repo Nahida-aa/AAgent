@@ -180,7 +180,7 @@ use workspace::{
     actions::*,
     app::initial::init,
     app::store::WorkspaceStore,
-    collab::{AutoWatch, open_remote_project_with_existing_connection},
+    collab::open_remote_project_with_existing_connection,
     core::WorkspaceId,
     core::actions::*,
     core::lifecycle::CloseIntent,

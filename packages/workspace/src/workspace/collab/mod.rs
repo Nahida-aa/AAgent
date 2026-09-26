@@ -1,13 +1,11 @@
-use super::*;
 use super::Workspace;
+use super::*;
 use crate::dock::Dock;
 use crate::workspace::core::WorkspaceId;
 use crate::workspace::core::lifecycle::CloseIntent;
 use anyhow::{Context as _, Result, anyhow};
 use collections::HashMap;
-use gpui::{
-    App, AsyncApp, Context, Entity, PromptLevel, Task, WeakEntity, Window,
-};
+use gpui::{App, AsyncApp, Context, Entity, PromptLevel, Task, WeakEntity, Window};
 
 use crate::pane::Pane;
 
@@ -33,49 +31,6 @@ use crate::pane::Pane;
 // ├── participant.rs        # RemoteCollaborator / ParticipantLocation
 // ├── channel.rs            # join_channel / join_channel_internal
 // └── room_project.rs       # join_in_room_project
-
-
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AutoWatch {
-    Off,
-    Active {
-        watched_peer: Option<client::proto::PeerId>,
-    },
-    Paused,
-}
-
-impl AutoWatch {
-    pub fn enabled(&self) -> bool { matches!(self, AutoWatch::Active { .. } | AutoWatch::Paused) }
-}
-
-impl FollowerState {
-    pub(crate) fn pane(&self) -> &Entity<Pane> {
-        self.dock_pane.as_ref().unwrap_or(&self.center_pane)
-    }
-}
-impl ViewId {
-    pub(crate) fn from_proto(message: proto::ViewId) -> Result<Self> {
-        Ok(Self {
-            creator: message
-                .creator
-                .map(CollaboratorId::PeerId)
-                .context("creator is missing")?,
-            id: message.id,
-        })
-    }
-
-    pub(crate) fn to_proto(self) -> Option<proto::ViewId> {
-        if let CollaboratorId::PeerId(peer_id) = self.creator {
-            Some(proto::ViewId {
-                creator: Some(peer_id),
-                id: self.id,
-            })
-        } else {
-            None
-        }
-    }
-}
 
 impl Workspace {}
 

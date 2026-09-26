@@ -12,7 +12,7 @@
 use super::*;
 pub mod options;
 // prompt_and_open_paths, prompt_for_open_path_and_open, PromptForNewPath, PromptForOpenPath
-mod prompt;
+pub(crate) mod prompt;
 pub mod file;
 pub mod local;
 pub mod matching;

@@ -138,14 +138,15 @@ use std::fmt;
 use std::mem;
 
 // workspace 内部子模块之间共享的类型（子模块通过 use super::* 继承）
-pub(crate) use collab::{OpenResult, WorkspaceMatching, workspace_windows_for_location};
+pub(crate) use collab::{OpenResult, OpenOptions, WorkspaceMatching, workspace_windows_for_location};
 pub(crate) use collab::actions::OpenChannelNotes;
+pub(crate) use collab::call::{ActiveCallEvent, GlobalAnyActiveCall};
 pub(crate) use collab::open_remote_project_with_existing_connection;
 pub(crate) use collab::room_project::join_in_room_project;
+pub(crate) use collab::{find_existing_workspace};
 pub(crate) use core::event::Event;
 pub(crate) use app::state::{ActiveWorktreeCreation, PreviousWorkspaceState};
-pub(crate) use core::lifecycle::reload;
-pub(crate) use collab::call::GlobalAnyActiveCall;
+pub(crate) use core::lifecycle::{prepare_window_to_close, reload};
 pub(crate) use window::{RegionFocusHandles, window_bounds_env_override};
 pub(crate) use window::activation::activate_any_workspace_window;
 pub(crate) use window::bounds::restore_native_window_state;
@@ -154,12 +155,14 @@ pub(crate) use follow::{ViewId, leader_border_for_pane};
 pub(crate) use pane::ActivateInDirectionTarget;
 pub(crate) use pane::ops::{clone_active_item, move_active_item, join_pane_into_active, move_all_items};
 pub(crate) use window::PartBehavior;
-pub(crate) use serialize::{WorkspaceLocation, SERIALIZATION_THROTTLE_TIME};
+pub(crate) use serialize::{flush_windows_serialization, WorkspaceLocation, SERIALIZATION_THROTTLE_TIME};
 pub(crate) use open::local::{open_items, open_workspace_by_id};
+pub(crate) use open::prompt::{prompt_and_open_paths, PromptForNewPath, PromptForOpenPath};
 pub(crate) use dock::sizing::{px_with_ui_font_fallback, adjust_active_dock_size_by_px, adjust_open_docks_size_by_px};
+pub(crate) use item::permalink::{open_file_permalink, copy_file_permalink};
+pub(crate) use registries::{FollowableViewRegistry, ProjectItemRegistry};
 pub(crate) use notification::render::notify_if_database_failed;
 
-pub use crate::workspace::collab::AutoWatch;
 pub use crate::workspace::app::store::WorkspaceStore;
 use crate::workspace::follow::CollaboratorId;
 

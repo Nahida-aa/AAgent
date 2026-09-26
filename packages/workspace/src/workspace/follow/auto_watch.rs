@@ -1,4 +1,18 @@
 use super::*;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AutoWatch {
+    Off,
+    Active {
+        watched_peer: Option<client::proto::PeerId>,
+    },
+    Paused,
+}
+
+impl AutoWatch {
+    pub fn enabled(&self) -> bool { matches!(self, AutoWatch::Active { .. } | AutoWatch::Paused) }
+}
+
 impl Workspace {
     // fn next_watched_peer               // private
     fn next_watched_peer(&self, cx: &App) -> Option<PeerId> {

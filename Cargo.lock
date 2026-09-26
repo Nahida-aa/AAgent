@@ -38,7 +38,7 @@ name = "aa-app"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_assets 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=c712ba162bd10c1a3a62d10c577acd8c06842249)",
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "aa_gpui_kit_ui",
  "anyhow",
  "chrono",
@@ -319,7 +319,7 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_theme"
 version = "0.1.0"
-source = "git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555#c4060f4269beb415bc27260a83850dd62a06c555"
+source = "git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3#ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3"
 dependencies = [
  "anyhow",
  "gpui",
@@ -3674,7 +3674,7 @@ dependencies = [
  "aa_clock",
  "aa_gpui_fuzzy",
  "aa_gpui_kit_assets 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=c712ba162bd10c1a3a62d10c577acd8c06842249)",
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aagent_actions",
@@ -4097,7 +4097,7 @@ dependencies = [
 name = "file_icons"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "gpui",
  "settings_content",
  "util 0.1.0",
@@ -6097,7 +6097,7 @@ dependencies = [
 name = "json_schema_store"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "anyhow",
  "collections",
  "dap",
@@ -6221,7 +6221,7 @@ dependencies = [
  "a_tracing",
  "aa_clock",
  "aa_gpui_fuzzy",
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "anyhow",
  "async-trait",
  "chardetng",
@@ -6363,7 +6363,7 @@ dependencies = [
 name = "languages"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "anyhow",
  "async-compression",
  "async-fs",
@@ -6920,7 +6920,7 @@ dependencies = [
 name = "markdown"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "aa_gpui_kit_ui",
  "anyhow",
  "base64",
@@ -7308,7 +7308,7 @@ dependencies = [
  "a_log",
  "a_tracing",
  "aa_clock",
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "anyhow",
  "buffer_diff",
  "collections",
@@ -9173,7 +9173,7 @@ checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 name = "platform_title_bar"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "aa_gpui_kit_ui",
  "aagent_actions",
  "gpui",
@@ -10384,7 +10384,7 @@ dependencies = [
 name = "remote_connection"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "anyhow",
@@ -11305,7 +11305,7 @@ checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 name = "sidebar"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "aa_gpui_kit_ui",
  "gpui",
  "settings_content",
@@ -12238,7 +12238,7 @@ dependencies = [
 name = "terminal"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "alacritty_terminal",
  "anyhow",
  "async-channel 2.5.0",
@@ -12275,7 +12275,7 @@ dependencies = [
 name = "terminal_view"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "aa_gpui_kit_ui",
  "aagent_actions",
  "anyhow",
@@ -12399,7 +12399,7 @@ dependencies = [
 name = "theme_settings"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "gpui",
  "inventory",
  "serde",
@@ -12582,7 +12582,7 @@ name = "title_bar"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_assets 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=c712ba162bd10c1a3a62d10c577acd8c06842249)",
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "aa_gpui_kit_ui",
  "gpui",
  "gpui_platform",
@@ -15592,7 +15592,7 @@ version = "0.1.0"
 dependencies = [
  "a_log",
  "aa_gpui_kit_component",
- "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=c4060f4269beb415bc27260a83850dd62a06c555)",
+ "aa_gpui_kit_theme 0.1.0 (git+file:///home/aa/repos/ide_ls/gpui_learn?rev=ce301dbb7dac86eebc8c96e7a31d9a2f4f9925a3)",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aagent_actions",

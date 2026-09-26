@@ -1,11 +1,11 @@
 use super::*;
 
-//! SidebarHandle — dyn object 桥接层。
-//!
-//! 详细解耦设计见 `docs/sidebar-decoupling.md`。
-//!
-//! 对齐 zed `workspace::SidebarHandle`（multi_workspace.rs L162）+
-//! `impl<T: Sidebar> SidebarHandle for Entity<T>`（L191）。
+// SidebarHandle — dyn object 桥接层。
+//
+// 详细解耦设计见 `docs/sidebar-decoupling.md`。
+//
+// 对齐 zed `workspace::SidebarHandle`（multi_workspace.rs L162）+
+// `impl<T: Sidebar> SidebarHandle for Entity<T>`（L191）。
 
 use gpui::{AnyView, App, Entity, EntityId, Pixels};
 use settings_content::SidebarSide;

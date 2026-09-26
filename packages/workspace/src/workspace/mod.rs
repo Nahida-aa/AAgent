@@ -22,10 +22,11 @@ use gpui::{
     Bounds, ClipboardItem, Context, CursorStyle, Decorations, DragMoveEvent, Entity, EntityId,
     EventEmitter, FocusHandle, Focusable, Global, HitboxBehavior, Hsla, KeyContext, Keystroke,
     ManagedView, MouseButton, PathPromptOptions, Pixels, Point, PromptLevel, Render, ResizeEdge,
-    Size, Subscription, SystemWindowTabController, Task, TaskExt, Tiling, WeakEntity, Window,
+    Size, Stateful, Subscription, SystemWindowTabController, Task, TaskExt, Tiling, WeakEntity, Window,
     WindowBounds, WindowHandle, WindowId, WindowOptions, actions, canvas, point, relative, size,
     transparent_black,
 };
+use ui::prelude::*;
 use futures::{
     Future, FutureExt, StreamExt,
     channel::{
@@ -103,23 +104,34 @@ pub mod status_bar;
 pub mod window;
 pub mod worktree;
 pub mod actions;
+pub use actions::*;
 pub use crate::workspace::{app::initial::init, core::workspace::Workspace};
 
-use crate::dock::{Dock, DockPosition, PanelButtons, PanelSizeState};
-use crate::item::{FollowableItemHandle, ItemBufferKind, ItemHandle, WeakItemHandle};
+use crate::dock::{Dock, DockPosition, Panel, PanelButtons, PanelHandle, PanelSizeState};
+use crate::item::{FollowableItemHandle, ItemBufferKind, ItemHandle, ProjectItem, SerializableItemHandle, WeakItemHandle};
 use crate::modal_layer::ModalLayer;
 use crate::multi_workspace::MultiWorkspace;
 use crate::notifications::{NotificationId, Notifications};
 use crate::pane::{Pane, SaveIntent, NavigationMode, SplitMode, group::{PaneGroup, SplitDirection, Member, AppState, FollowerState}};
 use crate::persistence::{
     WorkspaceDb, SerializedAxis,
-    model::{ItemId, PathList, SerializedItem, SerializedPane, SerializedPaneGroup, SerializedWorkspace, SerializedWorkspaceLocation, DockStructure},
+    model::{DockData, DockStructure, ItemId, MultiWorkspaceState, PathList, SerializedItem, SerializedMultiWorkspace, SerializedPane, SerializedPaneGroup, SerializedProjectGroupState, SerializedWorkspace, SerializedWorkspaceLocation},
 };
 use crate::status_bar::{StatusBar, sidebar_status::SidebarSide};
 use crate::toast_layer::ToastLayer;
 use crate::security_modal::SecurityModal;
 use crate::multi_workspace::ProjectGroupKey;
 use crate::notifications::simple_message_notification::MessageNotification;
+
+// crate 根模块本身的导入（嵌套子模块通过 use super::* 继承后可直接写 persistence::xxx）
+use crate::modal_layer;
+use crate::notifications;
+use crate::persistence;
+use crate::workspace_error;
+
+// std 常用模块（子模块通过 use super::* 继承）
+use std::fmt;
+use std::mem;
 
 pub use crate::workspace::collab::AutoWatch;
 pub use crate::workspace::app::store::WorkspaceStore;

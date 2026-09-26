@@ -1,6 +1,6 @@
 use super::*;
 use super::Workspace;
-use crate::{dock::Dock, workspace::event::CloseIntent};
+use crate::{dock::Dock, workspace::CloseIntent};
 use anyhow::{Context as _, Result, anyhow};
 use gpui::{App, Context, Entity, PromptLevel, Task, Window};
 

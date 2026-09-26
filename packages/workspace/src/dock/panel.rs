@@ -15,8 +15,8 @@ use crate::status_bar::HideStatusItem;
 use ui::IconName;
 use client::proto;
 use gpui::{
-    Action, AnyView, App, Context, Entity, EntityId, EventEmitter, FocusHandle, IntoElement,
-    ParentElement, Pixels, Render, Styled, Window, div, prelude::*, px,
+    Action, AnyView, App, Context, Entity, EntityId, EventEmitter, FocusHandle, Focusable,
+    IntoElement, ParentElement, Pixels, Render, Styled, Window, div, prelude::*, px,
 };
 use std::any::Any;
 use std::sync::Arc;

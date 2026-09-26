@@ -1,5 +1,5 @@
 use crate::{BufferSnapshot, Language, Point, ToPoint, ToTreeSitterPoint};
-use aa_gpui_fuzzy::{Case, LengthPenalty, StringMatch, StringMatchCandidate};
+use fuzzy_nucleo::{Case, LengthPenalty, StringMatch, StringMatchCandidate};
 use aa_gpui_kit_theme::SyntaxTheme;
 use gpui::{BackgroundExecutor, HighlightStyle, SharedString};
 use std::{ops::Range, sync::Arc};
@@ -213,7 +213,7 @@ impl<T> Outline<T> {
         if query.is_empty() {
             return Vec::new();
         }
-        let mut matches = aa_gpui_fuzzy::match_strings_async(
+        let mut matches = fuzzy_nucleo::match_strings_async(
             &self.candidates,
             query,
             Case::Smart,

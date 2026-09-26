@@ -25,7 +25,8 @@ encoding_rs.workspace = true
 fs.workspace = true
 futures.workspace = true
 futures-lite.workspace = true
-aa_gpui_fuzzy.workspace = true
+# 对齐 zed crates/worktree/Cargo.toml：只用 CharBag，走旧包 `fuzzy`。
+fuzzy.workspace = true
 git.workspace = true
 gpui.workspace = true
 ignore.workspace = true

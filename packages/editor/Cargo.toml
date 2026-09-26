@@ -40,7 +40,8 @@ feature_flags.workspace = true
 file_icons.workspace = true
 futures.workspace = true
 futures-lite.workspace = true
-aa_gpui_fuzzy.workspace = true
+# 对齐 zed crates/editor/Cargo.toml：editor 尚未迁到 fuzzy_nucleo。
+fuzzy.workspace = true
 fs.workspace = true
 git.workspace = true
 gpui.workspace = true

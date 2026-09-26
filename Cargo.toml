@@ -379,8 +379,10 @@ zstd = "0.11"
 # 外部 gpui_learn 共享库（GitHub git 依赖，稳定可复现）
 clock = { package = "aa_clock", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
 aa_gpui_fuzzy = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
-# zed 里这个包叫 `fuzzy`，同样用别名对齐。
-fuzzy = { package = "aa_gpui_fuzzy", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
+# 别名为 zed 的新包 `fuzzy_nucleo`：我们对齐的就是它（Case / LengthPenalty /
+# match_strings_async / StringMatch.string: SharedString）。成员包二选一，
+# 不能同时写 aa_gpui_fuzzy 和 fuzzy_nucleo（同一 crate 两个名字 → Cargo 报错）。
+fuzzy_nucleo = { package = "aa_gpui_fuzzy", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
 aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
 aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
 aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
@@ -397,6 +399,13 @@ aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", re
 ui_input = { package = "aa_gpui_kit_ui_input", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
 component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
 
+# zed 的模糊匹配正在迁移中：editor / worktree 仍用旧包 `fuzzy`（bool 参数那套
+# 签名），language / command_palette 等已迁到 `fuzzy_nucleo`。为了调用点能与 zed
+# 逐行对照，两边都照 zed 的原样声明：
+#   - `fuzzy` 直接用 zed 的真实实现（只依赖 gpui/gpui_util/path/log，全部已在
+#     同一 rev 上，不引入新第三方 crate，也不会出现两份 gpui）。
+#   - `fuzzy_nucleo` 是 gpui_learn 的 aa_gpui_fuzzy 的别名。
+fuzzy = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 credentials_provider = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 gpui_tokio = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 grammars  = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }

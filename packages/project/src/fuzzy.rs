@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use aa_gpui_fuzzy::{
+use fuzzy_nucleo::{
     PathMatchCandidate, PathMatchCandidateSet as FuzzyPathMatchCandidateSet, PathStyle,
 };
 use util::rel_path::RelPath;

@@ -120,6 +120,40 @@ pub fn is_file(&self) -> bool { !self.is_dir() }
 
 每个包在一个 Cargo.toml 里只能声明一个名字（别名 + 真名同时出现会报 E0463 类错误）。
 
+同一条的限制更强：**同一个 member 的 `[dependencies]` 里也不能同时写真名和别名**，
+会报 `error: the crate X depends on crate Y multiple times with different names`。
+真名和别名都可以在根 `[workspace.dependencies]` 里声明，由各 member 挑一个。
+
+## 10.1 模糊匹配：zed 有两套包，我们两套都要
+
+zed 正在把 `fuzzy` 迁到 `fuzzy_nucleo`，HEAD 上是两套并存，而且**按 crate 分工不同**：
+
+| zed crate | 依赖 | 签名差异 |
+| --- | --- | --- |
+| `editor`、`worktree` | `fuzzy`（旧） | `match_strings(..., smart_case: bool, penalize_length: bool, max, &cancel, executor)`，`StringMatch.string: String` |
+| `language`、`command_palette`、`file_finder` | `fuzzy_nucleo`（新） | `match_strings(..., Case, LengthPenalty, max)`，`StringMatch.string: SharedString` |
+| `project` | **两个都要** | `match_strings_async` 另有 Future 版 |
+
+我们的 `aa_gpui_fuzzy` 对齐的是 `fuzzy_nucleo`。所以 AAgent 侧的做法是镜像 zed 的拓扑：
+
+- `fuzzy_nucleo = { package = "aa_gpui_fuzzy", ... }`（语言/补全类已经迁移了的 crate）
+- `fuzzy = { git = "https://github.com/zed-industries/zed", rev = f6838a7... }`
+  （editor / worktree 用的旧包，**直接 git 依赖 zed 的真实实现**）
+
+引入 zed 真实的旧 `fuzzy`、而不是让我们自己的包去兼容旧签名，是因为它只依赖
+`gpui` / `gpui_util` / `path` / `log`，这四个我们已经在同一 rev 上引用了，不会引入
+新的第三方 crate，也不会出现两份 gpui；代价只有「二进制里两个匹配引擎」，而这正是
+zed 当下的状态。收益是 editor 那 5 处 `fuzzy::match_strings(...)` 能与 zed
+逐行对齐、一字不改。
+
+**CharBag 必须只有一个类型**：旧 `fuzzy` 的 `CharBag` 是被 `fuzzy_nucleo` 复用的
+（见 zed `crates/fuzzy_nucleo/Cargo.toml` 依赖 `fuzzy`）。我们最初在 gpui_learn 里
+自己实现了一份，于是 worktree（用旧 fuzzy）产出的 `CharBag` 与 project（用 nucleo
+侧）期望的 `CharBag` 就成了两个类型，`packages/project/src/fuzzy.rs` 里
+`PathMatchCandidate { char_bag: entry.char_bag }` 直接 E0308。别在边界处做转换，
+在根上修：gpui_learn 的 `aa_gpui_fuzzy` 依赖 zed 的 `fuzzy` 并
+`pub use fuzzy::CharBag;`，删掉本地副本。
+
 ## 11. Cargo 别名对 proc 宏不可见
 
 第 10 条的别名只在写代码的**人**眼里存在。proc 宏展开时拿到的是 token，

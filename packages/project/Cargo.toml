@@ -39,8 +39,8 @@ extension.workspace = true
 fancy-regex.workspace = true
 fs.workspace = true
 futures.workspace = true
-# fuzzy.workspace = true
-aa_gpui_fuzzy.workspace = true
+# 对齐 zed crates/project/Cargo.toml：这里只用到 nucleo 那一侧的类型。
+fuzzy_nucleo.workspace = true
 git.workspace = true
 git_hosting_providers.workspace = true
 globset.workspace = true

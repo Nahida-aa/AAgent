@@ -1,3 +1,5 @@
+use super::*;
+
 use gpui::Axis;
 use settings::{DockPosition as SettingsDockPosition, TerminalDockPosition};
 

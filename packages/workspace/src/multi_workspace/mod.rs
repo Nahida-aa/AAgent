@@ -11,15 +11,17 @@ pub use sidebar::handle::SidebarHandle;
 pub use sidebar::render_state::SidebarRenderState;
 pub use task::SpawnInTerminal;
 
+// 外部 crate 导入（子模块通过 use super::* 继承）
 use theme::ActiveTheme;
 use gpui::{
     AnyView, App, Context, DragMoveEvent, Entity, EntityId, EventEmitter, FocusHandle,
-    IntoElement, MouseButton, ParentElement, Render, Styled, Subscription, Task, WeakEntity,
-    Window, WindowId, div, prelude::*, px,
+    IntoElement, MouseButton, ParentElement, Pixels, Render, Styled, Subscription, Task,
+    WeakEntity, Window, WindowId, div, prelude::*, px,
 };
 
-use crate::Workspace;
-use settings_content::SidebarSide;
+// crate 内部转发
+pub use crate::Workspace;
+pub use settings_content::SidebarSide;
 mod actions;
 mod activate;
 mod close;

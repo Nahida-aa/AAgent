@@ -1,3 +1,5 @@
+use super::*;
+
 use gpui::{App, Context, Entity, Pixels, Window};
 
 use super::events::{SidebarEvent, SidebarRenderState};

@@ -1,3 +1,5 @@
+use super::*;
+
 //! SidebarRenderState — MultiWorkspace 对外暴露的 sidebar 只读投影。
 //!
 //! 对齐 zed `workspace::SidebarRenderState`（multi_workspace.rs L61）。

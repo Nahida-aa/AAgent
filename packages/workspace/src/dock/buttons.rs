@@ -1,3 +1,5 @@
+use super::*;
+
 use anyhow::anyhow;
 use gpui::{
     Anchor, App, Context, Entity, IntoElement, MouseButton, ParentElement, Render, SharedString,

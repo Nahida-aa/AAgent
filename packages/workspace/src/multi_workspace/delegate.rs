@@ -1,3 +1,5 @@
+use super::*;
+
 use gpui::{App, Context, Entity, ManagedView, Window};
 
 use super::MultiWorkspace;

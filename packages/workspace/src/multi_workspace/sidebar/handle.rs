@@ -1,3 +1,5 @@
+use super::*;
+
 //! SidebarHandle — dyn object 桥接层。
 //!
 //! 详细解耦设计见 `docs/sidebar-decoupling.md`。

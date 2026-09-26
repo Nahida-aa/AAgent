@@ -15,6 +15,7 @@ use gpui::{
     AnyView, App, Context, Entity, EntityId, EventEmitter, FocusHandle, Focusable, Pixels, Render,
     Window, div, prelude::*,
 };
+pub use super::super::SidebarSide;
 
 use super::events::SidebarEvent;
 

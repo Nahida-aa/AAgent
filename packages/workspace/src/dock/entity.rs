@@ -1,3 +1,5 @@
+use super::*;
+
 use anyhow::Context as _;
 use client::proto;
 use db::kvp::KeyValueStore;

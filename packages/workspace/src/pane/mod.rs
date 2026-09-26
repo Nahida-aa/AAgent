@@ -9,33 +9,23 @@
 //! - [activate_item] — ActivateItem action（带字段的 action 单独放）
 //! - [dragged] — DraggedTab / DraggedSelection drag marker
 
-// === gpui — 子模块共享 ===
-pub use gpui::{
+// === 外部 crate 导入（子模块通过 use super::* 继承） ===
+use gpui::{
     Action, Anchor, AnyElement, AnyView, App, AsyncWindowContext, ClickEvent, ClipboardItem,
     Context, Div, DragMoveEvent, Entity, EntityId, EventEmitter, ExternalPaths, FocusHandle,
     Focusable, IntoElement, KeyContext, MouseButton, NavigationDirection, Pixels, Point,
     PromptLevel, Render, ScrollHandle, Subscription, Task, TaskExt, WeakEntity, WeakFocusHandle,
     Window, actions, anchored, deferred, div, prelude::*, px,
 };
-
-// === ui — 子模块共享 ===
-pub use ui::{
+use ui::{
     ButtonSize, ContextMenu, ContextMenuEntry, ContextMenuItem, DecoratedIcon, Headline,
     HeadlineSize, IconButton, IconDecoration, IconDecorationKind, IconName, IconSize, Indicator,
     PopoverMenu, PopoverMenuHandle, Tab, TabPosition, Tooltip, prelude::*, right_click_menu,
 };
-
-// === language ===
-pub use language::{Capability, DiagnosticSeverity};
-
-// === project ===
-pub use project::{DirectoryLister, Project, ProjectEntryId, ProjectPath, WorktreeId};
-
-// === collections ===
-pub use collections::{BTreeSet, HashMap, HashSet, VecDeque};
-
-// === std ===
-pub use std::{
+use language::{Capability, DiagnosticSeverity};
+use project::{DirectoryLister, Project, ProjectEntryId, ProjectPath, WorktreeId};
+use collections::{BTreeSet, HashMap, HashSet, VecDeque};
+use std::{
     any::Any,
     cmp, fmt, mem,
     num::NonZeroUsize,
@@ -47,20 +37,16 @@ pub use std::{
     },
     time::Duration,
 };
+use parking_lot::Mutex;
+use settings::SettingsStore;
+use util::{ResultExt, TryFutureExt};
 
-// === parking_lot ===
-pub use parking_lot::Mutex;
-
-// === crate::item — 子模块共享 ===
+// === crate 内部转发（公开 API） ===
 pub use crate::item::{
     Item, ItemBufferKind, ItemHandle, ItemSettings, PreviewTabsSettings, ProjectItemKind,
     TabContentParams, TabTooltipContent, WeakItemHandle,
 };
-
-// === crate 根 actions ===
 pub use crate::{SplitDirection, Workspace};
-
-// === crate 其他 ===
 pub use crate::{
     invalid_item_view::InvalidItemView,
     toolbar::Toolbar,
@@ -68,12 +54,6 @@ pub use crate::{
         AutosaveSetting, FocusFollowsMouse, TabBarSettings, WorkspaceSettings,
     },
 };
-
-// === settings ===
-pub use settings::SettingsStore;
-
-// === util ===
-pub use util::{ResultExt, TryFutureExt};
 
 pub mod dragged;
 pub mod event;

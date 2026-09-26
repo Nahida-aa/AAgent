@@ -13,8 +13,9 @@ pub use position::DockPosition;
 pub use size::PanelSizeState;
 
 pub use proto::PanelId;
-use std::sync::Arc;
 
+// 外部 crate 导入（子模块通过 use super::* 继承）
+use std::sync::Arc;
 use gpui::{
     App, Context, Entity, IntoElement, MouseButton, MouseDownEvent, MouseUpEvent, ParentElement,
     Pixels, Render, Styled, Window, deferred, div, hsla, px, prelude::*,

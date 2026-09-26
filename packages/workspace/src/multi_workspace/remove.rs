@@ -1,3 +1,5 @@
+use super::*;
+
 use anyhow::Result;
 use gpui::{Context, Entity, Task, Window};
 

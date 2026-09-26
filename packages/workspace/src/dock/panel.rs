@@ -1,3 +1,5 @@
+use super::*;
+
 //! Panel trait 定义 + PanelHandle dyn object + 7 个占位 Panel struct。
 //!
 //! 完全对齐 zed `dock.rs`:

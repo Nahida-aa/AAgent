@@ -96,6 +96,7 @@ pub mod follow;
 pub mod modal;
 pub mod nav;
 pub mod notification;
+pub use notification::toast::Toast;
 pub mod open;
 pub mod panel;
 pub mod providers;

@@ -6,7 +6,9 @@
 
 pub mod settings;
 
-pub use settings::ThemeSettings;
+pub use settings::{
+    IconThemeSelection, ThemeAppearanceMode, ThemeSelection, ThemeSettings, set_mode,
+};
 // 注意: crate 内部有同名 `pub mod settings` 遮蔽了外部 settings crate，
 // 所以用 ::settings::Settings 绝对路径，或直接 extern crate 改名。
 #[allow(unused_imports)]
@@ -15,10 +17,11 @@ use ::settings::Settings;
 use std::borrow::Cow;
 use std::sync::Arc;
 
+use aa_gpui_kit_theme::ActiveTheme;
 use aa_gpui_kit_theme::registry::ThemeRegistry;
 use aa_gpui_kit_theme::{GlobalTheme, default_colors::catppuccin_mocha, set_theme};
 use aa_gpui_kit_theme::{IconTheme, LoadThemes, Theme};
-use gpui::{App, AssetSource, Font, Result, SharedString};
+use gpui::{App, AssetSource, Font, Result, SharedString, Window};
 
 /// 把 gpui 全局里的 `Arc<dyn AssetSource>` 适配成注册表要的 `Box<dyn AssetSource>`。
 /// Zed 的做法是 init 时由调用方把资产传进来（`LoadThemes::All(assets)`），
@@ -66,29 +69,26 @@ pub fn reload_icon_theme(cx: &mut App) {
     cx.set_global(GlobalTheme::new(theme, icon_theme));
 }
 
-/// 读取 ThemeSettings.ui_font 并返回给调用方设置窗口 rem size。
+/// 读取 ThemeSettings.ui_font，顺手把窗口 rem size 设成 UI 字号。
 /// 对齐 Zed `theme_settings::setup_ui_font` (crates/theme_settings/src/settings.rs L587)。
-/// Zed 会调 `window.set_rem_size(ui_font_size)`，但我们的 gpui 版本还没有这个 API，
-/// 所以这里只返回 Font，让调用方后续扩展。
-pub fn setup_ui_font(cx: &mut App) -> Font {
-    let theme_settings = ThemeSettings::get_global(cx);
-    theme_settings.ui_font.clone()
+pub fn setup_ui_font(window: &mut Window, cx: &mut App) -> Font {
+    let (ui_font, ui_font_size) = {
+        let theme_settings = ThemeSettings::get_global(cx);
+        (theme_settings.ui_font.clone(), theme_settings.ui_font_size(cx))
+    };
+
+    window.set_rem_size(ui_font_size);
+    ui_font
 }
 
 fn configured_theme(cx: &mut App) -> Arc<Theme> {
     let registry = ThemeRegistry::default_global(cx);
     let theme_settings = ThemeSettings::get_global(cx);
 
-    // 我们 ThemeSettings.theme 是 serde_json::Value（简化版），Zed 是 ThemeSelection enum。
-    // 从 Value 里拿 .name 字段，拿不到就用默认。
-    let theme_name = theme_settings
-        .theme
-        .get("name")
-        .and_then(|v| v.as_str())
-        .map(|s| s.to_string())
-        .unwrap_or_else(|| "Catppuccin Mocha".to_string());
+    // 主题名按当前系统明暗解析（对齐 zed：`ThemeSelection::name(system_appearance)`）。
+    let theme_name = theme_settings.theme.name(cx.theme().appearance());
 
-    match registry.get(&theme_name) {
+    match registry.get(theme_name.0.as_ref()) {
         Ok(theme) => theme,
         Err(_) => {
             let fallback = registry

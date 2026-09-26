@@ -10,6 +10,9 @@ aa_gpui_kit_theme.workspace = true
 gpui.workspace = true
 inventory.workspace = true
 settings = { workspace = true }
+# `ThemeAppearanceMode` / `ThemeName` / `ThemeSelection`（JSON 形状）在这边定义，
+# theme_settings 重导出它们 —— 与 zed 同（`theme_settings::ThemeAppearanceMode`）。
+settings_content.workspace = true
 settings_macros.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true

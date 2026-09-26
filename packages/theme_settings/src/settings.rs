@@ -4,10 +4,176 @@
 //! 用 `#[derive(RegisterSetting)]` 注册到 `settings::SettingsStore`。
 
 use gpui::{App, Font, FontFeatures, FontStyle, FontWeight, Pixels, SharedString, px};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use settings::IntoGpui as _;
 use settings_macros::RegisterSetting;
+
+use aa_gpui_kit_theme::{Appearance, DEFAULT_ICON_THEME_NAME};
+
+// 对齐 zed `theme_settings/src/settings.rs:11`：选择类类型由 settings_content
+// 定义，这里只重导出 —— 照搬 zed 的 `theme_settings::ThemeAppearanceMode::Light`
+// 才能直接过。
+pub use settings_content::{IconThemeName, ThemeAppearanceMode, ThemeName};
+
+/// 运行时主题选择（对齐 zed `theme_settings/src/settings.rs:142`）。
+///
+/// 与 `settings_content::ThemeSelection` 是**两个类型**：那边是 JSON 的反序列化
+/// 形状（跟着用户 settings.json 走），这边是装配后的运行时结果。zed 也这么分。
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ThemeSelection {
+    /// 固定一个主题。
+    Static(ThemeName),
+    /// 按明暗切换。
+    Dynamic {
+        #[serde(default)]
+        mode: ThemeAppearanceMode,
+        light: ThemeName,
+        dark: ThemeName,
+    },
+}
+
+impl From<settings_content::ThemeSelection> for ThemeSelection {
+    fn from(selection: settings_content::ThemeSelection) -> Self {
+        match selection {
+            settings_content::ThemeSelection::Static(theme) => Self::Static(theme),
+            settings_content::ThemeSelection::Dynamic { mode, light, dark } => {
+                Self::Dynamic { mode, light, dark }
+            }
+        }
+    }
+}
+
+impl Default for ThemeSelection {
+    fn default() -> Self {
+        Self::Dynamic {
+            mode: ThemeAppearanceMode::System,
+            light: ThemeName::from(settings_content::DEFAULT_LIGHT_THEME),
+            dark: ThemeName::from(settings_content::DEFAULT_DARK_THEME),
+        }
+    }
+}
+
+impl ThemeSelection {
+    /// 按系统明暗解析出主题名（对齐 zed `settings.rs:172`）。
+    pub fn name(&self, system_appearance: Appearance) -> ThemeName {
+        match self {
+            Self::Static(theme) => theme.clone(),
+            Self::Dynamic { mode, light, dark } => match mode {
+                ThemeAppearanceMode::Light => light.clone(),
+                ThemeAppearanceMode::Dark => dark.clone(),
+                ThemeAppearanceMode::System => match system_appearance {
+                    Appearance::Light => light.clone(),
+                    Appearance::Dark => dark.clone(),
+                },
+            },
+        }
+    }
+
+    /// 当前模式；`Static` 没有模式概念 → `None`（对齐 zed `settings.rs:188`）。
+    pub fn mode(&self) -> Option<ThemeAppearanceMode> {
+        match self {
+            Self::Static(_) => None,
+            Self::Dynamic { mode, .. } => Some(*mode),
+        }
+    }
+}
+
+/// 运行时图标主题选择（对齐 zed `theme_settings/src/settings.rs:196`）。
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum IconThemeSelection {
+    Static(IconThemeName),
+    Dynamic {
+        mode: ThemeAppearanceMode,
+        light: IconThemeName,
+        dark: IconThemeName,
+    },
+}
+
+impl From<settings_content::IconThemeSelection> for IconThemeSelection {
+    fn from(selection: settings_content::IconThemeSelection) -> Self {
+        match selection {
+            settings_content::IconThemeSelection::Static(theme) => Self::Static(theme),
+            settings_content::IconThemeSelection::Dynamic { mode, light, dark } => {
+                Self::Dynamic { mode, light, dark }
+            }
+        }
+    }
+}
+
+impl IconThemeSelection {
+    /// 按系统明暗解析出图标主题名（对齐 zed `settings.rs:225`）。
+    pub fn name(&self, system_appearance: Appearance) -> IconThemeName {
+        match self {
+            Self::Static(theme) => theme.clone(),
+            Self::Dynamic { mode, light, dark } => match mode {
+                ThemeAppearanceMode::Light => light.clone(),
+                ThemeAppearanceMode::Dark => dark.clone(),
+                ThemeAppearanceMode::System => match system_appearance {
+                    Appearance::Light => light.clone(),
+                    Appearance::Dark => dark.clone(),
+                },
+            },
+        }
+    }
+
+    pub fn mode(&self) -> Option<ThemeAppearanceMode> {
+        match self {
+            Self::Static(_) => None,
+            Self::Dynamic { mode, .. } => Some(*mode),
+        }
+    }
+}
+
+/// 切换主题的明暗模式（对齐 zed `theme_settings/src/settings.rs:316`）。
+///
+/// 直接改 `SettingsContent`，调用点配合 `settings::update_settings_file` 落盘。
+pub fn set_mode(content: &mut settings_content::SettingsContent, mode: ThemeAppearanceMode) {
+    let theme = content.theme.as_mut();
+
+    if let Some(selection) = theme.theme.as_mut() {
+        match selection {
+            settings_content::ThemeSelection::Static(_) => {
+                *selection = settings_content::ThemeSelection::Dynamic {
+                    mode: ThemeAppearanceMode::System,
+                    light: ThemeName::from(settings_content::DEFAULT_LIGHT_THEME),
+                    dark: ThemeName::from(settings_content::DEFAULT_DARK_THEME),
+                };
+            }
+            settings_content::ThemeSelection::Dynamic {
+                mode: mode_to_update,
+                ..
+            } => *mode_to_update = mode,
+        }
+    } else {
+        theme.theme = Some(settings_content::ThemeSelection::Dynamic {
+            mode,
+            light: ThemeName::from(settings_content::DEFAULT_LIGHT_THEME),
+            dark: ThemeName::from(settings_content::DEFAULT_DARK_THEME),
+        });
+    }
+
+    if let Some(selection) = theme.icon_theme.as_mut() {
+        match selection {
+            settings_content::IconThemeSelection::Static(icon_theme) => {
+                *selection = settings_content::IconThemeSelection::Dynamic {
+                    mode,
+                    light: icon_theme.clone(),
+                    dark: icon_theme.clone(),
+                };
+            }
+            settings_content::IconThemeSelection::Dynamic {
+                mode: mode_to_update,
+                ..
+            } => *mode_to_update = mode,
+        }
+    } else {
+        theme.icon_theme = Some(settings_content::IconThemeSelection::Static(
+            IconThemeName::from(DEFAULT_ICON_THEME_NAME),
+        ));
+    }
+}
 
 /// 没有显式设置时的默认字号/字体族（zed 的默认值；如需不同请改这里）。
 const DEFAULT_BUFFER_FONT_SIZE: f32 = 15.0;
@@ -28,8 +194,8 @@ fn font_from(family: Option<&str>, weight: Option<f32>) -> Font {
 #[derive(Clone, PartialEq, Debug, Deserialize, RegisterSetting)]
 #[serde(default)]
 pub struct ThemeSettings {
-    /// Theme selection. 可以是字符串（静态）或 `{ mode, light, dark }` 对象（动态）。
-    pub theme: Value,
+    /// 主题选择（运行时类型；JSON 形状见 [`settings_content::ThemeSelection`]）。
+    pub theme: ThemeSelection,
 
     /// Icon theme 名称（字符串）。
     pub icon_theme: Option<String>,
@@ -67,13 +233,7 @@ pub struct ThemeSettings {
 impl Default for ThemeSettings {
     fn default() -> Self {
         Self {
-            theme: Value::Object({
-                let mut m = serde_json::Map::new();
-                m.insert("mode".into(), Value::String("system".into()));
-                m.insert("light".into(), Value::String("One Light".into()));
-                m.insert("dark".into(), Value::String("One Dark".into()));
-                m
-            }),
+            theme: ThemeSelection::default(),
             icon_theme: None,
             ui_font_size: None,
             ui_font_family: None,
@@ -138,7 +298,11 @@ impl settings::Settings for ThemeSettings {
         let buffer_font_weight = t.buffer_font_weight.map(|w| w.0);
 
         Self {
-            theme: default.theme,
+            theme: t
+                .theme
+                .clone()
+                .map(ThemeSelection::from)
+                .unwrap_or_default(),
             icon_theme: None, // IconThemeSelection 暂不转换
             ui_font_size: t.ui_font_size.map(|s| s.0),
             ui_font_family: ui_font_family.clone(),

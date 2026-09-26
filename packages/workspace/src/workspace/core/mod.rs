@@ -25,6 +25,6 @@ pub mod history;
 pub mod ops;
 pub mod render;
 mod read;
-pub use debounce::{DelayedDebouncedEditAction};
+pub(crate) use debounce::{DelayedDebouncedEditAction};
 pub(crate) use keystrokes::DispatchingKeystrokes;
 pub(crate) use lifecycle::CloseIntent;

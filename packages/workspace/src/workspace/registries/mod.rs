@@ -10,5 +10,5 @@ mod project_item;
 mod serializable_item;
 
 pub use followable_view::FollowableViewRegistry;
-pub use project_item::{ProjectItemRegistry, register_project_item};
+pub(crate) use project_item::{ProjectItemRegistry, register_project_item};
 pub(crate) use serializable_item::{SerializableItemRegistry, register_serializable_item};

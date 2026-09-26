@@ -11,4 +11,4 @@ pub mod workspace;
 pub mod item;
 
 pub const SERIALIZATION_THROTTLE_TIME: Duration = Duration::from_millis(200);
-pub use workspace::{WorkspaceLocation};
+pub(crate) use workspace::{WorkspaceLocation};

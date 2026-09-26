@@ -1,7 +1,7 @@
 use super::*;
 use crate::dock::DockPosition;
 use crate::persistence::model::DockStructure;
-use crate::workspace::workspace_store::WorkspaceStore;
+use crate::workspace::app::store::WorkspaceStore;
 use client::{Client, UserStore};
 use gpui::{App, AsyncApp, Entity, Global, Window};
 use language::LanguageRegistry;

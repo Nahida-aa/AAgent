@@ -3,9 +3,10 @@ use std::sync::Arc;
 
 use gpui::{App, AsyncApp, Context, Entity, Task, Window};
 
-use crate::types::{OpenMode, OpenResult, WorkspaceId};
+use crate::workspace::open::options::{OpenMode, OpenResult};
+use crate::WorkspaceId;
 use crate::workspace::Workspace;
-use crate::workspace::app_state::AppState;
+use crate::workspace::app::state::AppState;
 
 impl Workspace {
     pub fn new(

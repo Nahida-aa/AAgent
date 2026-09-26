@@ -31,10 +31,11 @@ pub use dock::Panel;
 pub use multi_workspace::{
     CloseWorkspaceSidebar, DraggedSidebar, FocusWorkspaceSidebar, MoveProjectDown,
     MoveProjectToNewWindow, MoveProjectUp, MultiWorkspace, MultiWorkspaceEvent, NewThread,
-    NextProject, NextThread, PreviousProject, PreviousThread, ProjectGroup, ProjectGroupKey,
+    NextProject, NextThread, PreviousProject, PreviousThread, ProjectGroup,
     RemovalIntent, SerializedProjectGroupState, Sidebar, SidebarEvent, SidebarHandle,
     SidebarRenderState, SidebarSide, ToggleWorkspaceSidebar, sidebar_side_context_menu,
 };
+pub(crate) use multi_workspace::ProjectGroupKey;
 pub use path_list::{PathList, SerializedPathList};
 pub use remote::{
     RemoteConnectionIdentity, remote_connection_identity, same_remote_connection_identity,
@@ -179,17 +180,32 @@ use crate::{
 use workspace::{
     actions::*,
     app::initial::init,
+    app::state::AppState,
     app::store::WorkspaceStore,
-    collab::open_remote_project_with_existing_connection,
+    collab::call::{AnyActiveCall, GlobalAnyActiveCall},
+    collab::participant::ParticipantLocation,
     core::WorkspaceId,
     core::actions::*,
+    core::debounce::DelayedDebouncedEditAction,
     core::lifecycle::CloseIntent,
     core::workspace::Workspace,
     dock::render::DraggedDock,
-    follow::CollaboratorId,
-    follow::ViewId,
+    follow::{AutoWatch, CollaboratorId, FollowerState, ViewId},
+    follow::{leader_border_for_pane},
     notification::toast::Toast,
-    open::options::{OpenMode, OpenVisible},
-    providers::TerminalProvider,
+    open::options::{OpenMode, OpenOptions, OpenVisible, OpenResult},
+    open::remote::open_remote_project_with_existing_connection,
+    open::matching::{WorkspaceMatching, find_existing_workspace},
+    open::windows::workspace_windows_for_location,
+    open::prompt::{PromptForNewPath, PromptForOpenPath},
+    open::local::{open_items, open_workspace_by_id},
+    providers::{DebuggerProvider, TerminalProvider},
+    registries::{FollowableViewRegistry, ProjectItemRegistry, SerializableItemRegistry},
+    serialize::flush::flush_windows_serialization,
+    serialize::{SERIALIZATION_THROTTLE_TIME, WorkspaceLocation},
+    item::permalink::{copy_file_permalink, open_file_permalink},
+    collab::room_project::join_in_room_project,
+    core::lifecycle::prepare_window_to_close,
     window::{client_side_decorations, title::WindowTitleContext},
 };
+pub(crate) use workspace::pane::ActivateInDirectionTarget;

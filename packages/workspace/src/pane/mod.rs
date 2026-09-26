@@ -12,18 +12,18 @@
 use theme::ActiveTheme;
 use ui::IconName;
 use gpui::{
-    App, Context, Entity, EntityId, EventEmitter, FocusHandle, Focusable, IntoElement, Render,
-    Window, actions, div, prelude::*, px,
+    Action, AnyElement, AnyView, App, Context, Entity, EntityId, EventEmitter, FocusHandle,
+    Focusable, IntoElement, Pixels, Point, Render, ScrollHandle, Subscription, Task, WeakEntity,
+    WeakFocusHandle, Window, actions, div, prelude::*, px,
 };
 
-use crate::item::{Item, ItemHandle};
+use crate::item::{Item, ItemBufferKind, ItemHandle, ProjectItemKind, WeakItemHandle};
 
 pub mod dragged;
 pub mod event;
 pub mod group;
 pub use dragged::{DraggedSelection, DraggedTab};
 pub use event::Event;
-pub use history::{ActivationHistory, NavHistory};
 mod actions;
 mod add_item;
 mod close;
@@ -53,11 +53,6 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::sync::atomic::AtomicUsize;
 
-use gpui::{
-    Action, AnyElement, AnyView, App, Context, Entity, EntityId, EventEmitter, FocusHandle,
-    Focusable, Pixels, Point, Render, ScrollHandle, Subscription, Task, WeakEntity,
-    WeakFocusHandle, Window,
-};
 use language::DiagnosticSeverity;
 use parking_lot::Mutex;
 use project::{Project, ProjectPath};
@@ -65,45 +60,8 @@ use ui::{ContextMenu, PopoverMenuHandle};
 use util::TryFutureExt;
 
 use crate::Workspace;
-use crate::item::{Item, ItemBufferKind, ItemHandle, ProjectItemKind, WeakItemHandle};
 use crate::toolbar::Toolbar;
 use crate::workspace_settings::{FocusFollowsMouse, WorkspaceSettings};
-
-pub enum Event {
-    AddItem {
-        item: Box<dyn ItemHandle>,
-    },
-    ActivateItem {
-        local: bool,
-        focus_changed: bool,
-    },
-    Remove {
-        focus_on_pane: Option<Entity<Pane>>,
-    },
-    RemovedItem {
-        item: Box<dyn ItemHandle>,
-    },
-    Split {
-        direction: SplitDirection,
-        mode: SplitMode,
-    },
-    ItemPinned,
-    ItemUnpinned,
-    JoinAll,
-    JoinIntoNext,
-    ChangeItemTitle,
-    Focus,
-    ZoomIn,
-    ZoomOut,
-    UserSavedItem {
-        item: Box<dyn WeakItemHandle>,
-        save_intent: SaveIntent,
-    },
-}
-
-impl fmt::Debug for Event {
-    /* 原 impl */
-}
 
 pub struct ActivationHistoryEntry {
     pub entity_id: EntityId,
@@ -175,14 +133,6 @@ pub enum Side {
 pub(super) enum PinOperation {
     Pin,
     Unpin,
-}
-
-pub struct DraggedTab {
-    pub pane: Entity<Pane>,
-    pub item: Box<dyn ItemHandle>,
-    pub ix: usize,
-    pub detail: usize,
-    pub is_active: bool,
 }
 
 impl EventEmitter<Event> for Pane {}

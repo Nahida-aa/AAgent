@@ -11,13 +11,10 @@ pub mod render_state;
 pub use handle::SidebarHandle;
 pub use render_state::SidebarRenderState;
 
-use settings_content::SidebarSide;
-
 use gpui::{
     AnyView, App, Context, Entity, EntityId, EventEmitter, FocusHandle, Focusable, Pixels, Render,
     Window, div, prelude::*,
 };
-use settings::SidebarSide;
 
 use super::events::SidebarEvent;
 

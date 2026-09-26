@@ -13,8 +13,9 @@ pub use task::SpawnInTerminal;
 
 use theme::ActiveTheme;
 use gpui::{
-    App, Context, DragMoveEvent, Entity, IntoElement, MouseButton, ParentElement, Render, Styled,
-    Window, div, prelude::*, px,
+    AnyView, App, Context, DragMoveEvent, Entity, EntityId, EventEmitter, FocusHandle,
+    IntoElement, MouseButton, ParentElement, Render, Styled, Subscription, Task, WeakEntity,
+    Window, WindowId, div, prelude::*, px,
 };
 
 use crate::Workspace;
@@ -46,11 +47,6 @@ use std::cell::Cell;
 use std::rc::Rc;
 
 use anyhow::Result;
-use gpui::{
-    AnyView, App, Context, Entity, EntityId, EventEmitter, FocusHandle, Subscription, Task,
-    WeakEntity, Window, WindowId,
-};
-
 
 pub(crate) const SIDEBAR_RESIZE_HANDLE_SIZE: Pixels = px(6.0);
 /// 顶层 MultiWorkspace entity。

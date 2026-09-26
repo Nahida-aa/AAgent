@@ -15,17 +15,12 @@ pub use size::PanelSizeState;
 pub use proto::PanelId;
 use std::sync::Arc;
 
-use gpui::Pixels;
-use gpui::px;
+use gpui::{
+    App, Context, Entity, IntoElement, MouseButton, MouseDownEvent, MouseUpEvent, ParentElement,
+    Pixels, Render, Styled, Window, deferred, div, hsla, px, prelude::*,
+};
+use theme::ActiveTheme;
 
 pub(crate) const RESIZE_HANDLE_SIZE: Pixels = px(6.);
 
 pub(crate) const PANEL_SIZE_STATE_KEY: &str = "dock_panel_size";
-
-use gpui::{
-    App, Context, Entity, IntoElement, MouseButton, MouseDownEvent, MouseUpEvent, ParentElement,
-    Render, Styled, Window, deferred, div, hsla, prelude::*, px,
-};
-use theme::ActiveTheme;
-
-use self::panel::{Panel, PanelHandle};

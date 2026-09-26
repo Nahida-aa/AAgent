@@ -20,8 +20,6 @@ use smallvec::SmallVec;
 use std::any::{Any, TypeId};
 use ui::{Icon, IconName};
 
-use crate::{ItemEvent, ToolbarItemLocation};
-
 pub trait ItemHandle: 'static + Send {
     fn item_focus_handle(&self, cx: &App) -> FocusHandle;
     fn subscribe_to_item_events(

@@ -14,26 +14,21 @@ mod handle;
 mod handle_impl;
 mod project_item;
 mod serializable;
-mod settings;
+pub mod settings;
+pub mod tab;
 mod traits;
 pub mod weak_handle;
 
 pub use events::*;
 pub use follow::*;
 pub use handle::*;
+pub use handle_impl::*;
 pub use project_item::*;
 pub use serializable::*;
 pub use settings::*;
+pub use tab::{ItemBufferKind, TabContentParams, TabTooltipContent};
 pub use traits::*;
 pub use weak_handle::*;
-
-pub mod handle;
-pub mod settings;
-pub mod tab;
-use gpui::IntoElement;
-pub use handle::{ItemHandle};
-pub use tab::{ItemBufferKind, TabContentParams, TabTooltipContent};
-use ui::{Color, Icon, Label, LabelCommon};
 
 use std::time::Duration;
 

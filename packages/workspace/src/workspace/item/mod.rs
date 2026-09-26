@@ -26,7 +26,7 @@ mod ops;
 // serialize_items
 mod serialize;
 // open_file_permalink, copy_file_permalink, handle_file_permalink
-mod permalink;
+pub(crate) mod permalink;
 //
 mod save;
 pub mod close;

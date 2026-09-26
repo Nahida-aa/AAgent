@@ -22,7 +22,7 @@ use super::{HANDLE_HITBOX_SIZE, HORIZONTAL_MIN_SIZE, VERTICAL_MIN_SIZE};
 
 const DIVIDER_SIZE: f32 = 1.0;
 
-pub(super) fn pane_axis(
+pub(crate) fn pane_axis(
     axis: Axis,
     basis: usize,
     flexes: Arc<Mutex<Vec<f32>>>,

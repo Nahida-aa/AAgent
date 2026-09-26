@@ -1,4 +1,11 @@
-fn serialize_pane_handle(
+use gpui::{App, Entity, Window};
+
+use crate::{
+    Pane,
+    persistence::model::{SerializedItem, SerializedPane},
+};
+
+pub(crate) fn serialize_pane_handle(
     pane_handle: &Entity<Pane>,
     window: &mut Window,
     cx: &mut App,

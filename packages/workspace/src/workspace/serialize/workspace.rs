@@ -1,3 +1,5 @@
+use crate::workspace::serialize::pane::serialize_pane_handle;
+
 enum WorkspaceLocation {
     // Valid local paths or SSH project to serialize
     Location(SerializedWorkspaceLocation, PathList),

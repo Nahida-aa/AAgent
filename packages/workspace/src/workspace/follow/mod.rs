@@ -69,5 +69,6 @@ pub mod ops;
 pub mod read;
 pub mod rpc;
 pub mod shared_screen;
+pub use auto_watch::AutoWatch;
 pub use state::{CollaboratorId, FollowerState, ViewId};
 pub(crate) use leader::leader_border_for_pane;

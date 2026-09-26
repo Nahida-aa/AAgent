@@ -3,6 +3,9 @@ use gpui::{
     App, Bounds, CursorStyle, Div, Global, HitboxBehavior, IntoElement, MouseButton, ParentElement,
     Pixels, Point, ResizeEdge, Size, Stateful, Styled, Tiling, Window, div, px, relative,
 };
+// zed 的 `rounded_client_corners` 不在 gpui 里，是 theme crate 的扩展 trait
+// （zed: crates/theme/src/theme.rs:58），方法要能用必须把它引进作用域。
+use theme::ClientDecorationsExt;
 
 /// Add client-side decorations (rounded corners, shadows, resize handling) when
 /// appropriate.

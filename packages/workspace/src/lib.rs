@@ -198,7 +198,10 @@ pub use crate::workspace::{
         local::open_new,
         options::{OpenOptions, OpenVisible},
     },
-    registries::{FollowableViewRegistry, serializable_item::register_serializable_item},
+    registries::{
+        FollowableViewRegistry, project_item::register_project_item,
+        serializable_item::register_serializable_item,
+    },
     serialize::SERIALIZATION_THROTTLE_TIME,
 };
 use workspace::{

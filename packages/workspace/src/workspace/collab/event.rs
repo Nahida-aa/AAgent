@@ -1,4 +1,3 @@
-
 use super::*;
 pub enum ActiveCallEvent {
     ParticipantLocationChanged { participant_id: PeerId },
@@ -10,7 +9,7 @@ pub enum ActiveCallEvent {
 
 impl Workspace {
     //
-    fn on_active_call_event(
+    pub(crate) fn on_active_call_event(
         &mut self,
         event: &ActiveCallEvent,
         window: &mut Window,

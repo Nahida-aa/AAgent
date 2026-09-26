@@ -1,5 +1,5 @@
-use super::*;
 use super::Workspace;
+use super::*;
 use crate::{dock::Dock, workspace::CloseIntent};
 use anyhow::{Context as _, Result, anyhow};
 use gpui::{App, Context, Entity, PromptLevel, Task, Window};
@@ -41,10 +41,5 @@ impl Workspace {
                 modal_layer.reveal_stashed_modal(window, cx);
             });
         });
-    }
-
-    pub fn toggle_status_toast<V: ToastView>(&mut self, entity: Entity<V>, cx: &mut App) {
-        self.toast_layer
-            .update(cx, |toast_layer, cx| toast_layer.toggle_toast(cx, entity))
     }
 }

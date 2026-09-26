@@ -15,7 +15,7 @@ static ZED_WINDOW_POSITION: LazyLock<Option<Point<Pixels>>> = LazyLock::new(|| {
 
 impl Workspace {
     // │   ├── save_window_bounds
-    fn save_window_bounds(&self, window: &mut Window, cx: &mut App) -> Task<()> {
+   pub(crate) fn save_window_bounds(&self, window: &mut Window, cx: &mut App) -> Task<()> {
         let Some(display) = window.display(cx) else {
             return Task::ready(());
         };

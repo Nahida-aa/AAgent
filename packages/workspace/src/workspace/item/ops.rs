@@ -206,7 +206,7 @@ impl Workspace {
         })
     }
     // pub fn load_path                 // private
-    fn load_path(
+   pub(crate) fn load_path(
         &mut self,
         path: ProjectPath,
         window: &mut Window,
@@ -589,7 +589,7 @@ impl Workspace {
         }
     }
     // pub fn move_item_to_pane_at_index
-    fn move_item_to_pane_at_index(
+    pub(crate) fn move_item_to_pane_at_index(
         &mut self,
         action: &MoveItemToPane,
         window: &mut Window,

@@ -209,6 +209,22 @@ impl Dock {
         cx.notify();
     }
 
+    pub(crate) fn set_open_internal(
+        &mut self,
+        open: bool,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if open != self.is_open {
+            self.is_open = open;
+            if let Some(active_panel) = self.active_panel_entry() {
+                active_panel.panel.set_active(open, window, cx);
+            }
+
+            cx.notify();
+        }
+    }
+
     pub fn set_panel_zoomed(
         &mut self,
         panel: &gpui::AnyView,
@@ -737,13 +753,17 @@ impl Dock {
             cx.notify();
         }
     }
+
+    /// Resets the active panel and, when this dock is included in
+    /// `resize_all_panels_in_dock`, all panels using the same sizing mode.
     pub fn reset_panel_sizes(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         if self.should_resize_all_panels(cx) {
-            self.resize_all_panels(size, flex, window, cx);
+            self.reset_all_panel_sizes(window, cx);
         } else {
-            self.resize_active_panel(size, flex, window, cx);
+            self.reset_active_panel_size(window, cx);
         }
     }
+
     fn reset_active_panel_size(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         let state = PanelSizeState::default();
         self.resize_active_panel(state.size, state.flex, window, cx);

@@ -1,9 +1,8 @@
-
 use super::*;
 pub struct WorkspaceStore {
-    workspaces: HashSet<(gpui::AnyWindowHandle, WeakEntity<Workspace>)>,
-    client: Arc<Client>,
-    _subscriptions: Vec<client::Subscription>,
+    pub(crate) workspaces: HashSet<(gpui::AnyWindowHandle, WeakEntity<Workspace>)>,
+    pub(crate) client: Arc<Client>,
+    pub(crate) _subscriptions: Vec<client::Subscription>,
 }
 impl WorkspaceStore {
     pub fn new(client: Arc<Client>, cx: &mut Context<Self>) -> Self {

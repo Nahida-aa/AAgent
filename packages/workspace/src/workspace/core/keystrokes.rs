@@ -14,7 +14,7 @@ pub(crate) struct DispatchingKeystrokes {
 
 impl Workspace {
     // fn send_keystrokes
-    fn send_keystrokes(
+    pub(crate) fn send_keystrokes(
         &mut self,
         action: &SendKeystrokes,
         window: &mut Window,

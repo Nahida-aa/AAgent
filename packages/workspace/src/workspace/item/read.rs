@@ -44,7 +44,7 @@ impl Workspace {
     }
 
     // fn active_project_path           // private
-    fn active_project_path(&self, cx: &App) -> Option<ProjectPath> {
+   pub(crate) fn active_project_path(&self, cx: &App) -> Option<ProjectPath> {
         self.active_item(cx).and_then(|item| item.project_path(cx))
     }
 }

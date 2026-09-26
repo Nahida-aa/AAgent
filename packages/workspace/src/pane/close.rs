@@ -5,7 +5,7 @@ use project::Project;
 use settings::Settings;
 use theme_settings::ThemeSettings;
 use util::debug_panic;
-
+use anyhow::Result;
 use super::Pane;
 use super::history::{NavigationMode, TagNavigationMode};
 use crate::Workspace;
@@ -342,7 +342,7 @@ impl Pane {
         dirty_project_item_ids.is_empty()
     }
 
-    pub(super) fn file_names_for_prompt(
+    pub(crate) fn file_names_for_prompt(
         items: &mut dyn Iterator<Item = &Box<dyn ItemHandle>>,
         cx: &App,
     ) -> String {

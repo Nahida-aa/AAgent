@@ -10,6 +10,8 @@
 //! - [dragged] — DraggedTab / DraggedSelection drag marker
 
 // === 外部 crate 导入（子模块通过 use super::* 继承） ===
+use collections::{BTreeSet, HashMap, HashSet, VecDeque};
+use git::{CopyFilePermalink, OpenFilePermalink};
 use gpui::{
     Action, Anchor, AnyElement, AnyView, App, AsyncWindowContext, ClickEvent, ClipboardItem,
     Context, Div, DragMoveEvent, Entity, EntityId, EventEmitter, ExternalPaths, FocusHandle,
@@ -17,19 +19,13 @@ use gpui::{
     PromptLevel, Render, ScrollHandle, Subscription, Task, TaskExt, WeakEntity, WeakFocusHandle,
     Window, actions, anchored, deferred, div, prelude::*, px,
 };
-use ui::{
-    ButtonSize, ContextMenu, ContextMenuEntry, ContextMenuItem, DecoratedIcon, Headline,
-    HeadlineSize, IconButton, IconButtonShape, IconDecoration, IconDecorationKind, IconName,
-    IconSize, Indicator, PopoverMenu, PopoverMenuHandle, Tab, TabPosition, Tooltip,
-    prelude::*, right_click_menu,
-};
-use git::{CopyFilePermalink, OpenFilePermalink};
 use itertools::Itertools;
 use language::{Capability, DiagnosticSeverity};
+use parking_lot::Mutex;
 use project::{DirectoryLister, Project, ProjectEntryId, ProjectPath, WorktreeId};
-use collections::{BTreeSet, HashMap, HashSet, VecDeque};
 use schemars::JsonSchema;
 use serde::Deserialize;
+use settings::{Settings, SettingsStore};
 use std::{
     any::Any,
     cmp, fmt, mem,
@@ -42,35 +38,34 @@ use std::{
     },
     time::Duration,
 };
-use parking_lot::Mutex;
-use settings::{Settings, SettingsStore};
 use theme_settings::ThemeSettings;
-use util::{
-    ResultExt, TryFutureExt, debug_panic, maybe, paths::PathStyle, serde::default_true,
+use ui::{
+    ButtonSize, ContextMenu, ContextMenuEntry, ContextMenuItem, DecoratedIcon, Headline,
+    HeadlineSize, IconButton, IconButtonShape, IconDecoration, IconDecorationKind, IconName,
+    IconSize, Indicator, PopoverMenu, PopoverMenuHandle, Tab, TabPosition, Tooltip, prelude::*,
+    right_click_menu,
 };
+use util::{ResultExt, TryFutureExt, debug_panic, maybe, paths::PathStyle, serde::default_true};
 
 // === crate 内部私有导入（子模块通过 use super::* 继承，不含 pub use 已有的类型避免 E0252） ===
 use crate::{
     CloseWindow, NewCenterTerminal, NewFile, NewTerminal, OpenInTerminal, OpenOptions,
-    OpenTerminal, OpenVisible, ToggleFileFinder, ToggleProjectSymbols, ToggleZoom,
-    Workspace, WorkspaceItemBuilder, ZoomIn, ZoomOut, focus_follows_mouse::FocusFollowsMouse as _,
-    item::SaveOptions,
-    move_item,
+    OpenTerminal, OpenVisible, ToggleFileFinder, ToggleProjectSymbols, ToggleZoom, Workspace,
+    WorkspaceItemBuilder, ZoomIn, ZoomOut, focus_follows_mouse::FocusFollowsMouse as _,
+    item::SaveOptions, move_item,
 };
 use settings::{ActivateOnClose, ClosePosition, ShowCloseButton, ShowDiagnostics};
 
 // === crate 内部转发（公开 API） ===
+pub use crate::SplitDirection;
 pub use crate::item::{
     Item, ItemBufferKind, ItemHandle, ItemSettings, PreviewTabsSettings, ProjectItemKind,
     TabContentParams, TabTooltipContent, WeakItemHandle,
 };
-pub use crate::{SplitDirection};
 pub use crate::{
     invalid_item_view::InvalidItemView,
     toolbar::Toolbar,
-    workspace_settings::{
-        AutosaveSetting, FocusFollowsMouse, TabBarSettings, WorkspaceSettings,
-    },
+    workspace_settings::{AutosaveSetting, FocusFollowsMouse, TabBarSettings, WorkspaceSettings},
 };
 
 pub mod dragged;
@@ -94,11 +89,11 @@ mod selection;
 mod tab_bar;
 mod zoom;
 
-pub use actions::*;
+pub use actions::{SplitMode, *};
 pub use helpers::*;
 pub use history::*;
 pub use queries::*;
-pub use selection::*;
+pub use selection::{DraggedSelection, *};
 
 pub struct ActivationHistoryEntry {
     pub entity_id: EntityId,
@@ -285,7 +280,32 @@ impl Pane {
     ) {
         self.can_split_predicate = can_split_predicate;
     }
-
+    pub fn split(
+        &mut self,
+        direction: SplitDirection,
+        mode: SplitMode,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if self.items.len() <= 1 && mode == SplitMode::MovePane {
+            // MovePane with only one pane present behaves like a SplitEmpty in the opposite direction
+            let active_item = self.active_item();
+            cx.emit(Event::Split {
+                direction: direction.opposite(),
+                mode: SplitMode::EmptyPane,
+            });
+            // ensure that we focus the moved pane
+            // in this case we know that the window is the same as the active_item
+            if let Some(active_item) = active_item {
+                cx.defer_in(window, move |_, window, cx| {
+                    let focus_handle = active_item.item_focus_handle(cx);
+                    window.focus(&focus_handle, cx);
+                });
+            }
+        } else {
+            cx.emit(Event::Split { direction, mode });
+        }
+    }
     pub fn set_can_toggle_zoom(&mut self, can_toggle_zoom: bool, cx: &mut Context<Self>) {
         self.can_toggle_zoom = can_toggle_zoom;
         cx.notify();

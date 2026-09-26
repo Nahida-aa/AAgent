@@ -62,7 +62,12 @@ impl Workspace {
     // │   ├── move_part_focus
     /// Moves focus to the next (or previous) visible window region. See
     /// [`FocusNextPart`].
-    fn move_part_focus(&mut self, forward: bool, window: &mut Window, cx: &mut Context<Self>) {
+    pub(crate) fn move_part_focus(
+        &mut self,
+        forward: bool,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
         let parts = self.focusable_parts(cx);
         if parts.is_empty() {
             return;
@@ -113,7 +118,7 @@ impl Workspace {
     /// toolbar in response to arrow keys. Navigation is clamped to the title
     /// bar so arrows move between items and stop at the ends (ARIA toolbar
     /// semantics); Tab is still used to leave the toolbar.
-    fn move_titlebar_item_focus(
+    pub(crate) fn move_titlebar_item_focus(
         &mut self,
         forward: bool,
         window: &mut Window,
@@ -202,14 +207,14 @@ impl FocusablePart {
 /// navigation would focus an inner element that has no accessibility node, and
 /// assistive technology would fall back to announcing the whole window.
 pub(crate) struct RegionFocusHandles {
-    left_dock: FocusHandle,
-    right_dock: FocusHandle,
-    bottom_dock: FocusHandle,
-    editor: FocusHandle,
+    pub(crate) left_dock: FocusHandle,
+    pub(crate) right_dock: FocusHandle,
+    pub(crate) bottom_dock: FocusHandle,
+    pub(crate) editor: FocusHandle,
 }
 
 impl RegionFocusHandles {
-    fn new(cx: &mut App) -> Self {
+    pub(crate) fn new(cx: &mut App) -> Self {
         Self {
             left_dock: cx.focus_handle(),
             right_dock: cx.focus_handle(),
@@ -218,7 +223,7 @@ impl RegionFocusHandles {
         }
     }
 
-    fn dock(&self, position: DockPosition) -> &FocusHandle {
+    pub(crate) fn dock(&self, position: DockPosition) -> &FocusHandle {
         match position {
             DockPosition::Left => &self.left_dock,
             DockPosition::Right => &self.right_dock,

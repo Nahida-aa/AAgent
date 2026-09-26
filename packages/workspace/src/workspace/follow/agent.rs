@@ -1,7 +1,12 @@
 use super::*;
+use crate::item::ItemBufferKind;
 impl Workspace {
     // handle_agent_location_changed
-    fn handle_agent_location_changed(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+    pub(crate) fn handle_agent_location_changed(
+        &mut self,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
         let Some(follower_state) = self.follower_states.get_mut(&CollaboratorId::Agent) else {
             return;
         };
@@ -64,7 +69,7 @@ impl Workspace {
         self.leader_updated(CollaboratorId::Agent, window, cx);
     }
     //
-    fn active_item_for_agent(&self) -> Option<Box<dyn ItemHandle>> {
+    pub(crate) fn active_item_for_agent(&self) -> Option<Box<dyn ItemHandle>> {
         let state = self.follower_states.get(&CollaboratorId::Agent)?;
         let active_view_id = state.active_view_id?;
         Some(
@@ -75,5 +80,4 @@ impl Workspace {
                 .boxed_clone(),
         )
     }
-
 }

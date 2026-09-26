@@ -11,7 +11,7 @@ pub(crate) struct WindowTitleNeeds {
 }
 
 impl WindowTitleNeeds {
-    fn from_template(template: &str) -> Self {
+    pub(crate) fn from_template(template: &str) -> Self {
         Self {
             file_path: template.contains("${filePath}"),
             relative_path: template.contains("${relativePath}"),

@@ -48,7 +48,7 @@ impl Workspace {
         cx.notify();
     }
     // fn handle_auto_watch_video_tracks_changed
-    fn handle_auto_watch_video_tracks_changed(
+   pub(crate) fn handle_auto_watch_video_tracks_changed(
         &mut self,
         peer_id: PeerId,
         window: &mut Window,
@@ -81,7 +81,7 @@ impl Workspace {
         }
     }
     // fn handle_auto_watch_local_share_stopped
-    fn handle_auto_watch_local_share_stopped(
+   pub(crate) fn handle_auto_watch_local_share_stopped(
         &mut self,
         window: &mut Window,
         cx: &mut Context<Self>,

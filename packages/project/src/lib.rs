@@ -33,7 +33,6 @@ mod directory;
 mod environment;
 mod event;
 mod fuzzy;
-mod group_key;
 mod impls;
 mod item;
 mod path;
@@ -59,7 +58,6 @@ pub use event::{Event, OpenedBufferEvent};
 // 当两个 crate 各实现一遍）。我们的 `aa_gpui_fuzzy` 已经统一到 nucleo 终态，
 // 只有一套 trait，故只保留 `PathMatchCandidateSetIter`。
 pub use fuzzy::{Candidates, PathMatchCandidateSet, PathMatchCandidateSetIter};
-pub use group_key::{ProjectGroupKey, path_suffix};
 pub use item::ProjectItem;
 pub use lsp_command::{CallHierarchyItem, IncomingCall, OutgoingCall};
 pub use lsp_store::{
@@ -69,6 +67,7 @@ pub use lsp_store::{
     SERVER_PROGRESS_THROTTLE_TIMEOUT,
 };
 pub use path::{ProjectPath, ResolvedPath};
+pub use project::group_key::{ProjectGroupKey, path_suffix};
 pub use project::{LocalProjectFlags, *};
 
 // zed 的 project.rs 即 crate 根，这些辅助函数天然在根上；拆分后需显式转发

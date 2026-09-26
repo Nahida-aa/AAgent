@@ -28,7 +28,12 @@ impl Workspace {
     }
 
     // fn collaborator_left               // private
-    fn collaborator_left(&mut self, peer_id: PeerId, window: &mut Window, cx: &mut Context<Self>) {
+    pub(crate) fn collaborator_left(
+        &mut self,
+        peer_id: PeerId,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
         self.follower_states.retain(|leader_id, state| {
             if *leader_id == CollaboratorId::PeerId(peer_id) {
                 for item in state.items_by_leader_view_id.values() {
@@ -250,5 +255,4 @@ impl Workspace {
     pub fn is_being_followed(&self, id: impl Into<CollaboratorId>) -> bool {
         self.follower_states.contains_key(&id.into())
     }
-
 }

@@ -1,11 +1,11 @@
 //
 use super::*;
 impl Workspace {
-   pub(crate)  async fn serialize_items(
+    pub(crate) async fn serialize_items(
         this: &WeakEntity<Self>,
         items_rx: UnboundedReceiver<Box<dyn SerializableItemHandle>>,
         cx: &mut AsyncWindowContext,
-   ) -> Result<()> {
+    ) -> Result<()> {
         const CHUNK_SIZE: usize = 200;
 
         let mut serializable_items = items_rx.ready_chunks(CHUNK_SIZE);
@@ -37,5 +37,12 @@ impl Workspace {
 
         Ok(())
     }
-
+    pub(crate) fn enqueue_item_serialization(
+        &mut self,
+        item: Box<dyn SerializableItemHandle>,
+    ) -> Result<()> {
+        self.serializable_items_tx
+            .unbounded_send(item)
+            .map_err(|err| anyhow!("failed to send serializable item over channel: {err}"))
+    }
 }

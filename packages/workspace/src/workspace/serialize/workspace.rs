@@ -21,12 +21,12 @@ impl Workspace {
         }
     }
     //
-    fn remove_from_session(&mut self, window: &mut Window, cx: &mut App) -> Task<()> {
+    pub(crate) fn remove_from_session(&mut self, window: &mut Window, cx: &mut App) -> Task<()> {
         self.session_id.take();
         self.serialize_workspace_internal(window, cx)
     }
     //
-    fn serialize_workspace(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+    pub(crate) fn serialize_workspace(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         if self._schedule_serialize_workspace.is_none() {
             self._schedule_serialize_workspace =
                 Some(cx.spawn_in(window, async move |this, cx| {
@@ -43,7 +43,7 @@ impl Workspace {
         }
     }
     //
-    fn serialize_workspace_internal(&self, window: &mut Window, cx: &mut App) -> Task<()> {
+    pub(crate) fn serialize_workspace_internal(&self, window: &mut Window, cx: &mut App) -> Task<()> {
         let Some(database_id) = self.database_id() else {
             return Task::ready(());
         };

@@ -36,6 +36,7 @@ pub struct DraggedTab {
     pub item: Box<dyn ItemHandle>,
     /// tab 在 source pane 里的索引（拖拽前位置）
     pub ix: usize,
+    pub detail: usize,
     /// 被拖 tab 在 source pane 里是不是当前激活项
     pub is_active: bool,
 }

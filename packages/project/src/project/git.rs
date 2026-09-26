@@ -76,4 +76,26 @@ impl Project {
             git_store.unstage_staged_hunks(staged_diff, index_ranges, cx)
         })
     }
+    // 当用户在编辑器中选中若干行，想分享一个指向这些行的永久链接时，UI 层会调用 Project::get_permalink_to_line
+    pub fn get_permalink_to_line(
+        &self,
+        buffer: &Entity<Buffer>,
+        selection: Range<u32>,
+        cx: &mut App,
+    ) -> Task<Result<url::Url>> {
+        self.git_store.update(cx, |git_store, cx| {
+            git_store.get_permalink_to_line(buffer, selection, cx)
+        })
+    }
+    // 当用户想分享某个文件的永久链接，而不关心具体行号时使用
+    pub fn get_file_permalink(
+        &self,
+        project_path: &ProjectPath,
+        cx: &mut App,
+    ) -> Task<Result<url::Url>> {
+        self.git_store.update(cx, |git_store, cx| {
+            git_store.get_file_permalink(project_path, cx)
+        })
+    }
+
 }

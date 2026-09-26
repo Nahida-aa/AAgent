@@ -23,7 +23,7 @@ impl Workspace {
         self.save_all_internal(SaveIntent::Close, true, window, cx)
     }
     // fn save_all_internal
-    fn save_all_internal(
+    pub(crate) fn save_all_internal(
         &mut self,
         mut save_intent: SaveIntent,
         allow_hot_exit_serialization: bool,
@@ -146,7 +146,7 @@ impl Workspace {
         })
     }
     // fn flush_deferred_saves
-    fn flush_deferred_saves(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+   pub(crate) fn flush_deferred_saves(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         let deferred = std::mem::take(&mut self.deferred_save_items);
         for weak_item in deferred {
             let Some(item) = weak_item.upgrade() else {

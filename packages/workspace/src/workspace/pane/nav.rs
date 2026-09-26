@@ -1,7 +1,7 @@
 use super::*;
 impl Workspace {
     // fn activate_pane_at_index          // private，但主语是 pane 索引
-    fn activate_pane_at_index(
+    pub(crate) fn activate_pane_at_index(
         &mut self,
         action: &ActivatePane,
         window: &mut Window,

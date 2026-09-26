@@ -1,12 +1,12 @@
-use super::*;
 use super::Workspace;
+use super::*;
 use crate::{dock::Dock, workspace::CloseIntent};
 use anyhow::{Context as _, Result, anyhow};
 use gpui::{App, Context, Entity, PromptLevel, Task, Window};
 
 impl Workspace {
     //
-    pub(super) fn render_notifications(
+    pub(crate) fn render_notifications(
         &self,
         _window: &mut Window,
         _cx: &mut Context<Self>,

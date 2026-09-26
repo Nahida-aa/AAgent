@@ -23,19 +23,19 @@ mod theme_preview;
 mod toast_layer;
 mod toolbar;
 pub mod welcome;
+pub mod workspace;
 pub mod workspace_error;
 mod workspace_settings;
-pub mod workspace;
 
 pub use dock::Panel;
+pub(crate) use multi_workspace::ProjectGroupKey;
 pub use multi_workspace::{
     CloseWorkspaceSidebar, DraggedSidebar, FocusWorkspaceSidebar, MoveProjectDown,
     MoveProjectToNewWindow, MoveProjectUp, MultiWorkspace, MultiWorkspaceEvent, NewThread,
-    NextProject, NextThread, PreviousProject, PreviousThread, ProjectGroup,
-    RemovalIntent, SerializedProjectGroupState, Sidebar, SidebarEvent, SidebarHandle,
-    SidebarRenderState, SidebarSide, ToggleWorkspaceSidebar, sidebar_side_context_menu,
+    NextProject, NextThread, PreviousProject, PreviousThread, ProjectGroup, RemovalIntent,
+    SerializedProjectGroupState, Sidebar, SidebarEvent, SidebarHandle, SidebarRenderState,
+    SidebarSide, ToggleWorkspaceSidebar, sidebar_side_context_menu,
 };
-pub(crate) use multi_workspace::ProjectGroupKey;
 pub use path_list::{PathList, SerializedPathList};
 pub use remote::{
     RemoteConnectionIdentity, remote_connection_identity, same_remote_connection_identity,
@@ -58,6 +58,7 @@ use futures::{
     },
     future::{Shared, try_join_all},
 };
+use gpui::prelude::FluentBuilder;
 use gpui::{
     Action, AnyEntity, AnyView, AnyWeakView, App, AppContext, AsyncApp, AsyncWindowContext, Axis,
     Bounds, ClipboardItem, Context, CursorStyle, Decorations, DragMoveEvent, Entity, EntityId,
@@ -67,7 +68,6 @@ use gpui::{
     WindowBounds, WindowHandle, WindowId, WindowOptions, actions, canvas, point, relative, size,
     transparent_black,
 };
-use gpui::prelude::FluentBuilder;
 pub use history_manager::*;
 pub use item::{
     FollowableItem, FollowableItemHandle, Item, ItemHandle, ItemSettings, PreviewTabsSettings,
@@ -124,8 +124,8 @@ use sqlez::{
     statement::Statement,
 };
 use status_bar::StatusBar;
-pub use status_bar::{HideStatusItem, StatusItemView};
 use status_bar::add_hide_button_entry;
+pub use status_bar::{HideStatusItem, StatusItemView};
 use std::{
     any::TypeId,
     borrow::Cow,
@@ -177,6 +177,8 @@ use crate::{
 // ========= workspace 嵌套模块的关键类型（crate 内部可见，顶级模块通过 crate::XXX 访问） =========
 // Zed 单文件时这些类型直接定义在 workspace.rs 里，天然 crate 根可见。我们拆分到子模块后
 // 需要这里 use 过来让 crate 根能看到。普通 use 足够了，不需要 pub use。
+pub use crate::workspace::{core::event::Event, follow::state::ViewId};
+pub(crate) use workspace::pane::ActivateInDirectionTarget;
 use workspace::{
     actions::*,
     app::initial::init,
@@ -184,36 +186,36 @@ use workspace::{
     app::store::WorkspaceStore,
     collab::call::{AnyActiveCall, GlobalAnyActiveCall},
     collab::participant::ParticipantLocation,
+    collab::room_project::join_in_room_project,
     core::WorkspaceId,
     core::actions::*,
     core::debounce::DelayedDebouncedEditAction,
     core::lifecycle::CloseIntent,
+    core::lifecycle::prepare_window_to_close,
     core::workspace::Workspace,
     dock::render::DraggedDock,
-    follow::{AutoWatch, CollaboratorId, FollowerState, ViewId},
-    follow::{leader_border_for_pane},
+    follow::leader_border_for_pane,
+    follow::{AutoWatch, CollaboratorId, FollowerState},
+    item::permalink::{copy_file_permalink, open_file_permalink},
     notification::toast::Toast,
-    open::options::{OpenMode, OpenOptions, OpenVisible, OpenResult},
-    open::remote::open_remote_project_with_existing_connection,
-    open::matching::{WorkspaceMatching, find_existing_workspace},
-    open::windows::workspace_windows_for_location,
-    open::prompt::{PromptForNewPath, PromptForOpenPath},
     open::local::{open_items, open_workspace_by_id},
+    open::matching::{WorkspaceMatching, find_existing_workspace},
+    open::options::{OpenMode, OpenOptions, OpenResult, OpenVisible},
+    open::prompt::{PromptForNewPath, PromptForOpenPath},
+    open::remote::open_remote_project_with_existing_connection,
+    open::windows::workspace_windows_for_location,
     providers::{DebuggerProvider, TerminalProvider},
     registries::{FollowableViewRegistry, ProjectItemRegistry, SerializableItemRegistry},
     serialize::flush::flush_windows_serialization,
     serialize::{SERIALIZATION_THROTTLE_TIME, WorkspaceLocation},
-    item::permalink::{copy_file_permalink, open_file_permalink},
-    collab::room_project::join_in_room_project,
-    core::lifecycle::prepare_window_to_close,
     window::{client_side_decorations, title::WindowTitleContext},
 };
-pub(crate) use workspace::pane::ActivateInDirectionTarget;
 // workspace 嵌套模块里定义，但需要 crate 根可见的类型
-pub(crate) use workspace::registries::project_item::WorkspaceItemBuilder;
-pub(crate) use workspace::pane::ops::move_item;
-pub(crate) use workspace::follow::state::FollowerView;
-pub(crate) use workspace::open::options::WorkspacePosition;
-pub(crate) use workspace::collab::participant::RemoteCollaborator;
+use workspace::collab::participant::RemoteCollaborator;
+use workspace::follow::{follower::Follower, state::FollowerView};
+
+use workspace::open::options::WorkspacePosition;
+use workspace::pane::ops::move_item;
+use workspace::registries::project_item::WorkspaceItemBuilder;
 // dock constant
-pub(crate) use dock::PANEL_SIZE_STATE_KEY;
+use dock::PANEL_SIZE_STATE_KEY;

@@ -48,20 +48,5 @@ impl TabContentParams {
 pub enum TabTooltipContent {
     Text(SharedString),
     // 预留 Custom — 以后 Editor 可以显示完整路径 + git status 等
-}
-
-/// Item buffer 类型 — 对齐 Zed `ItemBufferKind`。
-/// Zed 用来判断 tab 是否显示 split marker、buffer 数量等。
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ItemBufferKind {
-    /// 多个 buffer（比如 Search Results multibuffer）。
-    Multibuffer,
-    /// 单实例（比如 Editor 一个文件一个实例）。
-    Singleton,
-    /// 不适用（Terminal 没有 buffer 概念）。
-    None,
-}
-
-impl Default for ItemBufferKind {
-    fn default() -> Self { Self::None }
+    Custom(Box<dyn Fn(&mut Window, &mut App) -> AnyView>),
 }

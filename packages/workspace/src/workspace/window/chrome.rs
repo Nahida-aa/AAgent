@@ -16,7 +16,7 @@ impl Workspace {
     /// workspace's id into the shared `active_workspace_id` cell, which we
     /// simply compare against our own id. A workspace with no shared cell (e.g.
     /// a plain test window) owns its window unconditionally.
-    fn owns_window_chrome(&self) -> bool {
+    pub(crate) fn owns_window_chrome(&self) -> bool {
         match &self.active_workspace_id {
             Some(active_workspace_id) => active_workspace_id.get() == self.weak_self.entity_id(),
             None => true,
@@ -29,7 +29,7 @@ impl Workspace {
 
     // fn update_window_edited
 
-    pub(super) fn update_window_edited(&mut self, window: &mut Window, cx: &mut App) {
+    pub(crate) fn update_window_edited(&mut self, window: &mut Window, cx: &mut App) {
         if !self.owns_window_chrome() {
             return;
         }

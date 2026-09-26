@@ -57,7 +57,7 @@ impl Default for OpenOptions {
 }
 
 impl OpenOptions {
-    fn should_reuse_existing_window(&self) -> bool {
+   pub(crate) fn should_reuse_existing_window(&self) -> bool {
         !matches!(
             self.workspace_matching,
             WorkspaceMatching::None | WorkspaceMatching::MatchSubpaths

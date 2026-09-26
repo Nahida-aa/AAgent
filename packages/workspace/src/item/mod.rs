@@ -25,11 +25,31 @@ pub use handle::*;
 pub use handle_impl::*;
 pub use project_item::*;
 pub use serializable::*;
-pub use settings::*;
-pub use tab::{ItemBufferKind, TabContentParams, TabTooltipContent};
+pub use ::settings::{
+    ActivateOnClose, ClosePosition, RegisterSetting, Settings, SettingsLocation, ShowCloseButton,
+    ShowDiagnostics,
+};
+pub use crate::item::settings::{ItemSettings,PreviewTabsSettings};
+pub use tab::{ TabContentParams, TabTooltipContent};
 pub use traits::*;
 pub use weak_handle::*;
 
 use std::time::Duration;
 
 pub const LEADER_UPDATE_THROTTLE: Duration = Duration::from_millis(200);
+
+/// Item buffer 类型 — 对齐 Zed `ItemBufferKind`。
+/// Zed 用来判断 tab 是否显示 split marker、buffer 数量等。
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ItemBufferKind {
+    /// 多个 buffer（比如 Search Results multibuffer）。
+    Multibuffer,
+    /// 单实例（比如 Editor 一个文件一个实例）。
+    Singleton,
+    /// 不适用（Terminal 没有 buffer 概念）。
+    None,
+}
+
+impl Default for ItemBufferKind {
+    fn default() -> Self { Self::None }
+}

@@ -2,7 +2,7 @@ use super::*;
 
 impl Workspace {
     //
-    pub(super) fn dock_size(&self, dock: &Dock, window: &Window, cx: &App) -> Option<Pixels> {
+    pub(crate) fn dock_size(&self, dock: &Dock, window: &Window, cx: &App) -> Option<Pixels> {
         let panel = dock.active_panel()?;
         let size_state = dock
             .stored_panel_size_state(panel.as_ref())
@@ -74,7 +74,7 @@ impl Workspace {
         }
     }
     //
-    pub(super) fn opposite_dock_panel_and_size_state(
+    pub(crate) fn opposite_dock_panel_and_size_state(
         &self,
         position: DockPosition,
         window: &Window,
@@ -108,7 +108,8 @@ impl Workspace {
 
         Some(1.0)
     }
-    fn resize_dock(
+    //
+    pub(crate) fn resize_dock(
         &mut self,
         dock_pos: DockPosition,
         new_size: Pixels,
@@ -122,7 +123,7 @@ impl Workspace {
         }
     }
     //
-    fn resize_left_dock(&mut self, new_size: Pixels, window: &mut Window, cx: &mut App) {
+    pub(crate) fn resize_left_dock(&mut self, new_size: Pixels, window: &mut Window, cx: &mut App) {
         let workspace_width = self.bounds.size.width;
         let mut size = new_size.min(workspace_width - RESIZE_HANDLE_SIZE);
 
@@ -141,7 +142,12 @@ impl Workspace {
         });
     }
     //
-    fn resize_right_dock(&mut self, new_size: Pixels, window: &mut Window, cx: &mut App) {
+    pub(crate) fn resize_right_dock(
+        &mut self,
+        new_size: Pixels,
+        window: &mut Window,
+        cx: &mut App,
+    ) {
         let workspace_width = self.bounds.size.width;
         let mut size = new_size.min(workspace_width - RESIZE_HANDLE_SIZE);
         self.left_dock.read_with(cx, |left_dock, cx| {
@@ -158,7 +164,12 @@ impl Workspace {
         });
     }
     //
-    fn resize_bottom_dock(&mut self, new_size: Pixels, window: &mut Window, cx: &mut App) {
+    pub(crate) fn resize_bottom_dock(
+        &mut self,
+        new_size: Pixels,
+        window: &mut Window,
+        cx: &mut App,
+    ) {
         let size = new_size.min(self.bounds.bottom() - RESIZE_HANDLE_SIZE - self.bounds.top());
         self.bottom_dock.update(cx, |bottom_dock, cx| {
             bottom_dock.resize_panel_sizes(Some(size), None, window, cx);

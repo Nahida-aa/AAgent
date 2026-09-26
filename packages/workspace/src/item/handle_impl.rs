@@ -18,12 +18,16 @@ use smallvec::SmallVec;
 use ui::Icon;
 use util::ResultExt;
 
-use super::events::{ItemBufferKind, ItemEvent, SaveOptions, TabContentParams, TabTooltipContent};
 use super::follow::{FollowEvent, FollowableItemHandle};
 use super::handle::ItemHandle;
 use super::serializable::SerializableItemHandle;
 use super::traits::Item;
 use super::weak_handle::WeakItemHandle;
+use super::{
+    ItemBufferKind,
+    events::{ItemEvent, SaveOptions},
+    tab::{TabContentParams, TabTooltipContent},
+};
 use crate::item::LEADER_UPDATE_THROTTLE;
 use crate::searchable::SearchableItemHandle;
 use crate::toolbar::ToolbarItemLocation;

@@ -8,7 +8,7 @@ impl Workspace {
         self.apply_window_title(window, cx);
     }
     //
-    fn apply_window_title(&mut self, window: &mut Window, cx: &mut App) {
+  pub(crate)  fn apply_window_title(&mut self, window: &mut Window, cx: &mut App) {
         let project = self.project().read(cx);
         let active_project_path = self.active_item(cx).and_then(|item| item.project_path(cx));
         let settings = WorkspaceSettings::get_global(cx);

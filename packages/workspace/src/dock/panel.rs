@@ -226,3 +226,5 @@ where
 impl From<&dyn PanelHandle> for AnyView {
     fn from(val: &dyn PanelHandle) -> Self { val.to_any() }
 }
+
+impl Dock {}

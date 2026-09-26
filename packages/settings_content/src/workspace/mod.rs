@@ -28,6 +28,7 @@ pub use crate::{
         opening::{CliDefaultOpenBehavior, DefaultOpenBehavior, RestoreOnStartupBehavior},
         pane_split::{BottomDockLayout, PaneSplitDirectionHorizontal, PaneSplitDirectionVertical},
         text_rendering::TextRenderingMode,
+        item::{ActivateOnClose, ClosePosition,  ShowCloseButton, ShowDiagnostics},
     },
 };
 pub use active_pane::ActivePaneModifiers;

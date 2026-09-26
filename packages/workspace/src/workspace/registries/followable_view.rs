@@ -5,7 +5,7 @@ use crate::{FollowableItem, FollowableItemHandle, Workspace};
 use anyhow::{Context as _, Result, anyhow};
 use gpui::{AnyView, App, Entity, Window};
 use gpui::{Global, Task};
-use proto::ViewId;
+use crate::workspace::follow::state::ViewId;
 
 #[derive(Default)]
 pub struct FollowableViewRegistry(TypeIdHashMap<FollowableViewDescriptor>);

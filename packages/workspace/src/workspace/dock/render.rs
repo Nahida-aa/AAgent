@@ -3,7 +3,7 @@
 use super::*;
 
 impl Workspace {
-    fn render_dock(
+    pub(crate) fn render_dock(
         &self,
         position: DockPosition,
         dock: &Entity<Dock>,

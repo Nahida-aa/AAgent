@@ -68,9 +68,6 @@ impl Pane {
         }
     }
 
-    /// Should only be used when deserializing a pane.
-    pub fn set_pinned_count(&mut self, count: usize) { self.pinned_tab_count = count; }
-
     pub fn handle_item_edit(&mut self, item_id: EntityId, cx: &App) {
         if let Some(preview_item) = self.preview_item()
             && preview_item.item_id() == item_id

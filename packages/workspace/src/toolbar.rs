@@ -5,13 +5,13 @@
 //! 去掉 `can_navigate`，用 `px(...)` 代替 Zed 的 `DynamicSpacing`。
 
 use crate::ItemHandle;
-use ui::{h_flex, prelude::*, v_flex};
 use gpui::{
     AnyView, App, Context, Div, Entity, EntityId, EventEmitter, Global, KeyContext,
     ParentElement as _, Render, Styled, Window,
 };
 use language::LanguageRegistry;
 use std::sync::Arc;
+use ui::{h_flex, prelude::*, v_flex};
 
 pub struct PaneSearchBarCallbacks {
     pub setup_search_bar:
@@ -128,7 +128,7 @@ impl Toolbar {
 impl Default for Toolbar {
     fn default() -> Self { Self::new() }
 }
-impl ToolBar {
+impl Toolbar {
     pub fn new() -> Self {
         Self {
             active_item: None,

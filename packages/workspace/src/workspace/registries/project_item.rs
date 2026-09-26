@@ -99,7 +99,7 @@ impl ProjectItemRegistry {
             });
     }
 
-    fn open_path(
+   pub(crate) fn open_path(
         &self,
         project: &Entity<Project>,
         path: &ProjectPath,
@@ -117,7 +117,7 @@ impl ProjectItemRegistry {
         open_project_item
     }
 
-    fn build_item<T: project::ProjectItem>(
+   pub(crate) fn build_item<T: project::ProjectItem>(
         &self,
         item: Entity<T>,
         project: Entity<Project>,

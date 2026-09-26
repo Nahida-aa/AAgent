@@ -2,10 +2,14 @@
 //!
 //! 对齐 Zed `crates/workspace/src/item.rs`。
 
-use super::events::{ItemBufferKind, ItemEvent, SaveOptions, TabContentParams, TabTooltipContent};
 use super::follow::{FollowableItemHandle, WeakFollowableItemHandle};
 use super::serializable::SerializableItemHandle;
 use super::{Item, WeakItemHandle};
+use super::{
+    ItemBufferKind,
+    events::{ItemEvent, SaveOptions},
+    tab::{TabContentParams, TabTooltipContent},
+};
 use crate::searchable::SearchableItemHandle;
 use crate::toolbar::ToolbarItemLocation;
 use crate::workspace_settings::WorkspaceSettings;

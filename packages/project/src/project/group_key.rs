@@ -95,3 +95,9 @@ pub fn path_suffix(path: &Path, detail: usize) -> String {
     components.reverse();
     components.join("/")
 }
+
+impl Project {
+    pub fn project_group_key(&self, cx: &App) -> ProjectGroupKey {
+        ProjectGroupKey::from_project(self, cx)
+    }
+}

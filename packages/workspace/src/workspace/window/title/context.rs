@@ -13,7 +13,7 @@ pub(crate) struct WindowTitleContext {
 }
 
 impl WindowTitleContext {
-    fn value_for(&self, variable: &str) -> Option<&str> {
+   pub(crate)  fn value_for(&self, variable: &str) -> Option<&str> {
         match variable {
             "projectName" => Some(self.project_name.as_str()),
             "fileName" => self.file_name.as_deref(),
@@ -33,7 +33,7 @@ impl WindowTitleContext {
 
 impl Workspace {
     //
-    fn window_title_context(
+    pub(crate) fn window_title_context(
         project: &Project,
         project_path: Option<&ProjectPath>,
         needs: &WindowTitleNeeds,

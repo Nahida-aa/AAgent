@@ -109,7 +109,11 @@ impl MultiWorkspace {
 
     /// Collapses to a single workspace, discarding all groups.
     /// Used when multi-workspace is disabled by settings.
-    fn collapse_to_single_workspace(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+    pub(crate) fn collapse_to_single_workspace(
+        &mut self,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
         if self.sidebar_open {
             self.close_sidebar(window, cx);
         }

@@ -1,6 +1,7 @@
 use super::*;
+use crate::pane;
 impl Workspace {
-    // pub fn focus_center_pane
+    // focus_center_pane
     pub fn focus_center_pane(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         if let Some(item) = self.active_item(cx) {
             item.item_focus_handle(cx).focus(window, cx);
@@ -8,8 +9,8 @@ impl Workspace {
             log::error!("Could not find a focus target when switching focus to the center panes",);
         }
     }
-    // fn add_pane                        // private
-    fn add_pane(&mut self, window: &mut Window, cx: &mut Context<Self>) -> Entity<Pane> {
+    // add_pane
+    pub(crate) fn add_pane(&mut self, window: &mut Window, cx: &mut Context<Self>) -> Entity<Pane> {
         let pane = cx.new(|cx| {
             let mut pane = Pane::new(
                 self.weak_handle(),
@@ -146,7 +147,7 @@ impl Workspace {
         cx.notify();
     }
     // fn remove_pane                     // private
-    fn remove_pane(
+    pub(crate) fn remove_pane(
         &mut self,
         pane: Entity<Pane>,
         focus_on: Option<Entity<Pane>>,
@@ -177,7 +178,12 @@ impl Workspace {
         cx.emit(Event::PaneRemoved);
     }
     //
-    fn remove_panes(&mut self, member: Member, window: &mut Window, cx: &mut Context<Workspace>) {
+    pub(crate) fn remove_panes(
+        &mut self,
+        member: Member,
+        window: &mut Window,
+        cx: &mut Context<Workspace>,
+    ) {
         match member {
             Member::Axis(PaneAxis { members, .. }) => {
                 for child in members.iter() {
@@ -190,7 +196,7 @@ impl Workspace {
         }
     }
     //
-    fn force_remove_pane(
+    pub(crate) fn force_remove_pane(
         &mut self,
         pane: &Entity<Pane>,
         focus_on: &Option<Entity<Pane>>,
@@ -216,7 +222,7 @@ impl Workspace {
         }
         cx.notify();
     }
-    // pub fn resize_pane
+    // resize_pane
     pub fn resize_pane(
         &mut self,
         axis: gpui::Axis,
@@ -268,7 +274,7 @@ impl Workspace {
             .unwrap_or_else(|| self.split_pane(origin.clone(), SplitDirection::Right, window, cx))
     }
     // │   └── adjust_padding
-    fn adjust_padding(padding: Option<f32>) -> f32 {
+    pub(crate) fn adjust_padding(padding: Option<f32>) -> f32 {
         padding
             .unwrap_or(CenteredPaddingSettings::default().0)
             .clamp(

@@ -14,7 +14,7 @@ use anyhow::{Context as _, Result, anyhow};
     serde::Serialize,
     serde::Deserialize,
 )]
-pub struct WorkspaceId(i64);
+pub struct WorkspaceId(pub i64);
 
 impl WorkspaceId {
     pub fn from_i64(value: i64) -> Self { Self(value) }

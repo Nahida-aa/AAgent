@@ -5,14 +5,14 @@ pub(crate) struct DelayedDebouncedEditAction {
 }
 
 impl DelayedDebouncedEditAction {
-    fn new() -> DelayedDebouncedEditAction {
+    pub(crate) fn new() -> DelayedDebouncedEditAction {
         DelayedDebouncedEditAction {
             task: None,
             cancel_channel: None,
         }
     }
 
-    fn fire_new<F>(
+    pub(crate) fn fire_new<F>(
         &mut self,
         delay: Duration,
         window: &mut Window,

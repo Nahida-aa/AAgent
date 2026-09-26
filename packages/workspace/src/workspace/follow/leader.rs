@@ -1,6 +1,7 @@
 use super::*;
+// 我是 leader 时做什么
 impl Workspace {
-    //
+    // 我作为 leader，广播我的视图
     pub fn update_active_view_for_followers(&mut self, window: &mut Window, cx: &mut App) {
         let mut is_project_item = true;
         let mut update = proto::UpdateActiveView::default();
@@ -52,7 +53,7 @@ impl Workspace {
         }
     }
     //
-    fn active_item_for_followers(
+    pub(crate) fn active_item_for_followers(
         &self,
         window: &mut Window,
         cx: &mut App,
@@ -77,7 +78,7 @@ impl Workspace {
         (active_item, panel_id)
     }
     //
-    fn update_followers(
+    pub(crate) fn update_followers(
         &self,
         project_only: bool,
         update: proto::update_followers::Variant,

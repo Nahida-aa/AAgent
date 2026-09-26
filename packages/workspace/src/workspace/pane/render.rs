@@ -8,7 +8,7 @@ impl Workspace {
     /// focusing it announces "Editor" instead of falling back to the whole
     /// window. We only make it focusable in that case so it never adds a hitbox
     /// or intercepts mouse focus for other users.
-    fn render_center(
+    pub(crate) fn render_center(
         &self,
         render_cx: &PaneRenderContext,
         window: &mut Window,

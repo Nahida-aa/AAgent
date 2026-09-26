@@ -1,10 +1,10 @@
 use super::*;
 #[derive(Clone)]
 pub struct Toast {
-    id: NotificationId,
-    message: Cow<'static, str>,
-    autohide: bool,
-    on_click: Option<(Cow<'static, str>, Arc<dyn Fn(&mut Window, &mut App)>)>,
+    pub(crate) id: NotificationId,
+    pub(crate) message: Cow<'static, str>,
+    pub(crate) autohide: bool,
+    pub(crate) on_click: Option<(Cow<'static, str>, Arc<dyn Fn(&mut Window, &mut App)>)>,
 }
 
 impl Toast {

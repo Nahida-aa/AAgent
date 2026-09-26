@@ -1,4 +1,5 @@
 use super::*;
+use crate::item;
 impl Workspace {
     // fn active_view_for_follower        // private
     fn active_view_for_follower(
@@ -36,7 +37,7 @@ impl Workspace {
         })
     }
     // fn handle_follow                   // private
-    fn handle_follow(
+    pub(crate) fn handle_follow(
         &mut self,
         follower_project_id: Option<u64>,
         window: &mut Window,
@@ -51,7 +52,7 @@ impl Workspace {
         }
     }
     // fn handle_update_followers         // private
-    fn handle_update_followers(
+    pub(crate) fn handle_update_followers(
         &mut self,
         leader_id: PeerId,
         message: proto::UpdateFollowers,
@@ -63,7 +64,7 @@ impl Workspace {
             .ok();
     }
     // async fn process_leader_update
-    async fn process_leader_update(
+    pub(crate) async fn process_leader_update(
         this: &WeakEntity<Self>,
         leader_id: PeerId,
         update: proto::UpdateFollowers,
@@ -136,7 +137,7 @@ impl Workspace {
         Ok(())
     }
     // async fn add_view_from_leader
-    async fn add_view_from_leader(
+    pub(crate) async fn add_view_from_leader(
         this: WeakEntity<Self>,
         leader_id: PeerId,
         view: &proto::View,

@@ -1,7 +1,15 @@
 use super::*;
+
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+pub(crate) struct Follower {
+    pub(crate) project_id: Option<u64>,
+    pub(crate) peer_id: PeerId,
+}
+
+// 我是 follower 时做什么
 impl Workspace {
     //
-    fn leader_updated(
+    pub(crate) fn leader_updated(
         &mut self,
         leader_id: impl Into<CollaboratorId>,
         window: &mut Window,
@@ -86,5 +94,16 @@ impl Workspace {
             item_to_activate = Some((None, Box::new(shared_screen)));
         }
         item_to_activate
+    }
+
+    // 读的是 follower_states——那是 follower 侧的状态表。它回答的是“我这个 follower 的 pane 跟着谁”
+    pub fn leader_for_pane(&self, pane: &Entity<Pane>) -> Option<CollaboratorId> {
+        self.follower_states.iter().find_map(|(leader_id, state)| {
+            if state.center_pane == *pane || state.dock_pane.as_ref() == Some(pane) {
+                Some(*leader_id)
+            } else {
+                None
+            }
+        })
     }
 }

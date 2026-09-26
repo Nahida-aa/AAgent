@@ -32,7 +32,9 @@ impl PaneGroup {
         }
     }
 
-    pub fn set_is_center(&mut self, is_center: bool) { self.is_center = is_center; }
+    pub fn set_is_center(&mut self, is_center: bool) {
+        self.is_center = is_center;
+    }
 
     pub fn split(
         &mut self,
@@ -76,7 +78,9 @@ impl PaneGroup {
         }
     }
 
-    pub fn full_height_column_count(&self) -> usize { self.root.full_height_column_count() }
+    pub fn full_height_column_count(&self) -> usize {
+        self.root.full_height_column_count()
+    }
 
     pub fn pane_at_pixel_position(&self, coordinate: Point<Pixels>) -> Option<&Entity<Pane>> {
         match &self.root {
@@ -197,7 +201,9 @@ impl PaneGroup {
         self.mark_positions(cx);
     }
 
-    pub fn mark_positions(&mut self, cx: &mut App) { self.root.mark_positions(self.is_center, cx); }
+    pub fn mark_positions(&mut self, cx: &mut App) {
+        self.root.mark_positions(self.is_center, cx);
+    }
 
     pub fn render(
         &self,
@@ -218,9 +224,13 @@ impl PaneGroup {
         panes
     }
 
-    pub fn first_pane(&self) -> Entity<Pane> { self.root.first_pane() }
+    pub fn first_pane(&self) -> Entity<Pane> {
+        self.root.first_pane()
+    }
 
-    pub fn last_pane(&self) -> Entity<Pane> { self.root.last_pane() }
+    pub fn last_pane(&self) -> Entity<Pane> {
+        self.root.last_pane()
+    }
 
     pub fn find_pane_in_direction(
         &mut self,

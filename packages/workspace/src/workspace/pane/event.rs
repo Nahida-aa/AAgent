@@ -1,4 +1,6 @@
 use super::*;
+use crate::pane;
+
 impl Workspace {
     // fn handle_pane_focused
     fn handle_pane_focused(
@@ -61,7 +63,7 @@ impl Workspace {
         cx.notify();
     }
     // fn set_active_pane
-    fn set_active_pane(
+    pub(crate) fn set_active_pane(
         &mut self,
         pane: &Entity<Pane>,
         window: &mut Window,
@@ -72,12 +74,12 @@ impl Workspace {
         self.last_active_center_pane = Some(pane.downgrade());
     }
     // fn handle_panel_focused            // panel 获得焦点 → flush + update followers
-    fn handle_panel_focused(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+   pub(crate) fn handle_panel_focused(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         self.flush_deferred_saves(window, cx);
         self.update_active_view_for_followers(window, cx);
     }
     // fn handle_pane_event
-    fn handle_pane_event(
+    pub(crate) fn handle_pane_event(
         &mut self,
         pane: &Entity<Pane>,
         event: &pane::Event,

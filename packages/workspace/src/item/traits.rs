@@ -11,7 +11,7 @@ use std::any::{Any, TypeId};
 use std::path::Path;
 use std::sync::Arc;
 
-use super::events::{ItemBufferKind, ItemEvent, SaveOptions, TabContentParams, TabTooltipContent};
+use super::{ItemBufferKind,events::{ ItemEvent, SaveOptions, TabContentParams, TabTooltipContent}};
 use crate::{
     ItemNavHistory, Pane, ToolbarItemLocation, Workspace, WorkspaceId,
     invalid_item_view::InvalidItemView, searchable::SearchableItemHandle,

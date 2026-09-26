@@ -22,7 +22,7 @@ pub(crate) struct SerializableItemRegistry {
 impl Global for SerializableItemRegistry {}
 
 impl SerializableItemRegistry {
-    fn deserialize(
+    pub(crate) fn deserialize(
         item_kind: &str,
         project: Entity<Project>,
         workspace: WeakEntity<Workspace>,
@@ -41,7 +41,7 @@ impl SerializableItemRegistry {
         (descriptor.deserialize)(project, workspace, workspace_id, item_item, window, cx)
     }
 
-    fn cleanup(
+    pub(crate) fn cleanup(
         item_kind: &str,
         workspace_id: WorkspaceId,
         loaded_items: Vec<ItemId>,
@@ -58,7 +58,7 @@ impl SerializableItemRegistry {
         (descriptor.cleanup)(workspace_id, loaded_items, window, cx)
     }
 
-    fn view_to_serializable_item_handle(
+    pub(crate) fn view_to_serializable_item_handle(
         view: AnyView,
         cx: &App,
     ) -> Option<Box<dyn SerializableItemHandle>> {

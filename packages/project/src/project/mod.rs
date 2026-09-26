@@ -8,11 +8,13 @@ mod dap;
 mod diagnostics;
 mod events;
 mod git;
+pub mod group_key;
 mod helpers;
 mod images;
 mod init;
 mod lifecycle;
 mod lsp;
+
 mod lsp_events;
 mod lsp_rpc;
 mod paths;
@@ -25,13 +27,10 @@ mod worktrees;
 #[cfg(feature = "test-support")]
 mod test_support;
 
+pub use state::LocalProjectFlags;
 pub(crate) use state::{
     AgentLocation, BufferOrderedMessage, DebugAdapterClientState, DownloadingFile,
-    EntitySubscription,  ProjectClientState, RemotelyCreatedModelGuard,
-    RemotelyCreatedModels,
-};
-pub use state::{
-   LocalProjectFlags,
+    EntitySubscription, ProjectClientState, RemotelyCreatedModelGuard, RemotelyCreatedModels,
 };
 // ---- 供 project/ 各子模块经 `use super::*;` 取用 ----
 // zed 的 project.rs 是 crate 根，子模块用的裸名天然可见；拆分后在这里统一转发。
@@ -185,6 +184,10 @@ impl Project {
     pub fn fs(&self) -> &Arc<dyn Fs> { &self.fs }
     #[inline]
     pub fn environment(&self) -> &Entity<ProjectEnvironment> { &self.environment }
+    #[inline]
+    pub fn cli_environment(&self, cx: &App) -> Option<HashMap<String, String>> {
+        self.environment.read(cx).get_cli_environment()
+    }
     #[inline]
     pub fn active_entry(&self) -> Option<ProjectEntryId> { self.active_entry }
     #[inline]

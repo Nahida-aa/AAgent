@@ -1,4 +1,8 @@
-use gpui::{Anchor, AnyElement, App, Context, IntoElement, ParentElement, Styled, Window};
+// `Action` 必须在作用域里：zed 写 `SplitUp { mode }.boxed_clone()`，`boxed_clone`
+// 是 `gpui::Action` 的方法（gpui/src/action.rs:119），不在 gpui::prelude 里。
+use gpui::{
+    Action, Anchor, AnyElement, App, Context, IntoElement, ParentElement, Styled, Window,
+};
 use gpui_util::maybe;
 use project::ProjectPath;
 use ui::{ContextMenu, IconButton, IconName, IconSize, PopoverMenu, Tooltip, prelude::*};

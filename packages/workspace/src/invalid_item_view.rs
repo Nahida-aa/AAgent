@@ -6,9 +6,10 @@ use ui::{
 };
 use aagent_actions::workspace::OpenWithSystem;
 use gpui::{
-    App, Context, EventEmitter, FluentBuilder, FocusHandle, Focusable, InteractiveElement,
+    App, Context, EventEmitter, FocusHandle, Focusable, InteractiveElement,
     ParentElement, Render, SharedString, Styled as _, Window,
 };
+use gpui::prelude::FluentBuilder;
 
 use crate::Item;
 

@@ -2,7 +2,7 @@ use std::path::Path;
 
 use gpui::{App, Context, Entity, Window};
 use project::Project;
-use ui::anyhow;
+use anyhow;
 
 use super::traits::Item;
 use crate::Pane;

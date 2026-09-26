@@ -8,9 +8,10 @@ use std::{
 
 use collections::{HashMap, HashSet};
 use gpui::{
-    DismissEvent, Entity, EventEmitter, FluentBuilder, FocusHandle, Focusable, ScrollHandle,
+    DismissEvent, Entity, EventEmitter, FocusHandle, Focusable, ScrollHandle,
     WeakEntity,
 };
+use gpui::prelude::FluentBuilder;
 
 use project::{
     WorktreeId,

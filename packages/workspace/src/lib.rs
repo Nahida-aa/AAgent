@@ -171,9 +171,10 @@ use crate::{
     security_modal::SecurityModal,
 };
 
-// ========= workspace 嵌套模块的关键类型 =========
-// 这些类型在 Zed 单文件 workspace.rs 里 crate 根可见，我们拆分后需要精确 pub use 过来
-pub use workspace::{
+// ========= workspace 嵌套模块的关键类型（crate 内部可见，顶级模块通过 crate::XXX 访问） =========
+// Zed 单文件时这些类型直接定义在 workspace.rs 里，天然 crate 根可见。我们拆分到子模块后
+// 需要这里 use 过来让 crate 根能看到。普通 use 足够了，不需要 pub use。
+use workspace::{
     actions::*,
     app::initial::init,
     app::store::WorkspaceStore,

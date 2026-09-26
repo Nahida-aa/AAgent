@@ -9,20 +9,76 @@
 //! - [activate_item] — ActivateItem action（带字段的 action 单独放）
 //! - [dragged] — DraggedTab / DraggedSelection drag marker
 
-use theme::ActiveTheme;
-use ui::IconName;
-use gpui::{
-    Action, AnyElement, AnyView, App, Context, Entity, EntityId, EventEmitter, FocusHandle,
-    Focusable, IntoElement, Pixels, Point, Render, ScrollHandle, Subscription, Task, WeakEntity,
-    WeakFocusHandle, Window, actions, div, prelude::*, px,
+// === gpui — 子模块共享 ===
+pub use gpui::{
+    Action, Anchor, AnyElement, AnyView, App, AsyncWindowContext, ClickEvent, ClipboardItem,
+    Context, Div, DragMoveEvent, Entity, EntityId, EventEmitter, ExternalPaths, FocusHandle,
+    Focusable, IntoElement, KeyContext, MouseButton, NavigationDirection, Pixels, Point,
+    PromptLevel, Render, ScrollHandle, Subscription, Task, TaskExt, WeakEntity, WeakFocusHandle,
+    Window, actions, anchored, deferred, div, prelude::*, px,
 };
 
-use crate::item::{Item, ItemBufferKind, ItemHandle, ProjectItemKind, WeakItemHandle};
+// === ui — 子模块共享 ===
+pub use ui::{
+    ButtonSize, ContextMenu, ContextMenuEntry, ContextMenuItem, DecoratedIcon, Headline,
+    HeadlineSize, IconButton, IconDecoration, IconDecorationKind, IconName, IconSize, Indicator,
+    PopoverMenu, PopoverMenuHandle, Tab, TabPosition, Tooltip, prelude::*, right_click_menu,
+};
+
+// === language ===
+pub use language::{Capability, DiagnosticSeverity};
+
+// === project ===
+pub use project::{DirectoryLister, Project, ProjectEntryId, ProjectPath, WorktreeId};
+
+// === collections ===
+pub use collections::{BTreeSet, HashMap, HashSet, VecDeque};
+
+// === std ===
+pub use std::{
+    any::Any,
+    cmp, fmt, mem,
+    num::NonZeroUsize,
+    path::PathBuf,
+    rc::Rc,
+    sync::{
+        Arc,
+        atomic::{AtomicUsize, Ordering},
+    },
+    time::Duration,
+};
+
+// === parking_lot ===
+pub use parking_lot::Mutex;
+
+// === crate::item — 子模块共享 ===
+pub use crate::item::{
+    Item, ItemBufferKind, ItemHandle, ItemSettings, PreviewTabsSettings, ProjectItemKind,
+    TabContentParams, TabTooltipContent, WeakItemHandle,
+};
+
+// === crate 根 actions ===
+pub use crate::{SplitDirection, Workspace};
+
+// === crate 其他 ===
+pub use crate::{
+    invalid_item_view::InvalidItemView,
+    toolbar::Toolbar,
+    workspace_settings::{
+        AutosaveSetting, FocusFollowsMouse, TabBarSettings, WorkspaceSettings,
+    },
+};
+
+// === settings ===
+pub use settings::SettingsStore;
+
+// === util ===
+pub use util::{ResultExt, TryFutureExt};
 
 pub mod dragged;
 pub mod event;
 pub mod group;
-pub use dragged::{DraggedSelection, DraggedTab};
+pub use dragged::DraggedTab;
 pub use event::Event;
 mod actions;
 mod add_item;
@@ -45,23 +101,6 @@ pub use helpers::*;
 pub use history::*;
 pub use queries::*;
 pub use selection::*;
-
-use collections::{HashMap, HashSet};
-use std::any::Any;
-use std::num::NonZeroUsize;
-use std::rc::Rc;
-use std::sync::Arc;
-use std::sync::atomic::AtomicUsize;
-
-use language::DiagnosticSeverity;
-use parking_lot::Mutex;
-use project::{Project, ProjectPath};
-use ui::{ContextMenu, PopoverMenuHandle};
-use util::TryFutureExt;
-
-use crate::Workspace;
-use crate::toolbar::Toolbar;
-use crate::workspace_settings::{FocusFollowsMouse, WorkspaceSettings};
 
 pub struct ActivationHistoryEntry {
     pub entity_id: EntityId,

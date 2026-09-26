@@ -1,3 +1,4 @@
+use super::*;
 use super::actions::{
     ActivateItem, ActivateLastItem, ActivateNextItem, ActivatePreviousItem, AlternateFile,
     CloseActiveItem, CloseAllItems, CloseCleanItems, CloseItemsToTheLeft, CloseItemsToTheRight,

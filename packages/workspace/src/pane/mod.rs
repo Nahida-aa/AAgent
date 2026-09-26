@@ -19,12 +19,17 @@ use gpui::{
 };
 use ui::{
     ButtonSize, ContextMenu, ContextMenuEntry, ContextMenuItem, DecoratedIcon, Headline,
-    HeadlineSize, IconButton, IconDecoration, IconDecorationKind, IconName, IconSize, Indicator,
-    PopoverMenu, PopoverMenuHandle, Tab, TabPosition, Tooltip, prelude::*, right_click_menu,
+    HeadlineSize, IconButton, IconButtonShape, IconDecoration, IconDecorationKind, IconName,
+    IconSize, Indicator, PopoverMenu, PopoverMenuHandle, Tab, TabBar, TabPosition, Tooltip,
+    prelude::*, right_click_menu,
 };
+use git::{CopyFilePermalink, OpenFilePermalink};
+use itertools::Itertools;
 use language::{Capability, DiagnosticSeverity};
 use project::{DirectoryLister, Project, ProjectEntryId, ProjectPath, WorktreeId};
 use collections::{BTreeSet, HashMap, HashSet, VecDeque};
+use schemars::JsonSchema;
+use serde::Deserialize;
 use std::{
     any::Any,
     cmp, fmt, mem,
@@ -38,15 +43,27 @@ use std::{
     time::Duration,
 };
 use parking_lot::Mutex;
-use settings::SettingsStore;
-use util::{ResultExt, TryFutureExt};
+use settings::{Settings, SettingsStore};
+use theme_settings::ThemeSettings;
+use util::{
+    ResultExt, TryFutureExt, debug_panic, maybe, paths::PathStyle, serde::default_true,
+};
+
+// === crate 内部私有导入（子模块通过 use super::* 继承，不含 pub use 已有的类型避免 E0252） ===
+use crate::{
+    CloseWindow, NewCenterTerminal, NewFile, NewTerminal, OpenInTerminal, OpenOptions,
+    OpenTerminal, OpenVisible, ToggleFileFinder, ToggleProjectSymbols, ToggleZoom,
+    WorkspaceItemBuilder, ZoomIn, ZoomOut, focus_follows_mouse::FocusFollowsMouse as _,
+    item::{ActivateOnClose, ClosePosition, SaveOptions, ShowCloseButton, ShowDiagnostics},
+    move_item,
+};
 
 // === crate 内部转发（公开 API） ===
 pub use crate::item::{
     Item, ItemBufferKind, ItemHandle, ItemSettings, PreviewTabsSettings, ProjectItemKind,
     TabContentParams, TabTooltipContent, WeakItemHandle,
 };
-pub use crate::{SplitDirection, Workspace};
+pub use crate::{SplitDirection};
 pub use crate::{
     invalid_item_view::InvalidItemView,
     toolbar::Toolbar,

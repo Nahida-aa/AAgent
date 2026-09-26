@@ -19,6 +19,8 @@
 //! - `timestamp` 保留，NavHistory 内部自增计数器
 //! - `is_preview` / `row` 保留
 
+use super::*;
+
 use gpui::EntityId;
 use gpui::{App, Context, FocusOutEvent, Window};
 use project::Project;

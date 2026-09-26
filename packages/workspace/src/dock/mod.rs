@@ -16,11 +16,28 @@ pub use proto::PanelId;
 
 // 外部 crate 导入（子模块通过 use super::* 继承）
 use std::sync::Arc;
+
+use anyhow::Context as _;
+use client::proto;
+use db::kvp::KeyValueStore;
 use gpui::{
-    App, Context, Entity, IntoElement, MouseButton, MouseDownEvent, MouseUpEvent, ParentElement,
-    Pixels, Render, Styled, Window, deferred, div, hsla, px, prelude::*,
+    Action, Anchor, AnyView, App, Axis, Context, Entity, EntityId, EventEmitter, FocusHandle,
+    Focusable, IntoElement, KeyContext, MouseButton, MouseDownEvent, MouseUpEvent, ParentElement,
+    Pixels, Render, SharedString, StyleRefinement, Styled, Subscription, WeakEntity, Window,
+    deferred, div, hsla, px, prelude::*,
 };
+use serde::{Deserialize, Serialize};
+use settings::{Settings, SettingsStore};
 use theme::ActiveTheme;
+use ui::{ContextMenu, IconButton, Tooltip, prelude::*, right_click_menu};
+use util::ResultExt as _;
+
+// crate 根模块导入（子模块通过 use super::* 继承）
+use crate::{
+    DraggedDock, Event, FocusFollowsMouse, ModalLayer, Pane, Workspace,
+    WorkspaceSettings, focus_follows_mouse::FocusFollowsMouse as _,
+    persistence::model::DockData,
+};
 
 pub(crate) const RESIZE_HANDLE_SIZE: Pixels = px(6.);
 

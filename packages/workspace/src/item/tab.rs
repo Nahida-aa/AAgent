@@ -2,7 +2,7 @@
 //!
 //! 对齐 Zed `TabContentParams` + `TabTooltipContent` + `ItemBufferKind`。
 
-use gpui::SharedString;
+use gpui::{AnyView, App, SharedString, Window};
 
 /// Tab 渲染的上下文参数 — 对齐 Zed `TabContentParams`。
 ///

@@ -1,6 +1,5 @@
 pub use language::HighlightedText;
 
-use ui::{Icon, Label, LabelCommon};
 use gpui::{
     Action, AnyElement, AnyEntity, App, Context, Entity, EntityId, EventEmitter, Focusable, Font,
     IntoElement, Pixels, Point, Render, SharedString, Task, WeakEntity, Window,
@@ -10,8 +9,13 @@ use project::{Project, ProjectPath};
 use std::any::{Any, TypeId};
 use std::path::Path;
 use std::sync::Arc;
+use ui::{Icon, Label, LabelCommon};
 
-use super::{ItemBufferKind,events::{ ItemEvent, SaveOptions, TabContentParams, TabTooltipContent}};
+use super::{
+    ItemBufferKind,
+    events::{ItemEvent, SaveOptions},
+    tab::{TabContentParams, TabTooltipContent},
+};
 use crate::{
     ItemNavHistory, Pane, ToolbarItemLocation, Workspace, WorkspaceId,
     invalid_item_view::InvalidItemView, searchable::SearchableItemHandle,

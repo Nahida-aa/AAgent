@@ -9,14 +9,13 @@ use super::*;
 use super::Workspace;
 use crate::{dock::Dock, workspace::CloseIntent};
 use anyhow::{Context as _, Result, anyhow};
-use gpui::{App, Context, Entity, PromptLevel, Task, Window};
+use gpui::{Action, App, Context, Entity, PromptLevel, Task, Window};
 use language::Buffer;
 use project::{WorktreeId, debugger::session::ThreadStatus};
 
 use std::path::PathBuf;
 use std::process::ExitStatus;
 
-use gpui::{Action, App, Task, Window};
 use task::{DebugScenario, SharedTaskContext, SpawnInTerminal};
 
 /// 由终端面板实现的 trait — 抽象终端创建逻辑。

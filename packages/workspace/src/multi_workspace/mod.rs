@@ -12,12 +12,28 @@ pub use sidebar::render_state::SidebarRenderState;
 pub use task::SpawnInTerminal;
 
 // 外部 crate 导入（子模块通过 use super::* 继承）
-use theme::ActiveTheme;
+use anyhow::{Context as _, Result};
+use fs::Fs;
 use gpui::{
     AnyView, App, Context, DragMoveEvent, Entity, EntityId, EventEmitter, FocusHandle,
-    IntoElement, MouseButton, ParentElement, Pixels, Render, Styled, Subscription, Task,
-    WeakEntity, Window, WindowId, div, prelude::*, px,
+    Focusable, IntoElement, ManagedView, MouseButton, ParentElement, Pixels, Render, Styled,
+    Subscription, Task, TaskExt, WeakEntity, Window, WindowId, actions, deferred, div,
+    prelude::*, px,
 };
+use project::{DisableAiSettings, Project, ProjectGroupKey};
+use remote::RemoteConnectionOptions;
+use settings::{Settings, SidebarDockPosition};
+use std::{cell::Cell, path::PathBuf, rc::Rc};
+use theme::ActiveTheme;
+use ui::{ContextMenu, right_click_menu, prelude::*};
+use util::{ResultExt, path_list::PathList};
+
+// crate 内部私有导入（子模块通过 use super::* 继承）
+use crate::{
+    CloseIntent, CloseWindow, DockPosition, Item, ModalView, OpenMode, Panel, WorkspaceId,
+    persistence::model::MultiWorkspaceState,
+};
+use crate::Event as WorkspaceEvent;
 
 // crate 内部转发
 pub use crate::Workspace;
@@ -44,11 +60,6 @@ pub use actions::*;
 pub use events::*;
 pub use project_group::*;
 pub use sidebar::*;
-
-use std::cell::Cell;
-use std::rc::Rc;
-
-use anyhow::Result;
 
 pub(crate) const SIDEBAR_RESIZE_HANDLE_SIZE: Pixels = px(6.0);
 /// 顶层 MultiWorkspace entity。

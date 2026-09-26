@@ -137,18 +137,20 @@ use std::fmt;
 use std::mem;
 
 // workspace 内部子模块之间共享的类型（子模块通过 use super::* 继承）
-use collab::{OpenResult, WorkspaceMatching, workspace_windows_for_location};
-use collab::actions::OpenChannelNotes;
-use collab::open_remote_project_with_existing_connection;
-use core::event::Event;
-use app::state::ActiveWorktreeCreation;
-use collab::call::GlobalAnyActiveCall;
-use window::RegionFocusHandles;
-use follow::ViewId;
-use pane::ActivateInDirectionTarget;
-use pane::ops::{clone_active_item, move_active_item};
-use window::PartBehavior;
-use serialize::WorkspaceLocation;
+pub(crate) use collab::{OpenResult, WorkspaceMatching, workspace_windows_for_location};
+pub(crate) use collab::actions::OpenChannelNotes;
+pub(crate) use collab::open_remote_project_with_existing_connection;
+pub(crate) use core::event::Event;
+pub(crate) use app::state::{ActiveWorktreeCreation, PreviousWorkspaceState};
+pub(crate) use collab::call::GlobalAnyActiveCall;
+pub(crate) use window::{RegionFocusHandles, window_bounds_env_override};
+pub(crate) use follow::{ViewId, leader_border_for_pane};
+pub(crate) use pane::ActivateInDirectionTarget;
+pub(crate) use pane::ops::{clone_active_item, move_active_item};
+pub(crate) use window::PartBehavior;
+pub(crate) use serialize::{WorkspaceLocation, SERIALIZATION_THROTTLE_TIME};
+pub(crate) use open::local::open_items;
+pub(crate) use dock::sizing::px_with_ui_font_fallback;
 
 pub use crate::workspace::collab::AutoWatch;
 pub use crate::workspace::app::store::WorkspaceStore;

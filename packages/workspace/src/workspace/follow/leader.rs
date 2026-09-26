@@ -99,7 +99,7 @@ impl Workspace {
     }
 }
 
-fn leader_border_for_pane(
+pub(crate) fn leader_border_for_pane(
     follower_states: &HashMap<CollaboratorId, FollowerState>,
     pane: &Entity<Pane>,
     _: &Window,

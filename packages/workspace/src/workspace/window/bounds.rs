@@ -62,7 +62,7 @@ impl Workspace {
 }
 
 // │   ├── window_bounds_env_override
-fn window_bounds_env_override() -> Option<Bounds<Pixels>> {
+pub(crate) fn window_bounds_env_override() -> Option<Bounds<Pixels>> {
     ZED_WINDOW_POSITION
         .zip(*ZED_WINDOW_SIZE)
         .map(|(position, size)| Bounds {

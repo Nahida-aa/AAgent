@@ -309,7 +309,7 @@ impl Workspace {
     }
 }
 
-fn open_items(
+pub(crate) fn open_items(
     serialized_workspace: Option<SerializedWorkspace>,
     mut project_paths_to_open: Vec<(PathBuf, Option<ProjectPath>)>,
     window: &mut Window,

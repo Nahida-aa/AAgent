@@ -166,7 +166,7 @@ impl Workspace {
     }
 }
 
-fn px_with_ui_font_fallback(val: u32, cx: &Context<Workspace>) -> Pixels {
+pub(crate) fn px_with_ui_font_fallback(val: u32, cx: &Context<Workspace>) -> Pixels {
     if val == 0 {
         ThemeSettings::get_global(cx).ui_font_size(cx)
     } else {

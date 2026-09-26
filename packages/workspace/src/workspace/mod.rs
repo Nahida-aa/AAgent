@@ -135,11 +135,20 @@ use crate::workspace_error;
 use std::fmt;
 use std::mem;
 
+// workspace 内部子模块之间共享的类型（子模块通过 use super::* 继承）
+use collab::{OpenResult, OpenChannelNotes, WorkspaceMatching, workspace_windows_for_location};
+use collab::open_remote_project_with_existing_connection;
+use core::Event;
+use core::workspace::{ActiveWorktreeCreation, GlobalAnyActiveCall, RegionFocusHandles, ViewId};
+use pane::mod_target::ActivateInDirectionTarget;
+use pane::ops::{clone_active_item, move_active_item};
+use pane::PartBehavior;
+use serialize::workspace::WorkspaceLocation;
+use window::bounds::window_bounds_env_override;
+
 pub use crate::workspace::collab::AutoWatch;
 pub use crate::workspace::app::store::WorkspaceStore;
 use crate::workspace::follow::CollaboratorId;
-
-use core::Event;
 
 pub use core::{Workspace, WorkspaceId};
 pub use core::lifecycle::CloseIntent;

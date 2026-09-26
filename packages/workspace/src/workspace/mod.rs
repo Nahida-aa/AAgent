@@ -162,7 +162,7 @@ pub use crate::workspace::collab::AutoWatch;
 pub use crate::workspace::app::store::WorkspaceStore;
 use crate::workspace::follow::CollaboratorId;
 
-use core::{Workspace, WorkspaceId};
+use core::WorkspaceId;
 use core::lifecycle::CloseIntent;
 use open::options::{OpenMode, OpenVisible};
 use window::title::WindowTitleContext;

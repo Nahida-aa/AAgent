@@ -9,7 +9,7 @@ mod needs;
 // WindowTitleContext
 mod context;
 // WindowTitleTemplatePart,(parse\render)_window_title_format
-mod format;
+pub(crate) mod format;
 // update_window_title / apply_window_title / project_window_title
 mod render;
 

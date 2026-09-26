@@ -28,5 +28,5 @@ use crate::workspace::core::actions::ToggleAllDocks;
 mod read;
 mod ops;
 mod state;
-mod sizing;
+pub(crate) mod sizing;
 pub mod render;

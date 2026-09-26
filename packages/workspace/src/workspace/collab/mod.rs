@@ -1,7 +1,8 @@
 use super::*;
 use super::Workspace;
 use crate::dock::Dock;
-use crate::workspace::core::{CloseIntent, WorkspaceId};
+use crate::workspace::core::WorkspaceId;
+use crate::workspace::core::lifecycle::CloseIntent;
 use crate::workspace::collab::call::{AnyActiveCall, GlobalAnyActiveCall};
 use anyhow::{Context as _, Result, anyhow};
 use collections::HashMap;

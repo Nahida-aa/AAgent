@@ -187,7 +187,7 @@ use workspace::{
     core::workspace::Workspace,
     dock::render::DraggedDock,
     follow::CollaboratorId,
-    follow::state::ViewId,
+    follow::ViewId,
     notification::toast::Toast,
     open::options::{OpenMode, OpenVisible},
     providers::TerminalProvider,

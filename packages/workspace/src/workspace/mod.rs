@@ -144,7 +144,7 @@ use core::event::Event;
 use app::state::ActiveWorktreeCreation;
 use collab::call::GlobalAnyActiveCall;
 use window::RegionFocusHandles;
-use follow::state::ViewId;
+use follow::ViewId;
 use pane::ActivateInDirectionTarget;
 use pane::ops::{clone_active_item, move_active_item};
 use window::PartBehavior;

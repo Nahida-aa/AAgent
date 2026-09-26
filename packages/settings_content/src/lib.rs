@@ -45,10 +45,7 @@ pub use merge_from::MergeFrom;
 
 // ---------- 各子模块 re-export ----------
 
-pub use agent::{
-    AgentConfigOptionValue, CustomAgentServerSettings, LanguageModelSelection, SidebarDockPosition,
-    SidebarSide,
-};
+pub use agent::*;
 pub use language_model::{Config, McpConfig, McpServerDef, ProviderConfig, ResolvedConfig};
 use schemars::JsonSchema;
 use serde::{Serialize, de::DeserializeOwned};
@@ -145,8 +142,8 @@ pub use theme::{
     WindowBackgroundContent,
     // font::FontSettingsContent,
 };
-pub use ui::DockPosition;
-use ui::{DockSide, ShowIndentGuides};
+pub use ui::{DockPosition, DockSide};
+use ui::ShowIndentGuides;
 pub use workspace::folder_indicator::FolderIndicator;
 
 #[with_fallible_options]

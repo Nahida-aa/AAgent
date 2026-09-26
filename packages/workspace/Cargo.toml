@@ -38,7 +38,6 @@ db.workspace = true
 futures.workspace = true
 smallvec.workspace = true
 project.workspace = true
-# 源码在用、但之前清单漏声明的几个（照 zed crates/workspace 的依赖面补齐）。
 theme_settings.workspace = true
 fs.workspace = true
 itertools.workspace = true

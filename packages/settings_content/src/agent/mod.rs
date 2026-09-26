@@ -12,34 +12,30 @@ use collections::IndexMap;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use settings_macros::{MergeFrom, with_fallible_options};
-mod agent_server;
-mod auto_compact;
-mod model_selection;
-mod notification;
-mod profile;
-mod sandbox;
-mod sidebar;
+pub mod agent_server;
+pub mod auto_compact;
+pub mod model_selection;
+pub mod notification;
+pub mod profile;
+pub mod sandbox;
+pub mod sidebar;
+pub mod thinking;
+pub mod tool_permissions;
 
-pub use agent_server::{
-    AgentConfigOptionValue, AllAgentServersSettings, CustomAgentServerSettings,
+pub use agent_server::{AgentConfigOptionValue, AllAgentServersSettings, CustomAgentServerSettings};
+pub use auto_compact::{AutoCompactSettingsContent, AutoCompactThreshold};
+pub use model_selection::{
+    LanguageModelParameters, LanguageModelProviderSetting, LanguageModelSelection,
 };
-pub use model_selection::LanguageModelSelection;
+pub use notification::{NotifyWhenAgentWaiting, PlaySoundWhenAgentDone};
+pub use profile::{AgentProfileContent, ContextServerPresetContent};
+pub use sandbox::{GrantedWritePathContent, SandboxPermissionsContent};
 pub use sidebar::{SidebarDockPosition, SidebarSide};
-mod thinking;
-mod tool_permissions;
-use crate::{
-    DockPosition,
-    agent::{
-        auto_compact::AutoCompactSettingsContent,
-        model_selection::LanguageModelParameters,
-        notification::{NotifyWhenAgentWaiting, PlaySoundWhenAgentDone},
-        profile::AgentProfileContent,
-        sandbox::{GrantedWritePathContent, SandboxPermissionsContent},
-        thinking::ThinkingBlockDisplay,
-        tool_permissions::{ToolPermissionMode, ToolPermissionsContent, ToolRegexRule},
-    },
-    common::ExtendingVec,
+pub use thinking::ThinkingBlockDisplay;
+pub use tool_permissions::{
+    ToolPermissionMode, ToolPermissionsContent, ToolRegexRule, ToolRulesContent,
 };
+use crate::{DockPosition, common::ExtendingVec};
 
 #[with_fallible_options]
 #[derive(Clone, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom, Debug, Default)]

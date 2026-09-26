@@ -153,3 +153,26 @@ pub fn is_file(&self) -> bool { !self.is_dir() }
 
 推论（写宏时遵守）：**宏输出里不许硬编码自己的 crate 名**，要么用 `$crate`
 （`macro_rules!` 免疫别名问题），要么留 `crate = "..."` 覆盖口。
+
+## 12. E0599「找不到方法」先分清：是缺 import，还是 gpui_learn 缺扩展 trait
+
+照搬 zed 代码报 E0599 时，编译器的提示经常是误导（比如建议你用 `rounded_none`）。
+zed 有大量**扩展 trait**——方法看着像元素自带，其实住在别的 crate 里：
+
+| 方法 | 真身 | 我们补的位置 |
+|---|---|---|
+| `rounded_client_corners` | `theme::ClientDecorationsExt`（zed `theme.rs:58`） | `theme/src/lib.rs` |
+| `IconButton::tab_index` / `size` / `layer` / `track_focus` | `ui::ButtonCommon`（zed `icon_button.rs`） | `ui/src/components/button/mod.rs` |
+| `PopoverMenu::trigger_with_tooltip` | 约束 `T: PopoverTrigger + ButtonCommon` | `ui/src/components/popover_menu.rs` |
+| `menu.separator().when_some(..)` / `.map(..)` | `impl FluentBuilder for ContextMenu`（zed `context_menu.rs:271`） | `ui/src/components/context_menu/` |
+| `Tooltip::for_action(_in)` | zed `tooltip.rs:96/109` | `ui/src/components/tooltip/mod.rs` |
+| `PlayerColors::agent` | zed `players.rs:130` | `theme/src/styles/players.rs` |
+
+判定方法：报的是 `aa_gpui_kit_ui::X` / `aa_gpui_kit_theme::X` **找不到方法或
+trait bounds 不满足** → 去 zed grep 方法名，看它定义在哪个 trait / impl 上，
+再确认 gpui_learn 有没有对应物。别急着改调用点。
+
+注意 `FluentBuilder`：gpui 只给了 `impl<T: IntoElement> FluentBuilder for T`（blanket），
+所以**非元素类型**（`ContextMenu`、菜单条目）要显式补一条 `impl FluentBuilder for X {}`
+才写得动 `.when(..)` / `.when_some(..)`。在自己的 crate 里补这条 impl 不会
+和 blanket impl 冲突（zed 就是这么写的）。

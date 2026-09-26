@@ -13,6 +13,10 @@ use gpui::{App, Context, FocusOutEvent, Window};
 use project::Project;
 use settings::Settings;
 use theme_settings::ThemeSettings;
+use util::{
+    ResultExt, debug_panic, markdown::MarkdownInlineCode, maybe, paths::PathStyle,
+    serde::default_true, truncate_and_remove_front,
+};
 
 impl Pane {
     pub(super) fn handle_drag_move<T: 'static>(

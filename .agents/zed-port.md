@@ -119,3 +119,37 @@ pub fn is_file(&self) -> bool { !self.is_dir() }
 `use` 语句 —— 那会让以后对 zed 做 diff 变困难。
 
 每个包在一个 Cargo.toml 里只能声明一个名字（别名 + 真名同时出现会报 E0463 类错误）。
+
+## 11. Cargo 别名对 proc 宏不可见
+
+第 10 条的别名只在写代码的**人**眼里存在。proc 宏展开时拿到的是 token，
+**看不见 Cargo 别名**，所以宏生成的代码里如果硬编码了自己的 crate 名，
+消费方起了别名就会 E0433「cannot find module or crate `aa_gpui_kit_component`」。
+
+典型现场：`workspace/src/notifications/mod.rs` 的 `#[derive(RegisterComponent)]`
+（消费方把 `aa_gpui_kit_component` 起别名成 `component`）。
+
+处理顺序：
+
+1. **先确认是不是这个原因**：错误落在 `#[derive(...)]` 那一行，且报的是宏包
+   自己的 crate 名 → 就是它。
+2. **宏侧加 `crate = "..."` 覆盖**（serde 的 `#[serde(crate = "...")]` 同型），
+   默认还是真名，存量代码不用动。derive 能带 helper attribute：
+   `#[proc_macro_derive(RegisterComponent, attributes(register_component))]`，
+   用 `syn::parse_nested_meta` 读 `crate`，值 parse 成 `syn::Path`，
+   `quote!` 里全部用 `#krate::` 而不是字面量。
+3. **消费方**在自己那一行加属性，别去改 gpui_learn：
+   ```rust
+   #[derive(RegisterComponent)]
+   #[register_component(crate = "component")]  // 本 crate 起的 Cargo 别名
+   ```
+   消费者用不用别名是他自己的选择，不要反过来强迫别人写
+   `use aa_gpui_kit_component as component;`。
+
+> 函数式宏（如 `derive_dynamic_spacing!`）**没法带 helper attribute**，
+> 要覆盖只能做成宏参数。现在它硬编码 `aa_gpui_kit_theme::` 是安全的：
+> 唯一调用方是 gpui_learn 自己的 `ui` 包（`styles/spacing.rs`），
+> 那里没起别名；AAgent 零调用。**哪天有外部调用方了再说。**
+
+推论（写宏时遵守）：**宏输出里不许硬编码自己的 crate 名**，要么用 `$crate`
+（`macro_rules!` 免疫别名问题），要么留 `crate = "..."` 覆盖口。

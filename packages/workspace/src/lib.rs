@@ -40,6 +40,7 @@ pub use remote::{
     RemoteConnectionIdentity, remote_connection_identity, same_remote_connection_identity,
 };
 pub use toast_layer::{ToastAction, ToastLayer, ToastView};
+pub use workspace::*;
 
 use anyhow::{Context as _, Result, anyhow};
 use client::{

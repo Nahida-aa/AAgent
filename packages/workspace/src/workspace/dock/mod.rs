@@ -7,7 +7,7 @@ use gpui::{
 use std::sync::Arc;
 
 use super::Workspace;
-use crate::dock::{
+pub(crate) use crate::dock::{
     Dock, DockPosition, PanelHandle, PanelSizeState, RESIZE_HANDLE_SIZE,
 };
 use crate::pane::group::PaneRenderContext;

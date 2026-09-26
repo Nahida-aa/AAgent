@@ -253,7 +253,7 @@ impl Workspace {
 }
 
 #[derive(Clone)]
-enum ActivateInDirectionTarget {
+pub(crate) enum ActivateInDirectionTarget {
     Pane(Entity<Pane>),
     Dock(Entity<Dock>),
     Sidebar(FocusHandle),

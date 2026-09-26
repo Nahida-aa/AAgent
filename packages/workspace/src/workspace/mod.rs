@@ -119,7 +119,8 @@ use crate::persistence::{
     WorkspaceDb, SerializedAxis,
     model::{DockData, DockStructure, ItemId, MultiWorkspaceState, PathList, SerializedItem, SerializedMultiWorkspace, SerializedPane, SerializedPaneGroup, SerializedProjectGroupState, SerializedWorkspace, SerializedWorkspaceLocation},
 };
-use crate::status_bar::{StatusBar, sidebar_status::SidebarSide};
+use crate::status_bar::StatusBar;
+use crate::multi_workspace::SidebarSide;
 use crate::toast_layer::ToastLayer;
 use crate::security_modal::SecurityModal;
 use crate::multi_workspace::ProjectGroupKey;
@@ -136,24 +137,24 @@ use std::fmt;
 use std::mem;
 
 // workspace 内部子模块之间共享的类型（子模块通过 use super::* 继承）
-use collab::{OpenResult, OpenChannelNotes, WorkspaceMatching, workspace_windows_for_location};
+use collab::{OpenResult, WorkspaceMatching, workspace_windows_for_location};
+use collab::actions::OpenChannelNotes;
 use collab::open_remote_project_with_existing_connection;
-use core::Event;
+use core::event::Event;
 use core::workspace::{ActiveWorktreeCreation, GlobalAnyActiveCall, RegionFocusHandles, ViewId};
-use pane::mod_target::ActivateInDirectionTarget;
+use pane::{ActivateInDirectionTarget};
 use pane::ops::{clone_active_item, move_active_item};
-use pane::PartBehavior;
-use serialize::workspace::WorkspaceLocation;
-use window::bounds::window_bounds_env_override;
+use window::PartBehavior;
+use serialize::WorkspaceLocation;
 
 pub use crate::workspace::collab::AutoWatch;
 pub use crate::workspace::app::store::WorkspaceStore;
 use crate::workspace::follow::CollaboratorId;
 
-pub use core::{Workspace, WorkspaceId};
-pub use core::lifecycle::CloseIntent;
-pub use open::options::{OpenMode, OpenVisible};
-pub use window::title::WindowTitleContext;
+use core::{Workspace, WorkspaceId};
+use core::lifecycle::CloseIntent;
+use open::options::{OpenMode, OpenVisible};
+use window::title::WindowTitleContext;
 
 /// Handles a workspace.
 pub trait WorkspaceHandle {

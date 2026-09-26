@@ -20,7 +20,8 @@ use gpui::{
     Subscription, Task, TaskExt, WeakEntity, Window, WindowId, actions, deferred, div,
     prelude::*, px,
 };
-use project::{DisableAiSettings, Project, ProjectGroupKey};
+use project::{DisableAiSettings, Project};
+pub(crate) use project::ProjectGroupKey;
 use remote::RemoteConnectionOptions;
 use settings::{Settings, SidebarDockPosition};
 use std::{cell::Cell, path::PathBuf, rc::Rc};
@@ -35,8 +36,8 @@ use crate::{
 };
 use crate::Event as WorkspaceEvent;
 
-// crate 内部转发
-pub use crate::Workspace;
+// crate 内部转发（Workspace 是 crate 私有，用 pub(crate) 转发）
+pub(crate) use crate::workspace::Workspace;
 pub use settings_content::SidebarSide;
 mod actions;
 mod activate;

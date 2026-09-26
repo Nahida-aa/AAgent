@@ -1,5 +1,5 @@
 use super::*;
-struct DelayedDebouncedEditAction {
+pub(crate) struct DelayedDebouncedEditAction {
     task: Option<Task<()>>,
     cancel_channel: Option<oneshot::Sender<()>>,
 }

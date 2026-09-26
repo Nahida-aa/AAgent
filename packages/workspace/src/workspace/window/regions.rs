@@ -201,7 +201,7 @@ impl FocusablePart {
 /// (e.g. `Main`/"Editor", `Complementary`/"Left dock"). Without them, region
 /// navigation would focus an inner element that has no accessibility node, and
 /// assistive technology would fall back to announcing the whole window.
-struct RegionFocusHandles {
+pub(crate) struct RegionFocusHandles {
     left_dock: FocusHandle,
     right_dock: FocusHandle,
     bottom_dock: FocusHandle,

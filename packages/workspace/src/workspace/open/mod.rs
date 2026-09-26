@@ -21,4 +21,4 @@ pub mod remote;
 pub mod restore;
 pub mod windows;
 pub use options::{OpenMode, OpenOptions, OpenVisible};
-pub use prompt::{PromptForNewPath, PromptForOpenPath};
+pub(crate) use prompt::{PromptForNewPath, PromptForOpenPath};

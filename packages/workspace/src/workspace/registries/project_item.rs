@@ -16,7 +16,7 @@ type BuildProjectItemForPathFn =
     ) -> Option<Task<Result<(Option<ProjectEntryId>, WorkspaceItemBuilder)>>>;
 
 #[derive(Clone, Default)]
-struct ProjectItemRegistry {
+pub(crate) struct ProjectItemRegistry {
     build_project_item_fns_by_type: TypeIdHashMapp<BuildProjectItemFn>,
     build_project_item_for_path_fns: Vec<BuildProjectItemForPathFn>,
 }

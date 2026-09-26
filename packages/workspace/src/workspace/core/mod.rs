@@ -20,6 +20,7 @@ pub use ids::WorkspaceId;
 pub mod keystrokes;
 pub mod lifecycle;
 pub mod workspace;
+pub(crate) use workspace::Workspace;
 pub mod history;
 pub mod ops;
 pub mod render;

@@ -22,5 +22,5 @@ impl Workspace {
 
 
 }
-pub use context::{WindowTitleContext};
-pub use needs::{WindowTitleNeeds};
+pub(crate) use context::{WindowTitleContext};
+pub(crate) use needs::{WindowTitleNeeds};

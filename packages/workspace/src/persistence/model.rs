@@ -1,8 +1,9 @@
 use super::{SerializedAxis, SerializedWindowBounds};
 use crate::{
     Member, Pane, PaneAxis, SerializableItemRegistry, Workspace, WorkspaceId, item::ItemHandle,
-    multi_workspace::SerializedProjectGroupState, path_list::PathList,
 };
+pub(crate) use crate::multi_workspace::SerializedProjectGroupState;
+pub(crate) use crate::path_list::PathList;
 use anyhow::{Context, Result};
 use async_recursion::async_recursion;
 use collections::IndexSet;

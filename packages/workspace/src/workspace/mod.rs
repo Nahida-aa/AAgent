@@ -18,6 +18,21 @@ use gpui::{
 pub mod app;
 pub mod core;
 pub mod serialize;
+pub mod dock;
+pub mod pane;
+pub mod item;
+pub mod collab;
+pub mod follow;
+pub mod modal;
+pub mod nav;
+pub mod notification;
+pub mod open;
+pub mod panel;
+pub mod providers;
+pub mod registries;
+pub mod status_bar;
+pub mod window;
+pub mod worktree;
 pub use crate::workspace::{app::initial::init, core::workspace::Workspace};
 
 use crate::active_call::{ActiveCallEvent, AnyActiveCall, GlobalAnyActiveCall};

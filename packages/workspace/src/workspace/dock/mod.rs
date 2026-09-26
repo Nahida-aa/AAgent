@@ -16,25 +16,7 @@ use crate::dock::Dock;
 // focused_dock_position
 // agent_panel_position
 mod read;
-// add_panel
-// remove_panel
-// set_bottom_dock_layout     // 写 settings + serialize
 mod ops;
-// dock 状态的捕获/恢复，和序列化配合
-// capture_dock_state
-// set_dock_structure
-// finish_dock_restoration
 mod state;
-// 尺寸计算与持久化
-// // 遍历 all_docks，找哪个 dock 装了 T panel，取它的 size state
-// pub fn panel_size_state<T: Panel>(&self, cx: &App) -> Option<dock::PanelSizeState>;
-
-// // 按 panel_key + workspace_id 从 KVP 读
-// pub fn persisted_panel_size_state(&self, panel_key: &'static str, cx: &App) -> Option<dock::PanelSizeState>;
-
-// // 按 panel_key + workspace_id 写 KVP
-// pub fn persist_panel_size_state(&self, panel_key: &str, size_state: dock::PanelSizeState, cx: &mut App);
-
-// // 找 dock，调 dock.set_panel_size_state
-// pub fn set_panel_size_state<T: Panel>(&mut self, size_state, window, cx) -> bool;
 mod sizing;
+pub mod render;

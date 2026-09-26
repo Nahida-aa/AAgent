@@ -25,6 +25,7 @@ mod toolbar;
 pub mod welcome;
 pub mod workspace_error;
 mod workspace_settings;
+pub mod workspace;
 
 pub use dock::Panel;
 pub use multi_workspace::{
@@ -175,15 +176,6 @@ pub use workspace::{
     app::initial::init,
     core::WorkspaceId,
     core::workspace::Workspace,
+    dock::render::DraggedDock,
     providers::{DebuggerProvider, TerminalProvider},
 };
-
-// ========= Zed 原版 DraggedDock（workspace.rs 根级类型） =========
-#[derive(Clone)]
-pub struct DraggedDock(pub DockPosition);
-
-impl Render for DraggedDock {
-    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        gpui::Empty
-    }
-}

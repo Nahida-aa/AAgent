@@ -64,6 +64,9 @@ remote.workspace = true
 gpui_util.workspace = true
 uuid.workspace = true
 ui_input.workspace = true
+postage.workspace = true
+release_channel.workspace = true
+url.workspace = true
 
 [dev-dependencies]
 client = { workspace = true, features = ["test-support"] }

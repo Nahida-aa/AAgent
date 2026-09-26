@@ -1,14 +1,14 @@
 use super::*;
 
-//! Panel trait 定义 + PanelHandle dyn object + 7 个占位 Panel struct。
-//!
-//! 完全对齐 zed `dock.rs`:
-//! - `Panel` trait — 面板 entity 自己实现
-//! - `PanelHandle` trait (Send + Sync) — Arc<dyn PanelHandle> 存在 Dock 里
-//! - `impl<T: Panel> PanelHandle for Entity<T>` — 自动包装
-//!
-//! Zed 每个面板（Project、Git、Agent、Terminal...）是独立 Entity，
-//! 各自实现 Panel trait，Dock 存 Arc<dyn PanelHandle>。
+// Panel trait 定义 + PanelHandle dyn object + 7 个占位 Panel struct。
+//
+// 完全对齐 zed `dock.rs`:
+// - `Panel` trait — 面板 entity 自己实现
+// - `PanelHandle` trait (Send + Sync) — Arc<dyn PanelHandle> 存在 Dock 里
+// - `impl<T: Panel> PanelHandle for Entity<T>` — 自动包装
+//
+// Zed 每个面板（Project、Git、Agent、Terminal...）是独立 Entity，
+// 各自实现 Panel trait，Dock 存 Arc<dyn PanelHandle>。
 
 use crate::Pane;
 use crate::status_bar::HideStatusItem;

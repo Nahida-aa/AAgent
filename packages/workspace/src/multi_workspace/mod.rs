@@ -51,7 +51,6 @@ use gpui::{
     WeakEntity, Window, WindowId,
 };
 
-use crate::Workspace;
 
 pub(crate) const SIDEBAR_RESIZE_HANDLE_SIZE: Pixels = px(6.0);
 /// 顶层 MultiWorkspace entity。

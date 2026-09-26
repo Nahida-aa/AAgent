@@ -1,4 +1,8 @@
-use gpui::actions;
+use std::path::PathBuf;
+
+use gpui::{Action, actions};
+use schemars::JsonSchema;
+use serde::Deserialize;
 
 /// Opens a file or directory.
 #[derive(Clone, PartialEq, Deserialize, JsonSchema, Action)]

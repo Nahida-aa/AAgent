@@ -28,8 +28,8 @@ use crate::item::{FollowableItemHandle, ItemHandle, WeakItemHandle};
 use crate::modal_layer::ModalLayer;
 use crate::multi_workspace::MultiWorkspace;
 use crate::notifications::{NotificationId, Notifications};
-use crate::pane::{Pane, SplitDirection};
-use crate::pane_group::PaneGroup;
+use crate::pane::Pane;
+use crate::pane::group::{PaneGroup, SplitDirection};
 use crate::persistence::WorkspaceDb;
 use crate::providers::{DebuggerProvider, TerminalProvider};
 use crate::registries::{

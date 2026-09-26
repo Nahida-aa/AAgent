@@ -2,10 +2,12 @@ use gpui::{App, Context, FocusOutEvent, Window};
 use project::Project;
 use settings::Settings;
 use theme_settings::ThemeSettings;
+use util::maybe;
 
 use super::Pane;
 use super::history::{NavigationMode, TagNavigationMode};
 use crate::item::{ItemSettings, PreviewTabsSettings};
+use crate::pane::PinOperation;
 use crate::workspace_settings::{FocusFollowsMouse, TabBarSettings, WorkspaceSettings};
 
 impl Pane {

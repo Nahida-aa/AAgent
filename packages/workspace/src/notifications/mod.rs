@@ -13,11 +13,12 @@ use project::project_settings::ProjectSettings;
 use settings::Settings;
 use theme_settings::ThemeSettings;
 
-use ui::{CopyButton, Tooltip, prelude::*};
+use component;
 use gpui_util::ResultExt;
 use std::ops::Deref;
 use std::sync::{Arc, LazyLock};
 use std::{any::TypeId, time::Duration};
+use ui::{CopyButton, RegisterComponent, Tooltip, prelude::*};
 
 #[derive(Default)]
 pub struct Notifications {

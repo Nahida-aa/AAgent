@@ -25,12 +25,14 @@ mod worktrees;
 #[cfg(feature = "test-support")]
 mod test_support;
 
-pub use state::{
+pub(crate) use state::{
     AgentLocation, BufferOrderedMessage, DebugAdapterClientState, DownloadingFile,
-    EntitySubscription, LocalProjectFlags, ProjectClientState, RemotelyCreatedModelGuard,
+    EntitySubscription,  ProjectClientState, RemotelyCreatedModelGuard,
     RemotelyCreatedModels,
 };
-
+pub use state::{
+   LocalProjectFlags,
+};
 // ---- 供 project/ 各子模块经 `use super::*;` 取用 ----
 // zed 的 project.rs 是 crate 根，子模块用的裸名天然可见；拆分后在这里统一转发。
 // 这些供 project/ 各子模块经 `use super::*;` 取用。

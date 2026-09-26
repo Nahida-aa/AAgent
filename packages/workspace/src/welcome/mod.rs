@@ -13,9 +13,6 @@ use gpui::{
 use gpui::{WeakEntity, linear_color_stop, linear_gradient};
 use menu::{SelectNext, SelectPrevious};
 
-use ui::{
-    ButtonLike, Divider, DividerColor, IconSize, KeyBinding, Vector, VectorName, prelude::*,
-};
 use aagent_actions::{
     Extensions, OpenKeymap, OpenOnboarding, OpenSettings, assistant::ToggleFocus, command_palette,
 };
@@ -23,6 +20,7 @@ use gpui_util::ResultExt;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use settings::{DefaultOpenBehavior, Settings};
+use ui::{ButtonLike, Divider, DividerColor, IconSize, KeyBinding, Vector, VectorName, prelude::*};
 
 #[derive(PartialEq, Clone, Debug, Deserialize, Serialize, JsonSchema, Action)]
 #[action(namespace = welcome)]
@@ -321,7 +319,7 @@ impl WelcomePage {
                         })
                         .log_err();
                 } else {
-                    use zed_actions::OpenRecent;
+                    use aagent_actions::OpenRecent;
                     window.dispatch_action(OpenRecent::default().boxed_clone(), cx);
                 }
             }

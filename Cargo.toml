@@ -28,7 +28,6 @@ a_tracing_macro = { path = "packages/a_tracing_macro" }
 aa_env_vars = { path = "packages/aa_env_vars" }
 aagent_actions = { path = "packages/aagent_actions" }
 ad_credentials_provider = { path = "packages/ad_credentials_provider" }
-settings_json = { path = "packages/settings_json", default-features = false }
 aa-kernel = { path = "packages/kernel" }
 aa-core = { path = "packages/core" }
 aa-extension-sdk = { path = "packages/extension-sdk" }
@@ -38,6 +37,7 @@ aa-extension-mcp = { path = "packages/extension-mcp" }
 aa-llm = { path = "packages/llm" }
 aa-session = { path = "packages/aa_session" }
 aa-server = { path = "packages/server" }
+agent_settings = { path = "packages/agent_settings" }
 auto_update = { path = "packages/auto_update" }
 askpass = { path = "packages/askpass" }
 breadcrumbs = { path = "packages/breadcrumbs" }
@@ -49,7 +49,6 @@ cloud_api_types = { path = "packages/cloud_api_types" }
 cloud_llm_client = { path = "packages/cloud_llm_client" }
 dap = { path = "packages/dap" }
 db = { path = "packages/db" }
-agent_settings = { path = "packages/agent_settings" }
 edit_prediction_types = { path = "packages/edit_prediction_types" }
 editor = { path = "packages/editor" }
 env_var = { path = "packages/env_var" }
@@ -82,6 +81,11 @@ title_bar = { path = "packages/title_bar" }
 project = { path = "packages/project" }
 prettier = { path = "packages/prettier" }
 util_macros = { path = "packages/util_macros" }
+settings = { path = "packages/settings" }
+settings_content = { path = "packages/settings_content" }
+settings_macros = { path = "packages/settings_macros" }
+snippet_provider = { path = "packages/snippet_provider" }
+settings_json = { path = "packages/settings_json", default-features = false }
 sidebar = { path = "packages/sidebar" }
 session = { path = "packages/session" }
 rope = { path = "packages/rope" }
@@ -92,10 +96,7 @@ telemetry_events = { path = "packages/telemetry_events" }
 release_channel = { path = "packages/release_channel" }
 remote = { path = "packages/remote" }
 workspace = { path = "packages/workspace" }
-settings = { path = "packages/settings" }
-settings_content = { path = "packages/settings_content" }
-settings_macros = { path = "packages/settings_macros" }
-snippet_provider = { path = "packages/snippet_provider" }
+
 theme_settings = { path = "packages/theme_settings" }
 util = { path = "packages/util" }
 worktree = { path = "packages/worktree" }
@@ -105,6 +106,7 @@ zeta_prompt = { path = "packages/zeta_prompt" }
 
 agent-client-protocol = { version = "=2.1.0", features = ["unstable"] }
 aho-corasick = "1.1"
+any_vec = "0.14"
 anyhow = "1"
 async-channel = "2"
 axum = { version = "0.8", default-features = false }
@@ -113,10 +115,10 @@ async-std = { version = "1.12", features = ["unstable"] }
 async-trait = "0.1"
 alacritty_terminal = { git = "https://github.com/zed-industries/alacritty", rev = "4c129667ce56611becdc82de6e28218c80e2e88f" }
 async-lock = "3.4.2"
-async-recursion = "1.0.0"
 async-compression = { version = "0.4", features = ["bzip2", "gzip", "futures-io"] }
 async-fs = "2.1"
 async-pipe = { git = "https://github.com/zed-industries/async-pipe-rs", rev = "82d00a04211cf4e1236029aa03e6b6ce2a74c553" }
+async-recursion = "1.0.0"
 async-tar = { git = "https://github.com/zed-industries/async-tar", rev = "bd3ad6f89df9a9da7a8535958756d6bf465936a0" }
 async-tungstenite = "0.33"
 async_zip = { version = "0.0.18", features = ["deflate", "deflate64"] }

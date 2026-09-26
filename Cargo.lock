@@ -562,6 +562,25 @@ version = "0.1.0"
 [[package]]
 name = "agent_settings"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "collections",
+ "convert_case 0.11.0",
+ "fs",
+ "futures",
+ "gpui",
+ "language_model",
+ "log",
+ "paths",
+ "project",
+ "regex",
+ "schemars",
+ "serde",
+ "serde_json",
+ "serde_json_lenient",
+ "settings",
+ "util 0.1.0",
+]
 
 [[package]]
 name = "agent_skills"
@@ -733,6 +752,12 @@ dependencies = [
  "once_cell_polyfill",
  "windows-sys 0.61.2",
 ]
+
+[[package]]
+name = "any_vec"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "34cd60c5e3152cef0a592f1b296f1cc93715d89d2551d85315828c3a09575ff4"
 
 [[package]]
 name = "anyhow"
@@ -15572,7 +15597,10 @@ dependencies = [
  "aa_gpui_kit_ui_input",
  "aagent_actions",
  "agent_settings",
+ "any_vec",
  "anyhow",
+ "async-recursion",
+ "chrono",
  "client",
  "collections",
  "db",

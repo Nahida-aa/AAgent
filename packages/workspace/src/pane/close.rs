@@ -2,6 +2,7 @@ use gpui::{App, Context, FocusOutEvent, Window};
 use project::Project;
 use settings::Settings;
 use theme_settings::ThemeSettings;
+use util::debug_panic;
 
 use super::Pane;
 use super::history::{NavigationMode, TagNavigationMode};

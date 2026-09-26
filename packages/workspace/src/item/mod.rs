@@ -16,7 +16,7 @@ mod project_item;
 mod serializable;
 mod settings;
 mod traits;
-mod weak_handle;
+pub mod weak_handle;
 
 pub use events::*;
 pub use follow::*;
@@ -31,7 +31,7 @@ pub mod handle;
 pub mod settings;
 pub mod tab;
 use gpui::IntoElement;
-pub use handle::{Item, ItemHandle, WeakItemHandle};
+pub use handle::{ItemHandle};
 pub use tab::{ItemBufferKind, TabContentParams, TabTooltipContent};
 use ui::{Color, Icon, Label, LabelCommon};
 

@@ -80,7 +80,7 @@ pub(crate) use gpui::{
     Task, TextStyle,
 };
 pub(crate) use language_core::highlight_map::{CaptureId, HighlightId, HighlightMap};
-pub(crate) use lsp::{DiagnosticSeverity, LanguageServerId};
+pub use lsp::{DiagnosticSeverity, LanguageServerId};
 pub(crate) use parking_lot::Mutex;
 pub(crate) use settings::{SettingsStore, WorktreeId};
 pub(crate) use smallvec::SmallVec;

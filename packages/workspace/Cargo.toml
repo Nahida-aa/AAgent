@@ -18,7 +18,12 @@ test-support = [
 ]
 
 [dependencies]
+any_vec.workspace = true
+
 anyhow.workspace = true
+async-recursion.workspace = true
+chrono.workspace = true
+collections.workspace = true
 gpui.workspace = true
 theme.workspace = true
 ui.workspace = true
@@ -28,7 +33,6 @@ serde.workspace = true
 schemars = { workspace = true, features = ["derive"] }
 task.workspace = true
 language.workspace = true
-collections.workspace = true
 client.workspace = true
 db.workspace = true
 futures.workspace = true

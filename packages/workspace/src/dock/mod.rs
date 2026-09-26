@@ -1,10 +1,8 @@
 //! Dock 面板容器，对齐 zed `dock.rs`。
 
-mod buttons;
 pub mod buttons;
 mod entity;
 pub mod panel;
-mod panel;
 mod position;
 mod size;
 
@@ -24,13 +22,10 @@ pub(crate) const RESIZE_HANDLE_SIZE: Pixels = px(6.);
 
 pub(crate) const PANEL_SIZE_STATE_KEY: &str = "dock_panel_size";
 
-use theme::ActiveTheme;
 use gpui::{
     App, Context, Entity, IntoElement, MouseButton, MouseDownEvent, MouseUpEvent, ParentElement,
     Render, Styled, Window, deferred, div, hsla, prelude::*, px,
 };
+use theme::ActiveTheme;
 
 use self::panel::{Panel, PanelHandle};
-
-/// Resize handle 的大小（对齐 zed dock.rs `RESIZE_HANDLE_SIZE = px(6.)`）。
-pub const RESIZE_HANDLE_SIZE: f32 = 6.0;

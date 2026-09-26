@@ -1,15 +1,18 @@
 use super::*;
 
-use futures::stream::FuturesUnordered;
+use super::Pane;
+use super::history::{NavigationMode, TagNavigationMode};
+use crate::workspace_settings::{FocusFollowsMouse, TabBarSettings, WorkspaceSettings};
+use crate::{
+    item::{ItemSettings, PreviewTabsSettings},
+    notifications::NotifyResultExt,
+};
+use anyhow::Result;
+use futures::{StreamExt, stream::FuturesUnordered};
 use gpui::{App, Context, FocusOutEvent, Window};
 use project::Project;
 use settings::Settings;
 use theme_settings::ThemeSettings;
-use anyhow::Result;
-use super::Pane;
-use super::history::{NavigationMode, TagNavigationMode};
-use crate::item::{ItemSettings, PreviewTabsSettings};
-use crate::workspace_settings::{FocusFollowsMouse, TabBarSettings, WorkspaceSettings};
 
 impl Pane {
     pub(super) fn handle_drag_move<T: 'static>(

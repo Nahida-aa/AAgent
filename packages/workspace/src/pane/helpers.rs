@@ -1,20 +1,26 @@
-use ui::{
-    ContextMenu, IconButton, IconName, IconSize, PopoverMenu, Tooltip, prelude::*,
-};
-use gpui::{
-    Anchor, AnyElement, App, Context, DynamicSpacing, IntoElement, ParentElement, Styled, Window,
-};
+use gpui::{Anchor, AnyElement, App, Context, IntoElement, ParentElement, Styled, Window};
 use gpui_util::maybe;
 use project::ProjectPath;
+use ui::{ContextMenu, IconButton, IconName, IconSize, PopoverMenu, Tooltip, prelude::*};
 use util::{markdown::MarkdownInlineCode, paths::PathStyle, truncate_and_remove_front};
 
 use super::Pane;
-use super::actions::{
-    DeploySearch, NewCenterTerminal, NewFile, NewTerminal, SplitDown, SplitLeft, SplitMode,
-    SplitRight, SplitUp, ToggleFileFinder, ToggleProjectSymbols,
+use crate::{
+    CloseWindow, NewCenterTerminal, NewFile, NewTerminal, OpenInTerminal, OpenOptions,
+    OpenTerminal, OpenVisible, SplitDirection, ToggleFileFinder, ToggleProjectSymbols, ToggleZoom,
+    Workspace, WorkspaceItemBuilder, ZoomIn, ZoomOut,
+    focus_follows_mouse::FocusFollowsMouse as _,
+    invalid_item_view::InvalidItemView,
+    item::{
+        ActivateOnClose, ClosePosition, Item, ItemBufferKind, ItemHandle, ItemSettings,
+        PreviewTabsSettings, ProjectItemKind, SaveOptions, ShowCloseButton, ShowDiagnostics,
+        TabContentParams, TabTooltipContent, WeakItemHandle,
+    },
+    move_item,
+    notifications::NotifyResultExt,
+    toolbar::Toolbar,
+    workspace_settings::{AutosaveSetting, FocusFollowsMouse, TabBarSettings, WorkspaceSettings},
 };
-use crate::ToggleZoom;
-use crate::item::ItemHandle;
 
 pub(super) fn dirty_message_for(buffer_path: Option<ProjectPath>, path_style: PathStyle) -> String {
     let path = buffer_path.as_ref().and_then(|p| {

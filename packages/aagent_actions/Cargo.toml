@@ -5,6 +5,7 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
-gpui = "0.2.2"
-serde = { version = "1", features = ["derive"] }
-schemars = "1.0"
+gpui.workspace = true
+schemars.workspace = true
+serde.workspace = true
+util.workspace = true

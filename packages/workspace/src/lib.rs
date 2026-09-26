@@ -78,11 +78,11 @@ use notifications::{
     DetachAndPromptErr, Notifications, dismiss_app_notification,
     simple_message_notification::MessageNotification,
 };
-pub use pane::*;
-pub use pane_group::{
+pub use pane::group::{
     ActivePaneDecorator, HANDLE_HITBOX_SIZE, Member, PaneAxis, PaneGroup, PaneRenderContext,
     SplitDirection,
 };
+pub use pane::*;
 pub use persistence::{
     RecentWorkspace, WorkspaceDb, delete_unloaded_items,
     model::{

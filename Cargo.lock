@@ -412,6 +412,7 @@ dependencies = [
  "gpui",
  "schemars",
  "serde",
+ "util 0.1.0",
 ]
 
 [[package]]
@@ -4848,7 +4849,6 @@ dependencies = [
  "waker-fn",
  "web-time",
  "windows 0.62.2",
- "zed-font-kit",
  "zed-scap",
 ]
 

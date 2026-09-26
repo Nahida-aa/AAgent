@@ -66,6 +66,7 @@ use gpui::{
     WindowBounds, WindowHandle, WindowId, WindowOptions, actions, canvas, point, relative, size,
     transparent_black,
 };
+use gpui::prelude::FluentBuilder;
 pub use history_manager::*;
 pub use item::{
     FollowableItem, FollowableItemHandle, Item, ItemHandle, ItemSettings, PreviewTabsSettings,
@@ -185,6 +186,8 @@ use workspace::{
     core::lifecycle::CloseIntent,
     core::workspace::Workspace,
     dock::render::DraggedDock,
+    follow::CollaboratorId,
+    follow::state::ViewId,
     notification::toast::Toast,
     open::options::{OpenMode, OpenVisible},
     providers::TerminalProvider,

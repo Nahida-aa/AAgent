@@ -1,14 +1,14 @@
 use super::*;
 
-use gpui::{App, Context, FocusOutEvent, Window};
-use project::Project;
-use settings::Settings;
-use theme_settings::ThemeSettings;
-
 use super::Pane;
 use super::history::{NavigationMode, TagNavigationMode};
 use crate::item::{ItemSettings, PreviewTabsSettings};
 use crate::workspace_settings::{FocusFollowsMouse, TabBarSettings, WorkspaceSettings};
+use gpui::{App, Context, FocusOutEvent, Window};
+use project::Project;
+use settings::Settings;
+use theme_settings::ThemeSettings;
+use ui::TabBar;
 
 impl Pane {
     pub(super) fn tab_icon_element(

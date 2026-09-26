@@ -30,4 +30,4 @@ pub enum Event {
     WorktreeCreationChanged,
 }
 
-impl EventEmitter<Event> for Workspace {}
+// impl EventEmitter<Event> for Workspace {}

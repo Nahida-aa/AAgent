@@ -1,5 +1,6 @@
-
 use super::*;
+use crate::dock;
+
 impl Workspace {
     // add_panel
     pub fn add_panel<T: Panel>(

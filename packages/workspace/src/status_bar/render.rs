@@ -1,5 +1,6 @@
 use gpui::{
-    Anchor, App, Context, IntoElement, ParentElement, Render, Role, SharedString, Styled, Window,
+    Anchor, App, Context, Decorations, IntoElement, ParentElement, Render, Role, SharedString,
+    Styled, Window,
 };
 use theme::CLIENT_SIDE_DECORATION_ROUNDING;
 use ui::{ContextMenu, Divider, IconPosition, Indicator, Tooltip, prelude::*, right_click_menu};

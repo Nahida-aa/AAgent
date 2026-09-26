@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     // fn active_view_for_follower        // private
     fn active_view_for_follower(

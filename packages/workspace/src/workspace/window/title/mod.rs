@@ -1,3 +1,4 @@
+use super::*;
 use gpui::{App, Context, Entity};
 
 use super::Workspace;
@@ -21,3 +22,5 @@ impl Workspace {
 
 
 }
+pub use context::{WindowTitleContext};
+pub use needs::{WindowTitleNeeds};

@@ -1,5 +1,4 @@
 use collections::HashMap;
-use gpui::{AppContext, Context, WeakEntity};
 
 use std::cell::{Cell, RefCell};
 use std::collections::{HashMap, HashSet, VecDeque};
@@ -11,8 +10,16 @@ use std::sync::atomic::AtomicUsize;
 
 use collections::HashMap as _;
 use gpui::{
-    AnyView, App, Bounds, Context, Entity, EntityId, EventEmitter, FocusHandle, Global, Pixels,
-    Point, Subscription, Task, WeakEntity, Window,
+    AnyView, App, AppContext, Bounds, Context, Entity, EntityId, EventEmitter, FocusHandle,
+    Global, Pixels, Point, Subscription, Task, WeakEntity, Window,
+};
+use futures::{
+    Future, FutureExt, StreamExt,
+    channel::{
+        mpsc::{self, UnboundedReceiver, UnboundedSender},
+        oneshot,
+    },
+    future::{Shared, try_join_all},
 };
 
 pub mod app;
@@ -33,6 +40,7 @@ pub mod registries;
 pub mod status_bar;
 pub mod window;
 pub mod worktree;
+pub mod actions;
 pub use crate::workspace::{app::initial::init, core::workspace::Workspace};
 
 use crate::active_call::{ActiveCallEvent, AnyActiveCall, GlobalAnyActiveCall};
@@ -54,12 +62,15 @@ use crate::status_bar::StatusBar;
 use crate::toast_layer::ToastLayer;
 
 pub use crate::workspace::collab::AutoWatch;
-pub use crate::workspace::store::WorkspaceStore;
-use crate::{Pane, workspace::followers::CollaboratorId};
+pub use crate::workspace::app::store::WorkspaceStore;
+use crate::Pane;
+use crate::workspace::follow::CollaboratorId;
 
-pub use core::{CloseIntent, Event, OpenMode, OpenVisible, Workspace, WorkspaceId};
-pub use opening::{OpenOptions, OpenResult, WorkspaceMatching, open_paths, open_workspace_by_id};
-pub use providers::{AnyActiveCall, DebuggerProvider, GlobalAnyActiveCall, TerminalProvider};
+pub use core::{Event, Workspace, WorkspaceId};
+pub use core::lifecycle::CloseIntent;
+pub use open::{OpenOptions, OpenResult, WorkspaceMatching, open_paths, open_workspace_by_id};
+pub use open::options::{OpenMode, OpenVisible};
+pub use providers::{DebuggerProvider, TerminalProvider};
 pub use registries::{register_project_item, register_serializable_item};
 pub use window::title::{WindowTitleContext, WindowTitleNeeds};
 

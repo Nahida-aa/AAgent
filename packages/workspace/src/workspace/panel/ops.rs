@@ -1,4 +1,5 @@
 
+use super::*;
 impl Workspace {
     // add_panel
     pub fn add_panel<T: Panel>(

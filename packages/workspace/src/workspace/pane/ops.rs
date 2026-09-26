@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     // pub fn focus_center_pane
     pub fn focus_center_pane(&mut self, window: &mut Window, cx: &mut Context<Self>) {

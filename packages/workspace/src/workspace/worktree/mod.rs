@@ -1,3 +1,4 @@
+use super::*;
 use super::Workspace;
 use crate::{dock::Dock, workspace::event::CloseIntent};
 use anyhow::{Context as _, Result, anyhow};
@@ -10,6 +11,7 @@ mod ops;
 // workspace/worktree/switch.rs
 // capture_state_for_worktree_switch
 mod switch;
+pub mod trust;
 
 impl Workspace {
     pub fn worktrees<'a>(&self, cx: &'a App) -> impl 'a + Iterator<Item = Entity<Worktree>> {

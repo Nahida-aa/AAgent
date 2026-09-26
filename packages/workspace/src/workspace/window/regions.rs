@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     // │   ├── focusable_parts
     /// Returns the currently-visible major window regions ("parts"), in a stable

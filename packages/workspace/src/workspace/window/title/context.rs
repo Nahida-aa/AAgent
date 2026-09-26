@@ -1,3 +1,4 @@
+use super::*;
 #[derive(Default)]
 pub(crate) struct WindowTitleContext {
     pub project_name: String,

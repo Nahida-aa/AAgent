@@ -1,3 +1,4 @@
+use super::*;
 async fn join_channel_internal(
     channel_id: ChannelId,
     app_state: &Arc<AppState>,

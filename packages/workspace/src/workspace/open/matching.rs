@@ -1,3 +1,4 @@
+use super::*;
 pub async fn find_existing_workspace(
     abs_paths: &[PathBuf],
     open_options: &OpenOptions,

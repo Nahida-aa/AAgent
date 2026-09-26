@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     // fn next_watched_peer               // private
     fn next_watched_peer(&self, cx: &App) -> Option<PeerId> {

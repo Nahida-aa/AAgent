@@ -1,4 +1,5 @@
 /// Opens the channel notes for a specific channel by its ID.
+use super::*;
 #[derive(Clone, PartialEq, Deserialize, JsonSchema, Action)]
 #[action(namespace = collab)]
 #[serde(deny_unknown_fields)]

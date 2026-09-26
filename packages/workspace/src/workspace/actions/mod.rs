@@ -1,13 +1,16 @@
+use super::*;
 use gpui::Action;
 use schemars::JsonSchema;
 use serde::Deserialize;
 
-mod workspace;
-mod pane;
-mod item;
-mod dock;
-mod collab;
-mod zed;
+// NOTE: 以下 6 个 mod 声明不存在对应文件——这些 action 用 #[action(namespace = xxx)] 分组，
+// 不是子模块结构，声明是错的，已移除。
+// mod workspace;
+// mod pane;
+// mod item;
+// mod dock;
+// mod collab;
+// mod zed;
 
 
 

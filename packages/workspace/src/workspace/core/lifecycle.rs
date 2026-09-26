@@ -1,3 +1,4 @@
+use super::*;
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum CloseIntent {
     /// Quit the program entirely.

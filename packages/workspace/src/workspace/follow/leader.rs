@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     //
     pub fn update_active_view_for_followers(&mut self, window: &mut Window, cx: &mut App) {

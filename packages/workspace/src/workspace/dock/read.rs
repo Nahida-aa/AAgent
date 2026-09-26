@@ -1,3 +1,5 @@
+use super::*;
+
 impl Workspace {
 // left_dock
     pub fn left_dock(&self) -> &Entity<Dock> { &self.left_dock }

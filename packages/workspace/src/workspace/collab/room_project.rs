@@ -1,3 +1,4 @@
+use super::*;
 pub fn join_in_room_project(
     project_id: u64,
     follow_user_id: u64,

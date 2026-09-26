@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     //
     /// Renders the center pane group wrapped in a `Main` landmark so assistive

@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     //
     pub(crate) fn update_window_title(&mut self, window: &mut Window, cx: &mut App) {

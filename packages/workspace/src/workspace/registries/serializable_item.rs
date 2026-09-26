@@ -1,3 +1,4 @@
+use super::*;
 #[derive(Copy, Clone)]
 struct SerializableItemDescriptor {
     deserialize: fn(

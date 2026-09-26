@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     //
     pub(crate) fn save_all(&mut self, action: &SaveAll, window: &mut Window, cx: &mut Context<Self>) {

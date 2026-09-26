@@ -1,5 +1,6 @@
 /// Which optional window-title variables are actually referenced by the active
 /// template. Used to skip expensive lookups when the template doesn't need them.
+use super::*;
 pub(crate) struct WindowTitleNeeds {
     pub file_path: bool,
     pub relative_path: bool,

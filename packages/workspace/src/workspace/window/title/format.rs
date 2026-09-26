@@ -1,3 +1,4 @@
+use super::*;
 pub(crate) enum WindowTitleTemplatePart<'a> {
     Literal(&'a str),
     Variable(&'a str),

@@ -1,5 +1,6 @@
 /// Controls which types of items should be made visible in the project panel
 /// when opened.
+use super::*;
 #[derive(Debug, Clone)]
 pub enum OpenVisible {
     /// Make all opened items visible (both files and directories).

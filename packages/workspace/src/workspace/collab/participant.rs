@@ -1,4 +1,5 @@
 /// Workspace-local view of a remote participant's location.
+use super::*;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ParticipantLocation {
     SharedProject { project_id: u64 },

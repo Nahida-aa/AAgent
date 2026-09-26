@@ -1,15 +1,15 @@
+use super::*;
 use super::Workspace;
-use crate::{dock::Dock, workspace::event::CloseIntent};
+use crate::dock::Dock;
+use crate::workspace::core::{CloseIntent, WorkspaceId};
+use crate::workspace::collab::call::{AnyActiveCall, GlobalAnyActiveCall};
 use anyhow::{Context as _, Result, anyhow};
 use collections::HashMap;
-use gpui::{App, AsyncApp, Context, Entity, PromptLevel, Task, Window};
-
-use gpui::{App, AsyncApp, Entity, Task, WeakEntity};
+use gpui::{
+    App, AsyncApp, Context, Entity, PromptLevel, Task, WeakEntity, Window,
+};
 
 use crate::pane::Pane;
-use crate::types::WorkspaceId;
-use crate::workspace::Workspace;
-use crate::workspace::active_call::{AnyActiveCall, GlobalAnyActiveCall};
 
 // collab：通话、频道、共享项目
 // 是什么
@@ -1102,3 +1102,12 @@ pub fn remote_workspace_position_from_db(
         })
     })
 }
+
+pub mod actions;
+pub mod call;
+pub mod channel;
+pub mod event;
+pub mod participant;
+pub mod read;
+pub mod room_project;
+pub use call::{AnyActiveCall, GlobalAnyActiveCall};

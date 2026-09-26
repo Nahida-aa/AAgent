@@ -1,3 +1,5 @@
+use super::*;
+
 impl Workspace {
     //
     pub(super) fn dock_size(&self, dock: &Dock, window: &Window, cx: &App) -> Option<Pixels> {

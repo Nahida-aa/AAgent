@@ -1,3 +1,4 @@
+use super::*;
 pub async fn last_opened_workspace_location(
     db: &WorkspaceDb,
     fs: &dyn fs::Fs,

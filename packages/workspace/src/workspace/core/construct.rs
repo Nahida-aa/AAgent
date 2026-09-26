@@ -1,3 +1,4 @@
+use super::*;
 use std::sync::Arc;
 
 use gpui::{App, AsyncApp, Context, Entity, Task, Window};

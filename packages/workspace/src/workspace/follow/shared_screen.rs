@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     fn shared_screen_for_peer(
         &self,

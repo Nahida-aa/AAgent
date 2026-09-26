@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     // fn activate_pane_at_index          // private，但主语是 pane 索引
     fn activate_pane_at_index(

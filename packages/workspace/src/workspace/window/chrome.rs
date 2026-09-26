@@ -1,4 +1,5 @@
 
+use super::*;
 impl Workspace {
     //
     pub fn is_edited(&self) -> bool {

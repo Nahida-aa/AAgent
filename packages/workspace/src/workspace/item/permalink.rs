@@ -1,4 +1,5 @@
 /// Opens a permalink for the selected file on its Git hosting provider.
+use super::*;
 pub fn open_file_permalink(
     project: Entity<Project>,
     project_path: ProjectPath,

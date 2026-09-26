@@ -1,4 +1,5 @@
 
+use super::*;
 impl Workspace {
 
     // panel_size_state<T>

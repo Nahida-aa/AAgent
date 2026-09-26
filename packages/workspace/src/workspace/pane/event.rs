@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     // fn handle_pane_focused
     fn handle_pane_focused(

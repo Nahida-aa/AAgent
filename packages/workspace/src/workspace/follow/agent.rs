@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     // handle_agent_location_changed
     fn handle_agent_location_changed(&mut self, window: &mut Window, cx: &mut Context<Self>) {

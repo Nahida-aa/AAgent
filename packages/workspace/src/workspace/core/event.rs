@@ -1,3 +1,4 @@
+use super::*;
 use crate::persistence::model::SerializedWorkspaceLocation;
 
 pub enum Event {

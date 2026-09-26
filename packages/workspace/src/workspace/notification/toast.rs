@@ -1,3 +1,4 @@
+use super::*;
 #[derive(Clone)]
 pub struct Toast {
     id: NotificationId,

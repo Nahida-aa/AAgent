@@ -1,3 +1,4 @@
+use super::*;
 use gpui::{Context, Entity};
 
 use super::Workspace;
@@ -293,3 +294,6 @@ impl Workspace {
         self.update_active_view_for_followers(window, cx);
     }
 }
+
+pub mod ops;
+pub mod read;

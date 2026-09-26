@@ -1,6 +1,7 @@
 /// A stable identifier for a collaborator in the current workspace.
 ///
 /// 是 follow 用的“被跟随者标识”，不是 collab 的参与者对象
+use super::*;
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 pub enum CollaboratorId {
     PeerId(client::proto::PeerId),
@@ -16,7 +17,7 @@ impl From<&PeerId> for CollaboratorId {
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ViewId {
-    pub creator: crate::workspace_store::CollaboratorId,
+    pub creator: CollaboratorId,
     pub id: u64,
 }
 

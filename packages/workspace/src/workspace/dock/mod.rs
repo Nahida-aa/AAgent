@@ -1,7 +1,17 @@
-use gpui::{Context, Entity, Window};
+use super::*;
+use gpui::{
+    App, Axis, Context, Div, DragMoveEvent, Entity, IntoElement, ParentElement, Pixels, Role,
+    Stateful, Styled, Window, div, px,
+};
+
+use std::sync::Arc;
 
 use super::Workspace;
-use crate::dock::Dock;
+use crate::dock::{
+    Dock, DockPosition, PanelHandle, PanelSizeState, RESIZE_HANDLE_SIZE,
+};
+use crate::pane::group::PaneRenderContext;
+use crate::workspace::core::actions::ToggleAllDocks;
 
 // Dock 是左/右/底三个区域之一，管理开合、当前显示哪个 panel、各 panel 的尺寸状态
 // Panel 是具体面板（终端、项目、Outline…），提供默认尺寸和是否可伸缩

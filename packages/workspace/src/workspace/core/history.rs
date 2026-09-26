@@ -1,4 +1,5 @@
 // workspace/ops/workspace_history.rs
+use super::*;
 use crate::history_manager::{HistoryManager, HistoryManagerEntry};
 
 impl Workspace {

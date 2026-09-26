@@ -1,3 +1,4 @@
+use super::*;
 pub(crate) fn prompt_and_open_paths(
     app_state: Arc<AppState>,
     options: PathPromptOptions,

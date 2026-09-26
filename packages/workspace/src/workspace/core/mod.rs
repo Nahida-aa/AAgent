@@ -10,6 +10,7 @@
 // ├── read.rs          # weak_handle / app_state / project / ...
 // └── actions.rs            # namespace = workspace 的 action
 
+use super::*;
 pub mod actions;
 pub mod construct;
 pub mod debounce;
@@ -17,7 +18,11 @@ pub mod event;
 mod ids;
 pub use ids::WorkspaceId;
 pub mod keystrokes;
+pub mod lifecycle;
 pub mod workspace;
+pub mod history;
+pub mod ops;
+pub mod render;
 // weak_handle
 // app_state
 // user_store
@@ -34,3 +39,4 @@ pub mod workspace;
 // take_panels_task
 // set_multi_workspace        // 写字段 + 更新 status_bar
 mod read;
+pub use debounce::{DelayedDebouncedEditAction};

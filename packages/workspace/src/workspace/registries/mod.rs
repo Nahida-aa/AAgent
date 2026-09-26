@@ -4,6 +4,7 @@
 // │   ├── followable_views.rs    # FollowableViewRegistry
 // │   └── serializable_items.rs  # SerializableItemRegistry
 
+use super::*;
 mod followable_view;
 mod project_item;
 mod serializable_item;

@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     // pub fn close_global
     pub fn close_global(cx: &mut App) {

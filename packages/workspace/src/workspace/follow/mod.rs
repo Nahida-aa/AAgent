@@ -1,3 +1,4 @@
+use super::*;
 use super::Workspace;
 use crate::{dock::Dock, workspace::event::CloseIntent};
 use anyhow::{Context as _, Result, anyhow};
@@ -60,3 +61,12 @@ use gpui::{App, Context, Entity, PromptLevel, Task, Window};
 // workspace/follow/state.rs
 // FollowerState / Follower / FollowerView / ViewId / CollaboratorId
 mod state;
+pub mod agent;
+pub mod auto_watch;
+pub mod follower;
+pub mod leader;
+pub mod ops;
+pub mod read;
+pub mod rpc;
+pub mod shared_screen;
+pub use state::{CollaboratorId, FollowerState, ViewId};

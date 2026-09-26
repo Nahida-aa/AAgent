@@ -1,3 +1,4 @@
+use super::*;
 use collections::TypeIdHashMap;
 
 type BuildProjectItemFn =

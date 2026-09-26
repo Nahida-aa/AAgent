@@ -1,6 +1,7 @@
 /// 顶层 Workspace entity。对齐 zed `Workspace` 但做了大幅简化。
 /// Zed 的 Workspace ~3000 行（含 Pane、ItemHandle、ModalLayer、TeleportLayer 等），
 /// AAgent 现阶段只持有 Dock + StatusBar + 中心区域。
+use super::*;
 pub struct Workspace {
     pub(crate) weak_self: WeakEntity<Self>,
     /// 外部注册的 action callback 收集器。

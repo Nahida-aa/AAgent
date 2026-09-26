@@ -5,6 +5,7 @@
 //! - `OpenTerminal` — Action struct，带 working_directory + local 字段。
 //!
 //! Zed 对应: `crates/workspace/src/workspace.rs:327` (TerminalProvider) + :842 (OpenTerminal)。
+use super::*;
 use super::Workspace;
 use crate::{dock::Dock, workspace::event::CloseIntent};
 use anyhow::{Context as _, Result, anyhow};

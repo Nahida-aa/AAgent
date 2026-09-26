@@ -17,6 +17,7 @@
 // restore_native_window_state：从 DB 恢复原生窗口状态。
 
 // bounds / bounds_save_task_queued：当前几何和节流任务
+use super::*;
 mod bounds;
 // “chrome”指窗口外壳的非内容部分——标题和编辑标记。核心是 owns_window_chrome：多工作区共享一个平台窗口时，只有活动工作区能写标题和 edited 标记，否则后台工作区的事件会覆盖前台
 // owns_window_chrome / is_window_edited / update_window_edited / refresh_window_state
@@ -26,4 +27,8 @@ mod regions;
 // on_window_activation_changed, activate_next_window, activate_previous_window, close_global / window switching
 mod activation;
 // observe_window_bounds / observe_window_appearance / observe_window_activation 的组装
-mod subscriptions;
+// mod subscriptions;  // 不存在对应文件，注释掉
+pub mod decorations;
+pub mod title;
+pub mod titlebar;
+pub use regions::{PartBehavior, RegionFocusHandles};

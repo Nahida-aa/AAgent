@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     // set_sidebar_focus_handle   // setter，但只是字段写，可放这里
     pub fn set_sidebar_focus_handle(&mut self, handle: Option<FocusHandle>) {

@@ -1,3 +1,4 @@
+use super::*;
 use gpui::PathPromptOptions;
 use settings::DefaultOpenBehavior;
 use std::sync::Arc;

@@ -20,6 +20,7 @@
 
 // ProjectItemRegistry 注册的是“某类模型用什么 UI 打开”，比如 Buffer → Editor
 // open_item_abs_paths
+use super::*;
 mod read;
 mod ops;
 // serialize_items
@@ -28,3 +29,5 @@ mod serialize;
 mod permalink;
 //
 mod save;
+pub mod close;
+pub use events::{ItemBufferKind};

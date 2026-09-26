@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     // pub fn with_local_workspace
     /// Call the given callback with a workspace whose project is local or remote via WSL (allowing host access).

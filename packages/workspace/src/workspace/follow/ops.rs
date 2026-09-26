@@ -1,3 +1,4 @@
+use super::*;
 impl Workspace {
     // open_shared_screen
     pub fn open_shared_screen(

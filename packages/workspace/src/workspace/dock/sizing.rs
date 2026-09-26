@@ -174,7 +174,7 @@ pub(crate) fn px_with_ui_font_fallback(val: u32, cx: &Context<Workspace>) -> Pix
     }
 }
 
-fn adjust_active_dock_size_by_px(
+pub(crate) fn adjust_active_dock_size_by_px(
     px: Pixels,
     workspace: &mut Workspace,
     window: &mut Window,
@@ -194,7 +194,7 @@ fn adjust_active_dock_size_by_px(
     workspace.resize_dock(dock.position(), panel_size + px, window, cx);
 }
 
-fn adjust_open_docks_size_by_px(
+pub(crate) fn adjust_open_docks_size_by_px(
     px: Pixels,
     workspace: &mut Workspace,
     window: &mut Window,

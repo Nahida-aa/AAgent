@@ -71,7 +71,7 @@ pub(crate) fn window_bounds_env_override() -> Option<Bounds<Pixels>> {
         })
 }
 
-fn restore_native_window_state(
+pub(crate) fn restore_native_window_state(
     window_handle: WindowHandle<MultiWorkspace>,
     workspace_id: WorkspaceId,
     cx: &mut AsyncApp,

@@ -18,7 +18,7 @@
 
 // bounds / bounds_save_task_queued：当前几何和节流任务
 use super::*;
-mod bounds;
+pub(crate) mod bounds;
 // “chrome”指窗口外壳的非内容部分——标题和编辑标记。核心是 owns_window_chrome：多工作区共享一个平台窗口时，只有活动工作区能写标题和 edited 标记，否则后台工作区的事件会覆盖前台
 // owns_window_chrome / is_window_edited / update_window_edited / refresh_window_state
 mod chrome;
@@ -32,4 +32,5 @@ pub mod decorations;
 pub mod title;
 pub mod titlebar;
 pub use decorations::client_side_decorations;
+pub(crate) use bounds::window_bounds_env_override;
 pub(crate) use regions::{PartBehavior, RegionFocusHandles};

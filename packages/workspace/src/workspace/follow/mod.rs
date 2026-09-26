@@ -70,3 +70,4 @@ pub mod read;
 pub mod rpc;
 pub mod shared_screen;
 pub use state::{CollaboratorId, FollowerState, ViewId};
+pub(crate) use leader::leader_border_for_pane;

@@ -35,7 +35,7 @@ impl Workspace {
     }
 }
 
-fn notify_if_database_failed(window: WindowHandle<MultiWorkspace>, cx: &mut AsyncApp) {
+pub(crate) fn notify_if_database_failed(window: WindowHandle<MultiWorkspace>, cx: &mut AsyncApp) {
     window
         .update(cx, |multi_workspace, _, cx| {
             let workspace = multi_workspace.workspace().clone();

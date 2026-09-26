@@ -280,7 +280,7 @@ impl Workspace {
     // │   ├── adjacent_pane / adjacent_pane_of
 }
 // join_pane_into_active
-fn join_pane_into_active(
+pub(crate) fn join_pane_into_active(
     active_pane: &Entity<Pane>,
     pane: &Entity<Pane>,
     window: &mut Window,
@@ -298,7 +298,7 @@ fn join_pane_into_active(
     }
 }
 // / move_all_items
-fn move_all_items(
+pub(crate) fn move_all_items(
     from_pane: &Entity<Pane>,
     to_pane: &Entity<Pane>,
     window: &mut Window,

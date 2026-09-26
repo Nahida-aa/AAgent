@@ -177,37 +177,55 @@ use crate::{
 // ========= workspace 嵌套模块的关键类型（crate 内部可见，顶级模块通过 crate::XXX 访问） =========
 // Zed 单文件时这些类型直接定义在 workspace.rs 里，天然 crate 根可见。我们拆分到子模块后
 // 需要这里 use 过来让 crate 根能看到。普通 use 足够了，不需要 pub use。
-pub use crate::workspace::{core::event::Event, follow::state::ViewId};
-pub(crate) use workspace::pane::ActivateInDirectionTarget;
-use workspace::{
-    actions::*,
-    app::initial::init,
+pub use crate::workspace::{
+    actions::{
+        ActivatePaneLeft, ActivatePaneRight, NewCenterTerminal, NewTerminal, ToggleFileFinder,
+        ToggleProjectSymbols,
+    },
     app::state::AppState,
+    core::{
+        WorkspaceId,
+        actions::{
+            NewFile, NewFileSplit, NewFileSplitHorizontal, NewFileSplitVertical, NewWindow,
+            OpenInTerminal, OpenTerminal, ToggleReadOnlyFile, *,
+        },
+        event::Event,
+        workspace::Workspace,
+    },
+    follow::{CollaboratorId, state::ViewId},
+    notification::toast::Toast,
+    open::{
+        local::open_new,
+        options::{OpenOptions, OpenVisible},
+    },
+    registries::{FollowableViewRegistry, serializable_item::register_serializable_item},
+    serialize::SERIALIZATION_THROTTLE_TIME,
+};
+use workspace::{
+    app::initial::init,
     app::store::WorkspaceStore,
     collab::call::{AnyActiveCall, GlobalAnyActiveCall},
     collab::participant::ParticipantLocation,
     collab::room_project::join_in_room_project,
-    core::WorkspaceId,
     core::actions::*,
     core::debounce::DelayedDebouncedEditAction,
     core::lifecycle::CloseIntent,
     core::lifecycle::prepare_window_to_close,
-    core::workspace::Workspace,
     dock::render::DraggedDock,
     follow::leader_border_for_pane,
-    follow::{AutoWatch, CollaboratorId, FollowerState},
+    follow::{AutoWatch, FollowerState},
     item::permalink::{copy_file_permalink, open_file_permalink},
-    notification::toast::Toast,
     open::local::{open_items, open_workspace_by_id},
     open::matching::{WorkspaceMatching, find_existing_workspace},
-    open::options::{OpenMode, OpenOptions, OpenResult, OpenVisible},
+    open::options::{OpenMode, OpenResult},
     open::prompt::{PromptForNewPath, PromptForOpenPath},
     open::remote::open_remote_project_with_existing_connection,
     open::windows::workspace_windows_for_location,
+    pane::ActivateInDirectionTarget,
     providers::{DebuggerProvider, TerminalProvider},
-    registries::{FollowableViewRegistry, ProjectItemRegistry, SerializableItemRegistry},
+    registries::{ProjectItemRegistry, SerializableItemRegistry},
+    serialize::WorkspaceLocation,
     serialize::flush::flush_windows_serialization,
-    serialize::{SERIALIZATION_THROTTLE_TIME, WorkspaceLocation},
     window::{client_side_decorations, title::WindowTitleContext},
 };
 // workspace 嵌套模块里定义，但需要 crate 根可见的类型

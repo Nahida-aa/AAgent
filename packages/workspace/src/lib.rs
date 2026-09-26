@@ -40,7 +40,6 @@ pub use remote::{
     RemoteConnectionIdentity, remote_connection_identity, same_remote_connection_identity,
 };
 pub use toast_layer::{ToastAction, ToastLayer, ToastView};
-pub use workspace::*;
 
 use anyhow::{Context as _, Result, anyhow};
 use client::{
@@ -174,9 +173,17 @@ use crate::{
 
 // ========= workspace 嵌套模块的关键类型 =========
 pub use workspace::{
+    actions::*,
     app::initial::init,
+    app::store::WorkspaceStore,
+    collab::AutoWatch,
     core::WorkspaceId,
+    core::actions::*,
+    core::lifecycle::CloseIntent,
     core::workspace::Workspace,
     dock::render::DraggedDock,
+    notification::toast::Toast,
+    open::options::{OpenMode, OpenVisible},
     providers::{DebuggerProvider, TerminalProvider},
+    window::title::WindowTitleContext,
 };

@@ -98,7 +98,7 @@ impl Workspace {
 }
 
 #[derive(Clone)]
-struct DraggedDock(DockPosition);
+pub struct DraggedDock(pub DockPosition);
 
 impl Render for DraggedDock {
     fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {

@@ -177,3 +177,13 @@ pub use workspace::{
     core::workspace::Workspace,
     providers::{DebuggerProvider, TerminalProvider},
 };
+
+// ========= Zed 原版 DraggedDock（workspace.rs 根级类型） =========
+#[derive(Clone)]
+pub struct DraggedDock(pub DockPosition);
+
+impl Render for DraggedDock {
+    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+        gpui::Empty
+    }
+}

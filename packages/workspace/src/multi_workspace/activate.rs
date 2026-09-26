@@ -4,7 +4,7 @@ use gpui::{App, Context, Entity, Task, WeakEntity, Window};
 
 use super::MultiWorkspace;
 use super::project_group::ProjectGroupKey;
-use crate::{Workspace, WorkspaceEvent};
+use crate::{Event as WorkspaceEvent, Workspace};
 
 impl MultiWorkspace {
     pub(super) fn subscribe_to_workspace(

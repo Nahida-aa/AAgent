@@ -176,3 +176,27 @@ trait bounds 不满足** → 去 zed grep 方法名，看它定义在哪个 trai
 所以**非元素类型**（`ContextMenu`、菜单条目）要显式补一条 `impl FluentBuilder for X {}`
 才写得动 `.when(..)` / `.when_some(..)`。在自己的 crate 里补这条 impl 不会
 和 blanket impl 冲突（zed 就是这么写的）。
+
+### 12.1 「private field, not a method」= trait 没进作用域
+
+同一类 E0599 里最误导的一种：
+
+```text
+error[E0599]: no method named `children` found for struct `PaneAxisElement`
+403 |             .children(rendered_children)
+    |             -^^^^^^^^ private field, not a method
+```
+
+`.children(..)` 其实是 `gpui::ParentElement` 的提供方法；`PaneAxisElement`
+恰好也有个**私有** `children` 字段，trait 不在作用域时编译器就去解析字段，
+于是报「私有字段」而不是「缺 import」。`impl ParentElement` 一直都在
+`pane/group/element.rs:472`，只是调用点没 `use`。
+
+判定方法：报 "private field, not a method" → **先查是不是同名 trait 方法**，
+别去改字段可见性，也别重复写一个 `impl`（会撞 E0119 conflicting implementations）。
+
+### 12.2 关联函数（get_global / get / boxed_clone）同理
+
+`X::get_global(cx)`、`X::get(..)`、`SplitUp { .. }.boxed_clone()` 这类**关联函数**
+也要求 trait 在作用域：`settings::Settings`、`gpui::Action`。它们不在
+`ui::prelude::*` 里，照搬 zed 代码时要单独 `use`。

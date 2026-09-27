@@ -42,7 +42,6 @@ impl Project {
         }
     }
 
-    #[cfg(feature = "test-support")]
     pub fn shared(&mut self, project_id: u64, cx: &mut Context<Self>) -> Result<()> {
         anyhow::ensure!(
             matches!(self.client_state, ProjectClientState::Local),

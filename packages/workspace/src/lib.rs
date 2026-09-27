@@ -185,6 +185,7 @@ pub use crate::workspace::{
         MovePaneUp, OpenLog
     },
     app::state::{AppState, PreviousWorkspaceState},
+    collab::{participant::{RemoteCollaborator, ParticipantLocation}, call::{GlobalAnyActiveCall, AnyActiveCall}, event::ActiveCallEvent},
     core::{
         WorkspaceId,
         actions::{
@@ -216,8 +217,6 @@ pub use crate::workspace::{
 use workspace::{
     app::initial::init,
     app::store::WorkspaceStore,
-    collab::call::{AnyActiveCall, GlobalAnyActiveCall},
-    collab::participant::ParticipantLocation,
     collab::room_project::join_in_room_project,
     core::actions::*,
     core::debounce::DelayedDebouncedEditAction,
@@ -240,7 +239,6 @@ use workspace::{
     window::{client_side_decorations, title::WindowTitleContext},
 };
 // workspace 嵌套模块里定义，但需要 crate 根可见的类型
-use workspace::collab::participant::RemoteCollaborator;
 use workspace::follow::{follower::Follower, state::FollowerView};
 
 use workspace::open::options::WorkspacePosition;

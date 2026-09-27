@@ -21,7 +21,7 @@ pub mod zed_urls;
 #[cfg(test)]
 mod tests;
 
-pub use actions::init;
+pub use actions::{init, SignOut};
 pub use client::Client;
 pub use constants::{CONNECTION_TIMEOUT, INITIAL_RECONNECTION_DELAY, MAX_RECONNECTION_DELAY};
 pub use credentials::Credentials;

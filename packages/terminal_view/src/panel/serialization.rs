@@ -5,7 +5,7 @@ use db::kvp::KeyValueStore;
 use gpui::{AppContext, AsyncWindowContext, Context, Entity, Task, TaskExt, WeakEntity, Window};
 use serde_json;
 use util::{ResultExt, TryFutureExt};
-use workspace::{ItemId, PanelHandle, Workspace};
+use workspace::{ItemId, PanelHandle, Workspace, item::SerializableItem};
 
 use task::RevealStrategy;
 

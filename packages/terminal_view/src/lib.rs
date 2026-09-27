@@ -15,6 +15,35 @@ pub mod view;
 mod persistence;
 mod terminal_path_like_target;
 
+// ============================================================================
+// 对齐 Zed 原版顶层 pub 导出（外部 crate 需要）
+// ============================================================================
+// Zed terminal_view.rs 直接定义的 pub item, AAgent 拆成子模块后在这里转发。
+// 内部 crate 访问: 子模块自己加 use 路径, 不通过这里。
+
+// --- view 模块顶层 pub ---
+pub use view::{
+    ContentMode,
+    TerminalMode,
+    TerminalView,
+    actions::{RenameTerminal, ScrollTerminal, SendKeystroke, SendText},
+    block::{BlockContext, BlockProperties},
+    working_directory::default_working_directory,
+};
+
+// --- panel 模块顶层 pub ---
+pub use panel::TerminalPanel;
+
+// --- element 模块顶层 pub ---
+pub use element::{
+    BatchedTextRun,
+    BlockElementLayoutRect,
+    LayoutPoint,
+    LayoutRect,
+    LayoutState,
+    TerminalElement,
+};
+
 use gpui::App;
 use workspace::Workspace;
 

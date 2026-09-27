@@ -530,6 +530,30 @@ dependencies = [
 [[package]]
 name = "action_log"
 version = "0.1.0"
+dependencies = [
+ "a_log",
+ "aa_clock",
+ "anyhow",
+ "buffer_diff",
+ "collections",
+ "ctor",
+ "fs",
+ "futures",
+ "git",
+ "gpui",
+ "indoc",
+ "language",
+ "log",
+ "pretty_assertions",
+ "project",
+ "rand 0.9.5",
+ "serde_json",
+ "settings",
+ "telemetry",
+ "text",
+ "util 0.1.0",
+ "watch",
+]
 
 [[package]]
 name = "ad_credentials_provider"

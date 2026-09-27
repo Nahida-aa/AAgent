@@ -769,6 +769,17 @@ dependencies = [
 [[package]]
 name = "ai_onboarding"
 version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_component",
+ "aa_gpui_kit_ui",
+ "aagent_actions",
+ "client",
+ "cloud_api_types",
+ "gpui",
+ "language_model",
+ "smallvec",
+ "telemetry",
+]
 
 [[package]]
 name = "alacritty_terminal"

@@ -77,7 +77,6 @@ pub struct TerminalView {
     pub(super) _terminal_subscriptions: Vec<Subscription>,
 }
 
-impl EventEmitter<Event> for TerminalView {}
 impl EventEmitter<ItemEvent> for TerminalView {}
 impl EventEmitter<SearchEvent> for TerminalView {}
 impl Focusable for TerminalView {

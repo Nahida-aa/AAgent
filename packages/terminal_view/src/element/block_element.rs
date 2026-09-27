@@ -1,7 +1,7 @@
 use gpui::{Bounds, Hsla, Pixels, Point as GpuiPoint, Window, fill, point, size};
 use terminal::{Cell, Color, TerminalBounds, is_app_chosen_exact_color as terminal_is_app_chosen_exact_color};
 
-use super::layout::{BackgroundRegion, LayoutPoint};
+use super::layout::{BackgroundRegion, LayoutPoint, merge_background_regions};
 
 pub(super) const BLOCK_SUBCELL_COLUMNS: i32 = 8;
 pub(super) const BLOCK_SUBCELL_LINES: i32 = 24;

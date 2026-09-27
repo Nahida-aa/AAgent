@@ -1,14 +1,14 @@
-mod actions;
-mod block;
+pub mod actions;
+pub mod block;
 mod context_menu;
-mod events;
-mod helpers;
-mod hover;
-mod ime;
+pub mod events;
+pub mod helpers;
+pub mod hover;
+pub mod ime;
 mod input;
 mod item;
 mod lifecycle;
-mod mode;
+pub mod mode;
 mod rename;
 mod render;
 mod scroll;
@@ -16,7 +16,7 @@ mod scrollbar_settings;
 mod searchable;
 mod serializable;
 mod tab;
-mod working_directory;
+pub mod working_directory;
 
 pub use actions::*;
 pub use block::*;
@@ -24,14 +24,29 @@ pub use mode::*;
 
 use crate::persistence::TerminalDb;
 use crate::terminal_scrollbar::TerminalScrollHandle;
+use crate::terminal_path_like_target::{hover_path_like_target, open_path_like_target};
+use crate::panel::TerminalPanel;
+use hover::HoverTarget;
+use ime::ImeState;
+use events::subscribe_for_terminal_events;
 use editor::{Editor, blink_manager::BlinkManager};
 use gpui::{
-    App, Context, Entity, EventEmitter, FocusHandle, Pixels, Subscription, Task, WeakEntity, Window,
+    App, Context, Entity, EventEmitter, FocusHandle, Focusable, Pixels, Subscription, Task,
+    WeakEntity, Window, Point as GpuiPoint,
 };
 use project::Project;
+use settings::{Settings, SettingsStore};
 use std::rc::Rc;
-use terminal::Terminal;
-use workspace::{Workspace, WorkspaceId};
+use terminal::{Terminal, terminal_settings::{TerminalBlink, TerminalSettings, CursorShape}};
+use ui::ContextMenu;
+use workspace::{Workspace, WorkspaceId, dock::PanelEvent};
+use workspace::item::ItemEvent;
+use workspace::searchable::SearchEvent;
+
+use actions::{RenameTerminal, ScrollTerminal, SendKeystroke, SendText};
+use helpers::CURSOR_BLINK_INTERVAL;
+use working_directory::default_working_directory;
+use workspace::NewCenterTerminal;
 
 pub struct TerminalView {
     pub(super) terminal: Entity<Terminal>,

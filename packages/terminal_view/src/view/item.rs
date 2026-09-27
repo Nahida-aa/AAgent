@@ -1,21 +1,22 @@
 //! TerminalView 作为 Pane 里的 Item。
 
-use aa_gpui_kit_ui::IconName;
-use workspace::Item;
-
 use super::TerminalView;
-use gpui::{AnyElement, App, Context, Entity, Font, SharedString, Task, WeakEntity, Window};
+use super::actions::RenameTerminal;
+use super::working_directory::default_working_directory;
+
+use gpui::{AnyElement, App, Context, Entity, SharedString, Task, WeakEntity, Window};
 use project::{Project, ProjectEntryId};
-use std::any::Any;
+use terminal::task::TaskStatus;
+use ui::{
+    Color, Divider, Icon, IconName, Label, LabelSize, Tooltip, h_flex, v_flex, div, menu,
+};
 use workspace::{
     DraggedSelection, DraggedTab, Pane, ToolbarItemLocation, WorkspaceId, delete_unloaded_items,
     item::{HighlightedText, Item, ItemBufferKind, ItemEvent, TabContentParams, TabTooltipContent},
 };
 
-use super::working_directory::default_working_directory;
-use super::{TerminalView, actions::RenameTerminal};
 use crate::persistence::TerminalDb;
-use crate::terminal_panel::TerminalPanel;
+use crate::panel::TerminalPanel;
 
 impl Item for TerminalView {
     type Event = ItemEvent;

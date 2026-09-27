@@ -1,12 +1,17 @@
-use gpui::{Context, IntoElement, ParentElement, Render, Styled, Window};
-use ui::scrollbars::{ScrollAxes, Scrollbars};
+use std::cmp;
+
+use gpui::{
+    Context, IntoElement, MouseButton, MouseDownEvent, ParentElement, Render, Styled, Window,
+    anchored, deferred, div,
+};
+use ui::{ScrollAxes, Scrollbars};
 use ui::{WithScrollbar, prelude::*};
 use workspace::item::Item;
 
 use super::TerminalView;
 use super::mode::ContentMode;
 use super::scrollbar_settings::TerminalScrollbarSettingsWrapper;
-use crate::terminal_element::TerminalElement;
+use crate::element::TerminalElement;
 
 impl Render for TerminalView {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {

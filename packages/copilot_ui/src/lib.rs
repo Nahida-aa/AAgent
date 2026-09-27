@@ -1,12 +1,35 @@
-pub fn add(left: u64, right: u64) -> u64 { left + right }
+mod sign_in;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+use std::sync::Arc;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+use copilot::GlobalCopilotAuth;
+use gpui::AppContext;
+use language::language_settings::AllLanguageSettings;
+use project::DisableAiSettings;
+use settings::SettingsStore;
+pub use sign_in::{
+    ConfigurationMode, ConfigurationView, CopilotCodeVerification, initiate_sign_in,
+    initiate_sign_out, reinstall_and_sign_in,
+};
+use ui::App;
+use workspace::AppState;
+
+pub fn init(app_state: &Arc<AppState>, cx: &mut App) {
+    let disable_ai = cx.read_global(|settings: &SettingsStore, _| {
+        settings.get::<DisableAiSettings>(None).disable_ai
+    });
+    let provider = cx.read_global(|settings: &SettingsStore, _| {
+        settings
+            .get::<AllLanguageSettings>(None)
+            .edit_predictions
+            .provider
+    });
+    if !disable_ai && provider == settings::EditPredictionProvider::Copilot {
+        GlobalCopilotAuth::set_global(
+            app_state.languages.next_language_server_id(),
+            app_state.fs.clone(),
+            app_state.node_runtime.clone(),
+            cx,
+        );
     }
 }

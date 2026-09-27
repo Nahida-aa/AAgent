@@ -10,10 +10,12 @@ use terminal::Terminal;
 use util::{ResultExt, defer};
 use workspace::{ItemId, Pane, Workspace};
 
-use crate::TerminalView;
+use crate::view::TerminalView;
+use crate::view::working_directory::default_working_directory;
 
 use super::TerminalPanel;
-use super::helpers::is_enabled_in_workspace;
+use super::failed_to_spawn::FailedToSpawnTerminal;
+use super::helpers::{is_enabled_in_workspace, prepare_task_for_spawn, wait_for_terminals_tasks};
 
 impl TerminalPanel {
     pub fn open_terminal(

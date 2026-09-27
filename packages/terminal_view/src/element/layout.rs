@@ -1,7 +1,7 @@
 use std::mem;
 use std::rc::Rc;
 
-use aa_gpui_kit_theme::{ActiveTheme, Theme};
+use theme::{ActiveTheme, Theme};
 use editor::{CursorLayout, HighlightedRange, HighlightedRangeLine};
 use gpui::{
     AbsoluteLength, AnyElement, App, Bounds, ContentMask, Element, ElementId, Entity, FocusHandle,
@@ -14,7 +14,7 @@ use terminal::{
     is_default_background_color,
 };
 
-use crate::{BlockContext, BlockProperties, ContentMode, TerminalMode, TerminalView};
+use crate::view::{TerminalView, block::{BlockContext, BlockProperties}, mode::{ContentMode, TerminalMode}};
 
 /// The information generated during layout that is necessary for painting.
 pub struct LayoutState {

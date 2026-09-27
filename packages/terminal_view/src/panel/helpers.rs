@@ -7,7 +7,7 @@ use project::Project;
 use task::{Shell, ShellBuilder, SpawnInTerminal};
 use workspace::{DraggedTab, Pane, Workspace};
 
-use crate::TerminalView;
+use crate::view::TerminalView;
 
 use super::TerminalPanel;
 
@@ -30,7 +30,7 @@ pub fn prepare_task_for_spawn(
     }
 }
 
-pub(super) fn is_enabled_in_workspace(workspace: &Workspace, cx: &App) -> bool {
+pub fn is_enabled_in_workspace(workspace: &Workspace, cx: &App) -> bool {
     workspace.project().read(cx).supports_terminal(cx)
 }
 
@@ -108,7 +108,7 @@ pub fn new_terminal_pane(
     pane
 }
 
-pub(super) async fn wait_for_terminals_tasks(
+pub async fn wait_for_terminals_tasks(
     terminals_for_task: Vec<(usize, Entity<Pane>, Entity<TerminalView>)>,
     cx: &mut AsyncApp,
 ) {

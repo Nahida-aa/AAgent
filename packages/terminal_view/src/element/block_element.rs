@@ -1,5 +1,5 @@
-use gpui::{Bounds, Hsla, Pixels, Window, fill, point, size};
-use terminal::{Cell, Color, is_app_chosen_exact_color as terminal_is_app_chosen_exact_color};
+use gpui::{Bounds, Hsla, Pixels, Point as GpuiPoint, Window, fill, point, size};
+use terminal::{Cell, Color, TerminalBounds, is_app_chosen_exact_color as terminal_is_app_chosen_exact_color};
 
 use super::layout::{BackgroundRegion, LayoutPoint};
 

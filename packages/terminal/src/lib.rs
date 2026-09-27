@@ -23,7 +23,8 @@ use std::{process::ExitStatus, sync::Arc};
 use util::paths::PathStyle;
 use util::shell::Shell;
 use vte::ansi::{Processor, StdSyncHandler};
-mod actions;
+pub mod actions;
+pub use actions::*;
 mod ansi_text;
 mod bounds;
 mod cell;
@@ -53,20 +54,24 @@ mod startup_marker;
 use crate::alacritty::{
     AlacrittyTermConfig, AlacrittyTermLock, HyperlinkMatch, PtySender, RegexSearches,
 };
-use crate::cursor::{Cursor, CursorShape, Point, Range, SelectionRange};
+use crate::cursor::Cursor;
 use crate::events::{InternalEvent, TerminalBackendEvent};
 use crate::pty_info::{ProcessIdGetter, PtyProcessInfo};
 use crate::subprocess::SubprocessHandle;
-use crate::task::{TaskState, TaskStatus};
 pub use ansi_text::{AnsiSpans, ParsedAnsiText, parse_ansi_text, strip_ansi_text};
 pub use bounds::TerminalBounds;
-pub use colors::get_color_at_index;
+pub use colors::{
+    Color, NamedColor, get_color_at_index, is_app_chosen_exact_color,
+    is_default_background_color, rgba_color,
+};
+pub use cursor::{CursorShape, Point, Range, SelectionRange};
 pub use error::TerminalError;
-pub use events::{Event, PtyEvent};
+pub use events::{Event, MaybeNavigationTarget, PathLikeTarget, PtyEvent};
+pub use modes::Modes;
+pub use task::{TaskState, TaskStatus};
 mod subprocess;
 use crate::mappings::colors::to_vte_rgb;
 use crate::mappings::keys::to_esc_str;
-use crate::modes::Modes;
 mod foreground;
 
 pub use crate::{

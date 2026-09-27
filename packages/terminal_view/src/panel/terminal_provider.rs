@@ -7,7 +7,7 @@ use util::{ResultExt, TryFutureExt, defer};
 
 use super::TerminalPanel;
 
-pub(super) struct TerminalProvider(pub(super) gpui::Entity<TerminalPanel>);
+pub struct TerminalProvider(pub(super) gpui::Entity<TerminalPanel>);
 
 impl workspace::TerminalProvider for TerminalProvider {
     fn spawn(

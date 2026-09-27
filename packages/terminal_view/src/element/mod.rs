@@ -23,7 +23,8 @@ use gpui::{
 use terminal::Terminal;
 use workspace::Workspace;
 
-use crate::{BlockProperties, ContentMode, TerminalMode, TerminalView};
+use crate::panel::TerminalProvider;
+use crate::view::{TerminalView, block::BlockProperties, mode::{ContentMode, TerminalMode}};
 
 /// The GPUI element that paints the terminal.
 /// We need to keep a reference to the model for mouse events, do we need it for any other terminal stuff, or can we move that to connection?

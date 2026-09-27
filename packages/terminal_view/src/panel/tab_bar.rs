@@ -6,7 +6,7 @@ use terminal::Terminal;
 use ui::prelude::*;
 use ui::{ContextMenu, IconButton, IconName, IconSize, PopoverMenu, Tooltip};
 use workspace::{Pane, SplitDown, SplitLeft, SplitRight, SplitUp, ToggleZoom, Workspace};
-use zed_actions::assistant::InlineAssist;
+use aagent_actions::assistant::InlineAssist;
 
 use super::TerminalPanel;
 
@@ -61,7 +61,7 @@ impl TerminalPanel {
                                         )
                                         .action(
                                             "Spawn Task",
-                                            zed_actions::Spawn::modal().boxed_clone(),
+                                            aagent_actions::Spawn::modal().boxed_clone(),
                                         )
                                 });
 

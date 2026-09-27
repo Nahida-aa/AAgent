@@ -5,6 +5,7 @@ use gpui::{
     InspectorElementId, IntoElement, ParentElement, Pixels, Point as GpuiPoint, Styled, TextStyle,
     UnderlineStyle, Window, div, point, px, relative, size,
 };
+use language::CursorShape as EditorCursorShape;
 use terminal::{
     Cell, Content, CursorShape, IndexedCell, Modes, Point, Range, Terminal, TerminalBounds,
 };
@@ -13,8 +14,9 @@ use theme_settings::ThemeSettings;
 use ui::Tooltip;
 use ui::utils::ensure_minimum_contrast;
 
-use crate::terminal_settings::TerminalSettings;
-use crate::{BlockContext, ContentMode, TerminalMode};
+use terminal::terminal_settings::TerminalSettings;
+use crate::view::mode::{ContentMode, TerminalMode};
+use crate::view::block::BlockContext;
 
 use super::TerminalElement;
 use super::block_element::*;
@@ -23,7 +25,9 @@ use super::highlight::to_highlighted_range_lines;
 use super::input::TerminalInputHandler;
 use super::layout::*;
 use super::layout_grid::*;
+use gpui::FontFeatures;
 
+impl TerminalElement {
 pub(super) fn prepaint(
     self: &mut TerminalElement,
     global_id: Option<&GlobalElementId>,
@@ -31,7 +35,7 @@ pub(super) fn prepaint(
     bounds: Bounds<Pixels>,
     window: &mut Window,
     cx: &mut App,
-) -> Self::PrepaintState {
+) -> LayoutState {
     let rem_size = self.rem_size(cx);
     self.interactivity.prepaint(
         global_id,
@@ -432,3 +436,4 @@ pub(super) fn prepaint(
         },
     )
 }
+} // impl TerminalElement

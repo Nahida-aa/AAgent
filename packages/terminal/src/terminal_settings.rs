@@ -9,11 +9,11 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use settings::{IntoGpui as _, PathHyperlinkRegex};
 pub use settings_content::AlternateScroll;
-use settings_content::MergeFrom as _;
-use settings_content::{
+pub use settings_content::{
     FontFamilyName, ShowScrollbar, TerminalBell, TerminalBlink, TerminalDockPosition,
     TerminalLineHeight, VenvSettings, WorkingDirectory,
 };
+use settings_content::MergeFrom as _;
 use settings_macros::RegisterSetting;
 use util::shell::Shell;
 

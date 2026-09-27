@@ -8,18 +8,21 @@ use gpui::{
 };
 use itertools::Itertools;
 
-use crate::{BlockContext, TerminalMode, TerminalView};
+use crate::view::{TerminalView, block::BlockContext, mode::TerminalMode};
 
 use super::TerminalElement;
 use super::input::TerminalInputHandler;
 use super::layout::*;
+use super::highlight::to_highlighted_range_lines;
+use gpui::{TextRun, size};
 
+impl TerminalElement {
 pub(super) fn paint(
     self: &mut TerminalElement,
     global_id: Option<&GlobalElementId>,
     inspector_id: Option<&gpui::InspectorElementId>,
     bounds: Bounds<Pixels>,
-    layout: &mut Self::PrepaintState,
+    layout: &mut LayoutState,
     window: &mut Window,
     cx: &mut App,
 ) {
@@ -186,3 +189,4 @@ pub(super) fn paint(
         );
     });
 }
+} // impl TerminalElement

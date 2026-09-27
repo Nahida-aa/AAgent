@@ -1,5 +1,10 @@
 use gpui::{App, Context, Entity, Task, Window};
-use workspace::{Pane, SplitDirection, SplitMode, move_active_item, move_item, pane};
+use util::ResultExt;
+use workspace::{Pane, SplitDirection, SplitMode, move_active_item, pane};
+use workspace::dock::PanelEvent;
+
+use crate::view::TerminalView;
+use crate::view::working_directory::default_working_directory;
 
 use super::TerminalPanel;
 use super::helpers::new_terminal_pane;

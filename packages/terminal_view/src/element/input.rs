@@ -4,7 +4,7 @@ use gpui::{
 };
 use workspace::Workspace;
 
-use crate::TerminalView;
+use crate::view::TerminalView;
 
 pub(super) struct TerminalInputHandler {
     pub(super) terminal_view: Entity<TerminalView>,

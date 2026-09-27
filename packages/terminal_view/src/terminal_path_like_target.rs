@@ -1,4 +1,5 @@
-use super::{HoverTarget, HoveredWord, TerminalView};
+use crate::view::hover::{HoverTarget, HoveredWord};
+use crate::view::TerminalView;
 use anyhow::Result;
 use editor::items::open_resolved_target;
 use gpui::{Context, Task, TaskExt, WeakEntity, Window};

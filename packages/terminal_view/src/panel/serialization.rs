@@ -7,14 +7,17 @@ use serde_json;
 use util::{ResultExt, TryFutureExt};
 use workspace::{ItemId, Workspace};
 
-use crate::TerminalView;
+use task::RevealStrategy;
+
+use crate::view::TerminalView;
+use crate::view::working_directory::default_working_directory;
+use crate::panel::terminal_provider::TerminalProvider;
 use crate::persistence::{
     SerializedItems, SerializedTerminalPanel, deserialize_terminal_panel, serialize_pane_group,
 };
 
 use super::TerminalPanel;
 use super::actions::TERMINAL_PANEL_KEY;
-use super::helpers::default_working_directory;
 
 impl TerminalPanel {
     pub(super) fn serialization_key(workspace: &Workspace) -> Option<String> {

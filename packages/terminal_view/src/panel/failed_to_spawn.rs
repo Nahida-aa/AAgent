@@ -9,7 +9,7 @@ use ui::{
 };
 use workspace::item::Item;
 
-pub(super) struct FailedToSpawnTerminal {
+pub struct FailedToSpawnTerminal {
     pub(super) error: String,
     pub(super) focus_handle: FocusHandle,
 }

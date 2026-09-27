@@ -1,6 +1,6 @@
 use aa_gpui_kit_theme::Theme;
 use gpui::{Hsla, Rgba, black};
-use vte::ansi::{Color, NamedColor};
+pub use vte::ansi::{Color, NamedColor};
 
 /// Converts an 8 bit ANSI color to its GPUI equivalent.
 /// Accepts `usize` for compatibility with the `alacritty::Colors` interface,

@@ -1,13 +1,16 @@
-use gpui::{Context, Entity, Subscription, WeakEntity, Window};
+use gpui::{Context, Entity, Subscription, Task, WeakEntity, Window};
 use terminal::{Event, MaybeNavigationTarget, Terminal};
+use terminal::terminal_settings::{TerminalBell, TerminalBlink, TerminalSettings};
 use workspace::Workspace;
+use workspace::item::ItemEvent;
+use workspace::searchable::SearchEvent;
 
 use super::TerminalView;
 use super::hover::HoverTarget;
 use super::lifecycle::*; // 若 hover_tooltip_update 等字段
 use crate::terminal_path_like_target::{hover_path_like_target, open_path_like_target};
 
-pub(super) fn subscribe_for_terminal_events(
+pub fn subscribe_for_terminal_events(
     terminal: &Entity<Terminal>,
     workspace: WeakEntity<Workspace>,
     window: &mut Window,

@@ -4,7 +4,7 @@ use gpui::{
 };
 use terminal::{Modes, Terminal};
 
-use crate::{ContentMode, TerminalMode, TerminalView};
+use crate::view::{TerminalView, mode::{ContentMode, TerminalMode}};
 
 use super::TerminalElement;
 

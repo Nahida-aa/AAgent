@@ -7,15 +7,6 @@
 pub mod inline_assist_tab_bar_button;
 pub mod terminal_provider;
 
-use aa_gpui_kit_ui::IconName;
-use gpui::{
-    App, AppContext, Context, Entity, EventEmitter, IntoElement, Render, WeakEntity, Window,
-    actions, px,
-};
-use workspace::dock::panel::Panel;
-use workspace::{DockPosition, Pane, PaneEvent, Workspace};
-
-use crate::view::TerminalView;
 mod actions;
 mod failed_to_spawn;
 mod helpers;
@@ -26,33 +17,32 @@ mod render;
 mod serialization;
 mod tab_bar;
 mod terminal_ops;
-mod terminal_provider;
 
 pub use actions::*;
 pub use failed_to_spawn::*;
 pub use helpers::*;
-pub use init::*;
+pub use init::{init, *};
 pub use terminal_provider::*;
 
-use std::sync::Arc;
-use std::time::Duration;
-
+use ui::IconName;
 use collections::HashMap;
 use gpui::{
-    App, AsyncWindowContext, Context, Entity, EventEmitter, FocusHandle, Focusable, Pixels, Task,
-    WeakEntity, Window,
+    App, AppContext, AsyncWindowContext, Context, Entity, EventEmitter, FocusHandle, Focusable,
+    IntoElement, Pixels, Render, Task, WeakEntity, Window, actions, px,
 };
 use project::{Fs, Project};
 use settings::Settings;
+use std::sync::Arc;
+use std::time::Duration;
 use task::TaskId;
 use terminal::Terminal;
 use terminal::terminal_settings::TerminalSettings;
 use workspace::{
-    Pane, PaneGroup, Workspace,
-    dock::{DockPosition, Panel, PanelEvent},
+    DockPosition, Pane, PaneGroup, Workspace,
+    dock::{Panel, PanelEvent},
 };
 
-use crate::TerminalView;
+use crate::view::TerminalView;
 
 // ---------- TerminalPanel entity ----------
 

@@ -4,7 +4,7 @@ use project::search::SearchQuery;
 use task::TaskId;
 use terminal::{Point, Search};
 
-pub(super) const CURSOR_BLINK_INTERVAL: Duration = Duration::from_millis(500);
+pub const CURSOR_BLINK_INTERVAL: Duration = Duration::from_millis(500);
 
 pub(super) fn viewport_line_for_point(point: Point, display_offset: usize) -> Option<usize> {
     let display_offset = i32::try_from(display_offset).unwrap_or(i32::MAX);

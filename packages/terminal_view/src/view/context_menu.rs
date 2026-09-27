@@ -6,9 +6,9 @@ use terminal::terminal_settings::TerminalSettings;
 use terminal::{Clear, Copy, Paste, PasteText};
 use ui::ContextMenu;
 use workspace::{CloseActiveItem, NewCenterTerminal, NewTerminal};
-use zed_actions::{agent::AddSelectionToThread, assistant::InlineAssist};
+use aagent_actions::{agent::AddSelectionToThread, assistant::InlineAssist};
 
-use crate::terminal_panel::TerminalPanel;
+use crate::panel::TerminalPanel;
 
 use super::TerminalView;
 use super::mode::TerminalMode;

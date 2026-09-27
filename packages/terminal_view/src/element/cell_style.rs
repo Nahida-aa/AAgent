@@ -1,6 +1,6 @@
 use gpui::{
-    App, Font, FontStyle, FontWeight, Hsla, Pixels, StrikethroughStyle, TextRun, TextStyle,
-    UnderlineStyle,
+    App, Font, FontStyle, FontWeight, HighlightStyle, Hsla, Pixels, StrikethroughStyle, TextRun,
+    TextStyle, UnderlineStyle,
 };
 use terminal::{
     Cell, Color, NamedColor, Point, Range,

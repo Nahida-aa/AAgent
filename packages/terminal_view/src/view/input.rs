@@ -1,7 +1,11 @@
+use std::path::PathBuf;
+
 use super::TerminalView;
-use gpui::{Context, KeyDownEvent, Keystroke, Window};
-use terminal::Terminal;
-use terminal::terminal_settings::TerminalSettings;
+use shlex;
+use super::actions::{SendKeystroke, SendText};
+use editor::blink_manager::BlinkManager;
+use gpui::{Action, App, ClipboardEntry, Context, KeyContext, KeyDownEvent, Keystroke, Window};
+use terminal::{Modes, Terminal, terminal_settings::TerminalSettings, actions::{Copy, Paste, PasteText, SelectAll, ShowCharacterPalette}};
 
 impl TerminalView {
     pub(super) fn key_down(

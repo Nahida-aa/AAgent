@@ -9,7 +9,7 @@ use workspace::{
 
 use super::TerminalPanel;
 use super::actions::Toggle;
-use super::helpers::default_working_directory;
+use crate::view::working_directory::default_working_directory;
 
 impl Panel for TerminalPanel {
     fn activation_focus_handle(&self, cx: &App) -> gpui::FocusHandle {

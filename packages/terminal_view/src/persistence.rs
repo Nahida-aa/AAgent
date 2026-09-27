@@ -19,10 +19,7 @@ use workspace::{
     Workspace, WorkspaceDb, WorkspaceId,
 };
 
-use crate::{
-    TerminalView, default_working_directory,
-    terminal_panel::{TerminalPanel, new_terminal_pane},
-};
+use crate::{panel::{TerminalPanel,  helpers::new_terminal_pane}, view::{TerminalView,working_directory::default_working_directory }};
 
 pub(crate) fn serialize_pane_group(
     pane_group: &PaneGroup,

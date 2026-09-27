@@ -1,6 +1,6 @@
 use gpui::{
-    Anchor, App, Context, EventEmitter, FocusHandle, Focusable, IntoElement, ParentElement, Render,
-    SharedString, Styled, Window, px,
+    px, Anchor, App, Context, EventEmitter, FocusHandle, Focusable, IntoElement, ParentElement,
+    Render, SharedString, Styled, Window,
 };
 use ui::prelude::*;
 use ui::{
@@ -28,10 +28,10 @@ impl Render for FailedToSpawnTerminal {
             .menu(move |window, cx| {
                 Some(ContextMenu::build(window, cx, |context_menu, _, _| {
                     context_menu
-                        .action("Open Settings", zed_actions::OpenSettings.boxed_clone())
+                        .action("Open Settings", aagent_actions::OpenSettings.boxed_clone())
                         .action(
                             "Edit settings.json",
-                            zed_actions::OpenSettingsFile.boxed_clone(),
+                            aagent_actions::OpenSettingsFile.boxed_clone(),
                         )
                 }))
             })
@@ -65,7 +65,10 @@ impl Render for FailedToSpawnTerminal {
                         ButtonLike::new("open-settings-ui")
                             .child(Label::new("Edit Settings").size(LabelSize::Small))
                             .on_click(|_, window, cx| {
-                                window.dispatch_action(zed_actions::OpenSettings.boxed_clone(), cx);
+                                window.dispatch_action(
+                                    aagent_actions::OpenSettings.boxed_clone(),
+                                    cx,
+                                );
                             }),
                         popover_menu.into_any_element(),
                     )),

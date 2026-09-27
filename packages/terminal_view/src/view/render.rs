@@ -4,8 +4,7 @@ use gpui::{
     Context, Focusable, IntoElement, MouseButton, MouseDownEvent, ParentElement, Render, Styled,
     Window, anchored, deferred, div,
 };
-use ui::{ScrollAxes, Scrollbars};
-use ui::{WithScrollbar, prelude::*};
+use ui::{ScrollAxes, Scrollbars, WithScrollbar, ScrollableHandle, prelude::*};
 use workspace::item::Item;
 
 use super::TerminalView;

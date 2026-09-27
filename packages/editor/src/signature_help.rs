@@ -15,9 +15,9 @@ use std::time::Duration;
 use text::Rope;
 use theme_settings::ThemeSettings;
 use ui::{
-    ActiveTheme, AnyElement, ButtonCommon, ButtonStyle, Clickable, IconButton, IconButtonShape,
-    IconName, IconSize, InteractiveElement, IntoElement, Label, LabelCommon, LabelSize,
-    ParentElement, Pixels, SharedString, StatefulInteractiveElement, Styled, StyledExt,
+    ActiveTheme, AnyElement, ButtonCommon, ButtonStyle, Clickable, FluentBuilder, IconButton,
+    IconButtonShape, IconName, IconSize, InteractiveElement, IntoElement, Label, LabelCommon,
+    LabelSize, ParentElement, Pixels, SharedString, StatefulInteractiveElement, Styled, StyledExt,
     WithScrollbar, div, relative,
 };
 

@@ -8,11 +8,10 @@ use util::RangeExt;
 
 use crate::{BufferSnapshot, Language, RunnableCapture, RunnableConfig};
 
-use gpui::SharedString;
-
-/// A tag applied to a [`Runnable`], e.g. the captured name of a test/command.
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub struct RunnableTag(pub SharedString);
+// 对齐 zed：RunnableTag 只在 task crate 定义（`pub struct RunnableTag(pub
+// SharedString)`），language 原样复用，不再自带一份 —— 否则 editor 侧
+// `for RunnableTag(tag) in tags` 会撞上两个同名不同源的类型（E0308）。
+pub use task::RunnableTag;
 
 /// A runnable is a set of data about a region that could be resolved into a task.
 #[derive(Clone, Debug)]

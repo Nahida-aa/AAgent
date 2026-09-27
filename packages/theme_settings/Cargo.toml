@@ -5,8 +5,12 @@ edition.workspace = true
 license.workspace = true
 description = "AAgent Theme + UI settings struct + 主题系统初始化（对齐 Zed crates/theme_settings）"
 
+[features]
+default = []
+test-support = ["gpui/test-support", "settings/test-support", "theme/test-support"]
+
 [dependencies]
-aa_gpui_kit_theme.workspace = true
+theme.workspace = true
 collections.workspace = true
 gpui.workspace = true
 inventory.workspace = true
@@ -17,3 +21,7 @@ settings_content.workspace = true
 settings_macros.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
+
+[dev-dependencies]
+gpui = { workspace = true, features = ["test-support"] }
+settings = { workspace = true, features = ["test-support"] }

@@ -6,7 +6,7 @@
 use collections::HashMap;
 use std::sync::Arc;
 
-use aa_gpui_kit_theme::{Appearance, BufferLineHeight, DEFAULT_ICON_THEME_NAME};
+use theme::{Appearance, BufferLineHeight, DEFAULT_ICON_THEME_NAME};
 use gpui::{
     App, Context, Font, FontFeatures, FontStyle, Global, Pixels, SharedString, Subscription,
     Window, px,
@@ -249,7 +249,7 @@ pub struct ThemeSettings {
     pub markdown_preview_theme: Option<ThemeSelection>,
 
     /// The line height for buffers, and the terminal.
-    /// 从 settings_content 读，转换为 aa_gpui_kit_theme::BufferLineHeight（有 .value()）。
+    /// 从 settings_content 读，转换为 theme::BufferLineHeight（有 .value()）。
     #[serde(skip)]
     pub buffer_line_height: BufferLineHeight,
 

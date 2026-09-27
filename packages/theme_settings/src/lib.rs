@@ -1,7 +1,7 @@
 //! ThemeSettings — UI + theme 相关设置 + 主题系统初始化。
 //!
 //! 对齐 Zed 分层：
-//! - `aa_gpui_kit_theme` = Zed 的 `crates/theme`（核心类型、注册表、set_theme）
+//! - `theme` = Zed 的 `crates/theme`（核心类型、注册表、set_theme）
 //! - `theme-settings`    = Zed 的 `crates/theme_settings`（装配、设置集成）
 
 pub mod settings;
@@ -22,9 +22,9 @@ pub use settings::{
 
 // setup_ui_font 在 lib.rs 里也有定义（下面），不从 settings.rs re-export。
 
-// BufferLineHeight — aa_gpui_kit_theme 版本（有 .value() 方法）。
+// BufferLineHeight — theme 版本（有 .value() 方法）。
 // 用完整路径 re-export 避免 settings crate 里的同名冲突。
-pub use aa_gpui_kit_theme::BufferLineHeight;
+pub use theme::BufferLineHeight;
 
 // ThemeStyleContent / HighlightStyleContent / ThemeName / IconThemeName
 // 由 settings_content crate 定义（settings crate 也 re-export 了）。
@@ -41,10 +41,10 @@ use ::settings::Settings;
 use std::borrow::Cow;
 use std::sync::Arc;
 
-use aa_gpui_kit_theme::ActiveTheme;
-use aa_gpui_kit_theme::registry::ThemeRegistry;
-use aa_gpui_kit_theme::{GlobalTheme, default_colors::catppuccin_mocha, set_theme};
-use aa_gpui_kit_theme::{IconTheme, LoadThemes, Theme};
+use theme::ActiveTheme;
+use theme::registry::ThemeRegistry;
+use theme::{GlobalTheme, default_colors::catppuccin_mocha, set_theme};
+use theme::{IconTheme, LoadThemes, Theme};
 use gpui::{App, AssetSource, Font, Result, SharedString, Window};
 
 /// 把 gpui 全局里的 `Arc<dyn AssetSource>` 适配成注册表要的 `Box<dyn AssetSource>`。

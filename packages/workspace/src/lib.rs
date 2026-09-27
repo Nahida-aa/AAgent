@@ -194,6 +194,7 @@ pub use crate::workspace::{
         },
         event::Event,
         workspace::Workspace,
+        lifecycle::reload
     },
     follow::{CollaboratorId, state::ViewId},
     notification::toast::Toast,

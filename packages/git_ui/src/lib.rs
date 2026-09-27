@@ -1184,6 +1184,7 @@ pub(crate) fn render_split_button_chevron_trigger(
 
 /// A visual representation of a file's Git status.
 #[derive(IntoElement, RegisterComponent)]
+#[register_component(crate = "component")]
 pub struct GitStatusIcon {
     status: FileStatus,
 }

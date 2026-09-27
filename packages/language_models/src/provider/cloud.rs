@@ -426,6 +426,7 @@ impl LanguageModelProvider for CloudLanguageModelProvider {
 }
 
 #[derive(IntoElement, RegisterComponent)]
+#[register_component(crate = "component")]
 struct ZedAiConfiguration {
     is_connected: bool,
     plan: Option<Plan>,

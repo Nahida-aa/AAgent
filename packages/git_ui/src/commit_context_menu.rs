@@ -1,6 +1,6 @@
 use crate::commit_view::CommitView;
 use git::Oid;
-use gpui::{Action, ClipboardItem, Entity, FocusHandle, SharedString, WeakEntity, Window, actions};
+use gpui::{Action, ClipboardItem, Entity, FocusHandle, SharedString, WeakEntity, Window, actions, Rems};
 use project::{GIT_COMMAND_TASK_TAG, git_store::Repository};
 
 use task::{TaskContext, TaskVariables, VariableName};

@@ -50,7 +50,7 @@ use gpui::{
     AbsoluteLength, Action, Anchor, AnyElement, AsyncApp, AsyncWindowContext, ClickEvent,
     ClipboardItem, DismissEvent, Empty, Entity, EventEmitter, FocusHandle, Focusable, KeyContext,
     MouseButton, MouseDownEvent, Pixels, Point, PromptLevel, ScrollStrategy, Subscription, Task,
-    TaskExt, TextStyle, UniformListScrollHandle, WeakEntity, actions, anchored, deferred,
+    TaskExt, TextStyle, UniformListScrollHandle, Rems, WeakEntity, actions, anchored, deferred,
     uniform_list,
 };
 use itertools::Itertools;
@@ -9279,6 +9279,7 @@ impl Render for GitPanelMessageTooltip {
 }
 
 #[derive(IntoElement, RegisterComponent)]
+#[register_component(crate = "component")]
 pub struct PanelRepoFooter {
     active_repository: SharedString,
     branch: Option<Branch>,

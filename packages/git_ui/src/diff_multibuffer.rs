@@ -34,7 +34,7 @@ use workspace::{
     CloseActiveItem, ItemNavHistory, Workspace,
     item::{Item, SaveOptions},
 };
-use ztracing::instrument;
+use a_tracing::instrument;
 
 struct BufferSubscriptions {
     _diff: Entity<BufferDiff>,
@@ -665,7 +665,7 @@ impl DiffMultibuffer {
                     editor.rhs_editor().update(cx, |editor, cx| {
                         conflict_view::buffers_removed(editor, &[buffer_id], cx);
                     });
-                    let _span = ztracing::info_span!("remove_excerpts_for_path");
+                    let _span = a_tracing::info_span!("remove_excerpts_for_path");
                     _span.enter();
                     editor.remove_excerpts_for_path(path, cx);
                 }

@@ -329,7 +329,9 @@ dependencies = [
  "documented",
  "gpui",
  "gpui_macros",
+ "gpui_util",
  "itertools 0.14.0",
+ "log",
  "num-format",
  "serde",
  "serde_json",
@@ -2659,6 +2661,24 @@ dependencies = [
 [[package]]
 name = "channel"
 version = "0.1.0"
+dependencies = [
+ "aa_clock",
+ "anyhow",
+ "client",
+ "collections",
+ "futures",
+ "gpui",
+ "http_client",
+ "language",
+ "log",
+ "postage",
+ "release_channel",
+ "rpc",
+ "semver",
+ "settings",
+ "text",
+ "util 0.1.0",
+]
 
 [[package]]
 name = "chardetng"

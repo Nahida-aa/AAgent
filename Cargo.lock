@@ -828,6 +828,7 @@ dependencies = [
 name = "agent_ui"
 version = "0.1.0"
 dependencies = [
+ "aa_gpui_fuzzy",
  "aa_gpui_kit_component",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",

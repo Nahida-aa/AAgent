@@ -16,3 +16,7 @@ outline-json file='tools/outline/src/main.rs' fields='all':
 ## outline-page —— 大文件翻页看（text 保持人读格式）
 outline-page file='tools/outline/src/main.rs' offset='0' limit='30':
     cargo run --release -p outline -- -f text --fields text,line --offset {{offset}} --limit {{limit}} {{file}}
+
+# cargo tree -e no-dev -i -p terminal_view    # 谁依赖 terminal_view（反向）
+# cargo tree -e no-dev -p terminal_view       # terminal_view 依赖谁（正向）
+# cargo tree --prefix none -p terminal_view   # 简洁版

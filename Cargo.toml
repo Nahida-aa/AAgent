@@ -12,7 +12,7 @@ members = [
     "packages/server",
     "packages/settings",
     "packages/session",
-    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aagent_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/language_model_core", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/util_macros", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/language_core", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/askpass", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/telemetry", "packages/telemetry_events", "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_var", "packages/feature_flags_macros", "packages/file_icons", "packages/vim_mode_setting", "packages/json_schema_store", "packages/edit_prediction_types", "packages/platform_title_bar", "packages/action_log", "packages/agent_settings", "packages/acp_thread", "packages/agent", "packages/agent_servers", "packages/agent_skills", "packages/remote_connection", "packages/language_model", "packages/auto_update", "packages/languages", "tools/outline", "packages/http_proxy", "packages/sandbox", "packages/reqwest_client", "packages/google_ai", "packages/language_models", "packages/ai_onboarding", "packages/anthropic", "packages/bedrock", "packages/copilot_chat", "packages/copilot_ui", "packages/deepseek", "packages/extension_host", "packages/llama_cpp", "packages/lmstudio", "packages/mistral", "packages/ollama", "packages/open_ai", "packages/openai_subscribed", "packages/opencode", "packages/open_router", "packages/x_ai", "packages/x_ai_subscribed", "packages/aws_http_client", "packages/language_models_cloud", "packages/copilot", "packages/language_extension", "packages/theme_extension", "packages/command_palette_hooks",
+    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aagent_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/language_model_core", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/util_macros", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/language_core", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/askpass", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/telemetry", "packages/telemetry_events", "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_var", "packages/feature_flags_macros", "packages/file_icons", "packages/vim_mode_setting", "packages/json_schema_store", "packages/edit_prediction_types", "packages/platform_title_bar", "packages/action_log", "packages/agent_settings", "packages/acp_thread", "packages/agent", "packages/agent_servers", "packages/agent_skills", "packages/remote_connection", "packages/language_model", "packages/auto_update", "packages/languages", "tools/outline", "packages/http_proxy", "packages/sandbox", "packages/reqwest_client", "packages/google_ai", "packages/language_models", "packages/ai_onboarding", "packages/anthropic", "packages/bedrock", "packages/copilot_chat", "packages/copilot_ui", "packages/deepseek", "packages/extension_host", "packages/llama_cpp", "packages/lmstudio", "packages/mistral", "packages/ollama", "packages/open_ai", "packages/openai_subscribed", "packages/opencode", "packages/open_router", "packages/x_ai", "packages/x_ai_subscribed", "packages/aws_http_client", "packages/language_models_cloud", "packages/copilot", "packages/language_extension", "packages/theme_extension", "packages/command_palette_hooks", "packages/call", "packages/channel", "packages/git_ui_core", "packages/livekit_client", "packages/recent_projects", "packages/dev_container", "packages/open_path_prompt", "packages/picker", "packages/remote_server", "packages/livekit_api",
 ]
 
 [workspace.package]
@@ -39,6 +39,7 @@ aa-extension-mcp = { path = "packages/extension-mcp" }
 aa-llm = { path = "packages/llm" }
 aa-session = { path = "packages/aa_session" }
 aa-server = { path = "packages/server" }
+audio = { path = "packages/audio" }
 agent_settings = { path = "packages/agent_settings" }
 ai_onboarding = { path = "packages/ai_onboarding" }
 anthropic = { path = "packages/anthropic" }
@@ -48,6 +49,8 @@ aws_http_client = { path = "packages/aws_http_client" }
 bedrock = { path = "packages/bedrock" }
 breadcrumbs = { path = "packages/breadcrumbs" }
 buffer_diff = { path = "packages/buffer_diff" }
+call = { path = "packages/call" }
+channel = { path = "packages/channel" }
 command_palette_hooks = { path = "packages/command_palette_hooks" }
 context_server = { path = "packages/context_server" }
 copilot = { path = "packages/copilot" }
@@ -60,6 +63,7 @@ cloud_llm_client = { path = "packages/cloud_llm_client" }
 dap = { path = "packages/dap" }
 db = { path = "packages/db" }
 deepseek = { path = "packages/deepseek" }
+dev_container = { path = "packages/dev_container" }
 edit_prediction_types = { path = "packages/edit_prediction_types" }
 editor = { path = "packages/editor" }
 env_var = { path = "packages/env_var" }
@@ -71,6 +75,7 @@ file_icons = { path = "packages/file_icons" }
 fs = { path = "packages/fs" }
 git = { path = "packages/git" }
 git_hosting_providers = { path = "packages/git_hosting_providers" }
+git_ui_core = { path = "packages/git_ui_core" }
 google_ai = { path = "packages/google_ai" }
 http_proxy = { path = "packages/http_proxy" }
 json_schema_store = { path = "packages/json_schema_store" }
@@ -84,6 +89,8 @@ language_model_core = { path = "packages/language_model_core" }
 language_models = { path = "packages/language_models" }
 language_models_cloud = { path = "packages/language_models_cloud" }
 languages = { path = "packages/languages" }
+livekit_api = { path = "packages/livekit_api" }
+livekit_client = { path = "packages/livekit_client" }
 llama_cpp = { path = "packages/llama_cpp" }
 lmstudio = { path = "packages/lmstudio" }
 lsp = { path = "packages/lsp" }
@@ -94,18 +101,29 @@ mistral = { path = "packages/mistral" }
 node_runtime = { path = "packages/node_runtime" }
 ollama = { path = "packages/ollama" }
 open_ai = { path = "packages/open_ai" }
+open_path_prompt = { path = "packages/open_path_prompt" }
 open_router = { path = "packages/open_router" }
 openai_subscribed = { path = "packages/openai_subscribed" }
 opencode = { path = "packages/opencode" }
-
 paths = { path = "packages/paths" }
+picker = { path = "packages/picker" }
+platform_title_bar = { path = "packages/platform_title_bar" }
 proto = { path = "packages/proto" }
+
+project = { path = "packages/project" }
+prettier = { path = "packages/prettier" }
+recent_projects = { path = "packages/recent_projects" }
+rope = { path = "packages/rope" }
+rpc = { path = "packages/rpc" }
+release_channel = { path = "packages/release_channel" }
+remote = { path = "packages/remote" }
+remote_connection = { path = "packages/remote_connection" }
+remote_server = { path = "packages/remote_server" }
+reqwest_client = { path = "packages/reqwest_client" }
 terminal = { path = "packages/terminal" }
 terminal_view = { path = "packages/terminal_view" }
 task = { path = "packages/task" }
 title_bar = { path = "packages/title_bar" }
-project = { path = "packages/project" }
-prettier = { path = "packages/prettier" }
 util_macros = { path = "packages/util_macros" }
 settings = { path = "packages/settings" }
 settings_content = { path = "packages/settings_content" }
@@ -114,15 +132,12 @@ snippet_provider = { path = "packages/snippet_provider" }
 settings_json = { path = "packages/settings_json", default-features = false }
 sidebar = { path = "packages/sidebar" }
 session = { path = "packages/session" }
-rope = { path = "packages/rope" }
-rpc = { path = "packages/rpc" }
+
 sandbox = { path = "packages/sandbox" }
 text = { path = "packages/text" }
 telemetry = { path = "packages/telemetry" }
 telemetry_events = { path = "packages/telemetry_events" }
-release_channel = { path = "packages/release_channel" }
-remote = { path = "packages/remote" }
-reqwest_client = { path = "packages/reqwest_client" }
+
 theme_extension = { path = "packages/theme_extension" }
 theme_settings = { path = "packages/theme_settings" }
 util = { path = "packages/util" }
@@ -168,10 +183,13 @@ base64 = "0.22"
 betlang = "0.1.1"
 bitflags = "2.6.0"
 bytes = "1.0"
-const_format = "0.2"
-convert_case = "0.11.0"
 chardetng = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
+const_format = "0.2"
+convert_case = "0.11.0"
+core-foundation = "0.10"
+core-foundation-sys = "0.8.6"
+core-video = { version = "0.5.2", features = ["metal"] }
 circular-buffer = "1.0"
 ciborium = "0.2"
 clap = { version = "4", features = ["derive"] }
@@ -247,8 +265,10 @@ indexmap = { version = "2.7.0", features = ["serde"] }
 indoc = "2"
 itertools = "0.14.0"
 js-sys = "0.3"
+jsonwebtoken = "10.0"
 json5 = "0.4"
 linkify = "0.10.0"
+livekit = { version = "0.7.32", features = ["tokio", "rustls-tls-native-roots"] }
 log = { version = "0.4.16", features = ["kv_unstable_serde", "serde"] }
 lru = "0.16"
 tempfile = "3"
@@ -256,14 +276,17 @@ inventory = "0.3"
 libwebrtc = "0.3.26"
 # Terminal
 libc = "0.2"
+lsp-types = { git = "https://github.com/zed-industries/lsp-types", rev = "f1783e63a7f4eb4397bf51d4148b4895a1f7ab16" }
+
 mime = "0.3.17"
 # Zed crates (统一 git rev)
-notify = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
-notify-types = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
 
-lsp-types = { git = "https://github.com/zed-industries/lsp-types", rev = "f1783e63a7f4eb4397bf51d4148b4895a1f7ab16" }
 moka = { version = "0.12.10", features = ["sync"] }
 proptest = { git = "https://github.com/proptest-rs/proptest", rev = "3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b", features = ["attr-macro"] }
+nix = "0.30"
+notify = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
+notify-types = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
+nanoid = "0.4"
 refineable = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 regex = "1"
 reqwest = { version = "0.12", default-features = false, features = ["json", "stream"] }
@@ -275,7 +298,6 @@ tracing = "0.1.40"
 
 mach2 = "0.5"
 markup5ever_rcdom = "0.39"
-nix = "0.30"
 objc2-foundation = { version = "=0.3.2", default-features = false, features = [
     "NSArray",
     "NSAttributedString",
@@ -331,6 +353,8 @@ rand = "0.9"
 rsa = "0.9.6"
 rust-embed = { version = "8.11", features = ["include-exclude"] }
 rustix = { version = "1.1", features = ["fs"] }
+# WARNING: If you change this, you must also publish a new version of zed-scap to crates.io
+scap = { git = "https://github.com/zed-industries/scap", rev = "4afea48c3b002197176fb19cd0f9b180dd36eaac", default-features = false, package = "zed-scap", version = "0.0.8-zed" }
 schemars = { version = "1", features = ["derive"] }
 seccompiler = "0.5"
 semver = { version = "1.0", features = ["serde"] }
@@ -346,6 +370,7 @@ serde_yaml_ng = "0.10"
 sha2 = "0.10"
 shellexpand = "3.1"
 shlex = "1.3.0"
+simplelog = "0.12.2"
 slotmap = "1.0.6"
 smol = "2.0"
 strsim = "0.11"
@@ -416,6 +441,7 @@ wasm-bindgen = "0.2.120"
 wasm-bindgen-futures = "0.4"
 wasmtime-wasi = "48"
 wax = "0.7"
+webrtc-sys = "0.3.23"
 which = "8"
 windows-registry = "0.6.0"
 yawc = { git = "https://github.com/zed-industries/yawc", rev = "71a452f551cac178367eaac5d7418a09afa1f3a2", version = "0.3.3" }
@@ -549,9 +575,13 @@ gpui_wgpu = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afe
 gpui_util = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f", version = "=0.1.0" }
 gpui_shared_string = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f", version = "=0.1.0" }
 collections = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f", version = "=0.1.0" }
+
+livekit = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev = "0a1c519cfce9b365229026b55de9b9dbdb6fed3c" }
+libwebrtc = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev = "0a1c519cfce9b365229026b55de9b9dbdb6fed3c" }
 notify = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
 notify-types = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
-libwebrtc = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev = "0a1c519cfce9b365229026b55de9b9dbdb6fed3c" }
+webrtc-sys = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev = "0a1c519cfce9b365229026b55de9b9dbdb6fed3c" }
+
 
 # 本地开发覆盖（仅开发期用）：zed 的 crate 用本地 `packages/language_core` 顶上。
 # 等我们不再依赖 zed git 源后即可整段删除。

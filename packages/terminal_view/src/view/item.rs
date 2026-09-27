@@ -159,6 +159,4 @@ impl Item for TerminalView {
         let terminal = self.terminal().read(cx);
         terminal.title(detail == 0).into()
     }
-
-    fn tab_icon(&self, _window: &gpui::Window, _cx: &App) -> Option<ui::Icon> { Some(ui::Icon::TerminalAlt) }
 }

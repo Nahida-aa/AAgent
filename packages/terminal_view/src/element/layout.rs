@@ -205,7 +205,7 @@ pub(crate) struct BackgroundRegion {
 }
 
 impl BackgroundRegion {
-    fn new(line: i32, col: i32, color: Hsla) -> Self {
+    pub(crate) fn new(line: i32, col: i32, color: Hsla) -> Self {
         BackgroundRegion {
             start_line: line,
             start_col: col,
@@ -215,7 +215,7 @@ impl BackgroundRegion {
         }
     }
 
-    fn with_extents(
+    pub(crate) fn with_extents(
         start_line: i32,
         start_col: i32,
         end_line: i32,

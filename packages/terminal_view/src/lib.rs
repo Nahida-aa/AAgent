@@ -45,12 +45,12 @@ pub use element::{
 };
 
 use gpui::App;
-use workspace::Workspace;
+use workspace::{Workspace, register_serializable_item};
 
 pub fn init(cx: &mut App) {
     panel::init(cx);
 
-    workspace::item::register_serializable_item::<view::TerminalView>(cx);
+    register_serializable_item::<view::TerminalView>(cx);
 
     cx.observe_new(|workspace: &mut Workspace, _window, _cx| {
         workspace.register_action(view::TerminalView::deploy);

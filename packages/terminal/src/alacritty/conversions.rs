@@ -13,7 +13,7 @@ use alacritty_terminal::{
         search::RegexSearch,
     },
     vi_mode::ViMotion as AlacViMotion,
-    vte::ansi::CursorShape as AlacCursorShape,
+    vte::ansi::{Color, CursorShape as AlacCursorShape},
 };
 use std::sync::Arc;
 
@@ -172,8 +172,48 @@ impl Cell {
     pub fn character(&self) -> char { self.cell.c }
 
     #[inline]
+    pub fn foreground(&self) -> Color { self.cell.fg }
+
+    #[inline]
+    pub fn background(&self) -> Color { self.cell.bg }
+
+    #[inline]
+    pub fn zerowidth(&self) -> Option<&[char]> { self.cell.zerowidth() }
+
+    #[inline]
     pub fn hyperlink(&self) -> Option<Hyperlink> {
         self.cell.hyperlink().map(terminal_hyperlink_from_alacritty)
+    }
+
+    #[inline]
+    pub fn is_inverse(&self) -> bool { self.cell.flags.contains(Flags::INVERSE) }
+
+    #[inline]
+    pub fn is_wide_char_spacer(&self) -> bool { self.cell.flags.contains(Flags::WIDE_CHAR_SPACER) }
+
+    #[inline]
+    pub fn is_dim(&self) -> bool { self.cell.flags.intersects(Flags::DIM) }
+
+    #[inline]
+    pub fn has_underline(&self) -> bool { self.cell.flags.intersects(Flags::ALL_UNDERLINES) }
+
+    #[inline]
+    pub fn has_undercurl(&self) -> bool { self.cell.flags.contains(Flags::UNDERCURL) }
+
+    #[inline]
+    pub fn has_strikeout(&self) -> bool { self.cell.flags.intersects(Flags::STRIKEOUT) }
+
+    #[inline]
+    pub fn is_bold(&self) -> bool { self.cell.flags.intersects(Flags::BOLD) }
+
+    #[inline]
+    pub fn is_italic(&self) -> bool { self.cell.flags.intersects(Flags::ITALIC) }
+
+    #[inline]
+    pub fn has_visible_style_modifier(&self) -> bool {
+        self.cell
+            .flags
+            .intersects(Flags::ALL_UNDERLINES | Flags::INVERSE | Flags::STRIKEOUT)
     }
 }
 impl<'a> RenderableCells<'a> {

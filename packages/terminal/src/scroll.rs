@@ -66,6 +66,9 @@ impl Terminal {
         self.events.push_back(InternalEvent::Scroll(Scroll::Bottom));
     }
 
+    pub fn scrolled_to_top(&self) -> bool { self.last_content.scrolled_to_top }
+    pub fn scrolled_to_bottom(&self) -> bool { self.last_content.scrolled_to_bottom }
+
     pub fn activate_match(&mut self, index: usize) {
         if let Some(search_match) = self.matches.get(index).cloned() {
             self.set_selection(Some(Selection::simple_range(search_match)));

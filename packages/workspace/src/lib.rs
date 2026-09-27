@@ -206,6 +206,7 @@ pub use crate::workspace::{
         FollowableViewRegistry, project_item::register_project_item,
         serializable_item::register_serializable_item,
     },
+    providers::{TerminalProvider},
     serialize::SERIALIZATION_THROTTLE_TIME,
 };
 use workspace::{
@@ -229,7 +230,7 @@ use workspace::{
     open::remote::open_remote_project_with_existing_connection,
     open::windows::workspace_windows_for_location,
     pane::ActivateInDirectionTarget,
-    providers::{DebuggerProvider, TerminalProvider},
+    providers::{DebuggerProvider, },
     registries::{ProjectItemRegistry, SerializableItemRegistry},
     serialize::WorkspaceLocation,
     serialize::flush::flush_windows_serialization,

@@ -8179,6 +8179,23 @@ dependencies = [
 [[package]]
 name = "language_models_cloud"
 version = "0.1.0"
+dependencies = [
+ "anthropic",
+ "anyhow",
+ "cloud_llm_client",
+ "futures",
+ "google_ai",
+ "gpui",
+ "http_client",
+ "language_model",
+ "log",
+ "open_ai",
+ "schemars 1.2.2",
+ "semver",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.20",
+]
 
 [[package]]
 name = "languages"
@@ -10445,6 +10462,26 @@ dependencies = [
 [[package]]
 name = "openai_subscribed"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "base64 0.22.1",
+ "credentials_provider",
+ "futures",
+ "gpui",
+ "http_client",
+ "language_model",
+ "log",
+ "oauth_callback_server",
+ "open_ai",
+ "parking_lot",
+ "rand 0.9.5",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "smol",
+ "url",
+ "util 0.1.0",
+]
 
 [[package]]
 name = "opencode"
@@ -19007,6 +19044,27 @@ dependencies = [
 [[package]]
 name = "x_ai_subscribed"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "base64 0.22.1",
+ "credentials_provider",
+ "futures",
+ "gpui",
+ "http_client",
+ "language_model",
+ "log",
+ "oauth_callback_server",
+ "open_ai",
+ "parking_lot",
+ "rand 0.9.5",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "smol",
+ "url",
+ "util 0.1.0",
+ "x_ai",
+]
 
 [[package]]
 name = "xattr"

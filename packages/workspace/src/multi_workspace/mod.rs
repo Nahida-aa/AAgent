@@ -21,7 +21,10 @@ use gpui::{
     prelude::*, px,
 };
 use project::{DisableAiSettings, Project};
-pub(crate) use project::ProjectGroupKey;
+// 与 `registries::{SerializableItemRegistry, register_serializable_item}` 同型：
+// 类型留在 crate 内（`pub(crate)`）会让 workspace 根的 `pub use` 撞 E0365，而
+// zed 里 ProjectGroupKey 本来就是 project 的公开 API，直接公开转出。
+pub use project::ProjectGroupKey;
 use remote::RemoteConnectionOptions;
 use agent_settings::AgentSettings;
 use hold::HeldWorkspace;

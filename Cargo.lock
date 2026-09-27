@@ -2161,6 +2161,11 @@ dependencies = [
 [[package]]
 name = "aws_http_client"
 version = "0.1.0"
+dependencies = [
+ "aws-smithy-runtime-api",
+ "aws-smithy-types",
+ "http_client",
+]
 
 [[package]]
 name = "axum"
@@ -14941,10 +14946,53 @@ checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 name = "sidebar"
 version = "0.1.0"
 dependencies = [
+ "aa_clock",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aagent_actions",
+ "acp_thread",
+ "action_log",
+ "agent",
+ "agent-client-protocol",
+ "agent_settings",
+ "agent_ui",
+ "anyhow",
+ "async-channel 2.5.0",
+ "chrono",
+ "client",
+ "db",
+ "editor",
+ "extension",
+ "feature_flags",
+ "fs",
+ "git",
+ "git_ui_core",
  "gpui",
- "settings_content",
+ "http_client",
+ "itertools 0.14.0",
+ "language",
+ "language_model",
+ "log",
+ "menu",
+ "node_runtime",
+ "notifications",
+ "platform_title_bar",
+ "pretty_assertions",
+ "project",
+ "prompt_store",
+ "recent_projects",
+ "release_channel 0.1.0",
+ "remote",
+ "remote_connection",
+ "remote_server",
+ "semver",
+ "serde",
+ "serde_json",
+ "settings",
+ "telemetry",
+ "theme_settings",
+ "unicode-segmentation",
+ "util 0.1.0",
  "workspace",
 ]
 

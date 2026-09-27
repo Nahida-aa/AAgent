@@ -43,6 +43,7 @@ agent = { path = "packages/agent" }
 agent_settings = { path = "packages/agent_settings" }
 agent_servers = { path = "packages/agent_servers" }
 agent_skills = { path = "packages/agent_skills" }
+agent_ui = { path = "packages/agent_ui" }
 ai_onboarding = { path = "packages/ai_onboarding" }
 anthropic = { path = "packages/anthropic" }
 askpass = { path = "packages/askpass" }

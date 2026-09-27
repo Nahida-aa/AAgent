@@ -6,7 +6,6 @@ license.workspace = true
 publish = false
 description = "AAgent Sidebar entity (Agent Threads list + bottom bar)"
 
-[dependencies]
 [features]
 default = []
 

@@ -26,21 +26,21 @@ use crate::language_model::{
     x_ai::XAiSettingsContent,
     zed_dot_dev::ZedDotDevSettingsContent,
 };
-mod anthropic;
-mod bedrock;
-mod common;
-mod deepseek;
-mod google;
-mod llama_cpp;
-mod lmstudio;
-mod mistral;
+pub mod anthropic;
+pub mod bedrock;
+pub mod common;
+pub mod deepseek;
+pub mod google;
+pub mod llama_cpp;
+pub mod lmstudio;
+pub mod mistral;
 pub mod ollama;
 pub mod open_router;
-mod openai;
-mod opencode;
-mod vercel_ai_gateway;
-mod x_ai;
-mod zed_dot_dev;
+pub mod openai;
+pub mod opencode;
+pub mod vercel_ai_gateway;
+pub mod x_ai;
+pub mod zed_dot_dev;
 
 #[with_fallible_options]
 #[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]

@@ -19,7 +19,7 @@ use super::highlight::to_highlighted_range_lines;
 use gpui::{TextRun, size};
 
 pub(crate) fn paint(
-    e: &mut TerminalElement,
+    term_element: &mut TerminalElement,
     global_id: Option<&GlobalElementId>,
     inspector_id: Option<&gpui::InspectorElementId>,
     bounds: Bounds<Pixels>,
@@ -29,7 +29,7 @@ pub(crate) fn paint(
 ) {
     let paint_start = Instant::now();
     window.with_content_mask(Some(ContentMask { bounds }), |window| {
-        let scroll_top = self.terminal_view.read(cx).scroll_top;
+        let scroll_top = term_element.terminal_view.read(cx).scroll_top;
 
         window.paint_quad(fill(bounds, layout.background_color));
         let origin = layout.dimensions.bounds.origin - GpuiPoint::new(px(0.), scroll_top);
@@ -39,20 +39,20 @@ pub(crate) fn paint(
         let origin = point(snap_px(origin.x), snap_px(origin.y));
 
         let marked_text_cloned: Option<String> = {
-            let ime_state = &self.terminal_view.read(cx).ime_state;
+            let ime_state = &term_element.terminal_view.read(cx).ime_state;
             ime_state.as_ref().map(|state| state.marked_text.clone())
         };
 
         let terminal_input_handler = TerminalInputHandler {
-            terminal_view: self.terminal_view.clone(),
+            terminal_view: term_element.terminal_view.clone(),
             cursor_bounds: layout.ime_cursor_bounds.map(|bounds| bounds + origin),
-            workspace: self.workspace.clone(),
+            workspace: term_element.workspace.clone(),
         };
 
-        self.register_mouse_listeners(layout.mode, &layout.hitbox, &layout.content_mode, window);
+        term_element.register_mouse_listeners(layout.mode, &layout.hitbox, &layout.content_mode, window);
         if window.modifiers().secondary()
             && bounds.contains(&window.mouse_position())
-            && self.terminal_view.read(cx).hover.is_some()
+            && term_element.terminal_view.read(cx).hover.is_some()
         {
             window.set_cursor_style(gpui::CursorStyle::PointingHand, &layout.hitbox);
         } else {
@@ -62,7 +62,7 @@ pub(crate) fn paint(
         let original_cursor = layout.cursor.take();
         let hyperlink_tooltip = layout.hyperlink_tooltip.take();
         let block_below_cursor_element = layout.block_below_cursor_element.take();
-        self.interactivity.paint(
+        term_element.interactivity.paint(
             global_id,
             inspector_id,
             bounds,
@@ -70,10 +70,10 @@ pub(crate) fn paint(
             window,
             cx,
             |_, window, cx| {
-                window.handle_input(&self.focus, terminal_input_handler, cx);
+                window.handle_input(&term_element.focus, terminal_input_handler, cx);
 
                 window.on_key_event({
-                    let this = self.terminal.clone();
+                    let this = term_element.terminal.clone();
                     move |event: &ModifiersChangedEvent, phase, window, cx| {
                         if phase != DispatchPhase::Bubble {
                             return;
@@ -163,7 +163,7 @@ pub(crate) fn paint(
                         .log_err();
                 }
 
-                if self.cursor_visible
+                if term_element.cursor_visible
                     && marked_text_cloned.is_none()
                     && let Some(mut cursor) = original_cursor
                 {

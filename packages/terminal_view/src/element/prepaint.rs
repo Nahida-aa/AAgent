@@ -32,15 +32,15 @@ use super::layout_grid::*;
 use gpui::FontFeatures;
 
 pub(crate) fn prepaint(
-    e: &mut TerminalElement,
+    term_element: &mut TerminalElement,
     global_id: Option<&GlobalElementId>,
     inspector_id: Option<&gpui::InspectorElementId>,
     bounds: Bounds<Pixels>,
     window: &mut Window,
     cx: &mut App,
 ) -> LayoutState {
-    let rem_size = self.rem_size(cx);
-    self.interactivity.prepaint(
+    let rem_size = term_element.rem_size(cx);
+    term_element.interactivity.prepaint(
         global_id,
         inspector_id,
         bounds,
@@ -77,7 +77,7 @@ pub(crate) fn prepaint(
 
             let line_height = terminal_settings.line_height.value();
 
-            let font_size = match &self.mode {
+            let font_size = match &term_element.mode {
                 TerminalMode::Embedded { .. } => {
                     window.text_style().font_size.to_pixels(window.rem_size())
                 }
@@ -149,9 +149,9 @@ pub(crate) fn prepaint(
                 let mut origin = bounds.origin;
                 origin.x += gutter;
 
-                if matches!(self.terminal_view.read(cx).mode, TerminalMode::Standalone) {
+                if matches!(term_element.terminal_view.read(cx).mode, TerminalMode::Standalone) {
                     let should_anchor_to_bottom = {
-                        let content = self.terminal.read(cx).last_content();
+                        let content = term_element.terminal.read(cx).last_content();
                         content.mode.contains(Modes::ALT_SCREEN)
                             || (content.scrolled_to_bottom && content.bottom_row_occupied)
                     };
@@ -196,17 +196,17 @@ pub(crate) fn prepaint(
                 )
             };
 
-            let search_matches = self.terminal.read(cx).matches.clone();
+            let search_matches = term_element.terminal.read(cx).matches.clone();
 
             let background_color = theme.colors().terminal_background;
 
-            let (hover_tooltip, hover_match) = self.terminal.update(cx, |terminal, cx| {
+            let (hover_tooltip, hover_match) = term_element.terminal.update(cx, |terminal, cx| {
                 terminal.set_size(dimensions);
                 terminal.sync(window, cx);
 
                 if window.modifiers().secondary()
                     && bounds.contains(&window.mouse_position())
-                    && let Some(registered_hover) = self.terminal_view.read(cx).hover.as_ref()
+                    && let Some(registered_hover) = term_element.terminal_view.read(cx).hover.as_ref()
                 {
                     if let Some(last_hovered_word) =
                         terminal.last_content.last_hovered_word.as_ref()
@@ -224,7 +224,7 @@ pub(crate) fn prepaint(
                 }
             });
 
-            let scroll_top = self.terminal_view.read(cx).scroll_top;
+            let scroll_top = term_element.terminal_view.read(cx).scroll_top;
             let hyperlink_tooltip = hover_tooltip.map(|hover_tooltip| {
                 let offset = dimensions.bounds.origin - point(px(0.), scroll_top);
                 let mut element = div()
@@ -244,7 +244,7 @@ pub(crate) fn prepaint(
                 selection,
                 cursor,
                 ..
-            } = &self.terminal.read(cx).last_content;
+            } = &term_element.terminal.read(cx).last_content;
             let mode = *mode;
             let display_offset = *display_offset;
 
@@ -259,7 +259,7 @@ pub(crate) fn prepaint(
 
             // then have that representation be converted to the appropriate highlight data structure
 
-            let content_mode = self.terminal_view.read(cx).content_mode(window, cx);
+            let content_mode = term_element.terminal_view.read(cx).content_mode(window, cx);
 
             // Calculate the intersection of the terminal's bounds with the current
             // content mask (the visible viewport after all parent clipping).
@@ -365,7 +365,7 @@ pub(crate) fn prepaint(
             let cursor = if let CursorShape::Hidden = cursor.shape {
                 None
             } else {
-                let focused = self.focused;
+                let focused = term_element.focused;
                 ime_cursor_bounds.map(move |bounds| {
                     let (shape, text) = match cursor.shape {
                         CursorShape::Block if !focused => (EditorCursorShape::Hollow, None),
@@ -389,8 +389,8 @@ pub(crate) fn prepaint(
                 })
             };
 
-            let block_below_cursor_element = if let Some(block) = &self.block_below_cursor {
-                let terminal = self.terminal.read(cx);
+            let block_below_cursor_element = if let Some(block) = &term_element.block_below_cursor {
+                let terminal = term_element.terminal.read(cx);
                 if terminal.last_content.display_offset == 0 {
                     let target_line = terminal.last_content.cursor.point.line + 1;
                     let render = &block.render;

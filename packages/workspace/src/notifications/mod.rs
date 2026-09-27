@@ -640,7 +640,7 @@ pub mod simple_message_notification {
     }
 
     #[derive(RegisterComponent)]
-    // 本 crate 把 aa_gpui_kit_component 起了 Cargo 别名 `component`，
+    // 本 crate 把 aa_gpui_kit_component 起了 Cargo 别名 `component`
     // 宏看不见别名，得显式指过来。
     #[register_component(crate = "component")]
     pub struct MessageNotification {

@@ -6,6 +6,7 @@ use workspace::{ToastAction, ToastView};
 use aagent_actions::toast;
 
 #[derive(RegisterComponent)]
+#[register_component(crate = "component")]
 pub struct StatusToast {
     icon: Option<Icon>,
     text: SharedString,

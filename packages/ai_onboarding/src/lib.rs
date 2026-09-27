@@ -39,6 +39,7 @@ impl From<client::Status> for SignInStatus {
 }
 
 #[derive(RegisterComponent, IntoElement)]
+#[register_component(crate = "component")]
 pub struct ZedAiOnboarding {
     pub sign_in_status: SignInStatus,
     pub plan: Option<Plan>,

@@ -492,12 +492,14 @@ dependencies = [
  "buffer_diff",
  "chrono",
  "collections",
+ "env_logger 0.11.11",
  "feature_flags",
  "file_icons",
  "futures",
  "gpui",
  "http_proxy",
  "image",
+ "indoc",
  "itertools 0.14.0",
  "language",
  "language_model",
@@ -508,12 +510,14 @@ dependencies = [
  "parking_lot",
  "portable-pty",
  "project",
+ "rand 0.9.5",
  "sandbox",
  "serde",
  "serde_json",
  "settings",
  "task",
  "telemetry",
+ "tempfile",
  "terminal",
  "text",
  "url",
@@ -3974,6 +3978,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "env_filter"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "900d271a03799a1ee8d1ca9b19893b48ca674a9284fefcfb85f05e74ed314217"
+dependencies = [
+ "log",
+ "regex",
+]
+
+[[package]]
 name = "env_logger"
 version = "0.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3984,6 +3998,19 @@ dependencies = [
  "log",
  "regex",
  "termcolor",
+]
+
+[[package]]
+name = "env_logger"
+version = "0.11.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "de671bd27a75a797dc9ae289ba1e77276e75e2026408aab65185384e2d5cd3f6"
+dependencies = [
+ "anstream",
+ "anstyle",
+ "env_filter",
+ "jiff",
+ "log",
 ]
 
 [[package]]
@@ -8783,7 +8810,7 @@ version = "0.1.0"
 source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
 dependencies = [
  "clap",
- "env_logger",
+ "env_logger 0.10.2",
  "lazy_static",
  "log",
  "msvc_spectre_libs",
@@ -8825,7 +8852,7 @@ name = "pet-conda"
 version = "0.1.0"
 source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
 dependencies = [
- "env_logger",
+ "env_logger 0.10.2",
  "lazy_static",
  "log",
  "msvc_spectre_libs",
@@ -8933,7 +8960,7 @@ name = "pet-jsonrpc"
 version = "0.1.0"
 source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
 dependencies = [
- "env_logger",
+ "env_logger 0.10.2",
  "log",
  "msvc_spectre_libs",
  "pet-core",
@@ -9064,7 +9091,7 @@ name = "pet-python-utils"
 version = "0.1.0"
 source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
 dependencies = [
- "env_logger",
+ "env_logger 0.10.2",
  "lazy_static",
  "log",
  "msvc_spectre_libs",
@@ -9081,7 +9108,7 @@ name = "pet-reporter"
 version = "0.1.0"
 source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
 dependencies = [
- "env_logger",
+ "env_logger 0.10.2",
  "log",
  "msvc_spectre_libs",
  "pet-core",
@@ -9095,7 +9122,7 @@ name = "pet-telemetry"
 version = "0.1.0"
 source = "git+https://github.com/zed-industries/python-environment-tools.git?rev=5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f#5aad7164bfc2a58977b103c8ef8fdd7302ed2e9f"
 dependencies = [
- "env_logger",
+ "env_logger 0.10.2",
  "lazy_static",
  "log",
  "msvc_spectre_libs",

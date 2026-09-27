@@ -2,7 +2,7 @@ use anyhow::Result;
 use gpui::Action;
 use gpui::{
     AnyElement, App, Bounds, ClickEvent, Context, DismissEvent, EventEmitter, FocusHandle,
-    Focusable, ListSizingBehavior, ListState, MouseButton, MouseUpEvent, Pixels, ScrollStrategy,
+    Focusable, ListSizingBehavior, ListState, MouseButton, MouseUpEvent, Pixels, ScrollStrategy, Rems,
     Task, UniformListScrollHandle, Window, actions, canvas, div, list, prelude::*, uniform_list,
 };
 use head::Head;
@@ -18,7 +18,7 @@ use ui::{
 use ui_input::ErasedEditorEvent;
 use util::ResultExt;
 use workspace::ModalView;
-use zed_actions::editor::{MoveDown, MoveUp};
+use aagent_actions::editor::{MoveDown, MoveUp};
 
 mod footer;
 mod head;

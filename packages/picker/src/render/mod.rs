@@ -1,8 +1,8 @@
-use gpui::{KeyContext, canvas};
+use gpui::{KeyContext, canvas, FluentBuilder,};
 use settings::Settings;
 use theme_settings::ThemeSettings;
 use ui::{
-    ActiveTheme, Color, Context, Disableable, DocumentationAside, DocumentationSide, FluentBuilder,
+    ActiveTheme, Color, Context, Disableable, DocumentationAside, DocumentationSide,
     InteractiveElement, IntoElement, Label, LabelCommon, ListItem, ListItemSpacing, ParentElement,
     Render, ScrollAxes, Scrollbars, Styled, StyledExt, Window, WithScrollbar, div, h_flex,
     rems_from_px, utils::WithRemSize, v_flex,

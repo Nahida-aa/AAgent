@@ -1,4 +1,6 @@
-use gpui::{KeyContext, canvas, FluentBuilder,};
+use gpui::{KeyContext, canvas};
+// zed 的 gpui 根没有转出 FluentBuilder；我们的 ui 转出了它（编译器会提示）。
+use ui::FluentBuilder;
 use settings::Settings;
 use theme_settings::ThemeSettings;
 use ui::{

@@ -15,7 +15,7 @@ use workspace::path_link::{
 };
 use workspace::{Workspace, path_link::OpenTarget};
 
-pub(super) fn hover_path_like_target(
+pub(crate) fn hover_path_like_target(
     workspace: &WeakEntity<Workspace>,
     hovered_word: HoveredWord,
     path_like_target: &PathLikeTarget,

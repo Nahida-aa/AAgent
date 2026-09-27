@@ -15,7 +15,7 @@ use ui::{
     Color, Divider, Icon, IconName, Label, LabelCommon, LabelSize, Tooltip, VisibleOnHover,
     h_flex, v_flex, div,
 };
-use ui::context_menu::menu;
+use menu;
 use workspace::{
     DraggedSelection, DraggedTab, Pane, ToolbarItemLocation, WorkspaceId, delete_unloaded_items,
     item::{HighlightedText, Item, ItemBufferKind, ItemEvent, TabContentParams, TabTooltipContent},

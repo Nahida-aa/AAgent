@@ -61,7 +61,7 @@ pub use event::{Event, OpenedBufferEvent};
 // 只有一套 trait，故只保留 `PathMatchCandidateSetIter`。
 pub use fuzzy::{Candidates, PathMatchCandidateSet, PathMatchCandidateSetIter};
 pub use item::ProjectItem;
-pub use lsp_command::{CallHierarchyItem, IncomingCall, OutgoingCall};
+pub use lsp_command::{CallHierarchyItem, EditPredictionDefinition, IncomingCall, OutgoingCall};
 pub use lsp_store::{
     DiagnosticSummary, InvalidationStrategy, LanguageServerLogType, LanguageServerProgress,
     LanguageServerPromptRequest, LanguageServerShowDocumentRequest, LanguageServerStatus,

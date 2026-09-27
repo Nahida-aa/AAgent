@@ -37,7 +37,7 @@ use gpui::{
 use project::Project;
 use settings::{Settings, SettingsStore};
 use std::rc::Rc;
-use terminal::{Terminal, terminal_settings::{TerminalBlink, TerminalSettings, CursorShape}};
+use terminal::{Event, Terminal, terminal_settings::{TerminalBlink, TerminalSettings, CursorShape}};
 use ui::ContextMenu;
 use workspace::{Workspace, WorkspaceId, dock::PanelEvent};
 use workspace::item::ItemEvent;
@@ -77,6 +77,7 @@ pub struct TerminalView {
     pub(super) _terminal_subscriptions: Vec<Subscription>,
 }
 
+impl EventEmitter<Event> for TerminalView {}
 impl EventEmitter<ItemEvent> for TerminalView {}
 impl EventEmitter<SearchEvent> for TerminalView {}
 impl Focusable for TerminalView {

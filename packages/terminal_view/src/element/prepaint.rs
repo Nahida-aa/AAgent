@@ -32,7 +32,7 @@ use super::layout_grid::*;
 use gpui::FontFeatures;
 
 pub(crate) fn prepaint(
-    self: &mut TerminalElement,
+    e: &mut TerminalElement,
     global_id: Option<&GlobalElementId>,
     inspector_id: Option<&gpui::InspectorElementId>,
     bounds: Bounds<Pixels>,

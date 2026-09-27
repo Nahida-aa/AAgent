@@ -2,7 +2,7 @@ use editor::blink_manager::BlinkManager;
 use gpui::{App, Context, Focusable, Pixels, Window};
 use settings::{Settings, SettingsStore};
 use terminal::terminal_settings::{TerminalBlink, TerminalSettings};
-use terminal::{Modes, TerminalBounds};
+use terminal::{Event, Modes, TerminalBounds};
 
 use super::TerminalView;
 use super::mode::{ContentMode, TerminalMode};
@@ -115,7 +115,7 @@ impl TerminalView {
 
     pub fn clear_bell(&mut self, cx: &mut Context<TerminalView>) {
         self.has_bell = false;
-        cx.emit(terminal::Event::Wakeup);
+        cx.emit(Event::Wakeup);
     }
 
     pub fn should_show_cursor(&self, focused: bool, cx: &mut Context<Self>) -> bool {

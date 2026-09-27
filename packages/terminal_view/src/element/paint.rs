@@ -19,7 +19,7 @@ use super::highlight::to_highlighted_range_lines;
 use gpui::{TextRun, size};
 
 pub(crate) fn paint(
-    self: &mut TerminalElement,
+    e: &mut TerminalElement,
     global_id: Option<&GlobalElementId>,
     inspector_id: Option<&gpui::InspectorElementId>,
     bounds: Bounds<Pixels>,

@@ -4,12 +4,18 @@ use super::TerminalView;
 use super::actions::RenameTerminal;
 use super::working_directory::default_working_directory;
 
-use gpui::{AnyElement, App, Context, Entity, SharedString, Task, WeakEntity, Window};
-use project::{Project, ProjectEntryId};
-use terminal::task::TaskStatus;
-use ui::{
-    Color, Divider, Icon, IconName, Label, LabelSize, Tooltip, h_flex, v_flex, div, menu,
+use gpui::{
+    AnyElement, App, Context, Element, Entity, Focusable, InteractiveElement, IntoElement,
+    ParentElement, SharedString, Styled, Task, WeakEntity, Window,
 };
+use gpui::prelude::FluentBuilder;
+use project::{Project, ProjectEntryId};
+use terminal::TaskStatus;
+use ui::{
+    Color, Divider, Icon, IconName, Label, LabelCommon, LabelSize, Tooltip, VisibleOnHover,
+    h_flex, v_flex, div,
+};
+use ui::context_menu::menu;
 use workspace::{
     DraggedSelection, DraggedTab, Pane, ToolbarItemLocation, WorkspaceId, delete_unloaded_items,
     item::{HighlightedText, Item, ItemBufferKind, ItemEvent, TabContentParams, TabTooltipContent},

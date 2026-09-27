@@ -16,11 +16,13 @@ pub use layout::{BatchedTextRun, LayoutPoint, LayoutRect, LayoutState};
 use std::rc::Rc;
 
 use gpui::{
-    App, Context, DispatchPhase, Element, ElementId, Entity, FocusHandle, GlobalElementId,
-    InteractiveElement, Interactivity, IntoElement, Length, Pixels, StatefulInteractiveElement,
-    WeakEntity, Window, relative,
+    App, Bounds, Context, DispatchPhase, Element, ElementId, Entity, FocusHandle, GlobalElementId,
+    InteractiveElement, Interactivity, IntoElement, LayoutId, Length, Pixels, StatefulInteractiveElement,
+    WeakEntity, Window, px, relative,
 };
+use settings::Settings;
 use terminal::Terminal;
+use terminal::terminal_settings::TerminalSettings;
 use workspace::Workspace;
 
 use crate::panel::TerminalProvider;

@@ -1,8 +1,8 @@
 use std::cmp;
 
 use gpui::{
-    Context, IntoElement, MouseButton, MouseDownEvent, ParentElement, Render, Styled, Window,
-    anchored, deferred, div,
+    Context, Focusable, IntoElement, MouseButton, MouseDownEvent, ParentElement, Render, Styled,
+    Window, anchored, deferred, div,
 };
 use ui::{ScrollAxes, Scrollbars};
 use ui::{WithScrollbar, prelude::*};

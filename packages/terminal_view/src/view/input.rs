@@ -4,7 +4,9 @@ use super::TerminalView;
 use shlex;
 use super::actions::{SendKeystroke, SendText};
 use editor::blink_manager::BlinkManager;
-use gpui::{Action, App, ClipboardEntry, Context, KeyContext, KeyDownEvent, Keystroke, Window};
+use gpui::{Action, App, ClipboardEntry, Context, Focusable, KeyContext, KeyDownEvent, Keystroke, Window};
+use settings::Settings;
+use util::ResultExt;
 use terminal::{Modes, Terminal, terminal_settings::TerminalSettings, actions::{Copy, Paste, PasteText, SelectAll, ShowCharacterPalette}};
 
 impl TerminalView {

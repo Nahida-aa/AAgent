@@ -1,4 +1,4 @@
-use gpui::{App, Context, Entity, Task, Window};
+use gpui::{App, AppContext, Context, Entity, Focusable, Task, Window};
 use util::ResultExt;
 use workspace::{Pane, SplitDirection, SplitMode, move_active_item, pane};
 use workspace::dock::PanelEvent;

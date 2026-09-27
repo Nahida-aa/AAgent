@@ -31,8 +31,8 @@ use ime::ImeState;
 use events::subscribe_for_terminal_events;
 use editor::{Editor, blink_manager::BlinkManager};
 use gpui::{
-    App, Context, Entity, EventEmitter, FocusHandle, Focusable, Pixels, Subscription, Task,
-    WeakEntity, Window, Point as GpuiPoint,
+    App, AppContext, Context, Entity, EventEmitter, FocusHandle, Focusable, Pixels, Subscription,
+    Task, TaskExt, WeakEntity, Window, Point as GpuiPoint,
 };
 use project::Project;
 use settings::{Settings, SettingsStore};
@@ -81,7 +81,9 @@ impl EventEmitter<Event> for TerminalView {}
 impl EventEmitter<ItemEvent> for TerminalView {}
 impl EventEmitter<SearchEvent> for TerminalView {}
 impl Focusable for TerminalView {
-    /* 原样 */
+    fn focus_handle(&self, _cx: &App) -> FocusHandle {
+        self.focus_handle.clone()
+    }
 }
 
 impl TerminalView {

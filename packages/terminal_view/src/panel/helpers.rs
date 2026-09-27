@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use breadcrumbs::Breadcrumbs;
 use futures::future::join_all;
-use gpui::{App, AsyncApp, Context, Entity, WeakEntity, Window};
+use gpui::{Action, App, AppContext, AsyncApp, Context, Entity, WeakEntity, Window};
 use project::Project;
 use task::{Shell, ShellBuilder, SpawnInTerminal};
 use workspace::{DraggedTab, Pane, Workspace};

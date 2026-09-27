@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use anyhow::{Result, anyhow};
 use futures::{channel::oneshot, future::join_all};
-use gpui::{App, AsyncWindowContext, Context, Entity, Task, TaskExt, WeakEntity, Window};
+use gpui::{App, AppContext, AsyncWindowContext, Context, Entity, Focusable, Task, TaskExt, WeakEntity, Window};
 use itertools::Itertools;
 use project::Project;
 use task::{RevealStrategy, RevealTarget, Shell, ShellBuilder, SpawnInTerminal};

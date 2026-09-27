@@ -6,7 +6,8 @@ use gpui::{
     TextStyle, point,
 };
 use itertools::Itertools;
-use terminal::{Cell, Color, Content, IndexedCell, Modes, Point, Range, TerminalBounds};
+use terminal::{Cell, Color, Content, IndexedCell, Modes, Point, Range, TerminalBounds, is_default_background_color};
+use theme::ActiveTheme;
 
 use crate::element::TerminalElement;
 

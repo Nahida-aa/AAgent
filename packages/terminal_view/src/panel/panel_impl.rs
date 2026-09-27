@@ -1,4 +1,4 @@
-use gpui::{App, Context, Entity, Pixels, Window};
+use gpui::{App, Context, Entity, Focusable, Pixels, TaskExt, Window};
 use settings::{Settings, TerminalDockPosition};
 use terminal::terminal_settings::TerminalSettings;
 use ui::IconName;

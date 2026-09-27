@@ -1,6 +1,6 @@
 use gpui::{
-    px, Anchor, App, Context, EventEmitter, FocusHandle, Focusable, IntoElement, ParentElement,
-    Render, SharedString, Styled, Window,
+    px, Action, Anchor, App, Context, EventEmitter, FocusHandle, Focusable, IntoElement,
+    ParentElement, Render, SharedString, Styled, Window,
 };
 use ui::prelude::*;
 use ui::{

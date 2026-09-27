@@ -7,6 +7,8 @@ use gpui::{
     UnderlineStyle, Window, fill, point, px,
 };
 use itertools::Itertools;
+use settings::Settings;
+use util::ResultExt;
 
 use crate::view::{TerminalView, block::BlockContext, mode::TerminalMode};
 

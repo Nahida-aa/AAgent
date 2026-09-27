@@ -1,6 +1,6 @@
 use gpui::{
-    Anchor, App, Context, Focusable, IntoElement, ParentElement, RenderOnce, SharedString, Styled,
-    Window,
+    Action, Anchor, App, Context, Focusable, IntoElement, ParentElement, RenderOnce, SharedString,
+    Styled, Window,
 };
 use terminal::Terminal;
 use ui::prelude::*;

@@ -2,10 +2,10 @@ use std::time::{Duration, Instant};
 
 use anyhow::Result;
 use db::kvp::KeyValueStore;
-use gpui::{AsyncWindowContext, Context, Entity, Task, TaskExt, WeakEntity, Window};
+use gpui::{AppContext, AsyncWindowContext, Context, Entity, Task, TaskExt, WeakEntity, Window};
 use serde_json;
 use util::{ResultExt, TryFutureExt};
-use workspace::{ItemId, Workspace};
+use workspace::{ItemId, PanelHandle, Workspace};
 
 use task::RevealStrategy;
 

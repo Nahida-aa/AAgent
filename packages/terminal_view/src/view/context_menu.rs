@@ -1,6 +1,7 @@
 use gpui::{
     App, Context, DismissEvent, Entity, Focusable, Pixels, Point as GpuiPoint, Subscription, Window,
 };
+use gpui::prelude::FluentBuilder;
 use settings::Settings;
 use terminal::terminal_settings::TerminalSettings;
 use terminal::{Clear, Copy, Paste, PasteText};

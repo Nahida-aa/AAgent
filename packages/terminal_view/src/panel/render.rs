@@ -2,7 +2,7 @@ use std::cmp;
 use std::sync::Arc;
 
 use collections::HashMap;
-use gpui::{App, Context, IntoElement, ParentElement, Render, Styled, Window, div};
+use gpui::{App, Context, Focusable, IntoElement, ParentElement, Render, Styled, Window, div};
 use ui::prelude::*;
 use workspace::{
     ActivateNextPane, ActivatePane, ActivatePaneDown, ActivatePaneLeft, ActivatePaneRight,

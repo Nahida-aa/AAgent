@@ -1,7 +1,8 @@
 use crate::persistence::TerminalDb;
-use gpui::{App, Context, Entity, Task, WeakEntity, Window};
+use gpui::{AppContext, App, Context, Entity, Task, WeakEntity, Window};
 use project::Project;
-use workspace::{Workspace, WorkspaceId, item::SerializableItem};
+use util::ResultExt;
+use workspace::{Workspace, WorkspaceId, delete_unloaded_items, item::SerializableItem};
 
 use super::TerminalView;
 use super::working_directory::default_working_directory;

@@ -1,4 +1,5 @@
 use gpui::{Context, Entity, Subscription, Task, WeakEntity, Window};
+use settings::Settings;
 use terminal::{Event, MaybeNavigationTarget, Terminal};
 use terminal::terminal_settings::{TerminalBell, TerminalBlink, TerminalSettings};
 use workspace::Workspace;

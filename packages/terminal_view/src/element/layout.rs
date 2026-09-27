@@ -6,14 +6,17 @@ use editor::{CursorLayout, HighlightedRange, HighlightedRangeLine};
 use gpui::{
     AbsoluteLength, AnyElement, App, Bounds, ContentMask, Element, ElementId, Entity, FocusHandle,
     Font, GlobalElementId, HighlightStyle, Hitbox, Hsla, Interactivity, IntoElement, Length,
-    Pixels, Point as GpuiPoint, TextRun, TextStyle, WeakEntity, Window, point, px, relative, size,
+    Pixels, Point as GpuiPoint, TextRun, TextStyle, WeakEntity, Window, fill, point, px, relative,
+    size,
 };
 use language::CursorShape as EditorCursorShape;
 use terminal::{
     Cell, Content, CursorShape, IndexedCell, Modes, Point, Range, Terminal, TerminalBounds,
     is_default_background_color,
 };
+use util::ResultExt;
 
+use crate::element::BlockElementLayoutRect;
 use crate::view::{TerminalView, block::{BlockContext, BlockProperties}, mode::{ContentMode, TerminalMode}};
 
 /// The information generated during layout that is necessary for painting.

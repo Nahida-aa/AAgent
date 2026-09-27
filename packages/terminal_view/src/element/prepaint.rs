@@ -1,10 +1,12 @@
 use std::rc::Rc;
 
 use gpui::{
-    AnyElement, App, AvailableSpace, Bounds, ContentMask, GlobalElementId, HighlightStyle, Hsla,
-    InspectorElementId, IntoElement, ParentElement, Pixels, Point as GpuiPoint, Styled, TextStyle,
-    UnderlineStyle, Window, div, point, px, relative, size,
+    AnyElement, App, AvailableSpace, Bounds, ContentMask, FontStyle, GlobalElementId, HighlightStyle,
+    Hsla, InspectorElementId, InteractiveElement, IntoElement, ParentElement, Pixels,
+    Point as GpuiPoint, StatefulInteractiveElement, Styled, TextRun, TextStyle,
+    UnderlineStyle, WhiteSpace, Window, div, point, px, relative, size,
 };
+use itertools::Itertools;
 use language::CursorShape as EditorCursorShape;
 use terminal::{
     Cell, Content, CursorShape, IndexedCell, Modes, Point, Range, Terminal, TerminalBounds,
@@ -14,6 +16,8 @@ use theme_settings::ThemeSettings;
 use ui::Tooltip;
 use ui::utils::ensure_minimum_contrast;
 
+use editor::CursorLayout;
+use settings::Settings;
 use terminal::terminal_settings::TerminalSettings;
 use crate::view::mode::{ContentMode, TerminalMode};
 use crate::view::block::BlockContext;

@@ -1,5 +1,5 @@
 use editor::{Editor, actions::SelectAll};
-use gpui::{Context, Entity, Subscription, Window};
+use gpui::{AppContext, Context, Entity, Subscription, Window};
 
 use super::TerminalView;
 use super::actions::RenameTerminal;

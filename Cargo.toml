@@ -12,7 +12,7 @@ members = [
     "packages/server",
     "packages/settings",
     "packages/session",
-    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aagent_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/language_model_core", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/util_macros", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/language_core", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/askpass", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/telemetry", "packages/telemetry_events", "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_var", "packages/feature_flags_macros", "packages/file_icons", "packages/vim_mode_setting", "packages/json_schema_store", "packages/edit_prediction_types", "packages/platform_title_bar", "packages/action_log", "packages/agent_settings", "packages/acp_thread", "packages/agent", "packages/agent_servers", "packages/agent_skills", "packages/remote_connection", "packages/language_model", "packages/auto_update", "packages/languages", "tools/outline", "packages/http_proxy", "packages/sandbox", "packages/reqwest_client", "packages/google_ai", "packages/language_models", "packages/ai_onboarding", "packages/anthropic", "packages/bedrock", "packages/copilot_chat", "packages/copilot_ui", "packages/deepseek", "packages/extension_host", "packages/llama_cpp", "packages/lmstudio", "packages/mistral", "packages/ollama", "packages/open_ai", "packages/openai_subscribed", "packages/opencode", "packages/open_router", "packages/x_ai", "packages/x_ai_subscribed", "packages/aws_http_client", "packages/language_models_cloud", "packages/copilot", "packages/language_extension", "packages/theme_extension", "packages/command_palette_hooks", "packages/call", "packages/channel", "packages/git_ui_core", "packages/livekit_client", "packages/recent_projects", "packages/dev_container", "packages/open_path_prompt", "packages/picker", "packages/remote_server", "packages/livekit_api", "packages/notifications",
+    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aagent_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/language_model_core", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/util_macros", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/language_core", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/askpass", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/telemetry", "packages/telemetry_events", "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_var", "packages/feature_flags_macros", "packages/file_icons", "packages/vim_mode_setting", "packages/json_schema_store", "packages/edit_prediction_types", "packages/platform_title_bar", "packages/action_log", "packages/agent_settings", "packages/acp_thread", "packages/agent", "packages/agent_servers", "packages/agent_skills", "packages/remote_connection", "packages/language_model", "packages/auto_update", "packages/languages", "tools/outline", "packages/http_proxy", "packages/sandbox", "packages/reqwest_client", "packages/google_ai", "packages/language_models", "packages/ai_onboarding", "packages/anthropic", "packages/bedrock", "packages/copilot_chat", "packages/copilot_ui", "packages/deepseek", "packages/extension_host", "packages/llama_cpp", "packages/lmstudio", "packages/mistral", "packages/ollama", "packages/open_ai", "packages/openai_subscribed", "packages/opencode", "packages/open_router", "packages/x_ai", "packages/x_ai_subscribed", "packages/aws_http_client", "packages/language_models_cloud", "packages/copilot", "packages/language_extension", "packages/theme_extension", "packages/command_palette_hooks", "packages/call", "packages/channel", "packages/git_ui_core", "packages/livekit_client", "packages/recent_projects", "packages/dev_container", "packages/open_path_prompt", "packages/picker", "packages/remote_server", "packages/livekit_api", "packages/notifications", "packages/dap_adapters", "packages/debug_adapter_extension", "packages/web_search", "packages/prompt_store", "packages/streaming_diff", "packages/assets",
 ]
 
 [workspace.package]
@@ -39,11 +39,15 @@ aa-extension-mcp = { path = "packages/extension-mcp" }
 aa-llm = { path = "packages/llm" }
 aa-session = { path = "packages/aa_session" }
 aa-server = { path = "packages/server" }
-audio = { path = "packages/audio" }
+agent = { path = "packages/agent" }
 agent_settings = { path = "packages/agent_settings" }
+agent_servers = { path = "packages/agent_servers" }
+agent_skills = { path = "packages/agent_skills" }
 ai_onboarding = { path = "packages/ai_onboarding" }
 anthropic = { path = "packages/anthropic" }
 askpass = { path = "packages/askpass" }
+assets = { path = "packages/assets" }
+audio = { path = "packages/audio" }
 auto_update = { path = "packages/auto_update" }
 aws_http_client = { path = "packages/aws_http_client" }
 bedrock = { path = "packages/bedrock" }
@@ -61,7 +65,9 @@ cloud_api_client = { path = "packages/cloud_api_client" }
 cloud_api_types = { path = "packages/cloud_api_types" }
 cloud_llm_client = { path = "packages/cloud_llm_client" }
 dap = { path = "packages/dap" }
+dap_adapters = { path = "packages/dap_adapters" }
 db = { path = "packages/db" }
+debug_adapter_extension = { path = "packages/debug_adapter_extension"}
 deepseek = { path = "packages/deepseek" }
 dev_container = { path = "packages/dev_container" }
 edit_prediction_types = { path = "packages/edit_prediction_types" }
@@ -94,10 +100,11 @@ livekit_client = { path = "packages/livekit_client" }
 llama_cpp = { path = "packages/llama_cpp" }
 lmstudio = { path = "packages/lmstudio" }
 lsp = { path = "packages/lsp" }
-migrator = { path = "packages/migrator" }
 markdown = { path = "packages/markdown" }
 mermaid_render = { path = "packages/mermaid_render" }
+migrator = { path = "packages/migrator" }
 mistral = { path = "packages/mistral" }
+multi_buffer = { path = "packages/multi_buffer" }
 node_runtime = { path = "packages/node_runtime" }
 notifications = { path = "packages/notifications" }
 ollama = { path = "packages/ollama" }
@@ -109,9 +116,9 @@ opencode = { path = "packages/opencode" }
 paths = { path = "packages/paths" }
 picker = { path = "packages/picker" }
 platform_title_bar = { path = "packages/platform_title_bar" }
-proto = { path = "packages/proto" }
-
 project = { path = "packages/project" }
+prompt_store = { path = "packages/prompt_store" }
+proto = { path = "packages/proto" }
 prettier = { path = "packages/prettier" }
 recent_projects = { path = "packages/recent_projects" }
 rope = { path = "packages/rope" }
@@ -121,11 +128,8 @@ remote = { path = "packages/remote" }
 remote_connection = { path = "packages/remote_connection" }
 remote_server = { path = "packages/remote_server" }
 reqwest_client = { path = "packages/reqwest_client" }
-terminal = { path = "packages/terminal" }
-terminal_view = { path = "packages/terminal_view" }
-task = { path = "packages/task" }
-title_bar = { path = "packages/title_bar" }
-util_macros = { path = "packages/util_macros" }
+
+sandbox = { path = "packages/sandbox" }
 settings = { path = "packages/settings" }
 settings_content = { path = "packages/settings_content" }
 settings_macros = { path = "packages/settings_macros" }
@@ -133,17 +137,21 @@ snippet_provider = { path = "packages/snippet_provider" }
 settings_json = { path = "packages/settings_json", default-features = false }
 sidebar = { path = "packages/sidebar" }
 session = { path = "packages/session" }
-
-sandbox = { path = "packages/sandbox" }
+streaming_diff = { path = "packages/streaming_diff" }
+task = { path = "packages/task" }
 text = { path = "packages/text" }
 telemetry = { path = "packages/telemetry" }
 telemetry_events = { path = "packages/telemetry_events" }
-
+terminal = { path = "packages/terminal" }
+terminal_view = { path = "packages/terminal_view" }
+title_bar = { path = "packages/title_bar" }
 theme_extension = { path = "packages/theme_extension" }
 theme_settings = { path = "packages/theme_settings" }
 util = { path = "packages/util" }
+util_macros = { path = "packages/util_macros" }
 aa_http_client = { path = "packages/http_client" }
 vim_mode_setting = { path = "packages/vim_mode_setting" }
+web_search = { path = "packages/web_search" }
 workspace = { path = "packages/workspace" }
 worktree = { path = "packages/worktree" }
 x_ai = { path = "packages/x_ai" }
@@ -155,14 +163,14 @@ aho-corasick = "1.1"
 any_vec = "0.14"
 anyhow = "1"
 async-channel = "2"
-axum = { version = "0.8", default-features = false }
-async-std = { version = "1.12", features = ["unstable"] }
-
 async-trait = "0.1"
 alacritty_terminal = { git = "https://github.com/zed-industries/alacritty", rev = "4c129667ce56611becdc82de6e28218c80e2e88f" }
 async-lock = "3.4.2"
 async-compression = { version = "0.4", features = ["bzip2", "gzip", "futures-io"] }
 async-fs = "2.1"
+async-io = "2.6.0"
+axum = { version = "0.8", default-features = false }
+async-std = { version = "1.12", features = ["unstable"] }
 async-pipe = { git = "https://github.com/zed-industries/async-pipe-rs", rev = "82d00a04211cf4e1236029aa03e6b6ce2a74c553" }
 async-recursion = "1.0.0"
 async-tar = { git = "https://github.com/zed-industries/async-tar", rev = "bd3ad6f89df9a9da7a8535958756d6bf465936a0" }
@@ -184,6 +192,7 @@ base64 = "0.22"
 betlang = "0.1.1"
 bitflags = "2.6.0"
 bytes = "1.0"
+cargo_toml = "0.21"
 chardetng = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
 const_format = "0.2"
@@ -213,6 +222,7 @@ derive_more = { version = "2.1.1", features = [
     "not",
 ] }
 dirs = "6.0"
+dotenvy = "0.15.0"
 dunce = "1.0"
 ec4rs = { version = "1.2", features = ["allow-empty-values"] }
 emojis = "0.9"
@@ -235,6 +245,7 @@ glob = "0.3"
 handlebars = "4.3"
 heapless = "0.9.2"
 heck = "0.5"
+heed = { version = "0.21.0", features = ["read-txn-no-tls"] }
 hex = "0.4.3"
 html5ever = "0.39"
 http = "1.1"
@@ -266,6 +277,7 @@ indexmap = { version = "2.7.0", features = ["serde"] }
 indoc = "2"
 itertools = "0.14.0"
 js-sys = "0.3"
+json_dotpath = "1.1"
 jsonwebtoken = "10.0"
 json5 = "0.4"
 linkify = "0.10.0"
@@ -367,6 +379,7 @@ serde_json_lenient = { version = "0.2", features = [
 ] }
 serde_path_to_error = "0.1.17"
 serde_urlencoded = "0.7"
+serde_yaml = "0.9.34"
 serde_yaml_ng = "0.10"
 sha2 = "0.10"
 shellexpand = "3.1"
@@ -445,6 +458,7 @@ wax = "0.7"
 webrtc-sys = "0.3.23"
 which = "8"
 windows-registry = "0.6.0"
+yaml-rust2 = "0.8"
 yawc = { git = "https://github.com/zed-industries/yawc", rev = "71a452f551cac178367eaac5d7418a09afa1f3a2", version = "0.3.3" }
 zeroize = "1.8"
 zstd = "0.11"
@@ -472,6 +486,8 @@ aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", re
 ui_input = { package = "aa_gpui_kit_ui_input", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
 component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
 
+
+crashes = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 # zed 的模糊匹配正在迁移中：editor / worktree 仍用旧包 `fuzzy`（bool 参数那套
 # 签名），language / command_palette 等已迁到 `fuzzy_nucleo`。为了调用点能与 zed
 # 逐行对照，两边都照 zed 的原样声明：
@@ -480,6 +496,7 @@ component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahid
 #   - `fuzzy_nucleo` 是 gpui_learn 的 aa_gpui_fuzzy 的别名。
 fuzzy = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 credentials_provider = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
+eval_utils = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 gpui_tokio = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 grammars  = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 html_to_markdown = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
@@ -491,6 +508,7 @@ oauth_callback_server = { git = "https://github.com/zed-industries/zed", rev = "
 path = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 perf = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 proxy_handshake = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
+shell_command_parser = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 snippet = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 sqlez = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
 sqlez_macros = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
@@ -498,7 +516,6 @@ watch = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c
 proptest-derive = "0.8.0"
 
 # ---- 由脚本补齐的缺失依赖 ----
-multi_buffer = { path = "packages/multi_buffer" }
 ordered-float = "5"
 unicode-script = "0.5.7"
 unicode-width = "0.2"

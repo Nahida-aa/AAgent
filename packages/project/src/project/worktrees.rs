@@ -297,6 +297,11 @@ impl Project {
                 .log_err();
         }
     }
+    /// Returns a future that resolves when all visible worktrees have completed
+    /// their initial scan.
+    pub fn wait_for_initial_scan(&self, cx: &App) -> impl Future<Output = ()> + use<> {
+        self.worktree_store.read(cx).wait_for_initial_scan()
+    }
     pub(crate) fn set_worktrees_from_proto(
         &mut self,
         worktrees: Vec<proto::WorktreeMetadata>,

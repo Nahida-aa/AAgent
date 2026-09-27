@@ -184,7 +184,7 @@ pub use crate::workspace::{
         ToggleFileFinder, ToggleProjectSymbols, MovePaneDown, MovePaneLeft, MovePaneRight,
         MovePaneUp,
     },
-    app::state::AppState,
+    app::state::{AppState, PreviousWorkspaceState},
     core::{
         WorkspaceId,
         actions::{
@@ -199,8 +199,10 @@ pub use crate::workspace::{
     notification::toast::Toast,
     open::{
         local::open_new,
-        options::{OpenOptions, OpenVisible},
+        options::{OpenOptions, OpenVisible, OpenMode,},
+        remote::{open_remote_project_with_existing_connection, remote_workspace_position_from_db},
     },
+
     pane::ops::move_active_item,
     registries::{
         FollowableViewRegistry, project_item::register_project_item,
@@ -225,9 +227,8 @@ use workspace::{
     item::permalink::{copy_file_permalink, open_file_permalink},
     open::local::{open_items, open_workspace_by_id},
     open::matching::{WorkspaceMatching, find_existing_workspace},
-    open::options::{OpenMode, OpenResult},
+    open::options::{ OpenResult},
     open::prompt::{PromptForNewPath, PromptForOpenPath},
-    open::remote::open_remote_project_with_existing_connection,
     open::windows::workspace_windows_for_location,
     pane::ActivateInDirectionTarget,
     providers::{DebuggerProvider, },

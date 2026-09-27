@@ -234,3 +234,39 @@ error[E0599]: no method named `children` found for struct `PaneAxisElement`
 `X::get_global(cx)`、`X::get(..)`、`SplitUp { .. }.boxed_clone()` 这类**关联函数**
 也要求 trait 在作用域：`settings::Settings`、`gpui::Action`。它们不在
 `ui::prelude::*` 里，照搬 zed 代码时要单独 `use`。
+
+## 13. 同一个类型全仓库只准有一份定义（IconName / RunnableTag 之鉴）
+
+zed 单仓库里类型天然唯一。我们拆成两个仓库后，极易在「自家包」里重定义一个
+同名类型 —— 一旦 editor 照搬 zed 代码（它假定全仓库一个类型），就出现
+「expected X, found X」式 E0308 / E0599，报错文本极具迷惑性（两个类型打印
+出来名字一样）。
+
+已踩过的两例：
+
+| 类型 | zed 里在哪 | 我们错在哪 | 修法 |
+|---|---|---|---|
+| `IconName` | `crates/icons` 唯一一份 | `aa_icons`（真身）与 `aa_gpui_kit_assets`（build.rs 生成）各一份，`base::Icon` 用了后者 | 全部归到 `aa_icons`，assets 删生成枚举（2026-09-27） |
+| `RunnableTag` | `crates/task` 唯一一份，language 复用 | `task` 与 `language` 各一份 | language 删副本，`pub use task::RunnableTag` |
+
+**修法永远是「收敛到一份」**：谁在 zed 里是真身就归谁，另一侧删掉改 re-export。
+在边界写 `From` 转换是下策 —— 每个跨界点都要转换，还会持续繁殖。
+
+判定方法：E0308 报「两个同名类型不相通」→ 先怀疑重定义，`rg "pub struct 类型名"`
+跨包搜一遍，而不是琢磨怎么转换。
+
+## 14. 收 `impl Trait` 的函数，喂 `.into()` 会 E0283 —— 参数要用具体类型
+
+zed 代码大量出现 `.color(cx.theme().status().error.into())`：Hsla 经 `.into()`
+喂给 `Icon::color`。若 `Icon::color` 收 `impl ResolveColor`（我们曾为「base 不依赖
+主题包」发明的桥接 trait），rustc 对 `Into<?T>` 的候选（Color / Rgba / Background /
+Fill / HighlightStyle / Hsla 自身）**不做跨约束裁剪**，即使全仓库只有
+`Color: ResolveColor` 一个实现也报 E0283 type annotations needed。
+
+结论：**吃 zed 调用面的 API 参数要用具体类型**（zed 的 `Icon::color(Color)`，
+`Color::Custom(Hsla)` 兜底裸色）。桥接 trait 在这种参数上根本立不住 ——
+`Icon` 后来整个归位到 `ui`（与 zed 同布局），`color(Color)` 落地，trait 删除。
+
+推论：`base`（自研、theme-free）里不要放「zed ui 也有」的控件；凡是 zed 有
+的，放 `ui` 并收 zed 的具体参数类型，否则每搬一个文件都要重新打一遍补丁。
+

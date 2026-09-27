@@ -81,6 +81,7 @@ pub use crate::{
         HoveredWord, Scroll, Search, Selection, SelectionPhase, SelectionSide, SelectionType,
         ViMotion,
     },
+    builder::MAX_SCROLL_HISTORY_LINES,
     headless::HeadlessTerminal
 };
 /// Separates retained PTY process metadata from resources needed only while

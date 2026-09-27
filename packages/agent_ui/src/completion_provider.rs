@@ -28,7 +28,7 @@ use project::{
 use rope::Point;
 use settings::Settings;
 use terminal::terminal_settings::TerminalSettings;
-use terminal_view::{TerminalView, terminal_panel::TerminalPanel};
+use terminal_view::{TerminalView, panel::TerminalPanel};
 use text::{Anchor, ToOffset as _, ToPoint as _};
 use ui::IconName;
 use ui::prelude::*;

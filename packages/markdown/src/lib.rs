@@ -38,7 +38,7 @@ pub(crate) use builder::MarkdownElementBuilder;
 pub use element::{AutoscrollBehavior, MarkdownElement};
 pub use entity::{
     CodeBlockRenderFn, CodeBlockRenderer, CodeBlockTransformFn, CopyButtonVisibility, Markdown,
-    MarkdownOptions, WrapButtonVisibility,
+    MarkdownOptions, WrapButtonVisibility,CopyAsMarkdown,Copy
 };
 pub use escape::MarkdownEscaper;
 pub use parsed::ParsedMarkdown;

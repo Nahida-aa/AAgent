@@ -15,6 +15,7 @@ pub struct TerminalSandboxWarning {
 }
 
 #[derive(IntoElement, RegisterComponent)]
+#[register_component(crate = "component")]
 pub struct TerminalToolHeader {
     id: SharedString,
     hover_group: SharedString,

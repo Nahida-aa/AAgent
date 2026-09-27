@@ -28,8 +28,8 @@ pub mod workspace_error;
 mod workspace_settings;
 
 pub use dock::{Panel, PanelEvent, PanelHandle, DockPosition};
-pub(crate) use multi_workspace::ProjectGroupKey;
 pub use multi_workspace::{
+    ProjectGroupKey,
     CloseWorkspaceSidebar, DraggedSidebar, FocusWorkspaceSidebar, MoveProjectDown,
     MoveProjectToNewWindow, MoveProjectUp, MultiWorkspace, MultiWorkspaceEvent, NewThread,
     NextProject, NextThread, PreviousProject, PreviousThread, ProjectGroup, RemovalIntent,
@@ -182,7 +182,7 @@ pub use crate::workspace::{
         ActivatePaneDown, ActivatePaneLeft, ActivatePaneRight, ActivatePaneUp, NewCenterTerminal,
         NewTerminal, SwapPaneAdjacent, SwapPaneDown, SwapPaneLeft, SwapPaneRight, SwapPaneUp,
         ToggleFileFinder, ToggleProjectSymbols, MovePaneDown, MovePaneLeft, MovePaneRight,
-        MovePaneUp,
+        MovePaneUp, OpenLog
     },
     app::state::{AppState, PreviousWorkspaceState},
     core::{
@@ -200,7 +200,8 @@ pub use crate::workspace::{
     open::{
         local::{open_new, with_active_or_new_workspace},
         options::{OpenOptions, OpenVisible, OpenMode,},
-        remote::{open_remote_project_with_existing_connection, remote_workspace_position_from_db},
+        remote::{open_remote_project_with_existing_connection, remote_workspace_position_from_db, open_remote_project_with_new_connection},
+        matching::find_existing_workspace
     },
 
     pane::ops::move_active_item,
@@ -226,7 +227,7 @@ use workspace::{
     follow::{AutoWatch, FollowerState},
     item::permalink::{copy_file_permalink, open_file_permalink},
     open::local::{open_items, open_workspace_by_id},
-    open::matching::{WorkspaceMatching, find_existing_workspace},
+    open::matching::{WorkspaceMatching, },
     open::options::{ OpenResult},
     open::prompt::{PromptForNewPath, PromptForOpenPath},
     open::windows::workspace_windows_for_location,

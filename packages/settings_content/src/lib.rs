@@ -69,7 +69,7 @@ pub use crate::{
         SshPortForwardOption, TelemetrySettingsContent, VimSettingsContent,
         WhichKeySettingsContent, WslConnection,
     },
-    extension::ExtensionSettingsContent,
+    extension::{ExtensionSettingsContent, ExtensionCapabilityContent},
     feature_flags::FeatureFlagsMap,
     language_model::AllLanguageModelSettingsContent,
     profiles::SettingsProfile,

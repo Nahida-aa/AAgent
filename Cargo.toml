@@ -451,7 +451,16 @@ vte = { version = "0.15.0", features = ["ansi"] }
 walkdir = "2.5"
 wasm-encoder = "0.254"
 wasmparser = "0.254"
-wasmtime = { version = "45", features = ["component-model", "wat"] }
+wasmtime = { version = "48", default-features = false, features = [
+    "anyhow",
+    "async",
+    "demangle",
+    "runtime",
+    "cranelift",
+    "component-model",
+    "incremental-cache",
+    "parallel-compilation",
+] }
 wasm-bindgen = "0.2.120"
 wasm-bindgen-futures = "0.4"
 wasmtime-wasi = "48"

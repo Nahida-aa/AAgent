@@ -27,7 +27,7 @@ pub mod workspace;
 pub mod workspace_error;
 mod workspace_settings;
 
-pub use dock::Panel;
+pub use dock::{Panel, PanelEvent, PanelHandle, DockPosition};
 pub(crate) use multi_workspace::ProjectGroupKey;
 pub use multi_workspace::{
     CloseWorkspaceSidebar, DraggedSidebar, FocusWorkspaceSidebar, MoveProjectDown,
@@ -48,7 +48,7 @@ use client::{
     proto::{self, ErrorCode, PanelId, PeerId},
 };
 use collections::{HashMap, HashSet, TypeIdHashMap, hash_map};
-use dock::{Dock, DockPosition, PanelButtons, PanelHandle, RESIZE_HANDLE_SIZE};
+use dock::{Dock, PanelButtons, RESIZE_HANDLE_SIZE};
 use fs::Fs;
 use futures::{
     Future, FutureExt, StreamExt,
@@ -179,15 +179,18 @@ use crate::{
 // 需要这里 use 过来让 crate 根能看到。普通 use 足够了，不需要 pub use。
 pub use crate::workspace::{
     actions::{
-        ActivatePaneLeft, ActivatePaneRight, NewCenterTerminal, NewTerminal, ToggleFileFinder,
-        ToggleProjectSymbols,
+        ActivatePaneDown, ActivatePaneLeft, ActivatePaneRight, ActivatePaneUp, NewCenterTerminal,
+        NewTerminal, SwapPaneAdjacent, SwapPaneDown, SwapPaneLeft, SwapPaneRight, SwapPaneUp,
+        ToggleFileFinder, ToggleProjectSymbols, MovePaneDown, MovePaneLeft, MovePaneRight,
+        MovePaneUp,
     },
     app::state::AppState,
     core::{
         WorkspaceId,
         actions::{
-            NewFile, NewFileSplit, NewFileSplitHorizontal, NewFileSplitVertical, NewWindow,
-            OpenInTerminal, OpenTerminal, ToggleReadOnlyFile, *,
+            ActivateNextPane, ActivatePreviousPane, NewFile, NewFileSplit, NewFileSplitHorizontal,
+            NewFileSplitVertical, NewWindow, OpenInTerminal, OpenTerminal, ToggleReadOnlyFile,
+            *,
         },
         event::Event,
         workspace::Workspace,
@@ -198,6 +201,7 @@ pub use crate::workspace::{
         local::open_new,
         options::{OpenOptions, OpenVisible},
     },
+    pane::ops::move_active_item,
     registries::{
         FollowableViewRegistry, project_item::register_project_item,
         serializable_item::register_serializable_item,

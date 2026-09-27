@@ -334,6 +334,7 @@ dependencies = [
  "log",
  "menu",
  "num-format",
+ "schemars 1.2.2",
  "serde",
  "serde_json",
  "smallvec",
@@ -5185,6 +5186,29 @@ dependencies = [
 [[package]]
 name = "edit_prediction_context"
 version = "0.1.0"
+dependencies = [
+ "aa_clock",
+ "anyhow",
+ "collections",
+ "env_logger 0.11.11",
+ "futures 0.3.34",
+ "gpui",
+ "indoc",
+ "language",
+ "log",
+ "lsp",
+ "parking_lot",
+ "pretty_assertions",
+ "project",
+ "serde_json",
+ "settings",
+ "smallvec",
+ "telemetry",
+ "text",
+ "tree-sitter",
+ "util 0.1.0",
+ "zeta_prompt",
+]
 
 [[package]]
 name = "edit_prediction_metrics"
@@ -5213,6 +5237,41 @@ dependencies = [
 [[package]]
 name = "edit_prediction_ui"
 version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_ui",
+ "aagent_actions",
+ "anyhow",
+ "buffer_diff",
+ "client",
+ "cloud_llm_client",
+ "codestral",
+ "command_palette_hooks",
+ "copilot",
+ "copilot_chat",
+ "copilot_ui",
+ "edit_prediction",
+ "edit_prediction_types",
+ "editor",
+ "feature_flags",
+ "fs",
+ "futures 0.3.34",
+ "gpui",
+ "indoc",
+ "language",
+ "markdown",
+ "menu",
+ "multi_buffer",
+ "paths",
+ "project",
+ "regex",
+ "settings",
+ "telemetry",
+ "text",
+ "theme_settings",
+ "util 0.1.0",
+ "workspace",
+ "zeta_prompt",
+]
 
 [[package]]
 name = "editor"
@@ -11106,6 +11165,27 @@ dependencies = [
 [[package]]
 name = "outline"
 version = "0.1.0"
+dependencies = [
+ "aa_gpui_fuzzy",
+ "aa_gpui_kit_theme",
+ "aa_gpui_kit_ui",
+ "aagent_actions",
+ "editor",
+ "futures 0.3.34",
+ "gpui",
+ "indoc",
+ "language",
+ "lsp",
+ "menu",
+ "picker",
+ "picker_preview",
+ "project",
+ "rope",
+ "serde_json",
+ "settings",
+ "util 0.1.0",
+ "workspace",
+]
 
 [[package]]
 name = "outline-cli"

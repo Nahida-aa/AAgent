@@ -45,3 +45,43 @@ impl TerminalScrollHandle {
 }
 
 // ScrollableHandle trait 暂未实现（aa_gpui_kit_ui 里没有）
+impl ScrollableHandle for TerminalScrollHandle {
+    fn max_offset(&self) -> Point<Pixels> {
+        let state = self.state.borrow();
+        point(
+            Pixels::ZERO,
+            state.total_lines.saturating_sub(state.viewport_lines) as f32 * state.line_height,
+        )
+    }
+
+    fn offset(&self) -> Point<Pixels> {
+        let state = self.state.borrow();
+        let scroll_offset = state
+            .total_lines
+            .saturating_sub(state.viewport_lines)
+            .saturating_sub(state.display_offset);
+        Point::new(Pixels::ZERO, -(scroll_offset as f32 * state.line_height))
+    }
+
+    fn set_offset(&self, point: Point<Pixels>) {
+        let state = self.state.borrow();
+        let offset_delta = (point.y / state.line_height).round() as i32;
+
+        let max_offset = state.total_lines.saturating_sub(state.viewport_lines);
+        let display_offset = (max_offset as i32 + offset_delta).clamp(0, max_offset as i32);
+
+        self.future_display_offset
+            .set(Some(display_offset as usize));
+    }
+
+    fn viewport(&self) -> Bounds<Pixels> {
+        let state = self.state.borrow();
+        Bounds::new(
+            Point::new(px(0.), px(0.)),
+            size(
+                Pixels::ZERO,
+                state.viewport_lines as f32 * state.line_height,
+            ),
+        )
+    }
+}

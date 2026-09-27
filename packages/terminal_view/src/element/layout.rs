@@ -196,12 +196,12 @@ impl LayoutRect {
 
 /// Represents a rectangular region with a specific color on a logical grid.
 #[derive(Debug, Clone)]
-struct BackgroundRegion {
-    start_line: i32,
-    start_col: i32,
-    end_line: i32,
-    end_col: i32,
-    color: Hsla,
+pub(crate) struct BackgroundRegion {
+    pub(crate) start_line: i32,
+    pub(crate) start_col: i32,
+    pub(crate) end_line: i32,
+    pub(crate) end_col: i32,
+    pub(crate) color: Hsla,
 }
 
 impl BackgroundRegion {
@@ -277,7 +277,7 @@ impl TerminalLayoutCell for &IndexedCell {
 }
 
 /// Merge grid regions to minimize the number of rectangles.
-fn merge_background_regions(regions: Vec<BackgroundRegion>) -> Vec<BackgroundRegion> {
+pub(crate) fn merge_background_regions(regions: Vec<BackgroundRegion>) -> Vec<BackgroundRegion> {
     if regions.is_empty() {
         return regions;
     }

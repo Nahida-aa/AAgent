@@ -9,12 +9,12 @@ pub struct ScrollTerminal(pub i32);
 /// Sends the specified text directly to the terminal.
 #[derive(Clone, Debug, Default, Deserialize, JsonSchema, PartialEq, Action)]
 #[action(namespace = terminal)]
-pub struct SendText(String);
+pub struct SendText(pub(crate) String);
 
 /// Sends a keystroke sequence to the terminal.
 #[derive(Clone, Debug, Default, Deserialize, JsonSchema, PartialEq, Action)]
 #[action(namespace = terminal)]
-pub struct SendKeystroke(String);
+pub struct SendKeystroke(pub(crate) String);
 
 actions!(
     terminal,

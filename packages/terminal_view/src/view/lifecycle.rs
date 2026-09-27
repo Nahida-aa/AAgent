@@ -200,7 +200,7 @@ impl TerminalView {
         }
     }
 
-    pub(super) fn set_terminal(
+    pub(crate) fn set_terminal(
         &mut self,
         terminal: gpui::Entity<terminal::Terminal>,
         window: &mut Window,

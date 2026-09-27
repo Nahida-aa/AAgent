@@ -9,7 +9,7 @@ pub mod terminal_provider;
 
 mod actions;
 mod failed_to_spawn;
-mod helpers;
+pub(crate) mod helpers;
 mod init;
 mod pane_ops;
 mod panel_impl;

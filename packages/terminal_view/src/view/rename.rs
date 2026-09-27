@@ -17,7 +17,7 @@ impl TerminalView {
         }
     }
 
-    pub(super) fn mark_needs_serialize(&mut self, cx: &mut Context<Self>) {
+    pub(crate) fn mark_needs_serialize(&mut self, cx: &mut Context<Self>) {
         self.needs_serialize = true;
         cx.emit(workspace::item::ItemEvent::UpdateTab);
     }

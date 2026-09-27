@@ -1,3 +1,3 @@
 pub struct ImeState {
-    pub(super) marked_text: String,
+    pub(crate) marked_text: String,
 }

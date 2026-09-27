@@ -1,4 +1,5 @@
-use crate::view::hover::{HoverTarget, HoveredWord};
+use crate::view::hover::HoverTarget;
+use terminal::HoveredWord;
 use crate::view::TerminalView;
 use anyhow::Result;
 use editor::items::open_resolved_target;

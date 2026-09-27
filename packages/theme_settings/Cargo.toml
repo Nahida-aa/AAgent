@@ -7,6 +7,7 @@ description = "AAgent Theme + UI settings struct + 主题系统初始化（对�
 
 [dependencies]
 aa_gpui_kit_theme.workspace = true
+collections.workspace = true
 gpui.workspace = true
 inventory.workspace = true
 settings = { workspace = true }

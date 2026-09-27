@@ -923,6 +923,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "anthropic"
+version = "0.1.0"
+
+[[package]]
 name = "any_vec"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -12933,6 +12937,7 @@ name = "theme_settings"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
+ "collections",
  "gpui",
  "inventory",
  "serde",

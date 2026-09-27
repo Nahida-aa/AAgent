@@ -3,16 +3,16 @@
 //! 对齐 Zed `settings_content::ThemeSettingsContent` 的运行时版本。
 //! 用 `#[derive(RegisterSetting)]` 注册到 `settings::SettingsStore`。
 
-use std::collections::HashMap;
+use collections::HashMap;
 use std::sync::Arc;
 
-use aa_gpui_kit_theme::{Appearance, BufferLineHeight, DEFAULT_ICON_THEME_NAME, UiDensity};
+use aa_gpui_kit_theme::{Appearance, BufferLineHeight, DEFAULT_ICON_THEME_NAME};
 use gpui::{
     App, Context, Font, FontFeatures, FontStyle, Global, Pixels, SharedString, Subscription,
     Window, px,
 };
 use serde::{Deserialize, Serialize};
-use settings::IntoGpui as _;
+use settings::{IntoGpui as _, Settings as _};
 use settings_macros::RegisterSetting;
 
 // 对齐 zed `theme_settings/src/settings.rs:11`：选择类类型由 settings_content
@@ -254,7 +254,7 @@ pub struct ThemeSettings {
     pub theme_overrides: HashMap<String, settings::ThemeStyleContent>,
 
     /// The density of the UI.
-    pub ui_density: UiDensity,
+    pub ui_density: settings::UiDensity,
 
     /// The amount of fading applied to unnecessary code.
     pub unnecessary_code_fade: f32,
@@ -281,7 +281,7 @@ impl Default for ThemeSettings {
             icon_theme: IconThemeSelection::default(),
             experimental_theme_overrides: None,
             theme_overrides: HashMap::default(),
-            ui_density: UiDensity::default(),
+            ui_density: Default::default(),
             unnecessary_code_fade: 0.5,
         }
     }
@@ -402,6 +402,11 @@ impl ThemeSettings {
     pub fn line_height(&self) -> f32 {
         let v = self.buffer_line_height.value();
         v.max(1.0)
+    }
+
+    /// 兼容旧调用点：返回 buffer_line_height 的 f32 值。
+    pub fn buffer_line_height_value(&self) -> f32 {
+        self.buffer_line_height.value()
     }
 }
 

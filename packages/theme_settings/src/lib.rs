@@ -6,9 +6,33 @@
 
 pub mod settings;
 
+// settings.rs 里的 public items，全部 re-export
 pub use settings::{
-    IconThemeSelection, ThemeAppearanceMode, ThemeSelection, ThemeSettings, set_mode,
+    AgentBufferFontSize, AgentUiFontSize, BufferFontSize,
+    GitCommitBufferFontSize, IconThemeSelection, MarkdownPreviewFontSize, UiFontSize,
+    ThemeAppearanceMode, ThemeSelection, ThemeSettings,
+    adjust_agent_buffer_font_size, adjust_agent_ui_font_size, adjust_buffer_font_size,
+    adjust_git_commit_buffer_font_size, adjust_markdown_preview_font_size, adjust_ui_font_size,
+    appearance_to_mode, buffer_line_height_from_settings, clamp_font_size,
+    decrease_buffer_font_size, increase_buffer_font_size, observe_buffer_font_size_adjustment,
+    reset_agent_buffer_font_size, reset_agent_ui_font_size, reset_buffer_font_size,
+    reset_git_commit_buffer_font_size, reset_markdown_preview_font_size, reset_ui_font_size,
+    set_mode,
 };
+
+// setup_ui_font 在 lib.rs 里也有定义（下面），不从 settings.rs re-export。
+
+// BufferLineHeight — aa_gpui_kit_theme 版本（有 .value() 方法）。
+// 用完整路径 re-export 避免 settings crate 里的同名冲突。
+pub use aa_gpui_kit_theme::BufferLineHeight;
+
+// ThemeStyleContent / HighlightStyleContent / ThemeName / IconThemeName
+// 由 settings_content crate 定义（settings crate 也 re-export 了）。
+// 注意：crate 内部的 `pub mod settings` 遮蔽了外部 settings crate，
+// 所以要用 `::settings::` 绝对路径或直接用 `settings_content::`。
+// Zed 原版 theme_settings re-export 它们，保持同样 import 路径。
+pub use ::settings::{HighlightStyleContent, IconThemeName, ThemeName, ThemeStyleContent};
+
 // 注意: crate 内部有同名 `pub mod settings` 遮蔽了外部 settings crate，
 // 所以用 ::settings::Settings 绝对路径，或直接 extern crate 改名。
 #[allow(unused_imports)]
@@ -107,7 +131,7 @@ fn configured_icon_theme(cx: &mut App) -> Arc<IconTheme> {
     let appearance = cx.theme().appearance();
     let icon_theme_name = theme_settings.icon_theme.name(appearance);
     registry
-        .get_icon_theme(&icon_theme_name)
+        .get_icon_theme(icon_theme_name.0.as_ref())
         .unwrap_or_else(|_| {
             registry
                 .default_icon_theme()

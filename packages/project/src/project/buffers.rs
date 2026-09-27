@@ -1,5 +1,6 @@
 use super::*;
 
+use ::git::blame::Blame;
 use ::rpc::proto;
 use std::sync::Arc;
 use std::time::Duration;
@@ -555,6 +556,20 @@ impl Project {
                 .await
                 .into_iter()
                 .collect()
+        })
+    }
+
+    /// Blames a buffer（对齐 Zed `Project::blame_buffer`）。
+    ///
+    /// 转发到 `GitStore::blame_buffer`。
+    pub fn blame_buffer(
+        &mut self,
+        buffer: &Entity<Buffer>,
+        version: Option<clock::Global>,
+        cx: &mut Context<Self>,
+    ) -> Task<Result<Option<Blame>>> {
+        self.git_store.update(cx, |git_store, cx| {
+            git_store.blame_buffer(buffer, version, cx)
         })
     }
 }

@@ -11,6 +11,7 @@ use task::RevealStrategy;
 
 use crate::view::TerminalView;
 use crate::view::working_directory::default_working_directory;
+use terminal::Terminal;
 use crate::panel::terminal_provider::TerminalProvider;
 use crate::persistence::{
     SerializedItems, SerializedTerminalPanel, deserialize_terminal_panel, serialize_pane_group,

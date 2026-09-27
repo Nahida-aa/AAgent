@@ -160,5 +160,5 @@ impl Item for TerminalView {
         terminal.title(detail == 0).into()
     }
 
-    fn tab_icon(&self, _cx: &App) -> IconName { IconName::TerminalAlt }
+    fn tab_icon(&self, _window: &gpui::Window, _cx: &App) -> Option<ui::Icon> { Some(ui::Icon::TerminalAlt) }
 }

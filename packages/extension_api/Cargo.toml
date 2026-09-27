@@ -1,0 +1,16 @@
+[package]
+name = "extension_api"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+wit-bindgen = "0.41"
+
+[package.metadata.component]
+target = { path = "wit" }
+
+[package.metadata.cargo-shear]
+ignored-paths = ["wit/since_v*/settings.rs"]

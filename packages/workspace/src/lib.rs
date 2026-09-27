@@ -203,7 +203,8 @@ pub use crate::workspace::{
         local::{open_new, with_active_or_new_workspace},
         options::{OpenOptions, OpenVisible, OpenMode,},
         remote::{open_remote_project_with_existing_connection, remote_workspace_position_from_db, open_remote_project_with_new_connection},
-        matching::find_existing_workspace
+        matching::find_existing_workspace,
+        file::create_and_open_local_file
     },
 
     pane::ops::move_active_item,

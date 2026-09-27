@@ -255,7 +255,6 @@ dependencies = [
 name = "aa_gpui_base"
 version = "0.1.0"
 dependencies = [
- "aa_icons",
  "gpui",
 ]
 
@@ -326,6 +325,7 @@ dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui_macros",
+ "aa_icons",
  "documented",
  "gpui",
  "gpui_macros",
@@ -333,7 +333,7 @@ dependencies = [
  "serde",
  "serde_json",
  "smallvec",
- "strum 0.27.2",
+ "strum 0.28.0",
  "tracing",
  "unicode-segmentation",
 ]
@@ -725,6 +725,20 @@ dependencies = [
 [[package]]
 name = "agent_skills"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "base64 0.22.1",
+ "const_format",
+ "fs",
+ "futures",
+ "gpui",
+ "paths",
+ "serde",
+ "serde_json",
+ "serde_yaml_ng",
+ "url",
+ "util 0.1.0",
+]
 
 [[package]]
 name = "agent_ui"
@@ -751,6 +765,10 @@ checksum = "c982642fa9e8606056828ee9a8505737230110bb1099153c79efe865c59d12ba"
 dependencies = [
  "memchr",
 ]
+
+[[package]]
+name = "ai_onboarding"
+version = "0.1.0"
 
 [[package]]
 name = "alacritty_terminal"
@@ -6687,6 +6705,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "language_models"
+version = "0.1.0"
+
+[[package]]
 name = "languages"
 version = "0.1.0"
 dependencies = [
@@ -11591,6 +11613,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_yaml_ng"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b4db627b98b36d4203a7b458cf3573730f2bb591b28871d916dfa9efabfd41f"
+dependencies = [
+ "indexmap 2.14.2",
+ "itoa",
+ "ryu",
+ "serde",
+ "unsafe-libyaml",
+]
+
+[[package]]
 name = "serial2"
 version = "0.2.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -13893,6 +13928,12 @@ name = "unindent"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7264e107f553ccae879d21fbea1d6724ac785e8c3bfc762137959b5802826ef3"
+
+[[package]]
+name = "unsafe-libyaml"
+version = "0.2.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "673aac59facbab8a9007c7f6108d11f63b603f7cabff99fabf650fea5c32b861"
 
 [[package]]
 name = "untrusted"

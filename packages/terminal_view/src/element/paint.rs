@@ -18,7 +18,6 @@ use super::layout::*;
 use super::highlight::to_highlighted_range_lines;
 use gpui::{TextRun, size};
 
-impl TerminalElement {
 pub(crate) fn paint(
     self: &mut TerminalElement,
     global_id: Option<&GlobalElementId>,
@@ -191,4 +190,3 @@ pub(crate) fn paint(
         );
     });
 }
-} // impl TerminalElement

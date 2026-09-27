@@ -170,6 +170,19 @@ pub fn clamp_font_size(size: Pixels) -> Pixels {
     size.clamp(MIN_FONT_SIZE, MAX_FONT_SIZE)
 }
 
+/// Adjusts the given font size by the current buffer font size adjustment delta, if any.
+pub fn adjusted_font_size(size: Pixels, cx: &App) -> Pixels {
+    let adjusted_font_size =
+        if let Some(BufferFontSize(adjusted_size)) = cx.try_global::<BufferFontSize>() {
+            let buffer_font_size = ThemeSettings::get_global(cx).buffer_font_size;
+            let delta = *adjusted_size - buffer_font_size;
+            size + delta
+        } else {
+            size
+        };
+    clamp_font_size(adjusted_font_size)
+}
+
 // ---------- ThemeSettings ----------
 
 fn font_from(family: Option<&str>, weight: Option<f32>) -> Font {

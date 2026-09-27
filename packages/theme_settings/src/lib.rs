@@ -13,7 +13,7 @@ pub use settings::{
     ThemeAppearanceMode, ThemeSelection, ThemeSettings,
     adjust_agent_buffer_font_size, adjust_agent_ui_font_size, adjust_buffer_font_size,
     adjust_git_commit_buffer_font_size, adjust_markdown_preview_font_size, adjust_ui_font_size,
-    appearance_to_mode, buffer_line_height_from_settings, clamp_font_size,
+    appearance_to_mode, adjusted_font_size, buffer_line_height_from_settings, clamp_font_size,
     decrease_buffer_font_size, increase_buffer_font_size, observe_buffer_font_size_adjustment,
     reset_agent_buffer_font_size, reset_agent_ui_font_size, reset_buffer_font_size,
     reset_git_commit_buffer_font_size, reset_markdown_preview_font_size, reset_ui_font_size,

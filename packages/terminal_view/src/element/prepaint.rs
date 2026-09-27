@@ -31,7 +31,6 @@ use super::layout::*;
 use super::layout_grid::*;
 use gpui::FontFeatures;
 
-impl TerminalElement {
 pub(crate) fn prepaint(
     self: &mut TerminalElement,
     global_id: Option<&GlobalElementId>,
@@ -440,4 +439,3 @@ pub(crate) fn prepaint(
         },
     )
 }
-} // impl TerminalElement

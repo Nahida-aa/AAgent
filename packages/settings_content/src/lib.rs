@@ -47,6 +47,7 @@ pub use merge_from::MergeFrom;
 
 pub use agent::*;
 pub use language_model::{Config, McpConfig, McpServerDef, ProviderConfig, ResolvedConfig};
+pub use language_model_core::*;
 use schemars::JsonSchema;
 use serde::{Serialize, de::DeserializeOwned};
 use settings_macros::{MergeFrom, with_fallible_options};
@@ -67,11 +68,11 @@ pub use crate::{
         JournalSettingsContent, MarkdownPreviewSettingsContent, OutlinePanelSettingsContent,
         PanelSettingsContent, RemoteSettingsContent, ReplSettingsContent, SshConnection,
         SshPortForwardOption, TelemetrySettingsContent, VimSettingsContent,
-        WhichKeySettingsContent, WslConnection,
+        WhichKeySettingsContent, WslConnection  ,
     },
     extension::{ExtensionSettingsContent, ExtensionCapabilityContent},
     feature_flags::FeatureFlagsMap,
-    language_model::AllLanguageModelSettingsContent,
+    language_model::{AllLanguageModelSettingsContent, ollama::KeepAlive, open_router::{DataCollection, OpenRouterAvailableModel, OpenRouterProvider}},
     profiles::SettingsProfile,
     project::{
         ContextServerCommand, DiagnosticsSettingsContent, GitSettings, GlobalLspSettingsContent,

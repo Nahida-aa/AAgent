@@ -692,7 +692,7 @@ pub fn read_skill_body_from_content(
 }
 
 /// Content of the built-in `create-skill` SKILL.md, embedded at compile time.
-const CREATE_SKILL_CONTENT: &str = include_str!("builtin/create-skill/SKILL.md");
+const CREATE_SKILL_CONTENT: &str = include_str!("../builtin/create-skill/SKILL.md");
 
 /// Returns the set of skills that are compiled into the Zed binary.
 pub fn builtin_skills() -> Vec<Skill> {

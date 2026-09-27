@@ -1,0 +1,17 @@
+[package]
+name = "picker_preview"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+editor.workspace = true
+gpui.workspace = true
+language.workspace = true
+multi_buffer.workspace = true
+picker.workspace = true
+project.workspace = true
+rope.workspace = true
+settings.workspace = true
+ui.workspace = true
+util.workspace = true

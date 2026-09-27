@@ -1,12 +1,12 @@
 [package]
-name = "outline"
+name = "outline-cli"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 description = "打印源文件的符号大纲（走 zed 的 tree-sitter outline.scm 查询）"
 
 [[bin]]
-name = "outline"
+name = "outline-cli"
 path = "src/main.rs"
 
 [dependencies]

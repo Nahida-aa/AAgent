@@ -28,7 +28,7 @@ use gpui::{App, Global};
 
 use std::env;
 use std::{borrow::Cow, fmt, str};
-use util::asset_str;
+use ::util::asset_str;
 
 pub use ::settings_content::*;
 pub use base_keymap_setting::*;
@@ -106,7 +106,7 @@ impl fmt::Display for WorktreeId {
 
 // Dev builds read the checkout's files at runtime instead of embedding them;
 // see the `assets` crate for the rationale.
-util::fs_embed! {
+::util::fs_embed! {
     pub struct SettingsAssets,
     crate_relative = "../../assets",
     root_relative = "assets",

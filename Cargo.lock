@@ -255,7 +255,7 @@ dependencies = [
 name = "aa_gpui_base"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_assets 0.1.0",
+ "aa_icons",
  "gpui",
 ]
 
@@ -10769,6 +10769,22 @@ dependencies = [
  "wasm-bindgen-futures",
  "wasm-streams",
  "web-sys",
+]
+
+[[package]]
+name = "reqwest_client"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bytes",
+ "futures",
+ "gpui_util",
+ "http_client",
+ "http_client_tls",
+ "log",
+ "regex",
+ "reqwest",
+ "tokio",
 ]
 
 [[package]]

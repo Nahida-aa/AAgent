@@ -111,4 +111,17 @@ impl Project {
             git_store.open_uncommitted_diff(buffer, cx)
         })
     }
+    pub fn git_init(
+        &self,
+        path: Arc<Path>,
+        fallback_branch_name: String,
+        cx: &App,
+    ) -> Task<Result<()>> {
+        self.git_store
+            .read(cx)
+            .git_init(path, fallback_branch_name, cx)
+    }
+    pub fn git_config(&self, path: Arc<Path>, args: Vec<String>, cx: &App) -> Task<Result<String>> {
+        self.git_store.read(cx).git_config(path, args, cx)
+    }
 }

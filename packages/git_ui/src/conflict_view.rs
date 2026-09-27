@@ -162,7 +162,7 @@ pub(crate) fn buffers_removed(
     editor.remove_blocks(removed_block_ids, None, cx);
 }
 
-#[ztracing::instrument(skip_all)]
+#[a_tracing::instrument(skip_all)]
 fn conflicts_updated(
     editor: &mut Editor,
     conflict_set: Entity<ConflictSet>,
@@ -289,7 +289,7 @@ fn conflicts_updated(
     }
 }
 
-#[ztracing::instrument(skip_all)]
+#[a_tracing::instrument(skip_all)]
 fn update_conflict_highlighting(
     editor: &mut Editor,
     conflict: &ConflictRegion,

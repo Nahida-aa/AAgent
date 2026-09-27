@@ -81,7 +81,7 @@ pub use crate::{
         WorktreeSettingsContent,
     },
     title_bar::TitleBarSettingsContent,
-    ui::{HideMouseMode, LineIndicatorFormat, ReduceMotionMode},
+    ui::{HideMouseMode, LineIndicatorFormat, ReduceMotionMode, StatusStyle},
     workspace::{
         ActivePaneModifiers, AutosaveSetting, CenteredLayoutSettings, CloseWindowWhenNoItems,
         CliDefaultOpenBehavior, FullscreenMode, OnLastWindowClosed, OnNewWindow,

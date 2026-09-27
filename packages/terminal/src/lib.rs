@@ -81,6 +81,7 @@ pub use crate::{
         HoveredWord, Scroll, Search, Selection, SelectionPhase, SelectionSide, SelectionType,
         ViMotion,
     },
+    headless::HeadlessTerminal
 };
 /// Separates retained PTY process metadata from resources needed only while
 /// the terminal is live.

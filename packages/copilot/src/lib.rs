@@ -1829,7 +1829,7 @@ mod tests {
     }
 
     fn init_test(cx: &mut TestAppContext) {
-        zlog::init_test();
+        a_log::init_test();
 
         cx.update(|cx| {
             let settings_store = SettingsStore::test(cx);

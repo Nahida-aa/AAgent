@@ -37,7 +37,7 @@ use workspace::{
     item::{Item, ItemEvent, ItemHandle, SaveOptions},
     searchable::SearchableItemHandle,
 };
-use zed_actions::git as git_actions;
+use aagent_actions::git as git_actions;
 
 actions!(
     git,
@@ -1011,7 +1011,7 @@ mod tests {
 
     #[ctor::ctor(unsafe)]
     fn init_logger() {
-        zlog::init_test();
+        a_log::init_test();
     }
 
     fn init_test(cx: &mut TestAppContext) {
@@ -1029,7 +1029,7 @@ mod tests {
         });
     }
 
-    use zed_actions::git as git_actions;
+    use aagent_actions::git as git_actions;
 
     use crate::project_diff::{self, ProjectDiff};
 

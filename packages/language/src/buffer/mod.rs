@@ -103,7 +103,7 @@ pub(crate) use std::{
 };
 pub(crate) use sum_tree::TreeMap;
 pub use text::{
-    Anchor, Bias, BufferId, BufferSnapshot as TextBufferSnapshot, Edit, LineEnding, LineIndent,
+    Anchor, Bias, Buffer as TextBuffer, BufferId, BufferSnapshot as TextBufferSnapshot, Edit, LineEnding, LineIndent,
     OffsetRangeExt, OffsetUtf16, Patch, Point, PointUtf16, Rope, Selection, SelectionGoal,
     Subscription, TextDimension, TextSummary, ToOffset, ToPoint, ToPointUtf16, Transaction,
     TransactionId, Unclipped,

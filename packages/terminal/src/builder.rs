@@ -9,7 +9,7 @@ use crate::events::TerminalBackendEvent;
 use crate::mode::{TerminalMode, TerminalModeKind};
 use crate::pty_info::{ProcessIdGetter, PtyProcessInfo};
 use crate::selection::SelectionPhase;
-use crate::shell::HeadlessTerminal;
+use crate::headless::HeadlessTerminal;
 use crate::subprocess::{SubprocessHandle, convert_lf_to_crlf};
 use crate::terminal_settings::{
     AlternateScroll, CursorShape as SettingsCursorShape, TerminalSettings,

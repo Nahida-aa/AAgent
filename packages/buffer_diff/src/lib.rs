@@ -2429,7 +2429,7 @@ mod tests {
     use util::test::marked_text_ranges;
 
     #[ctor::ctor(unsafe)]
-    fn init_logger() { zlog::init_test(); }
+    fn init_logger() { a_log::init_test(); }
 
     #[gpui::test]
     async fn test_buffer_diff_simple(cx: &mut gpui::TestAppContext) {

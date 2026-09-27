@@ -27,9 +27,9 @@ mod worktrees;
 #[cfg(feature = "test-support")]
 mod test_support;
 
-pub use state::LocalProjectFlags;
+pub use state::{LocalProjectFlags, AgentLocation};
 pub(crate) use state::{
-    AgentLocation, BufferOrderedMessage, DebugAdapterClientState, DownloadingFile,
+     BufferOrderedMessage, DebugAdapterClientState, DownloadingFile,
     EntitySubscription, ProjectClientState, RemotelyCreatedModelGuard, RemotelyCreatedModels,
 };
 // ---- 供 project/ 各子模块经 `use super::*;` 取用 ----

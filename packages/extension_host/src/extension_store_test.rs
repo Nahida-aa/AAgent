@@ -53,7 +53,7 @@ use util::{rel_path::rel_path_buf, test::TempTree};
 #[cfg(test)]
 #[ctor::ctor(unsafe)]
 fn init_logger() {
-    zlog::init_test();
+    a_log::init_test();
 }
 
 #[gpui::test]

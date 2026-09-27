@@ -12,7 +12,7 @@ members = [
     "packages/server",
     "packages/settings",
     "packages/session",
-    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aagent_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/language_model_core", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/util_macros", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/language_core", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/askpass", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/telemetry", "packages/telemetry_events", "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_var", "packages/feature_flags_macros", "packages/file_icons", "packages/vim_mode_setting", "packages/json_schema_store", "packages/edit_prediction_types", "packages/platform_title_bar", "packages/action_log", "packages/agent_settings", "packages/acp_thread", "packages/agent", "packages/agent_servers", "packages/agent_skills", "packages/remote_connection", "packages/language_model", "packages/auto_update", "packages/languages", "tools/outline", "packages/http_proxy", "packages/sandbox", "packages/reqwest_client", "packages/google_ai", "packages/language_models", "packages/ai_onboarding", "packages/anthropic",
+    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aagent_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/util", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/language_model_core", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/util_macros", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/language_core", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/askpass", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/telemetry", "packages/telemetry_events", "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_var", "packages/feature_flags_macros", "packages/file_icons", "packages/vim_mode_setting", "packages/json_schema_store", "packages/edit_prediction_types", "packages/platform_title_bar", "packages/action_log", "packages/agent_settings", "packages/acp_thread", "packages/agent", "packages/agent_servers", "packages/agent_skills", "packages/remote_connection", "packages/language_model", "packages/auto_update", "packages/languages", "tools/outline", "packages/http_proxy", "packages/sandbox", "packages/reqwest_client", "packages/google_ai", "packages/language_models", "packages/ai_onboarding", "packages/anthropic", "packages/bedrock", "packages/copilot_chat", "packages/copilot_ui", "packages/deepseek", "packages/extension_host", "packages/llama_cpp", "packages/lmstudio", "packages/mistral", "packages/ollama", "packages/open_ai", "packages/openai_subscribed", "packages/opencode", "packages/open_router", "packages/x_ai", "packages/x_ai_subscribed", "packages/aws_http_client", "packages/language_models_cloud", "packages/copilot", "packages/language_extension", "packages/theme_extension", "packages/command_palette_hooks",
 ]
 
 [workspace.package]
@@ -44,19 +44,27 @@ ai_onboarding = { path = "packages/ai_onboarding" }
 anthropic = { path = "packages/anthropic" }
 askpass = { path = "packages/askpass" }
 auto_update = { path = "packages/auto_update" }
+aws_http_client = { path = "packages/aws_http_client" }
+bedrock = { path = "packages/bedrock" }
 breadcrumbs = { path = "packages/breadcrumbs" }
 buffer_diff = { path = "packages/buffer_diff" }
+command_palette_hooks = { path = "packages/command_palette_hooks" }
 context_server = { path = "packages/context_server" }
+copilot = { path = "packages/copilot" }
+copilot_chat = { path = "packages/copilot_chat" }
+copilot_ui = { path = "packages/copilot_ui" }
 client = { path = "packages/client" }
 cloud_api_client = { path = "packages/cloud_api_client" }
 cloud_api_types = { path = "packages/cloud_api_types" }
 cloud_llm_client = { path = "packages/cloud_llm_client" }
 dap = { path = "packages/dap" }
 db = { path = "packages/db" }
+deepseek = { path = "packages/deepseek" }
 edit_prediction_types = { path = "packages/edit_prediction_types" }
 editor = { path = "packages/editor" }
 env_var = { path = "packages/env_var" }
 extension = { path = "packages/extension" }
+extension_host = { path = "packages/extension_host" }
 feature_flags = { path = "packages/feature_flags" }
 feature_flags_macros = { path = "packages/feature_flags_macros" }
 file_icons = { path = "packages/file_icons" }
@@ -70,15 +78,26 @@ json_schema_store = { path = "packages/json_schema_store" }
 language = { path = "packages/language" }
 language_core = { path = "packages/language_core" }
 language_detection = { path = "packages/language_detection" }
+language_extension = { path = "packages/language_extension" }
 language_model = { path = "packages/language_model" }
 language_model_core = { path = "packages/language_model_core" }
 language_models = { path = "packages/language_models" }
+language_models_cloud = { path = "packages/language_models_cloud" }
 languages = { path = "packages/languages" }
+llama_cpp = { path = "packages/llama_cpp" }
+lmstudio = { path = "packages/lmstudio" }
 lsp = { path = "packages/lsp" }
 migrator = { path = "packages/migrator" }
 markdown = { path = "packages/markdown" }
 mermaid_render = { path = "packages/mermaid_render" }
+mistral = { path = "packages/mistral" }
 node_runtime = { path = "packages/node_runtime" }
+ollama = { path = "packages/ollama" }
+open_ai = { path = "packages/open_ai" }
+open_router = { path = "packages/open_router" }
+openai_subscribed = { path = "packages/openai_subscribed" }
+opencode = { path = "packages/opencode" }
+
 paths = { path = "packages/paths" }
 proto = { path = "packages/proto" }
 terminal = { path = "packages/terminal" }
@@ -104,13 +123,15 @@ telemetry_events = { path = "packages/telemetry_events" }
 release_channel = { path = "packages/release_channel" }
 remote = { path = "packages/remote" }
 reqwest_client = { path = "packages/reqwest_client" }
-workspace = { path = "packages/workspace" }
-
+theme_extension = { path = "packages/theme_extension" }
 theme_settings = { path = "packages/theme_settings" }
 util = { path = "packages/util" }
-worktree = { path = "packages/worktree" }
 aa_http_client = { path = "packages/http_client" }
 vim_mode_setting = { path = "packages/vim_mode_setting" }
+workspace = { path = "packages/workspace" }
+worktree = { path = "packages/worktree" }
+x_ai = { path = "packages/x_ai" }
+x_ai_subscribed = { path = "packages/x_ai_subscribed" }
 zeta_prompt = { path = "packages/zeta_prompt" }
 
 agent-client-protocol = { version = "=2.1.0", features = ["unstable"] }
@@ -131,6 +152,18 @@ async-recursion = "1.0.0"
 async-tar = { git = "https://github.com/zed-industries/async-tar", rev = "bd3ad6f89df9a9da7a8535958756d6bf465936a0" }
 async-tungstenite = "0.33"
 async_zip = { version = "0.0.18", features = ["deflate", "deflate64"] }
+aws-config = { version = "1.8.10", features = ["behavior-version-latest"] }
+aws-credential-types = { version = "1.2.8", features = [
+    "hardcoded-credentials",
+] }
+aws-sdk-bedrockruntime = { version = "1.112.0", default-features = false, features = [
+    "behavior-version-latest",
+    "default-https-client",
+    "rt-tokio",
+] }
+aws-sigv4 = { version = "1.4.0", features = ["http1"] }
+aws-smithy-runtime-api = { version = "1.9.2", features = ["http-1x", "client"] }
+aws-smithy-types = { version = "1.3.4", features = ["http-body-1-x"] }
 base64 = "0.22"
 betlang = "0.1.1"
 bitflags = "2.6.0"
@@ -217,12 +250,6 @@ js-sys = "0.3"
 json5 = "0.4"
 linkify = "0.10.0"
 log = { version = "0.4.16", features = ["kv_unstable_serde", "serde"] }
-lsp-types = { git = "https://github.com/zed-industries/lsp-types", rev = "f1783e63a7f4eb4397bf51d4148b4895a1f7ab16" }
-proptest = { git = "https://github.com/proptest-rs/proptest", rev = "3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b", features = ["attr-macro"] }
-refineable = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-regex = "1"
-reqwest = { version = "0.12", default-features = false, features = ["json", "stream"] }
-rodio = { git = "https://github.com/RustAudio/rodio", rev = "e50e726ddd0292f6ef9de0dda6b90af4ed1fb66a", features = ["wav", "playback", "wav_output", "recording"] }
 lru = "0.16"
 tempfile = "3"
 inventory = "0.3"
@@ -233,6 +260,14 @@ mime = "0.3.17"
 # Zed crates (统一 git rev)
 notify = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
 notify-types = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
+
+lsp-types = { git = "https://github.com/zed-industries/lsp-types", rev = "f1783e63a7f4eb4397bf51d4148b4895a1f7ab16" }
+moka = { version = "0.12.10", features = ["sync"] }
+proptest = { git = "https://github.com/proptest-rs/proptest", rev = "3dca198a8fef1b32e3a66f1e1897c955b4dc5b5b", features = ["attr-macro"] }
+refineable = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
+regex = "1"
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream"] }
+rodio = { git = "https://github.com/RustAudio/rodio", rev = "e50e726ddd0292f6ef9de0dda6b90af4ed1fb66a", features = ["wav", "playback", "wav_output", "recording"] }
 
 
 tracing = "0.1.40"
@@ -379,6 +414,7 @@ wasmparser = "0.254"
 wasmtime = { version = "45", features = ["component-model", "wat"] }
 wasm-bindgen = "0.2.120"
 wasm-bindgen-futures = "0.4"
+wasmtime-wasi = "48"
 wax = "0.7"
 which = "8"
 windows-registry = "0.6.0"

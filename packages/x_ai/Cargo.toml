@@ -1,0 +1,15 @@
+[package]
+name = "x_ai"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+default = []
+schemars = ["dep:schemars"]
+
+[dependencies]
+anyhow.workspace = true
+schemars = { workspace = true, optional = true }
+serde.workspace = true
+strum.workspace = true

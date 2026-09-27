@@ -17,6 +17,7 @@ pub struct DirectoryItem {
     pub is_dir: bool,
 }
 
+#[derive(Clone)]
 pub enum DirectoryLister {
     Project(Entity<Project>),
     Local(Entity<Project>, Arc<dyn Fs>),

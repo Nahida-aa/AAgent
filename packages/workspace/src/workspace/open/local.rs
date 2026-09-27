@@ -755,3 +755,34 @@ pub fn open_new(
         Ok(())
     })
 }
+
+pub fn with_active_or_new_workspace(
+    cx: &mut App,
+    f: impl FnOnce(&mut Workspace, &mut Window, &mut Context<Workspace>) + Send + 'static,
+) {
+    match cx
+        .active_window()
+        .and_then(|w| w.downcast::<MultiWorkspace>())
+    {
+        Some(multi_workspace) => {
+            cx.defer(move |cx| {
+                multi_workspace
+                    .update(cx, |multi_workspace, window, cx| {
+                        let workspace = multi_workspace.workspace().clone();
+                        workspace.update(cx, |workspace, cx| f(workspace, window, cx));
+                    })
+                    .log_err();
+            });
+        }
+        None => {
+            let app_state = AppState::global(cx);
+            open_new(
+                OpenOptions::default(),
+                app_state,
+                cx,
+                move |workspace, window, cx| f(workspace, window, cx),
+            )
+            .detach_and_log_err(cx);
+        }
+    }
+}

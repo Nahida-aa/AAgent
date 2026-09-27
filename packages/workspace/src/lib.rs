@@ -198,7 +198,7 @@ pub use crate::workspace::{
     follow::{CollaboratorId, state::ViewId},
     notification::toast::Toast,
     open::{
-        local::open_new,
+        local::{open_new, with_active_or_new_workspace},
         options::{OpenOptions, OpenVisible, OpenMode,},
         remote::{open_remote_project_with_existing_connection, remote_workspace_position_from_db},
     },

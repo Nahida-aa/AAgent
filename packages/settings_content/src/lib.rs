@@ -141,7 +141,7 @@ pub use theme::{
     WindowBackgroundContent,
     // font::FontSettingsContent,
 };
-pub use ui::{DockPosition, DockSide};
+pub use ui::{DockPosition, DockSide, ModalWidthContent};
 use ui::ShowIndentGuides;
 pub use workspace::folder_indicator::FolderIndicator;
 

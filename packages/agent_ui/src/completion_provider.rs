@@ -2325,11 +2325,14 @@ pub(crate) fn search_files(
 
         let executor = cx.background_executor().clone();
         cx.foreground_executor().spawn(async move {
-            fuzzy::match_path_sets(
+            // zed 走旧 fuzzy（`PathMatchCandidateSet` 是 trait）；我们的 project
+            // 统一到 aa_gpui_fuzzy 的 struct，故这里用 fuzzy_nucleo。
+            // zed 的 `smart_case=false` 对应 `Case::Ignore`（见 file_finder）。
+            fuzzy_nucleo::match_path_sets(
                 candidate_sets.as_slice(),
                 query.as_str(),
                 &relative_to,
-                false,
+                fuzzy_nucleo::Case::Ignore,
                 100,
                 &cancellation_flag,
                 executor,
@@ -2337,7 +2340,17 @@ pub(crate) fn search_files(
             .await
             .into_iter()
             .map(|mat| FileMatch {
-                mat,
+                // 本函数其余路径产 zed 旧 fuzzy 的 PathMatch（FileMatch 也存它），
+                // 这里逐字段转一层；两边字段完全同形（都已是 Arc<RelPath>）。
+                mat: fuzzy::PathMatch {
+                    score: mat.score,
+                    positions: mat.positions,
+                    worktree_id: mat.worktree_id,
+                    path: mat.path,
+                    path_prefix: mat.path_prefix,
+                    is_dir: mat.is_dir,
+                    distance_to_relative_ancestor: mat.distance_to_relative_ancestor,
+                },
                 is_recent: false,
             })
             .collect::<Vec<_>>()

@@ -415,7 +415,7 @@ impl MarkdownElement {
                 .child(
                     Icon::new(icon_name)
                         .size(IconSize::Small)
-                        .color(border_color),
+                        .color(border_color.into()),
                 )
                 .child(
                     Label::new(label)

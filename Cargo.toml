@@ -27,6 +27,7 @@ a_tracing = { path = "packages/a_tracing" }
 a_tracing_macro = { path = "packages/a_tracing_macro" }
 aa_env_vars = { path = "packages/aa_env_vars" }
 aagent_actions = { path = "packages/aagent_actions" }
+acp_thread = { path = "packages/acp_thread" }
 action_log = { path = "packages/action_log" }
 ad_credentials_provider = { path = "packages/ad_credentials_provider" }
 aa-kernel = { path = "packages/kernel" }
@@ -60,6 +61,7 @@ file_icons = { path = "packages/file_icons" }
 fs = { path = "packages/fs" }
 git = { path = "packages/git" }
 git_hosting_providers = { path = "packages/git_hosting_providers" }
+google_ai = { path = "packages/google_ai" }
 http_proxy = { path = "packages/http_proxy" }
 json_schema_store = { path = "packages/json_schema_store" }
 

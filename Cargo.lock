@@ -661,6 +661,43 @@ dependencies = [
 [[package]]
 name = "agent_servers"
 version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_ui",
+ "acp_thread",
+ "action_log",
+ "ad_credentials_provider",
+ "agent-client-protocol",
+ "anyhow",
+ "async-channel 2.5.0",
+ "chrono",
+ "client",
+ "collections",
+ "env_logger 0.11.11",
+ "feature_flags",
+ "fs",
+ "futures",
+ "google_ai",
+ "gpui",
+ "gpui_tokio",
+ "http_client",
+ "indoc",
+ "language_model",
+ "log",
+ "project",
+ "release_channel",
+ "remote",
+ "reqwest_client",
+ "serde",
+ "serde_json",
+ "settings",
+ "task",
+ "tempfile",
+ "terminal",
+ "thiserror 2.0.20",
+ "util 0.1.0",
+ "uuid",
+ "watch",
+]
 
 [[package]]
 name = "agent_settings"

@@ -21,11 +21,10 @@ pub enum SidebarEvent {
     SerializeNeeded,
 }
 
-#[derive(Default)]
-pub struct SidebarRenderState {
-    pub open: bool,
-    pub side: SidebarSide,
-}
+// 对齐 zed：SidebarRenderState 只在 sidebar/render_state.rs 定义一份，
+// 这里原样转出（此前两处各定义了一份，platform_title_bar 经 workspace 根
+// 拿到的是 render_state 侧，而 sidebar_ops 用的是 events 侧，E0308）。
+pub use super::sidebar::render_state::SidebarRenderState;
 
 pub use settings::SidebarSide;
 

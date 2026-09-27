@@ -1,12 +1,17 @@
-pub fn add(left: u64, right: u64) -> u64 { left + right }
+mod channel_buffer;
+mod channel_store;
+
+use client::{Client, UserStore};
+use gpui::{App, Entity};
+use std::sync::Arc;
+
+pub use channel_buffer::{ACKNOWLEDGE_DEBOUNCE_INTERVAL, ChannelBuffer, ChannelBufferEvent};
+pub use channel_store::{Channel, ChannelEvent, ChannelMembership, ChannelStore};
 
 #[cfg(test)]
-mod tests {
-    use super::*;
+mod channel_store_tests;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+pub fn init(client: &Arc<Client>, user_store: Entity<UserStore>, cx: &mut App) {
+    channel_store::init(client, user_store, cx);
+    channel_buffer::init(&client.clone().into());
 }

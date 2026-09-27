@@ -103,11 +103,14 @@ fn configured_icon_theme(cx: &mut App) -> Arc<IconTheme> {
     let registry = ThemeRegistry::default_global(cx);
     let theme_settings = ThemeSettings::get_global(cx);
 
-    // icon_theme 是 Option<String>，直接用或回退默认
-    match &theme_settings.icon_theme {
-        Some(name) => registry
-            .get_icon_theme(name)
-            .unwrap_or_else(|_| registry.default_icon_theme().unwrap_or_else(|_| Arc::new(IconTheme::default()))),
-        None => registry.default_icon_theme().unwrap_or_else(|_| Arc::new(IconTheme::default())),
-    }
+    // icon_theme 是 IconThemeSelection，按当前系统明暗解析
+    let appearance = cx.theme().appearance();
+    let icon_theme_name = theme_settings.icon_theme.name(appearance);
+    registry
+        .get_icon_theme(&icon_theme_name)
+        .unwrap_or_else(|_| {
+            registry
+                .default_icon_theme()
+                .unwrap_or_else(|_| Arc::new(IconTheme::default()))
+        })
 }

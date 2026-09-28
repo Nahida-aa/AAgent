@@ -748,7 +748,7 @@ impl Settings for AgentSettings {
             enabled: agent.enabled.unwrap(),
             button: agent.button.unwrap(),
             dock: agent.dock.unwrap(),
-            sidebar_side: agent.sidebar_side.unwrap(),
+            sidebar_side: agent.sidebar_side.unwrap_or(SidebarDockPosition::Left),
             // Clamped once here so that every reader gets a width the sidebar can
             // actually hold, rather than each call site having to remember to.
             threads_sidebar_default_width: agent

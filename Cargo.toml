@@ -330,7 +330,7 @@ nbformat = "1.2.0"
 nix = "0.30"
 notify = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
 notify-types = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
-refineable = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
+refineable = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
 regex = "1"
 reqwest = { version = "0.12", default-features = false, features = ["json", "stream"] }
 runtimelib = { version = "1.4.0", default-features = false, features = [
@@ -397,7 +397,8 @@ quote = "1.0.9"
 rayon = "1.8"
 rand = "0.9"
 rsa = "0.9.6"
-rust-embed = { version = "8.11", features = ["include-exclude"] }
+rust-embed = { version = "=8.11", features = ["include-exclude"] }
+rust-embed-impl = "=8.11"
 rustix = { version = "1.1", features = ["fs"] }
 # WARNING: If you change this, you must also publish a new version of zed-scap to crates.io
 scap = { git = "https://github.com/zed-industries/scap", rev = "4afea48c3b002197176fb19cd0f9b180dd36eaac", default-features = false, package = "zed-scap", version = "0.0.8-zed" }
@@ -425,7 +426,7 @@ strum = { version = "0.28", features = ["derive"] }
 streaming-iterator = "0.1"
 stacksafe = "1.0"
 smallvec = { version = "1.6", features = ["union", "const_new"] }
-sum_tree = { git = "https://github.com/zed-industries/zed.git", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
+sum_tree = { git = "https://github.com/zed-industries/zed.git", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
 syn = { version = "2.0.101", features = ["full", "extra-traits", "visit-mut"] }
 proc-macro2 = "1"
 sysinfo = "0.39"
@@ -529,33 +530,33 @@ ui_input = { package = "aa_gpui_kit_ui_input", git = "https://github.com/Nahida-
 component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
 
 
-crashes = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
+crashes = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
 # zed 的模糊匹配正在迁移中：editor / worktree 仍用旧包 `fuzzy`（bool 参数那套
 # 签名），language / command_palette 等已迁到 `fuzzy_nucleo`。为了调用点能与 zed
 # 逐行对照，两边都照 zed 的原样声明：
 #   - `fuzzy` 直接用 zed 的真实实现（只依赖 gpui/gpui_util/path/log，全部已在
 #     同一 rev 上，不引入新第三方 crate，也不会出现两份 gpui）。
 #   - `fuzzy_nucleo` 是 gpui_learn 的 aa_gpui_fuzzy 的别名。
-fuzzy = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-credentials_provider = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-eval_utils = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-gpui_tokio = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-grammars  = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-html_to_markdown = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-http_client = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-http_client_tls = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-net = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-menu = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-oauth_callback_server = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-path = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-perf = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-proxy_handshake = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-time_format = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-shell_command_parser = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-snippet = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-sqlez = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-sqlez_macros = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
-watch = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f" }
+fuzzy = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+credentials_provider = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+eval_utils = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+gpui_tokio = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+grammars  = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+html_to_markdown = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+http_client = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+http_client_tls = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+net = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+menu = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+oauth_callback_server = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+path = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+perf = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+proxy_handshake = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+time_format = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+shell_command_parser = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+snippet = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+sqlez = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+sqlez_macros = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
+watch = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
 proptest-derive = "0.8.0"
 
 # ---- 由脚本补齐的缺失依赖 ----
@@ -629,13 +630,13 @@ features = [
 
 [patch.crates-io]
 tree-sitter-language = { git = "https://github.com/tree-sitter/tree-sitter", rev = "43623ec9bf0eaaf7113285c46e8a09018f181b18" }
-gpui = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f", version = "=0.2.2" }
-gpui_macros = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f", version = "=0.1.0" }
-gpui_platform = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f", version = "=0.1.0" }
-gpui_wgpu = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f", version = "=0.1.0" }
-gpui_util = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f", version = "=0.1.0" }
-gpui_shared_string = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f", version = "=0.1.0" }
-collections = { git = "https://github.com/zed-industries/zed", rev = "f6838a7c4afecd7c212c43c70165588b92a5a11f", version = "=0.1.0" }
+gpui = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8", version = "=0.2.2" }
+gpui_macros = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8", version = "=0.1.0" }
+gpui_platform = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8", version = "=0.1.0" }
+gpui_wgpu = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8", version = "=0.1.0" }
+gpui_util = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8", version = "=0.1.0" }
+gpui_shared_string = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8", version = "=0.1.0" }
+collections = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8", version = "=0.1.0" }
 
 livekit = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev = "0a1c519cfce9b365229026b55de9b9dbdb6fed3c" }
 libwebrtc = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev = "0a1c519cfce9b365229026b55de9b9dbdb6fed3c" }
@@ -658,6 +659,7 @@ language_core = { path = "packages/language_core" }
 # 「找不到刚加的符号」（如 `unresolved import theme::ClientDecorationsExt`），
 # 症状很像代码没写。同源要求见下面 ui_input 那条注释。
 [patch."https://github.com/Nahida-aa/gpui_learn.git"]
+aa_gpui_kit_assets = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/assets" }
 aa_gpui_kit_theme = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/theme" }
 aa_gpui_kit_ui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui" }
 # icons 是刚加进 gpui_learn 的新包，还没进上面 git 依赖锁定的那个 rev，

@@ -222,6 +222,7 @@ pub use crate::workspace::{
     providers::{TerminalProvider, DebuggerProvider},
     serialize::SERIALIZATION_THROTTLE_TIME,
     item::permalink::{copy_file_permalink, open_file_permalink},
+    window::client_side_decorations
 };
 use workspace::{
     core::actions::*,
@@ -240,7 +241,7 @@ use workspace::{
     registries::{ProjectItemRegistry, SerializableItemRegistry},
     serialize::WorkspaceLocation,
     serialize::flush::flush_windows_serialization,
-    window::{client_side_decorations, title::WindowTitleContext},
+    window::{ title::WindowTitleContext},
 };
 // workspace 嵌套模块里定义，但需要 crate 根可见的类型
 use workspace::follow::{follower::Follower, state::FollowerView};

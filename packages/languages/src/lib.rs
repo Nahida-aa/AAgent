@@ -349,6 +349,19 @@ fn register_language(
     cx: &mut App,
 ) {
     let config = load_config(name);
+    log::info!(
+        "[register_language] name={name}, config.name={:?}, grammar={:?}, matcher.suffixes={:?}",
+        config.name,
+        config.grammar,
+        config.matcher.path_suffixes
+    );
+    // Also test query loading
+    let _queries = grammars::load_queries(name);
+    let has_highlights = _queries.highlights.is_some();
+    let has_injections = _queries.injections.is_some();
+    log::info!(
+        "[register_language] name={name}, queries: highlights={has_highlights}, injections={has_injections}"
+    );
     if let Some(rules) = &semantic_token_rules {
         SettingsStore::update_global(cx, |store, cx| {
             store.set_language_semantic_token_rules(config.name.0.clone(), rules.clone(), cx);

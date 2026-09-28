@@ -255,6 +255,7 @@ impl_numeric_stepper_nonzero_int!(NonZero<usize>, usize);
 type OnChangeCallback<T> = Rc<dyn Fn(&T, &mut Window, &mut App) + 'static>;
 
 #[derive(IntoElement, RegisterComponent)]
+#[register_component(crate = "component")]
 pub struct NumberField<T: NumberFieldType = usize> {
     id: ElementId,
     value: T,

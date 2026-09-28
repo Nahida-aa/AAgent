@@ -6,7 +6,9 @@
 use collections::HashMap;
 use std::sync::Arc;
 
-use theme::{Appearance, BufferLineHeight, DEFAULT_ICON_THEME_NAME};
+use theme::{
+    Appearance, BufferLineHeight, DEFAULT_ICON_THEME_NAME, DEFAULT_LIGHT_ICON_THEME_NAME,
+};
 use gpui::{
     App, Context, Font, FontFeatures, FontStyle, Global, Pixels, SharedString, Subscription,
     Window, px,
@@ -108,7 +110,14 @@ impl From<settings_content::IconThemeSelection> for IconThemeSelection {
 
 impl Default for IconThemeSelection {
     fn default() -> Self {
-        Self::Static(IconThemeName::from(DEFAULT_ICON_THEME_NAME))
+        // 跟随系统明暗:gpui_learn 内置了整套 Catppuccin 图标主题
+        // (Latte / Frappé / Macchiato / Mocha × 彩色 / 单色),所以默认不再是
+        // 单个静态名,而是一组明暗对——与配色主题的 `ThemeSelection` 同形。
+        Self::Dynamic {
+            mode: ThemeAppearanceMode::System,
+            light: IconThemeName::from(DEFAULT_LIGHT_ICON_THEME_NAME),
+            dark: IconThemeName::from(DEFAULT_ICON_THEME_NAME),
+        }
     }
 }
 
@@ -600,9 +609,11 @@ pub fn set_mode(content: &mut settings_content::SettingsContent, mode: ThemeAppe
             } => *mode_to_update = mode,
         }
     } else {
-        theme.icon_theme = Some(settings_content::IconThemeSelection::Static(
-            IconThemeName::from(DEFAULT_ICON_THEME_NAME),
-        ));
+        theme.icon_theme = Some(settings_content::IconThemeSelection::Dynamic {
+            mode,
+            light: IconThemeName::from(DEFAULT_LIGHT_ICON_THEME_NAME),
+            dark: IconThemeName::from(DEFAULT_ICON_THEME_NAME),
+        });
     }
 }
 

@@ -116,6 +116,8 @@ pub use crate::point_range::{point_from_lsp, point_to_lsp, range_from_lsp, range
 pub use crate::symbol_kind::{lsp_to_symbol_kind, symbol_kind_to_lsp};
 
 #[cfg(any(test, feature = "test-support"))]
+mod test_support;
+#[cfg(any(test, feature = "test-support"))]
 pub use crate::test_support::{FakeLspAdapter, json_lang, markdown_lang, rust_lang};
 
 pub(crate) fn to_settings_soft_wrap(value: language_core::SoftWrap) -> settings::SoftWrap {

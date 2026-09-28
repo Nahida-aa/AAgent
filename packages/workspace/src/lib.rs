@@ -184,7 +184,7 @@ pub use crate::workspace::{
         ToggleFileFinder, ToggleProjectSymbols, MovePaneDown, MovePaneLeft, MovePaneRight,
         MovePaneUp, OpenLog
     },
-    app::state::{AppState, PreviousWorkspaceState},
+    app::{initial::init, state::{AppState, PreviousWorkspaceState}},
     collab::{participant::{RemoteCollaborator, ParticipantLocation}, call::{GlobalAnyActiveCall, AnyActiveCall}, event::ActiveCallEvent},
     core::{
         WorkspaceId,
@@ -216,7 +216,6 @@ pub use crate::workspace::{
     serialize::SERIALIZATION_THROTTLE_TIME,
 };
 use workspace::{
-    app::initial::init,
     app::store::WorkspaceStore,
     collab::room_project::join_in_room_project,
     core::actions::*,

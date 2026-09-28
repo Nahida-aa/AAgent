@@ -1,66 +1,34 @@
-//! 统一初始化所有 Dock Panel。
+//! Dock Panel 统一注册 — 对齐 Zed `crates/zed/src/zed.rs::initialize_panels`。
 //!
-//! 对齐 Zed `crates/zed/src/zed.rs::initialize_panels`。
-//! Zed 版用 async 加载 + 持久化恢复；AAgent 简化为同步创建，
-//! 但保持 `Task<anyhow::Result<()>>` 签名以便后续扩展（持久化/异步加载）。
+//! Zed 的做法：每个 Panel crate 有 `init(cx)` 注册 action（toggle/focus），
+//! 然后在某个时机统一调用 `Panel::load()` + `Workspace::add_panel()`。
+//!
+//! AAgent 当前只有 `project_panel` + `outline_panel` 两个 Panel crate，
+//! AgentPanel / GitPanel / CollabPanel / DebugPanel 等尚未创建。
+//! 先保留此函数签名，后续逐个接入。
 
-use anyhow::Result;
-use gpui::{AppContext, Entity, Task, Window};
-// TODO: terminal_view 适配新 terminal API 后恢复
-// use terminal_view::TerminalPanel;
+use gpui::Entity;
+use std::time::Duration;
 use workspace::Workspace;
-use workspace::dock::panel::{
-    AgentPanel, CollabPanel, DebugPanel, GitPanel, OutlinePanel, ProjectPanel,
-};
 
-/// 创建所有 Panel entity 并注入到 Workspace 的对应 Dock。
-///
-/// Workspace::new() 只创建空 Dock（对齐 Zed），面板统一在这里组装：
-///
-/// ```text
-/// Left Dock   → AgentPanel
-/// Right Dock  → ProjectPanel, GitPanel, CollabPanel, OutlinePanel
-/// Bottom Dock → TerminalPanel, DebugPanel
-/// ```
-///
-/// Zed 对应：`zed.rs:776 initialize_panels` — 用 `futures::join!` 并行 async load，
-/// 因为每个 Panel::load() 要恢复持久化状态（KV store）。
-/// AAgent 当前无持久化，`cx.new()` 是同步的，所以直接创建 + 同步 add_panel。
-pub fn initialize_panels(
-    _window: &mut Window,
-    workspace: &Entity<Workspace>,
-    cx: &mut gpui::App,
-) -> Task<Result<()>> {
-    cx.update_entity(workspace, |ws, cx| {
-        // —— Left Dock ——
-        let agent = cx.new(|_| AgentPanel);
-        ws.add_panel::<AgentPanel>(agent, cx);
+/// 在 Workspace observe_new 回调里被调用，负责把各 Panel entity 注入 Dock。
+pub fn initialize_panels(window: &mut gpui::Window, workspace: &Entity<Workspace>, cx: &mut gpui::App) {
+    let _ = window;
+    let _ = workspace;
+    let _ = cx;
+    // TODO: 逐个接入 Panel crate：
+    //   - project_panel::ProjectPanel::load(...) → ws.add_panel(...)
+    //   - outline_panel::OutlinePanel::load(...) → ws.add_panel(...)
+    //   - agent_ui::AgentPanel::load(...) → ws.add_panel(...)
+    //   - git_ui::GitPanel::load(...) → ws.add_panel(...)
+    //   - terminal_view::TerminalPanel::load(...) → ws.add_panel(...)
+    //   - debug_panel::DebugPanel::load(...) → ws.add_panel(...)
+    //
+    // 对齐 Zed 用 futures::join! 并行加载，AAgent 当前无持久化需求可同步创建。
+    //
+    // 注意：各 Panel crate 的 `init(cx)` 已经在 `core::init` 里注册了 toggle/focus action，
+    // 这里只需要创建 entity 并 add_panel。
 
-        // —— Right Dock ——
-        let project = cx.new(|_| ProjectPanel);
-        ws.add_panel::<ProjectPanel>(project, cx);
-
-        let git = cx.new(|_| GitPanel);
-        ws.add_panel::<GitPanel>(git, cx);
-
-        let collab = cx.new(|_| CollabPanel);
-        ws.add_panel::<CollabPanel>(collab, cx);
-
-        let outline = cx.new(|_| OutlinePanel);
-        ws.add_panel::<OutlinePanel>(outline, cx);
-
-        // —— Bottom Dock ——
-        // TODO: terminal_view 适配新 terminal API 后恢复
-        // let terminal = cx.new(|cx| TerminalPanel::new(workspace, cx));
-        // ws.add_panel::<TerminalPanel>(terminal, cx);
-
-        let debug = cx.new(|_| DebugPanel);
-        ws.add_panel::<DebugPanel>(debug, cx);
-
-        cx.notify();
-    });
-
-    // 未来：持久化恢复、并行加载、panel 级别的 deferred tasks
-    // 对齐 Zed: workspace.finish_dock_restoration(cx)
-    Task::ready(Ok(()))
+    // 预留一个 future.detach() 占位，后续接入 futures::join!
+    let _ = tokio::time::sleep(Duration::ZERO);
 }

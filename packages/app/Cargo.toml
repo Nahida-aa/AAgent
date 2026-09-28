@@ -15,14 +15,14 @@ name = "aa-app"
 path = "src/main.rs"
 
 [dependencies]
-workspace.workspace = true
+workspace = { workspace = true, features = ["test-support"] }
 sidebar.workspace = true
 terminal.workspace = true
-# TODO: terminal_view 适配新 terminal API 后恢复
-# terminal_view.workspace = true
+terminal_view.workspace = true
 title_bar.workspace = true
 settings.workspace = true
 gpui.workspace = true
+gpui_tokio.workspace = true
 gpui_util.workspace = true
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -35,10 +35,15 @@ parking_lot = { workspace = true }
 # gpui_learn 共享库:内嵌 zed 图标/字体/主题的 assets + 自研 ui 库。
 # 开发期 path 依赖;后续可切换成 git 源。
 aa_gpui_kit_assets.workspace = true
-aa_gpui_kit_theme.workspace = true
+assets.workspace = true
+theme.workspace = true
 theme_settings.workspace = true
-aa_gpui_kit_ui.workspace = true
+ui.workspace = true
 editor.workspace = true
+project.workspace = true
+# AppState::test / Project::local 需要的间接依赖（通过 workspace crate re-export 不够，
+# main.rs 直接用了这些类型）—— 但 workspace crate 已经声明了它们，这里只需要保证可访问。
+# 实际上 main.rs 里 workspace::AppState::test() 内部已经处理了一切，main.rs 只需要 project。
 
 [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
 gpui_platform = { workspace = true, features = ["font-kit", "wayland", "x11"] }

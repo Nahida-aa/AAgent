@@ -37,7 +37,10 @@ pub fn workspace_windows_for_location(
         })
         .filter(|multi_workspace| {
             let read_result = multi_workspace.read(cx);
-            tracing::info!("  multi_workspace.read: is_ok={}", read_result.is_ok());
+            match &read_result {
+                Ok(_) => tracing::info!("  multi_workspace.read: OK"),
+                Err(e) => tracing::warn!("  multi_workspace.read: FAILED — {}", e),
+            }
             let same_host = |left: &RemoteConnectionOptions, right: &RemoteConnectionOptions| match (left, right) {
                 (RemoteConnectionOptions::Ssh(a), RemoteConnectionOptions::Ssh(b)) => {
                     (&a.host, &a.username, &a.port) == (&b.host, &b.username, &b.port)

@@ -17,4 +17,4 @@ pub(crate) use pending::PendingRequests;
 pub use stdio::StdioTransport;
 pub use tcp::TcpTransport;
 pub use transport_trait::Transport;
-pub(crate) use types::{Command, IoHandler, IoKind, IoMessage, LogHandlers, LogKind};
+pub use types::{Command, IoHandler, IoKind, IoMessage, LogHandlers, LogKind};

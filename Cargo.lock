@@ -77,6 +77,7 @@ dependencies = [
  "dap_adapters",
  "db",
  "debug_adapter_extension",
+ "debugger_ui",
  "dev_container",
  "edit_prediction",
  "edit_prediction_ui",

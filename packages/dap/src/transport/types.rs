@@ -3,8 +3,8 @@ use std::sync::Arc;
 
 use parking_lot::Mutex;
 
-pub(crate) type IoMessage = str;
-pub(crate) type Command = str;
+pub type IoMessage = str;
+pub type Command = str;
 
 pub type IoHandler = Box<dyn Send + FnMut(IoKind, Option<&Command>, &IoMessage)>;
 
@@ -21,7 +21,7 @@ pub enum IoKind {
     StdErr,
 }
 
-pub(crate) type LogHandlers = Arc<Mutex<SmallVec<[(LogKind, IoHandler); 2]>>>;
+pub type LogHandlers = Arc<Mutex<SmallVec<[(LogKind, IoHandler); 2]>>>;
 
 #[cfg(any(test, feature = "test-support"))]
 pub enum RequestHandling<T> {

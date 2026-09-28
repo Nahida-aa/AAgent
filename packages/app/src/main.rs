@@ -56,6 +56,11 @@ fn main() {
         title_bar::init(cx); // 内部 observe_new(|ws| ws.set_titlebar_item)
         theme_selector::init(cx); // 注册 Toggle action handler
 
+        // —— Panel init（对齐 Zed zed.rs L6174-6176）——
+        git_ui::init(cx);
+        project_panel::init(cx);
+        outline_panel::init(cx);
+
         // —— Fs 全局 ——
         <dyn fs::Fs>::set_global(fs.clone(), cx);
 
@@ -150,6 +155,12 @@ fn main() {
 
         // —— Workspace 全局 action ——
         workspace::init(app_state.clone(), cx);
+
+        // —— Collab UI（需要 &Arc<AppState>，对齐 Zed zed.rs L6173）——
+        collab_ui::init(&app_state, cx);
+
+        // —— Debugger ——
+        debugger_ui::init(cx);
 
         // —— observe_new 注册 ——
         aa_app_lib::initialize::initialize_workspace(app_state.clone(), cx);

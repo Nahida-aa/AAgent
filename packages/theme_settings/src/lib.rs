@@ -46,7 +46,7 @@ use std::sync::Arc;
 
 use theme::ActiveTheme;
 use theme::registry::ThemeRegistry;
-use theme::{GlobalTheme, SystemAppearance, default_colors::catppuccin_macchiato};
+use theme::{GlobalTheme, SystemAppearance, default_colors::catppuccin_macchiato, set_theme};
 use theme::{IconTheme, LoadThemes, Theme};
 use gpui::{App, Font, Window};
 use ::settings::SettingsStore;
@@ -56,7 +56,10 @@ use ::settings::SettingsStore;
 /// 完整对齐 Zed `theme_settings::init` (crates/theme_settings/src/theme_settings.rs L71)：
 /// 1. `theme::init` 做基础装配（SystemAppearance + ThemeRegistry）
 /// 2. 从 SettingsStore 解析初始主题 + 图标主题
-/// 3. `set_global(GlobalTheme::new(theme, icon_theme))` 应用
+/// 3. 应用主题 —— **必须用 `theme::set_theme()`**，它内部会调 `sync_global_colors`
+///    把主题语义色同步到 gpui 的 8 色兜底（gpui::GlobalColors），gpui 内置元素
+///    靠这个渲染。如果直接 cx.set_global(GlobalTheme::new) 就会跳过 sync，
+///    导致 StatusBar / TitleBar / dock 等区域颜色不对。
 /// 4. `observe_global::<SettingsStore>` 监听变化自动 reload
 ///
 /// **前置条件**: 必须在 `settings::init(cx)` 之后调用，这样 SettingsStore 已存在。
@@ -69,9 +72,12 @@ pub fn init(themes_to_load: LoadThemes, cx: &mut App) {
     let theme = configured_theme(cx);
     let icon_theme = configured_icon_theme(cx);
 
-    // 3. 应用到全局（对齐 Zed `GlobalTheme::update_theme` / `update_icon_theme`）
-    // 注意：不能用 set_theme() — 它内部用的是 registry.default_icon_theme()，
-    // 而我们需要的是 configured_icon_theme()。
+    // 3. 应用主题 —— 先用 set_theme 触发 sync_global_colors，再覆盖 icon_theme。
+    // set_theme 内部会：
+    //   (a) sync_global_colors(cx, &theme)  ← 关键！gpui::GlobalColors 8 色兜底
+    //   (b) cx.set_global(GlobalTheme::new(theme, default_icon_theme))
+    // 然后我们再 set_global 一次，覆盖 icon_theme 为 configured 的版本。
+    set_theme(cx, theme.clone());
     cx.set_global(GlobalTheme::new(theme, icon_theme));
 
     // 4. observe SettingsStore 变化自动 reload（对齐 Zed L104-L161）
@@ -110,9 +116,12 @@ pub fn init(themes_to_load: LoadThemes, cx: &mut App) {
 /// 对齐 Zed `theme_settings::reload_theme` (crates/theme_settings/src/theme_settings.rs L204)。
 pub fn reload_theme(cx: &mut App) {
     let theme = configured_theme(cx);
+    // 先 set_theme 触发 sync_global_colors，再覆盖 icon_theme
+    set_theme(cx, theme.clone());
     let global = cx.global::<GlobalTheme>();
     let icon_theme = global.icon_theme.clone();
     cx.set_global(GlobalTheme::new(theme, icon_theme));
+    cx.refresh_windows();
 }
 
 /// 把当前图标主题按 ThemeSettings + SystemAppearance 重新解析并应用。
@@ -122,6 +131,7 @@ pub fn reload_icon_theme(cx: &mut App) {
     let global = cx.global::<GlobalTheme>();
     let theme = global.theme.clone();
     cx.set_global(GlobalTheme::new(theme, icon_theme));
+    cx.refresh_windows();
 }
 
 /// 读取 ThemeSettings.ui_font，顺手把窗口 rem size 设成 UI 字号。
@@ -148,9 +158,12 @@ fn configured_theme(cx: &mut App) -> Arc<Theme> {
     match registry.get(theme_name.0.as_ref()) {
         Ok(theme) => theme,
         Err(_) => {
+            // Fallback 链：Macchiato → Mocha → 硬编码构造。
+            // 注意主题名要和 gpui_learn default_colors.rs 里的 name 字段一致。
             let fallback = registry
                 .get("Catppuccin Macchiato")
                 .or_else(|_| registry.get("Catppuccin Mocha"))
+                .or_else(|_| registry.get("ui-gpui Dark"))
                 .unwrap_or_else(|_| Arc::new(catppuccin_macchiato()));
             fallback
         }

@@ -4926,6 +4926,19 @@ dependencies = [
 [[package]]
 name = "debugger_tools"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "dap",
+ "editor",
+ "futures 0.3.34",
+ "gpui",
+ "project",
+ "serde_json",
+ "settings",
+ "smol",
+ "util 0.1.0",
+ "workspace",
+]
 
 [[package]]
 name = "debugid"

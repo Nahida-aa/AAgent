@@ -10,8 +10,8 @@
 //! - Sidebar / TitleBar / Panels 全由 `observe_new` 自动注入。
 
 use gpui::{
-    App, AppContext, Bounds, SharedString, TitlebarOptions, WindowBackgroundAppearance,
-    WindowBounds, WindowDecorations, WindowOptions, px, size,
+    App, AppContext, Bounds, Menu, MenuItem, NoAction, SharedString, TitlebarOptions,
+    WindowBackgroundAppearance, WindowBounds, WindowDecorations, WindowOptions, px, size,
 };
 use gpui_platform::application;
 use std::sync::Arc;
@@ -134,6 +134,71 @@ fn main() {
 
         // —— observe_new 注册 ——
         aa_app_lib::initialize::initialize_workspace(app_state, cx);
+
+        // —— 设置应用菜单（application_menu 靠 cx.get_menus() 读取数据）——
+        // Zed 原版由 app_menus.rs 构建完整菜单体系；AAgent 还没迁完整，
+        // 先提供简化版本让 application_menu 能渲染出来。
+        // 放在 open_window 之前因为 title_bar::init 已在上面 observe 了 Workspace。
+        cx.set_menus(vec![
+            Menu {
+                name: "AAgent".into(),
+                disabled: false,
+                items: vec![
+                    MenuItem::action("About AAgent", NoAction),
+                    MenuItem::separator(),
+                    MenuItem::action("Settings", NoAction),
+                ],
+            },
+            Menu {
+                name: "File".into(),
+                disabled: false,
+                items: vec![
+                    MenuItem::action("New", NoAction),
+                    MenuItem::action("Open", NoAction),
+                    MenuItem::separator(),
+                    MenuItem::action("Save", NoAction),
+                    MenuItem::action("Save As", NoAction),
+                    MenuItem::separator(),
+                    MenuItem::action("Close", NoAction),
+                    MenuItem::action("Quit", NoAction),
+                ],
+            },
+            Menu {
+                name: "Edit".into(),
+                disabled: false,
+                items: vec![
+                    MenuItem::action("Undo", NoAction),
+                    MenuItem::action("Redo", NoAction),
+                    MenuItem::separator(),
+                    MenuItem::action("Cut", NoAction),
+                    MenuItem::action("Copy", NoAction),
+                    MenuItem::action("Paste", NoAction),
+                    MenuItem::separator(),
+                    MenuItem::action("Find", NoAction),
+                    MenuItem::action("Replace", NoAction),
+                ],
+            },
+            Menu {
+                name: "View".into(),
+                disabled: false,
+                items: vec![
+                    MenuItem::action("Toggle Terminal", NoAction),
+                    MenuItem::action("Toggle Sidebar", NoAction),
+                    MenuItem::separator(),
+                    MenuItem::action("Zoom In", NoAction),
+                    MenuItem::action("Zoom Out", NoAction),
+                    MenuItem::action("Reset Zoom", NoAction),
+                ],
+            },
+            Menu {
+                name: "Help".into(),
+                disabled: false,
+                items: vec![
+                    MenuItem::action("Documentation", NoAction),
+                    MenuItem::action("Report Issue", NoAction),
+                ],
+            },
+        ]);
 
         // —— 主题变化时更新所有窗口的 background_appearance（对齐 Zed main.rs L795-L829）——
         // 必须在 open_window 之前注册，这样第一个窗口创建后主题变化也能生效。

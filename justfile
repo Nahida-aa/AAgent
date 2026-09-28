@@ -5,6 +5,9 @@ run-app:
 clean:
     cargo clean
 
+stats:
+    scc . --exclude-dir node_modules,dist,build,target,venv,.venv,__pycache__,.git,vendor,out,cmake-build-debug,CMakeFiles --exclude-ext lock,json,md,yaml,yml,toml,ini,conf
+
 # tools
 ## outline —— 打印源文件的符号大纲（zed 的 tree-sitter outline.scm）
 ## 用法：just outline <文件...> [fields=...]

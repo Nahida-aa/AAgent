@@ -50,7 +50,9 @@ pub fn workspace_windows_for_location(
 
             multi_workspace.read(cx).is_ok_and(|multi_workspace| {
                 multi_workspace.workspaces().any(|workspace| {
-                    match workspace.read(cx).workspace_location(cx) {
+                    let loc = workspace.read(cx).workspace_location(cx);
+                    tracing::info!("  workspace location: {:?}", std::mem::discriminant(&loc));
+                    match loc {
                         WorkspaceLocation::Location(location, _) => {
                             match (&location, serialized_location) {
                                 (

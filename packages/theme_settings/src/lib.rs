@@ -4,9 +4,13 @@
 //! - `theme` = Zed 的 `crates/theme`（核心类型、注册表、set_theme）
 //! - `theme-settings`    = Zed 的 `crates/theme_settings`（装配、设置集成）
 
+mod schema;
 pub mod settings;
 
-// settings.rs 里的 public items，全部 re-export
+pub use schema::{
+    ThemeContent, ThemeFamilyContent, status_colors_refinement, syntax_overrides,
+    theme_colors_refinement,
+};
 pub use settings::{
     AgentBufferFontSize, AgentUiFontSize, BufferFontSize,
     GitCommitBufferFontSize, IconThemeSelection, MarkdownPreviewFontSize, UiFontSize,

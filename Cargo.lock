@@ -343,6 +343,7 @@ dependencies = [
  "palette",
  "parking_lot",
  "refineable",
+ "schemars 1.2.2",
  "serde",
  "serde_json",
  "strum 0.27.2",
@@ -16698,9 +16699,12 @@ name = "theme_settings"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
+ "anyhow",
  "collections",
  "gpui",
  "inventory",
+ "palette",
+ "schemars 1.2.2",
  "serde",
  "serde_json",
  "settings",

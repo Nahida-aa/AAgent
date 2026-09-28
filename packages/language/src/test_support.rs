@@ -1,4 +1,5 @@
-use crate::*;
+use crate::{*, LanguageServerBinary};
+use gpui::{AsyncApp};
 
 #[doc(hidden)]
 #[cfg(any(test, feature = "test-support"))]

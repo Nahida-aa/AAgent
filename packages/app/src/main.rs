@@ -91,6 +91,10 @@ fn main() {
         let node_runtime =
             node_runtime::NodeRuntime::new(client.http_client(), None, node_options_rx);
 
+        // —— Language init（对齐 Zed main.rs L562）——
+        // 注册 native grammars（markdown, rust, python, ...）+ LSP adapters
+        languages::init(languages.clone(), fs.clone(), node_runtime.clone(), cx);
+
         // —— Session ——
         let session = cx.foreground_executor().block_on(session_task);
         let session = cx.new(|cx| session::AppSession::new(session, cx));

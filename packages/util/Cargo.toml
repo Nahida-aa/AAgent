@@ -50,5 +50,9 @@ mach2.workspace = true
 
 [features]
 test-support = ["rand", "util_macros", "path/test-support"]
+# Always embed fs_embed! assets at compile time — aacode is not the Zed repo,
+# so dev-time filesystem reading via dev_repo_root() would look in the wrong
+# directory (e.g. crates/grammars/src doesn't exist under aacode's repo root).
+default = ["debug-embed"]
 # Embed `fs_embed!` assets at compile time even in debug builds.
 debug-embed = ["rust-embed/debug-embed"]

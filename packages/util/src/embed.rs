@@ -15,7 +15,7 @@ pub fn asset_str<A: rust_embed::RustEmbed>(path: &str) -> Cow<'static, str> {
 /// Re-exports that back [`fs_embed!`] so a caller only needs to depend on `util`.
 #[doc(hidden)]
 pub mod __rust_embed {
-    pub use rust_embed::{EmbeddedFile, Filenames, Metadata, RustEmbed, utils};
+    pub use rust_embed::{EmbeddedFile, Filenames, Metadata, RustEmbed, flate, utils};
 }
 
 #[cfg(all(debug_assertions, not(feature = "debug-embed")))]

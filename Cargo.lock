@@ -136,7 +136,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
- "util 0.1.0",
+ "util",
  "uuid",
  "vim",
  "wasm-bindgen",
@@ -430,7 +430,7 @@ dependencies = [
  "sha2 0.10.9",
  "tempfile",
  "url",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -448,7 +448,7 @@ dependencies = [
  "gpui",
  "schemars 1.2.2",
  "serde",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -575,7 +575,7 @@ dependencies = [
  "text",
  "url",
  "urlencoding",
- "util 0.1.0",
+ "util",
  "uuid",
  "watch",
 ]
@@ -596,7 +596,7 @@ dependencies = [
  "serde_json",
  "settings",
  "theme_settings",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -624,7 +624,7 @@ dependencies = [
  "settings",
  "telemetry",
  "text",
- "util 0.1.0",
+ "util",
  "watch",
 ]
 
@@ -644,7 +644,7 @@ dependencies = [
  "project",
  "proto",
  "smallvec",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -779,7 +779,7 @@ dependencies = [
  "thiserror 2.0.21",
  "unindent",
  "url",
- "util 0.1.0",
+ "util",
  "uuid",
  "watch",
  "web_search",
@@ -872,7 +872,7 @@ dependencies = [
  "tempfile",
  "terminal",
  "thiserror 2.0.21",
- "util 0.1.0",
+ "util",
  "uuid",
  "watch",
 ]
@@ -897,7 +897,7 @@ dependencies = [
  "serde_json",
  "serde_json_lenient",
  "settings",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -915,7 +915,7 @@ dependencies = [
  "serde_json",
  "serde_yaml_ng",
  "url",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -1015,7 +1015,7 @@ dependencies = [
  "unicode-script",
  "unicode-segmentation",
  "url",
- "util 0.1.0",
+ "util",
  "uuid",
  "vim",
  "watch",
@@ -1353,7 +1353,7 @@ dependencies = [
  "net",
  "smol",
  "tempfile",
- "util 0.1.0",
+ "util",
  "which",
  "windows 0.62.2",
  "zeroize",
@@ -1365,7 +1365,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "gpui",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -1779,7 +1779,7 @@ dependencies = [
  "rodio",
  "settings",
  "thiserror 2.0.21",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -1818,7 +1818,7 @@ dependencies = [
  "settings",
  "smol",
  "tempfile",
- "util 0.1.0",
+ "util",
  "which",
  "workspace",
 ]
@@ -2725,7 +2725,7 @@ dependencies = [
  "text",
  "tracing",
  "unindent",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -2897,7 +2897,7 @@ dependencies = [
  "serde_json",
  "settings",
  "telemetry",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -3158,7 +3158,7 @@ dependencies = [
  "semver",
  "settings",
  "text",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -3364,7 +3364,7 @@ dependencies = [
  "tokio-native-tls",
  "tokio-rustls",
  "url",
- "util 0.1.0",
+ "util",
  "windows 0.62.2",
  "worktree",
 ]
@@ -3562,7 +3562,7 @@ dependencies = [
  "telemetry",
  "theme_settings",
  "title_bar",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -3634,7 +3634,7 @@ dependencies = [
  "telemetry",
  "theme_settings",
  "time",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -3786,7 +3786,7 @@ dependencies = [
  "slotmap",
  "tempfile",
  "url",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -3838,7 +3838,7 @@ dependencies = [
  "settings",
  "sum_tree",
  "theme_settings",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -3857,7 +3857,7 @@ dependencies = [
  "log",
  "serde",
  "serde_json",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -3877,7 +3877,7 @@ dependencies = [
  "release_channel 0.1.0",
  "serde_json",
  "settings",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -4797,7 +4797,7 @@ dependencies = [
  "smol",
  "task",
  "telemetry",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -4832,7 +4832,7 @@ dependencies = [
  "settings",
  "smol",
  "task",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -4943,7 +4943,7 @@ dependencies = [
  "sqlez",
  "sqlez_macros",
  "tempfile",
- "util 0.1.0",
+ "util",
  "uuid",
 ]
 
@@ -4959,7 +4959,7 @@ dependencies = [
  "gpui",
  "serde_json",
  "task",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -4975,7 +4975,7 @@ dependencies = [
  "serde_json",
  "settings",
  "smol",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -5030,7 +5030,7 @@ dependencies = [
  "theme_settings",
  "tree-sitter-go",
  "unindent",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -5177,7 +5177,7 @@ dependencies = [
  "serde_yaml",
  "settings",
  "shlex 1.3.0",
- "util 0.1.0",
+ "util",
  "walkdir",
  "workspace",
  "worktree",
@@ -5468,7 +5468,7 @@ dependencies = [
  "text",
  "thiserror 2.0.21",
  "toml 0.8.23",
- "util 0.1.0",
+ "util",
  "uuid",
  "workspace",
  "worktree",
@@ -5499,7 +5499,7 @@ dependencies = [
  "telemetry",
  "text",
  "tree-sitter",
- "util 0.1.0",
+ "util",
  "zeta_prompt",
 ]
 
@@ -5561,7 +5561,7 @@ dependencies = [
  "telemetry",
  "text",
  "theme_settings",
- "util 0.1.0",
+ "util",
  "workspace",
  "zeta_prompt",
 ]
@@ -5648,7 +5648,7 @@ dependencies = [
  "unindent",
  "url",
  "urlencoding",
- "util 0.1.0",
+ "util",
  "uuid",
  "vim_mode_setting",
  "workspace",
@@ -5963,7 +5963,7 @@ dependencies = [
  "toml 0.8.23",
  "tracing",
  "url",
- "util 0.1.0",
+ "util",
  "wasm-encoder 0.254.0",
  "wasmparser 0.254.0",
  "which",
@@ -6026,7 +6026,7 @@ dependencies = [
  "toml 0.8.23",
  "tracing",
  "url",
- "util 0.1.0",
+ "util",
  "wasmparser 0.254.0",
  "wasmtime 48.0.3",
  "wasmtime-wasi 48.0.3",
@@ -6128,7 +6128,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "gpui",
  "settings_content",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -6405,7 +6405,7 @@ dependencies = [
  "thiserror 2.0.21",
  "trash",
  "unicode-normalization",
- "util 0.1.0",
+ "util",
  "windows 0.62.2",
 ]
 
@@ -6744,7 +6744,7 @@ dependencies = [
  "time",
  "url",
  "urlencoding",
- "util 0.1.0",
+ "util",
  "uuid",
 ]
 
@@ -6767,7 +6767,7 @@ dependencies = [
  "settings",
  "url",
  "urlencoding",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -6833,7 +6833,7 @@ dependencies = [
  "time_format",
  "tracing",
  "unindent",
- "util 0.1.0",
+ "util",
  "watch",
  "workspace",
 ]
@@ -6875,7 +6875,7 @@ dependencies = [
  "terminal",
  "theme_settings",
  "unindent",
- "util 0.1.0",
+ "util",
  "watch",
  "workspace",
  "zeroize",
@@ -7005,7 +7005,7 @@ dependencies = [
  "serde_json",
  "settings",
  "text",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -7434,7 +7434,7 @@ dependencies = [
  "tree-sitter-rust",
  "tree-sitter-typescript",
  "tree-sitter-yaml",
- "util 0.1.0 (git+https://github.com/zed-industries/zed?rev=d3ccd5719486b39b6c18cf37a06233ef9833d6d8)",
+ "util",
 ]
 
 [[package]]
@@ -7800,7 +7800,7 @@ dependencies = [
  "sha2 0.10.9",
  "tempfile",
  "url",
- "util 0.1.0 (git+https://github.com/zed-industries/zed?rev=d3ccd5719486b39b6c18cf37a06233ef9833d6d8)",
+ "util",
 ]
 
 [[package]]
@@ -8194,7 +8194,7 @@ dependencies = [
  "project",
  "settings",
  "theme_settings",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -8703,7 +8703,7 @@ dependencies = [
  "settings",
  "snippet_provider",
  "task",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -8974,7 +8974,7 @@ dependencies = [
  "tree-sitter-typescript",
  "unicase",
  "unindent",
- "util 0.1.0",
+ "util",
  "watch",
 ]
 
@@ -9118,7 +9118,7 @@ dependencies = [
  "sha2 0.10.9",
  "strum 0.28.0",
  "tokio",
- "util 0.1.0",
+ "util",
  "x_ai",
  "x_ai_subscribed",
 ]
@@ -9160,7 +9160,7 @@ dependencies = [
  "project",
  "serde_json",
  "settings",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -9223,7 +9223,7 @@ dependencies = [
  "tree-sitter-typescript",
  "unindent",
  "url",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -9574,7 +9574,7 @@ dependencies = [
  "simplelog",
  "smallvec",
  "tokio",
- "util 0.1.0",
+ "util",
  "webrtc-sys",
  "zed-scap",
 ]
@@ -9790,7 +9790,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -9949,7 +9949,7 @@ dependencies = [
  "stacksafe",
  "sum_tree",
  "theme_settings",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -9973,7 +9973,7 @@ dependencies = [
  "settings",
  "theme_settings",
  "urlencoding",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -10458,7 +10458,7 @@ dependencies = [
  "tracing",
  "tree-sitter",
  "unicode-segmentation",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -10662,7 +10662,7 @@ dependencies = [
  "serde",
  "serde_json",
  "smol",
- "util 0.1.0",
+ "util",
  "watch",
  "which",
 ]
@@ -10707,7 +10707,7 @@ dependencies = [
  "rpc",
  "sum_tree",
  "time",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -11510,7 +11510,7 @@ dependencies = [
  "serde_json",
  "settings",
  "theme_settings",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -11551,7 +11551,7 @@ dependencies = [
  "sha2 0.10.9",
  "smol",
  "url",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -11678,7 +11678,7 @@ dependencies = [
  "rope",
  "serde_json",
  "settings",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -11727,7 +11727,7 @@ dependencies = [
  "settings",
  "smallvec",
  "theme_settings",
- "util 0.1.0",
+ "util",
  "workspace",
  "worktree",
 ]
@@ -11885,7 +11885,7 @@ dependencies = [
  "dirs",
  "ignore",
  "path",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -12620,7 +12620,7 @@ dependencies = [
  "serde_json",
  "settings",
  "theme_settings",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -12637,7 +12637,7 @@ dependencies = [
  "project",
  "rope",
  "settings",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -12955,7 +12955,7 @@ dependencies = [
  "paths",
  "serde",
  "serde_json",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -13154,7 +13154,7 @@ dependencies = [
  "tracing",
  "unindent",
  "url",
- "util 0.1.0",
+ "util",
  "watch",
  "wax",
  "which",
@@ -13199,7 +13199,7 @@ dependencies = [
  "telemetry",
  "tempfile",
  "theme_settings",
- "util 0.1.0",
+ "util",
  "workspace",
  "worktree",
 ]
@@ -13228,7 +13228,7 @@ dependencies = [
  "strum 0.28.0",
  "tempfile",
  "text",
- "util 0.1.0",
+ "util",
  "uuid",
 ]
 
@@ -13996,7 +13996,7 @@ dependencies = [
  "serde_json",
  "settings",
  "telemetry",
- "util 0.1.0",
+ "util",
  "windows-registry",
  "workspace",
  "worktree",
@@ -14169,7 +14169,7 @@ dependencies = [
  "tempfile",
  "thiserror 2.0.21",
  "urlencoding",
- "util 0.1.0",
+ "util",
  "which",
 ]
 
@@ -14263,7 +14263,7 @@ dependencies = [
  "thiserror 2.0.21",
  "toml 0.8.23",
  "unindent",
- "util 0.1.0",
+ "util",
  "uuid",
  "watch",
  "windows 0.62.2",
@@ -14328,7 +14328,7 @@ dependencies = [
  "tree-sitter-md",
  "tree-sitter-python",
  "tree-sitter-typescript",
- "util 0.1.0",
+ "util",
  "uuid",
  "workspace",
 ]
@@ -14488,7 +14488,7 @@ dependencies = [
  "sum_tree",
  "tracing",
  "unicode-segmentation",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -14538,7 +14538,7 @@ dependencies = [
  "sha2 0.10.9",
  "strum 0.28.0",
  "tracing",
- "util 0.1.0",
+ "util",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -15036,7 +15036,7 @@ dependencies = [
  "theme_settings",
  "tracing",
  "unindent",
- "util 0.1.0",
+ "util",
  "util_macros 0.1.0",
  "workspace",
 ]
@@ -15333,7 +15333,7 @@ dependencies = [
  "db",
  "gpui",
  "serde_json",
- "util 0.1.0",
+ "util",
  "uuid",
 ]
 
@@ -15369,7 +15369,7 @@ dependencies = [
  "strum 0.28.0",
  "tempfile",
  "unindent",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -15392,7 +15392,7 @@ dependencies = [
  "settings_macros",
  "strum 0.28.0",
  "tempfile",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -15408,7 +15408,7 @@ dependencies = [
  "tree-sitter",
  "tree-sitter-json",
  "unindent",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -15480,7 +15480,7 @@ dependencies = [
  "telemetry",
  "theme_settings",
  "url",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -15638,7 +15638,7 @@ dependencies = [
  "telemetry",
  "theme_settings",
  "unicode-segmentation",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -15877,7 +15877,7 @@ dependencies = [
  "serde_json",
  "serde_json_lenient",
  "snippet",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -15961,7 +15961,7 @@ dependencies = [
  "pollster 0.4.0",
  "sqlformat",
  "thread_local",
- "util 0.1.0 (git+https://github.com/zed-industries/zed?rev=d3ccd5719486b39b6c18cf37a06233ef9833d6d8)",
+ "util",
  "uuid",
 ]
 
@@ -16045,7 +16045,7 @@ dependencies = [
  "ordered-float 5.5.0",
  "rand 0.9.5",
  "rope",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -16591,7 +16591,7 @@ dependencies = [
  "serde_json_lenient",
  "sha2 0.10.9",
  "shellexpand",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -16617,7 +16617,7 @@ dependencies = [
  "tree-sitter-json",
  "tree-sitter-rust",
  "tree-sitter-typescript",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -16725,7 +16725,7 @@ dependencies = [
  "thiserror 2.0.21",
  "url",
  "urlencoding",
- "util 0.1.0",
+ "util",
  "util_macros 0.1.0",
  "vte",
  "windows 0.62.2",
@@ -16767,7 +16767,7 @@ dependencies = [
  "task",
  "terminal",
  "theme_settings",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -16852,7 +16852,7 @@ dependencies = [
  "rope",
  "smallvec",
  "sum_tree",
- "util 0.1.0",
+ "util",
 ]
 
 [[package]]
@@ -16877,7 +16877,7 @@ dependencies = [
  "settings",
  "telemetry",
  "theme_settings",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -17117,7 +17117,7 @@ dependencies = [
  "smallvec",
  "telemetry",
  "theme_settings",
- "util 0.1.0",
+ "util",
  "workspace",
 ]
 
@@ -18136,47 +18136,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "util"
-version = "0.1.0"
-source = "git+https://github.com/zed-industries/zed?rev=d3ccd5719486b39b6c18cf37a06233ef9833d6d8#d3ccd5719486b39b6c18cf37a06233ef9833d6d8"
-dependencies = [
- "anyhow",
- "async-fs",
- "async_zip",
- "collections",
- "command-fds",
- "dirs",
- "dunce",
- "futures 0.3.34",
- "futures-lite 2.6.1",
- "globset",
- "gpui_util",
- "itertools 0.14.0",
- "libc",
- "log",
- "mach2 0.5.0",
- "nix 0.30.1",
- "path",
- "percent-encoding",
- "regex",
- "rust-embed",
- "schemars 1.2.2",
- "serde",
- "serde_json",
- "serde_json_lenient",
- "shlex 1.3.0",
- "smol",
- "take-until",
- "tempfile",
- "tendril",
- "unicase",
- "url",
- "walkdir",
- "which",
- "windows 0.62.2",
-]
-
-[[package]]
 name = "util_macros"
 version = "0.1.0"
 dependencies = [
@@ -18362,7 +18321,7 @@ dependencies = [
  "text",
  "theme_settings",
  "tokio",
- "util 0.1.0",
+ "util",
  "util_macros 0.1.0",
  "vim_mode_setting",
  "workspace",
@@ -19746,7 +19705,7 @@ dependencies = [
  "gpui",
  "settings",
  "theme_settings",
- "util 0.1.0",
+ "util",
  "vim_mode_setting",
  "workspace",
 ]
@@ -20696,7 +20655,7 @@ dependencies = [
  "theme_settings",
  "tracing",
  "url",
- "util 0.1.0",
+ "util",
  "uuid",
  "worktree",
 ]
@@ -20734,7 +20693,7 @@ dependencies = [
  "sum_tree",
  "text",
  "tracing",
- "util 0.1.0",
+ "util",
  "worktree",
 ]
 
@@ -20821,7 +20780,7 @@ dependencies = [
  "sha2 0.10.9",
  "smol",
  "url",
- "util 0.1.0",
+ "util",
  "x_ai",
 ]
 

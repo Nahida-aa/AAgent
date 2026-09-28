@@ -407,7 +407,7 @@ quote = "1.0.9"
 rayon = "1.8"
 rand = "0.9"
 rsa = "0.9.6"
-rust-embed = { version = "=8.11", features = ["include-exclude"] }
+rust-embed = { version = "=8.11", features = ["include-exclude", "compression"] }
 rust-embed-impl = "=8.11"
 rustix = { version = "1.1", features = ["fs"] }
 # WARNING: If you change this, you must also publish a new version of zed-scap to crates.io
@@ -663,6 +663,7 @@ webrtc-sys = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev 
 # 统一指到本地这份。
 [patch."https://github.com/zed-industries/zed"]
 language_core = { path = "packages/language_core" }
+util = { path = "packages/util" }
 
 # gpui_learn 的 7 个包**全部走本地 path**：改完 gpui_learn 立即生效，不用 commit + 顶 rev。
 # 别把任何一个改回 `git = ..., rev = ...` —— 那会让它停在旧提交，aacode 侧报

@@ -134,6 +134,7 @@ dependencies = [
  "tracing-subscriber",
  "util 0.1.0",
  "uuid",
+ "vim",
  "wasm-bindgen",
  "watch",
  "workspace",
@@ -3528,6 +3529,38 @@ dependencies = [
 [[package]]
 name = "collab_ui"
 version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_theme",
+ "aa_gpui_kit_ui",
+ "aagent_actions",
+ "anyhow",
+ "call",
+ "channel",
+ "client",
+ "collections",
+ "db",
+ "editor",
+ "futures 0.3.34",
+ "fuzzy",
+ "gpui",
+ "livekit_client",
+ "menu",
+ "notifications",
+ "picker",
+ "project",
+ "release_channel 0.1.0",
+ "rpc",
+ "serde",
+ "serde_json",
+ "settings",
+ "smallvec",
+ "smol",
+ "telemetry",
+ "theme_settings",
+ "title_bar",
+ "util 0.1.0",
+ "workspace",
+]
 
 [[package]]
 name = "collections"
@@ -19652,6 +19685,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bae2f2b2b816647a1cab1acc91f5bd20812d53cb344382635ec2181940c8034f"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "which_key"
+version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_theme",
+ "aa_gpui_kit_ui",
+ "aagent_actions",
+ "collections",
+ "command_palette",
+ "gpui",
+ "settings",
+ "theme_settings",
+ "util 0.1.0",
+ "vim_mode_setting",
+ "workspace",
 ]
 
 [[package]]

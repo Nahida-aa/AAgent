@@ -129,7 +129,6 @@ language_model.workspace = true
 mimalloc = { version = "0.1", optional = true }
 recent_projects.workspace = true
 
-workspace.workspace = true
 sidebar.workspace = true
 terminal.workspace = true
 terminal_view.workspace = true
@@ -138,6 +137,7 @@ settings.workspace = true
 tokio.workspace = true
 gpui_util.workspace = true
 util.workspace = true
+search.workspace = true
 serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
@@ -159,6 +159,8 @@ language.workspace = true
 session.workspace = true
 node_runtime.workspace = true
 uuid.workspace = true
+vim.workspace = true
+workspace.workspace = true
 watch.workspace = true
 a_log.workspace = true
 a_tracing.workspace = true

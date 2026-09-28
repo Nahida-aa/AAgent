@@ -26,23 +26,30 @@ pub fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Ta
         // AgentPanel 通过单独的 agent_ui::init() observe_new 注入，这里不管。
 
         async fn add_panel_when_ready(
+            name: &str,
             panel_task: impl std::future::Future<Output = anyhow::Result<Entity<impl Panel>>> + 'static,
             workspace_handle: WeakEntity<Workspace>,
             mut cx: AsyncWindowContext,
         ) {
-            if let Some(panel) = panel_task.await.log_err() {
-                let _: GpuiResult<()> = workspace_handle
-                    .update_in(&mut cx, |workspace, window, cx| {
-                        workspace.add_panel(panel, window, cx);
-                    });
+            match panel_task.await {
+                Ok(panel) => {
+                    let result = workspace_handle
+                        .update_in(&mut cx, |workspace, window, cx| {
+                            workspace.add_panel(panel, window, cx);
+                        });
+                    tracing::info!("panel {name} add_panel result: {result:?}");
+                }
+                Err(e) => {
+                    tracing::error!("panel {name} load failed: {e}");
+                }
             }
         }
 
         futures::join!(
-            add_panel_when_ready(project_panel, workspace_handle.clone(), cx.clone()),
-            add_panel_when_ready(outline_panel, workspace_handle.clone(), cx.clone()),
-            add_panel_when_ready(git_panel, workspace_handle.clone(), cx.clone()),
-            add_panel_when_ready(terminal_panel, workspace_handle.clone(), cx.clone()),
+            add_panel_when_ready("project", project_panel, workspace_handle.clone(), cx.clone()),
+            add_panel_when_ready("outline", outline_panel, workspace_handle.clone(), cx.clone()),
+            add_panel_when_ready("git", git_panel, workspace_handle.clone(), cx.clone()),
+            add_panel_when_ready("terminal", terminal_panel, workspace_handle.clone(), cx.clone()),
         );
 
         let _: GpuiResult<()> = workspace_handle.update(cx, |workspace, cx| {

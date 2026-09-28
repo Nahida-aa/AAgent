@@ -16,7 +16,9 @@ pub fn init(cx: &mut App) {
                 }
             });
             workspace.register_action(|workspace, _: &Toggle, window, cx| {
-                if is_enabled_in_workspace(workspace, cx) {
+                let enabled = is_enabled_in_workspace(workspace, cx);
+                eprintln!("DEBUG TerminalPanel Toggle clicked, enabled={enabled}");
+                if enabled {
                     if !workspace.toggle_panel_focus::<TerminalPanel>(window, cx) {
                         workspace.close_panel::<TerminalPanel>(window, cx);
                     }

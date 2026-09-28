@@ -74,6 +74,7 @@ dap = { path = "packages/dap" }
 dap_adapters = { path = "packages/dap_adapters" }
 db = { path = "packages/db" }
 debug_adapter_extension = { path = "packages/debug_adapter_extension"}
+debugger_tools = { path = "packages/debugger_tools" }
 deepseek = { path = "packages/deepseek" }
 dev_container = { path = "packages/dev_container" }
 edit_prediction = { path = "packages/edit_prediction" }

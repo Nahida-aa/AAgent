@@ -5,10 +5,16 @@ pub(crate) fn prompt_and_open_paths(
     create_new_window: bool,
     cx: &mut App,
 ) {
-    if let Some(workspace_window) =
-        workspace_windows_for_location(&SerializedWorkspaceLocation::Local, cx)
-            .into_iter()
-            .next()
+    let all_windows = cx.windows().len();
+    let workspace_windows =
+        workspace_windows_for_location(&SerializedWorkspaceLocation::Local, cx);
+    tracing::info!(
+        "prompt_and_open_paths: create_new_window={}, all_windows={}, workspace_windows={}",
+        create_new_window,
+        all_windows,
+        workspace_windows.len()
+    );
+    if let Some(workspace_window) = workspace_windows.into_iter().next()
     {
         workspace_window
             .update(cx, |multi_workspace, window, cx| {
@@ -26,6 +32,7 @@ pub(crate) fn prompt_and_open_paths(
             })
             .ok();
     } else {
+        tracing::info!("prompt_and_open_paths: NO existing workspace window → creating new one");
         let task = Workspace::new_local(
             Vec::new(),
             app_state.clone(),
@@ -78,6 +85,7 @@ pub fn prompt_for_open_path_and_open(
         };
         if !create_new_window {
             if let Some(handle) = multi_workspace_handle {
+                tracing::info!("prompt_for_open_path_and_open → Activate in current window");
                 if let Some(task) = handle
                     .update(cx, |multi_workspace, window, cx| {
                         multi_workspace.open_project(paths, OpenMode::Activate, window, cx)
@@ -89,6 +97,7 @@ pub fn prompt_for_open_path_and_open(
                 return;
             }
         }
+        tracing::info!("prompt_for_open_path_and_open → fallback NewWindow (create_new_window={}, multi_workspace_handle={})", create_new_window, multi_workspace_handle.is_some());
         if let Some(task) = this
             .update_in(cx, |this, window, cx| {
                 this.open_workspace_for_paths(OpenMode::NewWindow, paths, window, cx)

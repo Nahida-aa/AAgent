@@ -729,3 +729,73 @@ pub fn appearance_to_mode(appearance: Appearance) -> ThemeAppearanceMode {
         Appearance::Dark => ThemeAppearanceMode::Dark,
     }
 }
+
+// ---------- set_theme / set_icon_theme ----------
+// Zed 在 crates/theme_settings/src/settings.rs L257+ 有这两个公开函数，
+// ThemeSelector 的 confirm() 调它们来写 settings.json 的 theme 字段。
+// 它们操作的是 settings_content::ThemeSettingsContent（settings::SettingsContent 的 theme 子字段）。
+
+/// Sets the theme for the given appearance.
+///
+/// If the current theme selection is Static, it's replaced.
+/// If Dynamic, only the matching appearance slot (light or dark) is updated,
+/// and the mode is adjusted if needed so the new theme is actually visible.
+pub fn set_theme(
+    current: &mut ::settings::SettingsContent,
+    theme_name: impl Into<Arc<str>>,
+    theme_appearance: Appearance,
+    system_appearance: Appearance,
+) {
+    let theme_name = ThemeName(theme_name.into());
+
+    let Some(selection) = current.theme.theme.as_mut() else {
+        current.theme.theme = Some(::settings_content::ThemeSelection::Static(theme_name));
+        return;
+    };
+
+    match selection {
+        ::settings_content::ThemeSelection::Static(theme) => {
+            *theme = theme_name;
+        }
+        ::settings_content::ThemeSelection::Dynamic { mode, light, dark } => {
+            match theme_appearance {
+                Appearance::Light => *light = theme_name,
+                Appearance::Dark => *dark = theme_name,
+            }
+
+            let should_update_mode =
+                !(mode == &ThemeAppearanceMode::System && theme_appearance == system_appearance);
+
+            if should_update_mode {
+                *mode = appearance_to_mode(theme_appearance);
+            }
+        }
+    }
+}
+
+/// Sets the icon theme for the given appearance.
+pub fn set_icon_theme(
+    current: &mut ::settings::SettingsContent,
+    icon_theme_name: IconThemeName,
+    appearance: Appearance,
+) {
+    use settings_content::IconThemeSelection;
+
+    if let Some(selection) = current.theme.icon_theme.as_mut() {
+        let icon_theme_to_update = match selection {
+            IconThemeSelection::Static(theme) => theme,
+            IconThemeSelection::Dynamic { mode, light, dark } => match mode {
+                ThemeAppearanceMode::Light => light,
+                ThemeAppearanceMode::Dark => dark,
+                ThemeAppearanceMode::System => match appearance {
+                    Appearance::Light => light,
+                    Appearance::Dark => dark,
+                },
+            },
+        };
+
+        *icon_theme_to_update = icon_theme_name;
+    } else {
+        current.theme.icon_theme = Some(IconThemeSelection::Static(icon_theme_name));
+    }
+}

@@ -21,7 +21,7 @@ pub use settings::{
     decrease_buffer_font_size, increase_buffer_font_size, observe_buffer_font_size_adjustment,
     reset_agent_buffer_font_size, reset_agent_ui_font_size, reset_buffer_font_size,
     reset_git_commit_buffer_font_size, reset_markdown_preview_font_size, reset_ui_font_size,
-    set_mode,
+    set_icon_theme, set_mode, set_theme,
 };
 
 // setup_ui_font 在 lib.rs 里也有定义（下面），不从 settings.rs re-export。
@@ -46,7 +46,7 @@ use std::sync::Arc;
 
 use theme::ActiveTheme;
 use theme::registry::ThemeRegistry;
-use theme::{GlobalTheme, SystemAppearance, default_colors::catppuccin_macchiato, set_theme};
+use theme::{GlobalTheme, SystemAppearance, default_colors::catppuccin_macchiato};
 use theme::{IconTheme, LoadThemes, Theme};
 use gpui::{App, Font, Window};
 use gpui::colors::DefaultColors;
@@ -78,7 +78,7 @@ pub fn init(themes_to_load: LoadThemes, cx: &mut App) {
     //   (a) sync_global_colors(cx, &theme)  ← 关键！gpui::GlobalColors 8 色兜底
     //   (b) cx.set_global(GlobalTheme::new(theme, default_icon_theme))
     // 然后我们再 set_global 一次，覆盖 icon_theme 为 configured 的版本。
-    set_theme(cx, theme.clone());
+    theme::set_theme(cx, theme.clone());
     cx.set_global(GlobalTheme::new(theme.clone(), icon_theme));
 
     // —— DEBUG: 验证运行时实际颜色值 ——
@@ -141,7 +141,7 @@ pub fn init(themes_to_load: LoadThemes, cx: &mut App) {
 pub fn reload_theme(cx: &mut App) {
     let theme = configured_theme(cx);
     // 先 set_theme 触发 sync_global_colors，再覆盖 icon_theme
-    set_theme(cx, theme.clone());
+    theme::set_theme(cx, theme.clone());
     let global = cx.global::<GlobalTheme>();
     let icon_theme = global.icon_theme.clone();
     cx.set_global(GlobalTheme::new(theme, icon_theme));

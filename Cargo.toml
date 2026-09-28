@@ -158,6 +158,7 @@ settings_content = { path = "packages/settings_content" }
 settings_macros = { path = "packages/settings_macros" }
 settings_ui = { path = "packages/settings_ui" }
 snippet_provider = { path = "packages/snippet_provider" }
+snippets_ui = { path = "packages/snippets_ui" }
 settings_json = { path = "packages/settings_json", default-features = false }
 sidebar = { path = "packages/sidebar" }
 session = { path = "packages/session" }

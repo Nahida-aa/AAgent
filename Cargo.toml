@@ -110,6 +110,7 @@ language_model = { path = "packages/language_model" }
 language_model_core = { path = "packages/language_model_core" }
 language_models = { path = "packages/language_models" }
 language_models_cloud = { path = "packages/language_models_cloud" }
+language_selector = { path = "packages/language_selector" }
 languages = { path = "packages/languages" }
 livekit_api = { path = "packages/livekit_api" }
 livekit_client = { path = "packages/livekit_client" }

@@ -265,6 +265,7 @@ fn main() {
             cx.update(|cx| {
                 tracing::info!("=== startup post-check ===");
                 tracing::info!("total windows: {}", cx.windows().len());
+                tracing::info!("active_window: {}", cx.active_window().is_some());
                 for (i, window) in cx.windows().iter().enumerate() {
                     let downcast = window.downcast::<workspace::MultiWorkspace>();
                     tracing::info!("  window[{}] downcast:<MultiWorkspace>={}", i, downcast.is_some());
@@ -279,6 +280,7 @@ fn main() {
                 .await;
             cx.update(|cx| {
                 tracing::info!("=== startup post-check (+500ms) ===");
+                tracing::info!("active_window: {}", cx.active_window().is_some());
                 for (i, window) in cx.windows().iter().enumerate() {
                     let downcast = window.downcast::<workspace::MultiWorkspace>();
                     tracing::info!("  window[{}] downcast:<MultiWorkspace>={}", i, downcast.is_some());

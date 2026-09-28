@@ -79,6 +79,7 @@ pub fn prompt_for_open_path_and_open(
         cx,
     );
     let multi_workspace_handle = window.window_handle().downcast::<MultiWorkspace>();
+    tracing::info!("prompt_for_open_path_and_open: multi_workspace_handle.is_some={}", multi_workspace_handle.is_some());
     cx.spawn_in(window, async move |this, cx| {
         let Some(paths) = paths.await.log_err().flatten() else {
             return;

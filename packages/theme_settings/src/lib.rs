@@ -47,7 +47,7 @@ use std::sync::Arc;
 
 use theme::ActiveTheme;
 use theme::registry::ThemeRegistry;
-use theme::{GlobalTheme, default_colors::catppuccin_mocha, set_theme};
+use theme::{GlobalTheme, SystemAppearance, default_colors::catppuccin_mocha, set_theme};
 use theme::{IconTheme, LoadThemes, Theme};
 use gpui::{App, AssetSource, Font, Result, SharedString, Window};
 
@@ -66,6 +66,10 @@ impl AssetSource for GlobalAssets {
 /// Zed 先调 `theme::init` 做基础装配，再装 settings provider，再 observe settings 变化。
 /// 这里先实现 `theme::init` 那部分（gpui_learn 的 init_theme 逻辑简化版）。
 pub fn init(themes_to_load: LoadThemes, cx: &mut App) {
+    // 0. 注册系统明暗全局（gpui_learn theme::init 的第一步）。
+    // 必须在任何可能用到 SystemAppearance 的模块之前调用。
+    SystemAppearance::init(cx);
+
     // 1. 用 app 的 asset_source 构造注册表（gpui_learn ThemeRegistry::new 自带 Catppuccin 内置主题）
     let assets: Box<dyn AssetSource> = Box::new(GlobalAssets(cx.asset_source().clone()));
     ThemeRegistry::set_global(assets, cx);

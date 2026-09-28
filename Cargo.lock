@@ -105,6 +105,7 @@ dependencies = [
  "parking_lot",
  "pretty_assertions",
  "project",
+ "prompt_store",
  "rayon",
  "recent_projects",
  "remote",

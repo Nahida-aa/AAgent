@@ -89,6 +89,22 @@ fn main() {
         });
         workspace::AppState::set_global(app_state.clone(), cx);
 
+        // —— Agent init 链（对齐 Zed main.rs L709-L722，AppState 之后）——
+        let prompt_builder = prompt_store::PromptBuilder::load(app_state.fs.clone(), false, cx);
+        project::AgentRegistryStore::init_global(
+            cx,
+            app_state.fs.clone(),
+            app_state.client.http_client(),
+        );
+        agent_ui::init(
+            app_state.fs.clone(),
+            prompt_builder,
+            app_state.languages.clone(),
+            false, // is_new_install
+            false, // is_eval
+            cx,
+        );
+
         // —— Workspace 全局 action ——
         workspace::init(app_state.clone(), cx);
 

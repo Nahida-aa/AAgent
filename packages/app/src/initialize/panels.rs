@@ -1,34 +1,61 @@
 //! Dock Panel 统一注册 — 对齐 Zed `crates/zed/src/zed.rs::initialize_panels`。
 //!
-//! Zed 的做法：每个 Panel crate 有 `init(cx)` 注册 action（toggle/focus），
-//! 然后在某个时机统一调用 `Panel::load()` + `Workspace::add_panel()`。
+//! Zed 的做法:每个 Panel crate 暴露 `load(workspace_handle, cx) -> Task/Result<Entity<P>>`
+//! (都是 async fn，AgentPanel 例外返回 Task)，在 `cx.spawn_in(window, async { futures::join!(...) })`
+//! 里并行加载后 `add_panel`，最后 `workspace.finish_dock_restoration(cx)`。
 //!
-//! AAgent 当前只有 `project_panel` + `outline_panel` 两个 Panel crate，
-//! AgentPanel / GitPanel / CollabPanel / DebugPanel 等尚未创建。
-//! 先保留此函数签名，后续逐个接入。
+//! AAgent 有:project_panel / outline_panel / git_ui / terminal_view / agent_ui。
+//! project_panel 和 outline_panel 暂有编译错误，后续接入。
 
-use gpui::Entity;
-use std::time::Duration;
-use workspace::Workspace;
+use gpui::{AsyncWindowContext, Context, Entity, Result as GpuiResult, Task, WeakEntity, Window};
+use gpui_util::ResultExt;
+use workspace::{Panel, Workspace};
+
+use git_ui::git_panel::GitPanel;
+use terminal_view::TerminalPanel;
+
+// ProjectPanel::load / OutlinePanel::load 签名都对，
+// 但 project_panel / outline_panel crate 自身有编译错误（ShowIndentGuides / download_file），
+// 待修复后在下面 futures::join! 里接入。
+// use project_panel::ProjectPanel;
+// use outline_panel::OutlinePanel;
 
 /// 在 Workspace observe_new 回调里被调用，负责把各 Panel entity 注入 Dock。
-pub fn initialize_panels(window: &mut gpui::Window, workspace: &Entity<Workspace>, cx: &mut gpui::App) {
-    let _ = window;
-    let _ = workspace;
-    let _ = cx;
-    // TODO: 逐个接入 Panel crate：
-    //   - project_panel::ProjectPanel::load(...) → ws.add_panel(...)
-    //   - outline_panel::OutlinePanel::load(...) → ws.add_panel(...)
-    //   - agent_ui::AgentPanel::load(...) → ws.add_panel(...)
-    //   - git_ui::GitPanel::load(...) → ws.add_panel(...)
-    //   - terminal_view::TerminalPanel::load(...) → ws.add_panel(...)
-    //   - debug_panel::DebugPanel::load(...) → ws.add_panel(...)
-    //
-    // 对齐 Zed 用 futures::join! 并行加载，AAgent 当前无持久化需求可同步创建。
-    //
-    // 注意：各 Panel crate 的 `init(cx)` 已经在 `core::init` 里注册了 toggle/focus action，
-    // 这里只需要创建 entity 并 add_panel。
+///
+/// 对齐 Zed `initialize_panels`（crates/zed/src/zed.rs L777）：
+/// 返回 `Task<anyhow::Result<()>>`，调用方通过 `workspace.set_panels_task(task)` 保存。
+pub fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Task<anyhow::Result<()>> {
+    cx.spawn_in(window, async move |workspace_handle, cx| {
+        // let project_panel = ProjectPanel::load(workspace_handle.clone(), cx.clone());
+        // let outline_panel = OutlinePanel::load(workspace_handle.clone(), cx.clone());
+        let git_panel = GitPanel::load(workspace_handle.clone(), cx.clone());
+        let terminal_panel = TerminalPanel::load(workspace_handle.clone(), cx.clone());
+        // AgentPanel 通过单独的 agent_ui::init() observe_new 注入，这里不管。
 
-    // 预留一个 future.detach() 占位，后续接入 futures::join!
-    let _ = tokio::time::sleep(Duration::ZERO);
+        async fn add_panel_when_ready(
+            panel_task: impl std::future::Future<Output = anyhow::Result<Entity<impl Panel>>> + 'static,
+            workspace_handle: WeakEntity<Workspace>,
+            mut cx: AsyncWindowContext,
+        ) {
+            if let Some(panel) = panel_task.await.log_err() {
+                let _: GpuiResult<()> = workspace_handle
+                    .update_in(&mut cx, |workspace, window, cx| {
+                        workspace.add_panel(panel, window, cx);
+                    });
+            }
+        }
+
+        futures::join!(
+            // add_panel_when_ready(project_panel, workspace_handle.clone(), cx.clone()),
+            // add_panel_when_ready(outline_panel, workspace_handle.clone(), cx.clone()),
+            add_panel_when_ready(git_panel, workspace_handle.clone(), cx.clone()),
+            add_panel_when_ready(terminal_panel, workspace_handle.clone(), cx.clone()),
+        );
+
+        let _: GpuiResult<()> = workspace_handle.update(cx, |workspace, cx| {
+            workspace.finish_dock_restoration(cx);
+        });
+
+        anyhow::Ok(())
+    })
 }

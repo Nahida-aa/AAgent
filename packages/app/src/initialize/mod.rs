@@ -46,8 +46,8 @@ pub fn initialize_workspace(_app_state: Arc<workspace::AppState>, cx: &mut App) 
             return;
         };
 
-        let workspace_handle = cx.entity();
-        panels::initialize_panels(window, &workspace_handle, cx);
+        let panels_task = panels::initialize_panels(window, cx);
+        workspace.set_panels_task(panels_task);
     })
     .detach();
 }

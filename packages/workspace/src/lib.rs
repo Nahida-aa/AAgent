@@ -185,7 +185,14 @@ pub use crate::workspace::{
         MovePaneUp, OpenLog
     },
     app::{initial::init, state::{AppState, PreviousWorkspaceState}, store::WorkspaceStore},
-    collab::{participant::{RemoteCollaborator, ParticipantLocation}, call::{GlobalAnyActiveCall, AnyActiveCall}, event::ActiveCallEvent},
+    collab::{
+        participant::{RemoteCollaborator, ParticipantLocation}, call::{GlobalAnyActiveCall, AnyActiveCall},
+        event::ActiveCallEvent,
+        room_project::join_in_room_project,
+        channel::join_channel,
+        actions::{CopyRoomId, Deafen, LeaveCall, Mute, OpenChannelNotes, OpenChannelNotesById, ScreenShare}
+    },
+
     core::{
         WorkspaceId,
         actions::{
@@ -197,7 +204,7 @@ pub use crate::workspace::{
         workspace::Workspace,
         lifecycle::reload
     },
-    follow::{CollaboratorId, state::ViewId},
+    follow::{CollaboratorId, AutoWatch, state::ViewId},
     notification::toast::Toast,
     open::{
         local::{open_new, with_active_or_new_workspace},
@@ -217,14 +224,13 @@ pub use crate::workspace::{
     item::permalink::{copy_file_permalink, open_file_permalink},
 };
 use workspace::{
-    collab::room_project::join_in_room_project,
     core::actions::*,
     core::debounce::DelayedDebouncedEditAction,
     core::lifecycle::CloseIntent,
     core::lifecycle::prepare_window_to_close,
     dock::render::DraggedDock,
     follow::leader_border_for_pane,
-    follow::{AutoWatch, FollowerState},
+    follow::{FollowerState},
     open::local::{open_items, open_workspace_by_id},
     open::matching::{WorkspaceMatching, },
     open::options::{ OpenResult},

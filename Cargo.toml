@@ -60,6 +60,7 @@ call = { path = "packages/call" }
 codestral = { path = "packages/codestral" }
 channel = { path = "packages/channel" }
 cli = { path = "packages/cli" }
+collab_ui = { path = "packages/collab_ui" }
 command_palette = { path = "packages/command_palette" }
 command_palette_hooks = { path = "packages/command_palette_hooks" }
 context_server = { path = "packages/context_server" }

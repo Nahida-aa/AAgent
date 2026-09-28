@@ -205,8 +205,7 @@ pub struct AgentSettings {
     pub button: bool,
     pub dock: DockPosition,
     pub flexible: bool,
-    pub sidebar_side: SidebarDockPosition,
-    pub threads_sidebar_default_width: Pixels,
+    pub threads_sidebar: ThreadsSidebarSettings,
     pub default_width: Pixels,
     pub default_height: Pixels,
     pub max_content_width: Option<Pixels>,
@@ -244,6 +243,13 @@ pub struct AgentSettings {
     pub sandbox_permissions: SandboxPermissions,
 }
 
+#[derive(Clone, Copy, Debug)]
+pub struct ThreadsSidebarSettings {
+    pub auto_open: bool,
+    pub position: SidebarDockPosition,
+    pub default_width: Pixels,
+}
+
 impl AgentSettings {
     pub fn enabled(&self, cx: &App) -> bool {
         self.enabled && !DisableAiSettings::get_global(cx).disable_ai
@@ -268,7 +274,7 @@ impl AgentSettings {
     }
 
     pub fn sidebar_side(&self) -> SidebarSide {
-        match self.sidebar_side {
+        match self.threads_sidebar.position {
             SidebarDockPosition::Left => SidebarSide::Left,
             SidebarDockPosition::Right => SidebarSide::Right,
         }
@@ -744,18 +750,22 @@ pub fn normalize_path(raw: &str) -> String {
 impl Settings for AgentSettings {
     fn from_settings(content: &settings::SettingsContent) -> Self {
         let agent = content.agent.clone().unwrap();
+        let threads_sidebar = agent.threads_sidebar.unwrap();
         Self {
             enabled: agent.enabled.unwrap(),
             button: agent.button.unwrap(),
             dock: agent.dock.unwrap(),
-            sidebar_side: agent.sidebar_side.unwrap_or(SidebarDockPosition::Left),
-            // Clamped once here so that every reader gets a width the sidebar can
-            // actually hold, rather than each call site having to remember to.
-            threads_sidebar_default_width: agent
-                .threads_sidebar_default_width
-                .unwrap_or(settings::PixelSetting(300.0))
-                .into_gpui()
-                .clamp(THREADS_LIST_MIN_WIDTH, THREADS_LIST_MAX_WIDTH),
+            threads_sidebar: ThreadsSidebarSettings {
+                auto_open: threads_sidebar.auto_open.unwrap(),
+                position: threads_sidebar.position.unwrap(),
+                // Clamped once here so that every reader gets a width the sidebar can
+                // actually hold, rather than each call site having to remember to.
+                default_width: threads_sidebar
+                    .default_width
+                    .unwrap()
+                    .into_gpui()
+                    .clamp(THREADS_LIST_MIN_WIDTH, THREADS_LIST_MAX_WIDTH),
+            },
             default_width: agent.default_width.unwrap().into_gpui(),
             default_height: agent.default_height.unwrap().into_gpui(),
             max_content_width: if agent.limit_content_width.unwrap() {

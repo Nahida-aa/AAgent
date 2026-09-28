@@ -1,6 +1,8 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use settings_macros::MergeFrom;
+use settings_macros::{MergeFrom, with_fallible_options};
+
+use crate::PixelSetting;
 
 /// Where to position the threads sidebar.
 #[derive(
@@ -58,4 +60,27 @@ impl SidebarSide {
             Self::Right => "Right",
         }
     }
+}
+
+#[with_fallible_options]
+#[derive(Clone, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom, Debug, Default)]
+pub struct ThreadsSidebarSettingsContent {
+    /// Whether opening a folder in an existing window automatically opens the
+    /// Threads Sidebar. Applies when `default_open_behavior` or
+    /// `cli_default_open_behavior` is set to `existing_window`.
+    ///
+    /// Default: true
+    pub auto_open: Option<bool>,
+    /// Where to position the threads sidebar.
+    ///
+    /// Default: left
+    pub position: Option<SidebarDockPosition>,
+    /// Default width of the threads sidebar in pixels.
+    ///
+    /// Values range from 200 to 800, matching the widths the sidebar can be
+    /// dragged to. Values outside that range are clamped into it.
+    ///
+    /// Default: 300
+    #[schemars(range(min = 200, max = 800))]
+    pub default_width: Option<PixelSetting>,
 }

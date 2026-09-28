@@ -6,6 +6,7 @@ mod collab;
 mod constructors;
 mod dap;
 mod diagnostics;
+mod env;
 mod events;
 mod git;
 pub mod group_key;

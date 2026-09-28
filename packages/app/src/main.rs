@@ -19,6 +19,14 @@ use std::sync::Arc;
 fn main() {
     tracing_subscriber::fmt::init();
 
+    // `aa-app --printenv` — shell env 捕获子进程（对齐 Zed main.rs L251-L255）。
+    // project/src/environment.rs 的 capture_unix 会 shell exec `<exe> --printenv`
+    // 来拿到 JSON env vars。没这个分支 shell env 就全是空的。
+    if std::env::args().any(|a| a == "--printenv") {
+        util::shell_env::print_env();
+        return;
+    }
+
     // —— app.run 外层：db / fs / session（不依赖 gpui App）——
     let app = application().with_assets(aa_gpui_kit_assets::Assets);
     let app_db = db::AppDatabase::new();

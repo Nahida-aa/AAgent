@@ -137,6 +137,7 @@ title_bar.workspace = true
 settings.workspace = true
 tokio.workspace = true
 gpui_util.workspace = true
+util.workspace = true
 serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }

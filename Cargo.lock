@@ -67,7 +67,6 @@ dependencies = [
  "cli",
  "client",
  "codestral",
- "collab_ui",
  "collections",
  "command_palette",
  "copilot",

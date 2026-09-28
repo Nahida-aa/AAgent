@@ -77,7 +77,6 @@ breadcrumbs.workspace = true
 call.workspace = true
 channel.workspace = true
 chrono.workspace = true
-collab_ui.workspace = true
 clap.workspace = true
 cli.workspace = true
 client.workspace = true

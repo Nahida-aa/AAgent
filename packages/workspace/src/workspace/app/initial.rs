@@ -25,23 +25,29 @@ pub fn init(app_state: Arc<AppState>, cx: &mut App) {
     cx.on_action(|_: &CloseWindow, cx| Workspace::close_global(cx))
         .on_action(|_: &Reload, cx| reload(cx))
         .on_action(|action: &Open, cx: &mut App| {
+            // gpui dispatches menu actions inside window.update(), which takes
+            // the window slot out temporarily. Defer so the slot is restored
+            // before prompt_and_open_paths tries to read it.
             let app_state = AppState::global(cx);
-            prompt_and_open_paths(
-                app_state,
-                PathPromptOptions {
-                    files: true,
-                    directories: true,
-                    multiple: true,
-                    prompt: None,
-                },
-                action.create_new_window.unwrap_or_else(|| {
-                    matches!(
-                        WorkspaceSettings::get_global(cx).default_open_behavior,
-                        DefaultOpenBehavior::NewWindow
-                    )
-                }),
-                cx,
-            );
+            let create_new_window = action.create_new_window.unwrap_or_else(|| {
+                matches!(
+                    WorkspaceSettings::get_global(cx).default_open_behavior,
+                    DefaultOpenBehavior::NewWindow
+                )
+            });
+            cx.defer(move |cx| {
+                prompt_and_open_paths(
+                    app_state,
+                    PathPromptOptions {
+                        files: true,
+                        directories: true,
+                        multiple: true,
+                        prompt: None,
+                    },
+                    create_new_window,
+                    cx,
+                );
+            });
         })
         .on_action(|_: &OpenFiles, cx: &mut App| {
             let directories = cx.can_select_mixed_files_and_dirs();

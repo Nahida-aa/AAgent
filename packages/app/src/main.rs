@@ -259,5 +259,36 @@ fn main() {
         .detach();
 
         cx.activate(true);
+
+        // 启动后异步检查 MultiWorkspace 窗口是否可被 read
+        cx.spawn(async move |cx| {
+            cx.update(|cx| {
+                tracing::info!("=== startup post-check ===");
+                tracing::info!("total windows: {}", cx.windows().len());
+                for (i, window) in cx.windows().iter().enumerate() {
+                    let downcast = window.downcast::<workspace::MultiWorkspace>();
+                    tracing::info!("  window[{}] downcast:<MultiWorkspace>={}", i, downcast.is_some());
+                    if let Some(handle) = downcast {
+                        let read_result = handle.read(cx);
+                        tracing::info!("  window[{}] .read() is_ok={}", i, read_result.is_ok());
+                    }
+                }
+            });
+            cx.background_executor()
+                .timer(std::time::Duration::from_millis(500))
+                .await;
+            cx.update(|cx| {
+                tracing::info!("=== startup post-check (+500ms) ===");
+                for (i, window) in cx.windows().iter().enumerate() {
+                    let downcast = window.downcast::<workspace::MultiWorkspace>();
+                    tracing::info!("  window[{}] downcast:<MultiWorkspace>={}", i, downcast.is_some());
+                    if let Some(handle) = downcast {
+                        let read_result = handle.read(cx);
+                        tracing::info!("  window[{}] .read() is_ok={}", i, read_result.is_ok());
+                    }
+                }
+            });
+        })
+        .detach();
     });
 }

@@ -42,46 +42,68 @@ pub use ::settings::{HighlightStyleContent, IconThemeName, ThemeName, ThemeStyle
 #[allow(unused_imports)]
 use ::settings::Settings;
 
-use std::borrow::Cow;
 use std::sync::Arc;
 
 use theme::ActiveTheme;
 use theme::registry::ThemeRegistry;
-use theme::{GlobalTheme, SystemAppearance, default_colors::catppuccin_macchiato, set_theme};
+use theme::{GlobalTheme, SystemAppearance, default_colors::catppuccin_macchiato};
 use theme::{IconTheme, LoadThemes, Theme};
-use gpui::{App, AssetSource, Font, Result, SharedString, Window};
-
-/// 把 gpui 全局里的 `Arc<dyn AssetSource>` 适配成注册表要的 `Box<dyn AssetSource>`。
-/// Zed 的做法是 init 时由调用方把资产传进来（`LoadThemes::All(assets)`），
-/// 我们保持「资产在 gpui 全局」的现有约定，用适配器桥接。
-struct GlobalAssets(Arc<dyn AssetSource>);
-
-impl AssetSource for GlobalAssets {
-    fn load(&self, path: &str) -> Result<Option<Cow<'static, [u8]>>> { self.0.load(path) }
-    fn list(&self, path: &str) -> Result<Vec<SharedString>> { self.0.list(path) }
-}
+use gpui::{App, Font, Window};
+use ::settings::SettingsStore;
 
 /// 安装主题系统（应用启动时调用一次）。
-/// 对齐 Zed `theme_settings::init` (crates/theme_settings/src/theme_settings.rs L71) —
-/// Zed 先调 `theme::init` 做基础装配，再装 settings provider，再 observe settings 变化。
-/// 这里先实现 `theme::init` 那部分（gpui_learn 的 init_theme 逻辑简化版）。
+///
+/// 完整对齐 Zed `theme_settings::init` (crates/theme_settings/src/theme_settings.rs L71)：
+/// 1. `theme::init` 做基础装配（SystemAppearance + ThemeRegistry）
+/// 2. 从 SettingsStore 解析初始主题 + 图标主题
+/// 3. `set_global(GlobalTheme::new(theme, icon_theme))` 应用
+/// 4. `observe_global::<SettingsStore>` 监听变化自动 reload
+///
+/// **前置条件**: 必须在 `settings::init(cx)` 之后调用，这样 SettingsStore 已存在。
 pub fn init(themes_to_load: LoadThemes, cx: &mut App) {
-    // 0. 注册系统明暗全局（gpui_learn theme::init 的第一步）。
-    // 必须在任何可能用到 SystemAppearance 的模块之前调用。
-    SystemAppearance::init(cx);
+    // 1. 基础主题系统装配（对齐 Zed `theme::init`）。
+    // gpui_learn 的 theme::init 封装了 SystemAppearance::init + ThemeRegistry::set_global。
+    theme::init(themes_to_load, cx);
 
-    // 1. 用 app 的 asset_source 构造注册表（gpui_learn ThemeRegistry::new 自带 Catppuccin 内置主题）
-    let assets: Box<dyn AssetSource> = Box::new(GlobalAssets(cx.asset_source().clone()));
-    ThemeRegistry::set_global(assets, cx);
+    // 2. 从 SettingsStore 解析初始主题 + 图标主题（SettingsStore 此时应已存在）
+    let theme = configured_theme(cx);
+    let icon_theme = configured_icon_theme(cx);
 
-    // 2. 选默认主题（优先注册表的 "Catppuccin Macchiato"，拿不到就用内置构造）
-    let registry = ThemeRegistry::global(cx);
-    let theme = registry
-        .get("Catppuccin Macchiato")
-        .map(|t| (*t).clone())
-        .or_else(|_| registry.get("Catppuccin Mocha").map(|t| (*t).clone()))
-        .unwrap_or_else(|_| catppuccin_macchiato());
-    set_theme(cx, Arc::new(theme));
+    // 3. 应用到全局（对齐 Zed `GlobalTheme::update_theme` / `update_icon_theme`）
+    // 注意：不能用 set_theme() — 它内部用的是 registry.default_icon_theme()，
+    // 而我们需要的是 configured_icon_theme()。
+    cx.set_global(GlobalTheme::new(theme, icon_theme));
+
+    // 4. observe SettingsStore 变化自动 reload（对齐 Zed L104-L161）
+    let settings = ThemeSettings::get_global(cx);
+    let mut prev_theme_name = settings.theme.name(SystemAppearance::global(cx).0);
+    let mut prev_icon_theme_name = settings.icon_theme.name(SystemAppearance::global(cx).0);
+    let mut prev_theme_overrides = (
+        settings.experimental_theme_overrides.clone(),
+        settings.theme_overrides.clone(),
+    );
+
+    cx.observe_global::<SettingsStore>(move |cx| {
+        let settings = ThemeSettings::get_global(cx);
+        let theme_name = settings.theme.name(SystemAppearance::global(cx).0);
+        let icon_theme_name = settings.icon_theme.name(SystemAppearance::global(cx).0);
+        let theme_overrides = (
+            settings.experimental_theme_overrides.clone(),
+            settings.theme_overrides.clone(),
+        );
+
+        if theme_name != prev_theme_name || theme_overrides != prev_theme_overrides {
+            prev_theme_name = theme_name;
+            prev_theme_overrides = theme_overrides;
+            reload_theme(cx);
+        }
+
+        if icon_theme_name != prev_icon_theme_name {
+            prev_icon_theme_name = icon_theme_name;
+            reload_icon_theme(cx);
+        }
+    })
+    .detach();
 }
 
 /// 把当前主题按 ThemeSettings + SystemAppearance 重新解析并应用。
@@ -119,7 +141,9 @@ fn configured_theme(cx: &mut App) -> Arc<Theme> {
     let theme_settings = ThemeSettings::get_global(cx);
 
     // 主题名按当前系统明暗解析（对齐 zed：`ThemeSelection::name(system_appearance)`）。
-    let theme_name = theme_settings.theme.name(cx.theme().appearance());
+    // 用 SystemAppearance::global 而非 cx.theme().appearance()，
+    // 因为 theme_settings::init 时 GlobalTheme 可能还不存在。
+    let theme_name = theme_settings.theme.name(SystemAppearance::global(cx).0);
 
     match registry.get(theme_name.0.as_ref()) {
         Ok(theme) => theme,
@@ -138,7 +162,7 @@ fn configured_icon_theme(cx: &mut App) -> Arc<IconTheme> {
     let theme_settings = ThemeSettings::get_global(cx);
 
     // icon_theme 是 IconThemeSelection，按当前系统明暗解析
-    let appearance = cx.theme().appearance();
+    let appearance = SystemAppearance::global(cx).0;
     let icon_theme_name = theme_settings.icon_theme.name(appearance);
     registry
         .get_icon_theme(icon_theme_name.0.as_ref())

@@ -10,11 +10,12 @@
 //! - Sidebar / TitleBar / Panels 全由 `observe_new` 自动注入。
 
 use gpui::{
-    App, AppContext, Bounds, SharedString, TitlebarOptions, WindowBounds, WindowDecorations,
-    WindowOptions, px, size,
+    App, AppContext, Bounds, SharedString, TitlebarOptions, WindowBackgroundAppearance,
+    WindowBounds, WindowDecorations, WindowOptions, px, size,
 };
 use gpui_platform::application;
 use std::sync::Arc;
+use theme::ActiveTheme;
 
 fn main() {
     tracing_subscriber::fmt::init();
@@ -45,9 +46,11 @@ fn main() {
             .expect("failed to load embedded fonts");
 
         // —— 全局 init 链（纯 crate 初始化，不涉及 AppState）——
+        // 顺序对齐 Zed: settings::init 必须在 theme_settings::init 之前
+        // （theme_settings::init 需要 SettingsStore 存在才能读 ThemeSettings）
         gpui_tokio::init(cx);
-        theme_settings::init(theme::LoadThemes::JustBase, cx);
         settings::init(cx);
+        theme_settings::init(theme::LoadThemes::JustBase, cx);
         editor::init(cx);
         terminal_view::init(cx);
         title_bar::init(cx); // 内部 observe_new(|ws| ws.set_titlebar_item)
@@ -132,12 +135,28 @@ fn main() {
         // —— observe_new 注册 ——
         aa_app_lib::initialize::initialize_workspace(app_state, cx);
 
+        // —— 主题变化时更新所有窗口的 background_appearance（对齐 Zed main.rs L795-L829）——
+        // 必须在 open_window 之前注册，这样第一个窗口创建后主题变化也能生效。
+        cx.observe_global::<theme::GlobalTheme>(|cx| {
+            let background_appearance = cx.theme().window_background_appearance();
+            for &mut window in cx.windows().iter_mut() {
+                window
+                    .update(cx, |_, window, _| {
+                        window.set_background_appearance(background_appearance)
+                    })
+                    .ok();
+            }
+        })
+        .detach();
+
         // —— 打开第一个窗口 ——
         let bounds = Bounds::centered(None, size(1100.0.into(), px(720.0)), cx);
+        let window_background = cx.theme().window_background_appearance();
         cx.open_window(
             WindowOptions {
                 window_bounds: Some(WindowBounds::Windowed(bounds)),
                 window_decorations: Some(WindowDecorations::Client),
+                window_background,
                 titlebar: Some(TitlebarOptions {
                     appears_transparent: true,
                     title: Some(SharedString::from("AAgent")),

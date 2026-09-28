@@ -235,19 +235,29 @@ fn main() {
         .detach();
 
         // —— 打开第一个窗口 ——
-        // 对齐 Zed main.rs L1562: 用 workspace::open_new(Default::default(), ...)。
-        // 内部会调 Workspace::new_local(Vec::new(), ...) → build_window_options → observe_new 注入 Sidebar/Panels。
-        let open_new = workspace::open_new(
-            workspace::OpenOptions::default(),
-            app_state,
-            cx,
-            |_workspace, _window, _cx| {
-                // Zed 原版这里会调 Editor::new_file 或 Launchpad；AAgent 暂时空闭包
-            },
-        );
-        cx.foreground_executor()
-            .block_on(open_new)
-            .expect("failed to create initial workspace");
-        tracing::info!("initial workspace created, total_windows={}", cx.windows().len());
+        // 对齐 Zed main.rs L877-L953:
+        // 1. initialize_workspace 先注册 observe_new
+        // 2. cx.spawn 异步启动窗口创建（不 block_on！gpui foreground executor 不能嵌套阻塞）
+        // 3. cx.activate(true) 让 app 出现在前台
+        cx.spawn({
+            let app_state = app_state.clone();
+            async move |cx| {
+                let _ = cx
+                    .update(|cx| {
+                        workspace::open_new(
+                            workspace::OpenOptions::default(),
+                            app_state,
+                            cx,
+                            |_workspace, _window, _cx| {
+                                // Zed 原版会在这里调 Editor::new_file 或 Launchpad
+                            },
+                        )
+                    })
+                    .await;
+            }
+        })
+        .detach();
+
+        cx.activate(true);
     });
 }

@@ -155,9 +155,23 @@ impl Dock {
     }
 
     pub fn panel_index_for_type<T: Panel>(&self) -> Option<usize> {
-        self.panel_entries
+        let result = self.panel_entries
             .iter()
-            .position(|entry| entry.panel.to_any().downcast::<T>().is_ok())
+            .position(|entry| entry.panel.to_any().downcast::<T>().is_ok());
+        eprintln!(
+            "DEBUG panel_index_for_type<{}>: dock={:?}, entries={}, result={:?}",
+            std::any::type_name::<T>(),
+            self.position,
+            self.panel_entries.len(),
+            result
+        );
+        for (i, entry) in self.panel_entries.iter().enumerate() {
+            eprintln!(
+                "  entry[{i}]: persistent_name={:?}",
+                entry.panel.persistent_name()
+            );
+        }
+        result
     }
 
     pub fn panel_index_for_persistent_name(&self, ui_name: &str, _cx: &App) -> Option<usize> {

@@ -101,6 +101,7 @@ dependencies = [
  "language_model",
  "languages",
  "mimalloc",
+ "node_runtime",
  "parking_lot",
  "pretty_assertions",
  "project",
@@ -113,6 +114,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "session",
  "settings",
  "sidebar",
  "spin 0.10.1",
@@ -121,9 +123,12 @@ dependencies = [
  "terminal_view",
  "theme_settings",
  "title_bar",
+ "tokio",
  "tracing",
  "tracing-subscriber",
+ "uuid",
  "wasm-bindgen",
+ "watch",
  "workspace",
 ]
 

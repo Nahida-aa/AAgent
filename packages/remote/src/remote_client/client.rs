@@ -40,7 +40,7 @@ use util::ResultExt as _;
 use util::paths::{PathStyle, RemotePathBuf};
 
 use super::channel_client::ChannelClient;
-use super::connect::ConnectionPool;
+use super::connect::{ConnectionPool, connect};
 use super::connection::{ConnectionIdentifier, RemoteConnection};
 use super::delegate::RemoteClientDelegate;
 use super::options::RemoteConnectionOptions;

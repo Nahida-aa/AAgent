@@ -135,7 +135,7 @@ terminal.workspace = true
 terminal_view.workspace = true
 title_bar.workspace = true
 settings.workspace = true
-
+tokio.workspace = true
 gpui_util.workspace = true
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -148,6 +148,11 @@ theme.workspace = true
 theme_settings.workspace = true
 ui.workspace = true
 project.workspace = true
+language.workspace = true
+session.workspace = true
+node_runtime.workspace = true
+uuid.workspace = true
+watch.workspace = true
 a_log.workspace = true
 a_tracing.workspace = true
 

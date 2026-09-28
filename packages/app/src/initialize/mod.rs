@@ -7,7 +7,7 @@
 //! 之所以要在 `cx.defer` 里创建，是因为 MultiWorkspace::new / Workspace::new 的订阅
 //! 链需要先建立好，再注入子 entity（Sidebar 等）。
 
-use gpui::App;
+use gpui::{App, AppContext};
 use std::sync::Arc;
 
 pub mod panels;

@@ -46,21 +46,6 @@ skill for more detailed guidance.
 
 所有代码统一放在 `packages/` 下，不分 Rust/TS：
 
-**主线包（必须编译通过）：**
-
-- `packages/kernel/` 微内核（ToolRegistry、ToolProvider）
-- `packages/core/` 核心类型（Extension trait、LLM 抽象）
-- `packages/extensions/` 扩展系统 + WASM 加载器（wasmtime Component Model）
-- `packages/extension-sdk/` 扩展公开 API
-- `packages/extension-mcp/` MCP 客户端适配器（JSON-RPC 2.0 over stdio）
-- `packages/function-tools/` LLM function calling 工具集（fs 工具）
-- `packages/llm/` LLM Provider 实现（OpenAI 兼容 + Ollama 原生）
-- `packages/config/` LLM 配置系统（aa.json + AA_* env）
-- `packages/session/` 共享对话循环（run_turn），事件驱动
-- `packages/server/` HTTP/API 服务（axum, `/chat` SSE, `/health`, `/tools`）
-- `packages/workspace/` **GPUI Workspace 框架**（状态栏、面板、Dock）
-- `packages/ui/` **GPUI UI 组件层**
-- `packages/app/` **GPUI 桌面前端**（主窗口、标题栏、Agent 面板）
 
 **非主线（仅参考/历史，不保证编译）：**
 

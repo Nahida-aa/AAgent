@@ -13,7 +13,7 @@ pub use crate::editor::{
     cursor::CursorAnimationSettingsContent,
     diff::DiffViewStyle,
     drag_and_drop::DragAndDropSelectionContent,
-    gutter::GitGutterWidth,
+    gutter::{GitGutterWidth, GitGutterWidthDiscriminants},
     jupyter::JupyterContent,
     lsp::{
         DocumentColorsRenderMode, GoToDefinitionFallback, GoToDefinitionScrollStrategy,

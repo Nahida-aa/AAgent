@@ -125,6 +125,7 @@ dependencies = [
  "serde_json",
  "session",
  "settings",
+ "settings_ui",
  "sidebar",
  "spin 0.10.1",
  "tempfile",

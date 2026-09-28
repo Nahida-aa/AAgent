@@ -32,7 +32,7 @@ pub use crate::{
     },
 };
 pub use active_pane::ActivePaneModifiers;
-pub use autosave::AutosaveSetting;
+pub use autosave::{AutosaveSetting, AutosaveSettingDiscriminants};
 pub use window::{
     CloseWindowWhenNoItems, FullscreenMode, OnLastWindowClosed, OnNewWindow, WindowDecorations,
 };

@@ -91,6 +91,7 @@ pub enum ThemeAppearanceMode {
     strum::EnumDiscriminants,
     JsonSchema,
 )]
+#[strum_discriminants(derive(strum::VariantArray, strum::VariantNames, strum::FromRepr))]
 #[serde(untagged)]
 pub enum ThemeSelection {
     Static(ThemeName),

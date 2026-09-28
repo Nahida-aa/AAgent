@@ -40,13 +40,14 @@ use schemars::JsonSchema;
 pub use theme_selection::{DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME};
 
 // ---------- 子类型 re-export ----------
-pub use buffer_line_height::BufferLineHeight;
+pub use buffer_line_height::{BufferLineHeight, BufferLineHeightDiscriminants};
 pub use font::{FontFamilyName, FontSize, FontStyleContent, FontWeightContent};
 
 pub use colors::{ThemeColor, ThemeColorsContent};
 
 pub use theme_selection::{
-    IconThemeName, IconThemeSelection, ThemeAppearanceMode, ThemeName, ThemeSelection,
+    IconThemeName, IconThemeSelection, IconThemeSelectionDiscriminants, ThemeAppearanceMode,
+    ThemeName, ThemeSelection, ThemeSelectionDiscriminants,
 };
 pub use ui_density::UiDensity;
 

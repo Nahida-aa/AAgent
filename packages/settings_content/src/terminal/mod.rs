@@ -21,7 +21,8 @@ pub use display::{
 };
 pub use dock::TerminalDockPosition;
 pub use shell::{
-    ActivateScript, CondaManager, PathHyperlinkRegex, Shell, VenvSettings, WorkingDirectory,
+    ActivateScript, CondaManager, PathHyperlinkRegex, Shell, ShellDiscriminants, VenvSettings,
+    WorkingDirectory, WorkingDirectoryDiscriminants,
 };
 pub use toolbar::TerminalToolbarContent;
 

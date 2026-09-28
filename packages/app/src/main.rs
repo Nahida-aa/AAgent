@@ -160,6 +160,9 @@ fn main() {
         // —— Workspace 全局 action ——
         workspace::init(app_state.clone(), cx);
 
+        // —— Settings UI（对齐 Zed main.rs L784）——
+        settings_ui::init(cx);
+
         // —— Collab UI（需要 &Arc<AppState>，对齐 Zed zed.rs L6173）——
         collab_ui::init(&app_state, cx);
 
@@ -180,7 +183,7 @@ fn main() {
                 items: vec![
                     MenuItem::action("About aacode", NoAction),
                     MenuItem::separator(),
-                    MenuItem::action("Settings", NoAction),
+                    MenuItem::action("Settings", settings_ui::OpenSettings),
                 ],
             },
             Menu {

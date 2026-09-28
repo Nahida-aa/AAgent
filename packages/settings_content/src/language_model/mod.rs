@@ -29,6 +29,7 @@ use crate::language_model::{
 pub mod anthropic;
 pub mod bedrock;
 pub mod common;
+pub use common::OpenAiReasoningEffort;
 pub mod deepseek;
 pub mod google;
 pub mod llama_cpp;

@@ -20597,6 +20597,7 @@ dependencies = [
  "telemetry",
  "tempfile",
  "theme_settings",
+ "tracing",
  "url",
  "util 0.1.0",
  "uuid",

@@ -3518,6 +3518,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "collab_ui"
+version = "0.1.0"
+
+[[package]]
 name = "collections"
 version = "0.1.0"
 source = "git+https://github.com/zed-industries/zed?rev=d3ccd5719486b39b6c18cf37a06233ef9833d6d8#d3ccd5719486b39b6c18cf37a06233ef9833d6d8"

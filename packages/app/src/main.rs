@@ -73,6 +73,9 @@ fn main() {
         // —— Client 全局 ——
         client::Client::set_global(client.clone(), cx);
 
+        // —— Collab call ——
+        call::init(client.clone(), user_store.clone(), cx);
+
         // —— AppState 构造 ——
         let app_state = Arc::new(workspace::AppState {
             languages,

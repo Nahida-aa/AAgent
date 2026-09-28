@@ -26,10 +26,18 @@ pub fn workspace_windows_for_location(
     serialized_location: &SerializedWorkspaceLocation,
     cx: &App,
 ) -> Vec<WindowHandle<MultiWorkspace>> {
-    cx.windows()
+    let all_windows = cx.windows();
+    tracing::info!("workspace_windows_for_location: {} windows total", all_windows.len());
+    all_windows
         .into_iter()
-        .filter_map(|window| window.downcast::<MultiWorkspace>())
+        .filter_map(|window| {
+            let downcasted = window.downcast::<MultiWorkspace>();
+            tracing::info!("  downcast: {}", downcasted.is_some());
+            downcasted
+        })
         .filter(|multi_workspace| {
+            let read_result = multi_workspace.read(cx);
+            tracing::info!("  multi_workspace.read: is_ok={}", read_result.is_ok());
             let same_host = |left: &RemoteConnectionOptions, right: &RemoteConnectionOptions| match (left, right) {
                 (RemoteConnectionOptions::Ssh(a), RemoteConnectionOptions::Ssh(b)) => {
                     (&a.host, &a.username, &a.port) == (&b.host, &b.username, &b.port)
@@ -48,10 +56,12 @@ pub fn workspace_windows_for_location(
                 _ => false,
             };
 
-            multi_workspace.read(cx).is_ok_and(|multi_workspace| {
+            read_result.is_ok_and(|multi_workspace| {
+                let ws_count = multi_workspace.workspaces().count();
+                tracing::info!("  workspaces count: {}", ws_count);
                 multi_workspace.workspaces().any(|workspace| {
                     let loc = workspace.read(cx).workspace_location(cx);
-                    tracing::info!("  workspace location: {:?}", std::mem::discriminant(&loc));
+                    tracing::info!("    workspace location: {:?}", std::mem::discriminant(&loc));
                     match loc {
                         WorkspaceLocation::Location(location, _) => {
                             match (&location, serialized_location) {

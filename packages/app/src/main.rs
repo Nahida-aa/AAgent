@@ -10,8 +10,8 @@
 //! - Sidebar / TitleBar / Panels 全由 `observe_new` 自动注入。
 
 use gpui::{
-    App, AppContext, Bounds, Menu, MenuItem, NoAction, SharedString, TitlebarOptions,
-    WindowBackgroundAppearance, WindowBounds, WindowDecorations, WindowOptions, px, size,
+    App, AppContext, Menu, MenuItem, NoAction, SharedString,
+    WindowBackgroundAppearance, WindowDecorations, px, size,
 };
 use gpui_platform::application;
 use std::sync::Arc;
@@ -107,7 +107,23 @@ fn main() {
             user_store,
             workspace_store,
             fs,
-            build_window_options: |_, _| Default::default(),
+            build_window_options: |_, cx| {
+                gpui::WindowOptions {
+                    window_bounds: Some(gpui::WindowBounds::Windowed(gpui::Bounds::centered(
+                        None,
+                        size(1100.0.into(), px(720.0)),
+                        cx,
+                    ))),
+                    window_decorations: Some(WindowDecorations::Client),
+                    window_background: cx.theme().window_background_appearance(),
+                    titlebar: Some(gpui::TitlebarOptions {
+                        appears_transparent: true,
+                        title: Some(SharedString::from("AAgent")),
+                        ..Default::default()
+                    }),
+                    ..Default::default()
+                }
+            },
             node_runtime,
             session,
         });
@@ -134,7 +150,7 @@ fn main() {
         workspace::init(app_state.clone(), cx);
 
         // —— observe_new 注册 ——
-        aa_app_lib::initialize::initialize_workspace(app_state, cx);
+        aa_app_lib::initialize::initialize_workspace(app_state.clone(), cx);
 
         // —— 设置应用菜单（application_menu 靠 cx.get_menus() 读取数据）——
         // Zed 原版由 app_menus.rs 构建完整菜单体系；AAgent 还没迁完整，
@@ -219,54 +235,22 @@ fn main() {
         .detach();
 
         // —— 打开第一个窗口 ——
-        let bounds = Bounds::centered(None, size(1100.0.into(), px(720.0)), cx);
-        let window_background = cx.theme().window_background_appearance();
-        cx.open_window(
-            WindowOptions {
-                window_bounds: Some(WindowBounds::Windowed(bounds)),
-                window_decorations: Some(WindowDecorations::Client),
-                window_background,
-                titlebar: Some(TitlebarOptions {
-                    appears_transparent: true,
-                    title: Some(SharedString::from("AAgent")),
-                    ..Default::default()
-                }),
-                ..Default::default()
-            },
-            |window, cx| {
-                    // Zed 模式：只 new Workspace → MultiWorkspace
-                    // Sidebar / TitleBar / Panels 全由 observe_new 自动注入
-                    let app_state = workspace::AppState::global(cx);
-                    let project = project::Project::local(
-                        app_state.client.clone(),
-                        app_state.node_runtime.clone(),
-                        app_state.user_store.clone(),
-                        app_state.languages.clone(),
-                        app_state.fs.clone(),
-                        None,
-                        Default::default(),
-                        cx,
-                    );
-                    let workspace = cx.new(|cx| {
-                        workspace::Workspace::new(
-                            None,
-                            project,
-                            app_state.clone(),
-                            window,
-                            cx,
-                        )
-                    });
-                    cx.new(|cx| workspace::MultiWorkspace::new(workspace, window, cx))
-                },
-        )
-        .unwrap();
+        // 对齐 Zed: 用 workspace::Workspace::new_local(Vec::new(), ...) 创建空 workspace。
+        // 内部会调 build_window_options 拿到上面配的 WindowOptions，并触发 observe_new 注入 Sidebar/Panels。
+        let task = workspace::Workspace::new_local(
+            Vec::new(),
+            app_state.clone(),
+            None,
+            None,
+            None,
+            workspace::OpenMode::Activate,
+            cx,
+        );
+        let open_result = cx.foreground_executor().block_on(task);
         tracing::info!(
-            "initial window created: total_windows={}, multi_workspace_windows={}",
-            cx.windows().len(),
-            cx.windows()
-                .iter()
-                .filter(|w| w.downcast::<workspace::MultiWorkspace>().is_some())
-                .count()
+            "initial workspace created: {:?}, total_windows={}",
+            open_result.as_ref().map(|_| ()),
+            cx.windows().len()
         );
         cx.activate(true);
     });

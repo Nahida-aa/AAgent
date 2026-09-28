@@ -235,23 +235,19 @@ fn main() {
         .detach();
 
         // —— 打开第一个窗口 ——
-        // 对齐 Zed: 用 workspace::Workspace::new_local(Vec::new(), ...) 创建空 workspace。
-        // 内部会调 build_window_options 拿到上面配的 WindowOptions，并触发 observe_new 注入 Sidebar/Panels。
-        let task = workspace::Workspace::new_local(
-            Vec::new(),
-            app_state.clone(),
-            None,
-            None,
-            None,
-            workspace::OpenMode::Activate,
+        // 对齐 Zed main.rs L1562: 用 workspace::open_new(Default::default(), ...)。
+        // 内部会调 Workspace::new_local(Vec::new(), ...) → build_window_options → observe_new 注入 Sidebar/Panels。
+        let open_new = workspace::open_new(
+            workspace::OpenOptions::default(),
+            app_state,
             cx,
+            |_workspace, _window, _cx| {
+                // Zed 原版这里会调 Editor::new_file 或 Launchpad；AAgent 暂时空闭包
+            },
         );
-        let open_result = cx.foreground_executor().block_on(task);
-        tracing::info!(
-            "initial workspace created: {:?}, total_windows={}",
-            open_result.as_ref().map(|_| ()),
-            cx.windows().len()
-        );
-        cx.activate(true);
+        cx.foreground_executor()
+            .block_on(open_new)
+            .expect("failed to create initial workspace");
+        tracing::info!("initial workspace created, total_windows={}", cx.windows().len());
     });
 }

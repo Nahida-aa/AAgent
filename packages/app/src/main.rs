@@ -260,6 +260,14 @@ fn main() {
                 },
         )
         .unwrap();
+        tracing::info!(
+            "initial window created: total_windows={}, multi_workspace_windows={}",
+            cx.windows().len(),
+            cx.windows()
+                .iter()
+                .filter(|w| w.downcast::<workspace::MultiWorkspace>().is_some())
+                .count()
+        );
         cx.activate(true);
     });
 }

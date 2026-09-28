@@ -77,6 +77,8 @@ fn register_status_bar_items(
     // —— Right side ——
     let cursor_position =
         cx.new(|_| go_to_line::cursor_position::CursorPosition::new(workspace));
+    let active_buffer_language =
+        cx.new(|_| language_selector::ActiveBufferLanguage::new(workspace));
     let vim_mode_indicator = cx.new(|cx| vim::ModeIndicator::new(window, cx));
 
     // —— 统一注册进 StatusBar ——
@@ -89,6 +91,7 @@ fn register_status_bar_items(
         status_bar.add_left_item(activity_indicator, window, cx);
 
         status_bar.add_right_item(cursor_position, window, cx);
+        status_bar.add_right_item(active_buffer_language, window, cx);
         // 保持 vim 模式指示器在最右侧（Zed 原版也放在最后）
         status_bar.add_right_item(vim_mode_indicator, window, cx);
     });

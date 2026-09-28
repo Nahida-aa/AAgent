@@ -125,6 +125,7 @@ http_client.workspace = true
 
 languages = { workspace = true, features = ["load-grammars"] }
 language_model.workspace = true
+language_selector.workspace = true
 
 mimalloc = { version = "0.1", optional = true }
 recent_projects.workspace = true

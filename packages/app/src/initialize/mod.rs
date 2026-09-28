@@ -48,6 +48,13 @@ pub fn initialize_workspace(_app_state: Arc<workspace::AppState>, cx: &mut App) 
 
         register_status_bar_items(workspace, window, cx);
 
+        // 对齐 Zed `crates/zed/src/zed.rs L901-L906` — 注册 AgentPanel 相关 action。
+        // 放在主应用层而不是 agent_ui crate 的 init 里，避免重复注册。
+        workspace
+            .register_action(agent_ui::AgentPanel::toggle_focus)
+            .register_action(agent_ui::AgentPanel::focus)
+            .register_action(agent_ui::AgentPanel::toggle);
+
         let panels_task = panels::initialize_panels(window, cx);
         workspace.set_panels_task(panels_task);
     })

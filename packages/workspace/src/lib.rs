@@ -190,7 +190,7 @@ pub use crate::workspace::{
         event::ActiveCallEvent,
         room_project::join_in_room_project,
         channel::join_channel,
-        actions::{CopyRoomId, Deafen, LeaveCall, Mute, OpenChannelNotes, OpenChannelNotesById, ScreenShare}
+        actions::{CopyRoomId, Deafen, LeaveCall, Mute, OpenChannelNotes, OpenChannelNotesById, ScreenShare, ShareProject}
     },
 
     core::{

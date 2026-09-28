@@ -7,7 +7,7 @@
 //! 之所以要在 `cx.defer` 里创建，是因为 MultiWorkspace::new / Workspace::new 的订阅
 //! 链需要先建立好，再注入子 entity（Sidebar 等）。
 
-use gpui::{App, AppContext, Entity, Window};
+use gpui::{App, AppContext, Context, Entity, Window};
 use std::sync::Arc;
 
 pub mod panels;
@@ -63,7 +63,7 @@ pub fn initialize_workspace(_app_state: Arc<workspace::AppState>, cx: &mut App) 
 fn register_status_bar_items(
     workspace: &mut workspace::Workspace,
     window: &mut Window,
-    cx: &mut AppContext<'_>,
+    cx: &mut Context<workspace::Workspace>,
 ) {
     // —— Left side ——
     let search_button = cx.new(|_| search::search_status_button::SearchButton::new());

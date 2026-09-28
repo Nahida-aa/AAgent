@@ -31,10 +31,7 @@ pub fn prepare_task_for_spawn(
 }
 
 pub fn is_enabled_in_workspace(workspace: &Workspace, cx: &App) -> bool {
-    let supports = workspace.project().read(cx).supports_terminal(cx);
-    let is_local = workspace.project().read(cx).is_local();
-    eprintln!("DEBUG is_enabled_in_workspace: supports_terminal={supports}, is_local={is_local}");
-    supports
+    workspace.project().read(cx).supports_terminal(cx)
 }
 
 pub fn new_terminal_pane(

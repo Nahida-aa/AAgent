@@ -4,6 +4,14 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
+[features]
+test-support = [
+    "dap/test-support",
+    "gpui/test-support",
+    "task/test-support",
+    "util/test-support",
+]
+
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true

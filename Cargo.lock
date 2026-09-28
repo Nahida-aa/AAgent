@@ -111,6 +111,7 @@ dependencies = [
  "remote",
  "remote_server",
  "repl",
+ "reqwest_client",
  "search",
  "semver",
  "serde",
@@ -7784,6 +7785,7 @@ dependencies = [
  "tokio",
  "tokio-rustls",
  "tower-service",
+ "webpki-roots",
 ]
 
 [[package]]
@@ -14237,6 +14239,7 @@ dependencies = [
  "wasm-bindgen-futures",
  "wasm-streams",
  "web-sys",
+ "webpki-roots",
 ]
 
 [[package]]

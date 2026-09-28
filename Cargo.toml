@@ -332,7 +332,7 @@ notify = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716
 notify-types = { git = "https://github.com/zed-industries/notify", rev = "d842f16b2716bd60f09caf3ae3a894237ab38f54" }
 refineable = { git = "https://github.com/zed-industries/zed", rev = "d3ccd5719486b39b6c18cf37a06233ef9833d6d8" }
 regex = "1"
-reqwest = { version = "0.12", default-features = false, features = ["json", "stream"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls"] }
 runtimelib = { version = "1.4.0", default-features = false, features = [
     "async-dispatcher-runtime", "aws-lc-rs"
 ] }

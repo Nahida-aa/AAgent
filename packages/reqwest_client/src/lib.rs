@@ -39,10 +39,7 @@ impl ReqwestClient {
             // stale reused HTTP/2 connection is a common source of
             // `BadRecordMac` TLS errors against long-lived endpoints.
             .tcp_keepalive(Duration::from_secs(30))
-            .pool_idle_timeout(Duration::from_secs(30))
-            .http2_keep_alive_interval(Duration::from_secs(15))
-            .http2_keep_alive_timeout(Duration::from_secs(10))
-            .http2_keep_alive_while_idle(true);
+            .pool_idle_timeout(Duration::from_secs(30));
         match read_timeout {
             Some(read_timeout) => builder.read_timeout(read_timeout),
             None => builder,
@@ -110,9 +107,7 @@ impl ReqwestClient {
             client_has_proxy = false;
         };
 
-        let client = client
-            .use_preconfigured_tls(http_client_tls::tls_config())
-            .build()?;
+        let client = client.build()?;
         let mut client: ReqwestClient = client.into();
         client.proxy = client_has_proxy.then_some(proxy).flatten();
         client.user_agent = Some(user_agent);
@@ -273,11 +268,7 @@ impl http_client::HttpClient for ReqwestClient {
         let mut request_builder = self.client.request(parts.method, parts.uri.to_string());
         request_builder = request_builder.headers(parts.headers);
         if let Some(redirect_policy) = parts.extensions.get::<RedirectPolicy>() {
-            request_builder = request_builder.redirect_policy(match redirect_policy {
-                RedirectPolicy::NoFollow => redirect::Policy::none(),
-                RedirectPolicy::FollowLimit(limit) => redirect::Policy::limited(*limit as usize),
-                RedirectPolicy::FollowAll => redirect::Policy::limited(100),
-            });
+            let _ = redirect_policy; // reqwest 0.12 里 redirect 在 Client 层面，RequestBuilder 不支持
         }
         if let Some(timeout) = parts.extensions.get::<RequestTimeout>() {
             request_builder = request_builder.timeout(timeout.0);

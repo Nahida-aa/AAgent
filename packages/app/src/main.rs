@@ -47,8 +47,20 @@ fn main() {
         // —— Fs 全局 ——
         <dyn fs::Fs>::set_global(fs.clone(), cx);
 
+        // —— HTTP client（对齐 Zed main.rs L508-L528）——
+        // 先给 gpui 一个 ReqwestClient，Client::production 内部要用；
+        // 再用 client.http_client()（带 server URL 前缀的 HttpClientWithUrl）覆盖。
+        let user_agent = format!("AAgent/{}", env!("CARGO_PKG_VERSION"));
+        let http = {
+            let _guard = gpui_tokio::Tokio::handle(cx).enter();
+            reqwest_client::ReqwestClient::proxy_and_user_agent(None, &user_agent)
+                .expect("could not start HTTP client")
+        };
+        cx.set_http_client(Arc::new(http));
+
         // —— Client ——
         let client = client::Client::production(cx);
+        cx.set_http_client(client.http_client());
 
         // —— LanguageRegistry ——
         let languages = Arc::new(language::LanguageRegistry::new(

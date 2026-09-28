@@ -97,7 +97,12 @@ impl EventEmitter<MultiWorkspaceEvent> for MultiWorkspace {}
 
 impl MultiWorkspace {
     pub fn new(workspace: Entity<Workspace>, window: &mut Window, cx: &mut Context<Self>) -> Self {
-        let release_subscription = cx.on_release(|this: &mut MultiWorkspace, _cx| {
+        let entity_id = cx.entity_id();
+        tracing::info!(?entity_id, "MultiWorkspace CREATED");
+        let release_subscription = cx.on_release(move |_this: &mut MultiWorkspace, _cx| {
+            tracing::info!(?entity_id, "MultiWorkspace RELEASED (entity dropped)");
+        });
+        let release_subscription2 = cx.on_release(|this: &mut MultiWorkspace, _cx| {
             if let Some(task) = this._serialize_task.take() {
                 task.detach();
             }
@@ -137,7 +142,7 @@ impl MultiWorkspace {
             sidebar_overlay: None,
             pending_removal_tasks: Vec::new(),
             _serialize_task: None,
-            _subscriptions: vec![release_subscription, settings_subscription],
+            _subscriptions: vec![release_subscription, release_subscription2, settings_subscription],
             previous_focus_handle: None,
         }
     }

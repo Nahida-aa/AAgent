@@ -38,6 +38,7 @@ http_client.workspace = true
 itertools.workspace = true
 language.workspace = true
 log.workspace = true
+tracing.workspace = true
 menu.workspace = true
 markdown.workspace = true
 node_runtime.workspace = true

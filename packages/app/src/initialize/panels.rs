@@ -9,6 +9,7 @@ use gpui_util::ResultExt;
 use workspace::{Panel, Workspace};
 
 use agent_ui::AgentPanel;
+use collab_ui::collab_panel::CollabPanel;
 use project_panel::ProjectPanel;
 use outline_panel::OutlinePanel;
 use git_ui::git_panel::GitPanel;
@@ -23,6 +24,7 @@ pub fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Ta
         let project_panel = ProjectPanel::load(workspace_handle.clone(), cx.clone());
         let outline_panel = OutlinePanel::load(workspace_handle.clone(), cx.clone());
         let git_panel = GitPanel::load(workspace_handle.clone(), cx.clone());
+        let collab_panel = CollabPanel::load(workspace_handle.clone(), cx.clone());
         let terminal_panel = TerminalPanel::load(workspace_handle.clone(), cx.clone());
         // AgentPanel: Zed 通过 setup_or_teardown_ai_panel 注册（crates/zed/src/zed.rs L820），
         // 简化版：直接 load + add_panel
@@ -54,6 +56,7 @@ pub fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Ta
             add_panel_when_ready("project", project_panel, workspace_handle.clone(), cx.clone()),
             add_panel_when_ready("outline", outline_panel, workspace_handle.clone(), cx.clone()),
             add_panel_when_ready("git", git_panel, workspace_handle.clone(), cx.clone()),
+            add_panel_when_ready("collab", collab_panel, workspace_handle.clone(), cx.clone()),
             add_panel_when_ready("terminal", terminal_panel, workspace_handle.clone(), cx.clone()),
             add_panel_when_ready("agent", agent_panel, workspace_handle.clone(), cx.clone()),
         );

@@ -54,6 +54,7 @@ fn main() {
         editor::init(cx);
         terminal_view::init(cx);
         title_bar::init(cx); // 内部 observe_new(|ws| ws.set_titlebar_item)
+        theme_selector::init(cx); // 注册 Toggle action handler
 
         // —— Fs 全局 ——
         <dyn fs::Fs>::set_global(fs.clone(), cx);
@@ -184,6 +185,9 @@ fn main() {
                 items: vec![
                     MenuItem::action("Toggle Terminal", NoAction),
                     MenuItem::action("Toggle Sidebar", NoAction),
+                    MenuItem::separator(),
+                    MenuItem::action("Themes...", aagent_actions::theme_selector::Toggle { themes_filter: None }),
+                    MenuItem::action("Icon Themes...", aagent_actions::icon_theme_selector::Toggle { themes_filter: None }),
                     MenuItem::separator(),
                     MenuItem::action("Zoom In", NoAction),
                     MenuItem::action("Zoom Out", NoAction),

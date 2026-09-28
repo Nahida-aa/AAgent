@@ -13,6 +13,9 @@ Before editing files for a substantial task:
 <!-- intent-skills:end -->
 
 - 修改代码后, 如果认为适合提交, 就自行提交
+## Debug
+
+- 使用 tracing
 
 ## Code Navigation
 

@@ -47,7 +47,7 @@ use std::sync::Arc;
 
 use theme::ActiveTheme;
 use theme::registry::ThemeRegistry;
-use theme::{GlobalTheme, SystemAppearance, default_colors::catppuccin_mocha, set_theme};
+use theme::{GlobalTheme, SystemAppearance, default_colors::catppuccin_macchiato, set_theme};
 use theme::{IconTheme, LoadThemes, Theme};
 use gpui::{App, AssetSource, Font, Result, SharedString, Window};
 
@@ -74,12 +74,13 @@ pub fn init(themes_to_load: LoadThemes, cx: &mut App) {
     let assets: Box<dyn AssetSource> = Box::new(GlobalAssets(cx.asset_source().clone()));
     ThemeRegistry::set_global(assets, cx);
 
-    // 2. 选默认主题（优先注册表的 "Catppuccin Mocha"，拿不到就用内置构造）
+    // 2. 选默认主题（优先注册表的 "Catppuccin Macchiato"，拿不到就用内置构造）
     let registry = ThemeRegistry::global(cx);
     let theme = registry
-        .get("Catppuccin Mocha")
+        .get("Catppuccin Macchiato")
         .map(|t| (*t).clone())
-        .unwrap_or_else(|_| catppuccin_mocha());
+        .or_else(|_| registry.get("Catppuccin Mocha").map(|t| (*t).clone()))
+        .unwrap_or_else(|_| catppuccin_macchiato());
     set_theme(cx, Arc::new(theme));
 }
 
@@ -124,8 +125,9 @@ fn configured_theme(cx: &mut App) -> Arc<Theme> {
         Ok(theme) => theme,
         Err(_) => {
             let fallback = registry
-                .get("Catppuccin Mocha")
-                .unwrap_or_else(|_| Arc::new(catppuccin_mocha()));
+                .get("Catppuccin Macchiato")
+                .or_else(|_| registry.get("Catppuccin Mocha"))
+                .unwrap_or_else(|_| Arc::new(catppuccin_macchiato()));
             fallback
         }
     }

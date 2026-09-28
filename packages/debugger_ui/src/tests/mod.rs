@@ -35,7 +35,7 @@ mod variable_list;
 
 pub fn init_test(cx: &mut gpui::TestAppContext) {
     #[cfg(test)]
-    zlog::init_test();
+    a_log::init_test();
 
     cx.update(|cx| {
         let settings = SettingsStore::test(cx);

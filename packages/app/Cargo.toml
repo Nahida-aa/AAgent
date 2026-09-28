@@ -82,6 +82,8 @@ cli.workspace = true
 client.workspace = true
 clock = { workspace = true, optional = true }
 codestral.workspace = true
+collab_ui.workspace = true
+notifications.workspace = true
 collections.workspace = true
 command_palette.workspace = true
 copilot.workspace = true

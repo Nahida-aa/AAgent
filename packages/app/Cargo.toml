@@ -14,33 +14,143 @@ path = "src/lib.rs"
 name = "aa-app"
 path = "src/main.rs"
 
+[features]
+tracy = ["a_tracing/tracy"]
+# LEAK_BACKTRACE=1 cargo run --features zed/track-project-leak --profile release-fast
+track-project-leak = ["gpui/leak-detection"]
+test-support = [
+    "gpui/test-support",
+    "gpui_platform/screen-capture",
+    "dep:image",
+    "workspace/test-support",
+    "project/test-support",
+    "editor/test-support",
+    "terminal_view/test-support",
+    "image_viewer/test-support",
+    "recent_projects/test-support",
+    "repl/test-support",
+    "title_bar/test-support",
+]
+visual-tests = [
+    "gpui/test-support",
+    "gpui_platform/screen-capture",
+    "gpui_platform/test-support",
+    "dep:image",
+    "dep:tempfile",
+    "dep:action_log",
+    "dep:agent_servers",
+    "workspace/test-support",
+    "project/test-support",
+    "editor/test-support",
+    "terminal_view/test-support",
+    "image_viewer/test-support",
+    "clock/test-support",
+    "acp_thread/test-support",
+    "action_log/test-support",
+    "agent_ui/test-support",
+    "db/test-support",
+    "agent/test-support",
+    "language_model/test-support",
+    "fs/test-support",
+    "recent_projects/test-support",
+    "title_bar/test-support",
+]
+
 [dependencies]
-workspace = { workspace = true, features = ["test-support"] }
+acp_thread.workspace = true
+acp_tools.workspace = true
+action_log = { workspace = true, optional = true }
+activity_indicator.workspace = true
+agent-client-protocol.workspace = true
+agent.workspace = true
+agent_servers = { workspace = true, optional = true }
+agent_settings.workspace = true
+agent_skills.workspace = true
+agent_ui = { workspace = true, features = ["audio"] }
+anyhow.workspace = true
+askpass.workspace = true
+assets.workspace = true
+aa_gpui_kit_assets.workspace = true # 与 assets 不同, 遇到相关问题 需要讨论
+audio.workspace = true
+auto_update.workspace = true
+breadcrumbs.workspace = true
+call.workspace = true
+channel.workspace = true
+chrono.workspace = true
+clap.workspace = true
+cli.workspace = true
+client.workspace = true
+clock = { workspace = true, optional = true }
+codestral.workspace = true
+collections.workspace = true
+command_palette.workspace = true
+copilot.workspace = true
+copilot_chat.workspace = true
+copilot_ui.workspace = true
+crashes.workspace = true
+dap_adapters.workspace = true
+db.workspace = true
+debug_adapter_extension.workspace = true
+dev_container.workspace = true
+editor.workspace = true
+env_logger.workspace = true
+extension.workspace = true
+extension_host.workspace = true
+fs.workspace = true
+futures.workspace = true
+git.workspace = true
+git_hosting_providers.workspace = true
+git_ui = { workspace = true, features = ["call"] }
+git_ui_core.workspace = true
+go_to_line.workspace = true
+gpui = { workspace = true, features = ["profiler", "stacker"] }
+gpui_platform = { workspace = true, features = [
+    "screen-capture",
+    "font-kit",
+    "wayland",
+    "x11",
+] }
+gpui_tokio.workspace = true
+image = { workspace = true, optional = true }
+spin = "0.10.0"
+itertools.workspace = true
+rayon.workspace = true
+semver.workspace = true
+tempfile = { workspace = true, optional = true }
+
+edit_prediction.workspace = true
+edit_prediction_ui.workspace = true
+http_client.workspace = true
+
+
+languages = { workspace = true, features = ["load-grammars"] }
+language_model.workspace = true
+
+mimalloc = { version = "0.1", optional = true }
+recent_projects.workspace = true
+
+workspace.workspace = true
 sidebar.workspace = true
 terminal.workspace = true
 terminal_view.workspace = true
 title_bar.workspace = true
 settings.workspace = true
-gpui.workspace = true
-gpui_tokio.workspace = true
+
 gpui_util.workspace = true
 serde = { workspace = true }
 serde_json = { workspace = true }
-anyhow = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
-futures = { workspace = true }
-chrono = { workspace = true }
 parking_lot = { workspace = true }
 # gpui_learn 共享库:内嵌 zed 图标/字体/主题的 assets + 自研 ui 库。
 # 开发期 path 依赖;后续可切换成 git 源。
-aa_gpui_kit_assets.workspace = true
-assets.workspace = true
 theme.workspace = true
 theme_settings.workspace = true
 ui.workspace = true
-editor.workspace = true
 project.workspace = true
+a_log.workspace = true
+a_tracing.workspace = true
+
 # AppState::test / Project::local 需要的间接依赖（通过 workspace crate re-export 不够，
 # main.rs 直接用了这些类型）—— 但 workspace crate 已经声明了它们，这里只需要保证可访问。
 # 实际上 main.rs 里 workspace::AppState::test() 内部已经处理了一切，main.rs 只需要 project。
@@ -54,3 +164,61 @@ gpui_platform = { workspace = true }
 [target.'cfg(target_family = "wasm")'.dependencies]
 gpui_platform = { workspace = true }
 wasm-bindgen = "0.2.120"
+
+[dev-dependencies]
+activity_indicator = { workspace = true, features = ["test-support"] }
+call = { workspace = true, features = ["test-support"] }
+editor = { workspace = true, features = ["test-support"] }
+fs = { workspace = true, features = ["test-support"] }
+gpui = { workspace = true, features = ["profiler", "test-support"] }
+image_viewer = { workspace = true, features = ["test-support"] }
+itertools.workspace = true
+language = { workspace = true, features = ["test-support"] }
+pretty_assertions.workspace = true
+project = { workspace = true, features = ["test-support"] }
+remote = { workspace = true, features = ["test-support"] }
+remote_server = { workspace = true, features = ["test-support"] }
+semver.workspace = true
+terminal_view = { workspace = true, features = ["test-support"] }
+title_bar = { workspace = true, features = ["test-support"] }
+workspace = { workspace = true, features = ["test-support"] }
+image.workspace = true
+agent_ui = { workspace = true, features = ["test-support"] }
+search = { workspace = true, features = ["test-support"] }
+repl = { workspace = true, features = ["test-support"] }
+
+
+[package.metadata.bundle-dev]
+icon = ["resources/app-icon-dev@2x.png", "resources/app-icon-dev.png"]
+identifier = "dev.zed.Zed-Dev"
+name = "Zed Dev"
+osx_minimum_system_version = "10.15.7"
+osx_info_plist_exts = ["resources/info/*"]
+osx_url_schemes = ["zed"]
+
+[package.metadata.bundle-nightly]
+icon = ["resources/app-icon-nightly@2x.png", "resources/app-icon-nightly.png"]
+identifier = "dev.zed.Zed-Nightly"
+name = "Zed Nightly"
+osx_minimum_system_version = "10.15.7"
+osx_info_plist_exts = ["resources/info/*"]
+osx_url_schemes = ["zed"]
+
+[package.metadata.bundle-preview]
+icon = ["resources/app-icon-preview@2x.png", "resources/app-icon-preview.png"]
+identifier = "dev.zed.Zed-Preview"
+name = "Zed Preview"
+osx_minimum_system_version = "10.15.7"
+osx_info_plist_exts = ["resources/info/*"]
+osx_url_schemes = ["zed"]
+
+[package.metadata.bundle-stable]
+icon = ["resources/app-icon@2x.png", "resources/app-icon.png"]
+identifier = "dev.zed.Zed"
+name = "Zed"
+osx_minimum_system_version = "10.15.7"
+osx_info_plist_exts = ["resources/info/*"]
+osx_url_schemes = ["zed"]
+
+[package.metadata.cargo-shear]
+ignored = ["profiling", "tracing"]

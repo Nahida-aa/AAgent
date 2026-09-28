@@ -760,6 +760,7 @@ impl RemoteClient {
 
     #[cfg(any(test, feature = "test-support"))]
     pub fn simulate_disconnect(&self, client_cx: &mut App) -> Task<()> {
+        use super::connect::ConnectionPoolEntry;
         let opts = self.connection_options();
         client_cx.spawn(async move |cx| {
             let connection = cx.update_global(|c: &mut ConnectionPool, _| {

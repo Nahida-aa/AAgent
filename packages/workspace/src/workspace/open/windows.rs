@@ -39,7 +39,9 @@ pub fn workspace_windows_for_location(
             let read_result = multi_workspace.read(cx);
             match &read_result {
                 Ok(_) => tracing::info!("  multi_workspace.read: OK"),
-                Err(e) => tracing::warn!("  multi_workspace.read: FAILED — {}", e),
+                Err(e) => {
+                    tracing::warn!("  multi_workspace.read: FAILED — {}", e);
+                }
             }
             let same_host = |left: &RemoteConnectionOptions, right: &RemoteConnectionOptions| match (left, right) {
                 (RemoteConnectionOptions::Ssh(a), RemoteConnectionOptions::Ssh(b)) => {

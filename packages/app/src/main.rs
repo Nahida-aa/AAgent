@@ -30,6 +30,8 @@ fn main() {
     ));
 
     app.run(|cx: &mut App| {
+        cx.set_global(app_db);
+
         aa_gpui_kit_assets::Assets
             .load_fonts(cx)
             .expect("failed to load embedded fonts");

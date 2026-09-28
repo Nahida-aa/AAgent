@@ -753,7 +753,7 @@ impl Settings for AgentSettings {
             // actually hold, rather than each call site having to remember to.
             threads_sidebar_default_width: agent
                 .threads_sidebar_default_width
-                .unwrap()
+                .unwrap_or(settings::PixelSetting(300.0))
                 .into_gpui()
                 .clamp(THREADS_LIST_MIN_WIDTH, THREADS_LIST_MAX_WIDTH),
             default_width: agent.default_width.unwrap().into_gpui(),

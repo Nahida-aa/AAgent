@@ -5,6 +5,7 @@ use language::Buffer;
 use settings::{Settings as _, SettingsLocation};
 
 /// AI 功能的全局开关（对齐 Zed `project::DisableAiSettings`）。
+#[derive(Copy, Clone, Debug, settings::RegisterSetting)]
 pub struct DisableAiSettings {
     pub disable_ai: bool,
 }

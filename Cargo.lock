@@ -16787,6 +16787,28 @@ name = "theme_extension"
 version = "0.1.0"
 
 [[package]]
+name = "theme_selector"
+version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_theme",
+ "aa_gpui_kit_ui",
+ "aagent_actions",
+ "editor",
+ "fs",
+ "fuzzy",
+ "gpui",
+ "log",
+ "picker",
+ "project",
+ "serde_json",
+ "settings",
+ "telemetry",
+ "theme_settings",
+ "util 0.1.0",
+ "workspace",
+]
+
+[[package]]
 name = "theme_settings"
 version = "0.1.0"
 dependencies = [
@@ -16802,6 +16824,7 @@ dependencies = [
  "settings",
  "settings_content",
  "settings_macros",
+ "tracing",
 ]
 
 [[package]]

@@ -10,8 +10,8 @@ use settings_macros::{MergeFrom, with_fallible_options};
 
 // ---------- 常量 ----------
 
-pub const DEFAULT_LIGHT_THEME: &str = "One Light";
-pub const DEFAULT_DARK_THEME: &str = "One Dark";
+pub const DEFAULT_LIGHT_THEME: &str = "Catppuccin Latte";
+pub const DEFAULT_DARK_THEME: &str = "Catppuccin Macchiato";
 
 // ---------- ThemeName ----------
 

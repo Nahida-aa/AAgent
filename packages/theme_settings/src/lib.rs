@@ -49,6 +49,7 @@ use theme::registry::ThemeRegistry;
 use theme::{GlobalTheme, SystemAppearance, default_colors::catppuccin_macchiato, set_theme};
 use theme::{IconTheme, LoadThemes, Theme};
 use gpui::{App, Font, Window};
+use gpui::colors::DefaultColors;
 use ::settings::SettingsStore;
 
 /// 安装主题系统（应用启动时调用一次）。
@@ -78,7 +79,30 @@ pub fn init(themes_to_load: LoadThemes, cx: &mut App) {
     //   (b) cx.set_global(GlobalTheme::new(theme, default_icon_theme))
     // 然后我们再 set_global 一次，覆盖 icon_theme 为 configured 的版本。
     set_theme(cx, theme.clone());
-    cx.set_global(GlobalTheme::new(theme, icon_theme));
+    cx.set_global(GlobalTheme::new(theme.clone(), icon_theme));
+
+    // —— DEBUG: 验证运行时实际颜色值 ——
+    let tc = theme.colors();
+    tracing::info!(
+        "[theme_settings::init] theme.name={}, appearance={:?}",
+        theme.name,
+        theme.appearance
+    );
+    tracing::info!(
+        "[theme_settings::init] theme colors: bg={:?}, status_bar={:?}, panel={:?}, editor_bg={:?}",
+        tc.background,
+        tc.status_bar_background,
+        tc.panel_background,
+        tc.editor_background
+    );
+    // 也验证 gpui GlobalColors 是否被 sync — 通过 cx.default_colors() (impl DefaultColors for App)
+    let dc: &Arc<gpui::colors::Colors> = cx.default_colors();
+    tracing::info!(
+        "[theme_settings::init] gpui default_colors: bg={:?}, border={:?}, container={:?}",
+        dc.background,
+        dc.border,
+        dc.container
+    );
 
     // 4. observe SettingsStore 变化自动 reload（对齐 Zed L104-L161）
     let settings = ThemeSettings::get_global(cx);

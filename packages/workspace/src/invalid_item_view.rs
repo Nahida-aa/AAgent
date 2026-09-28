@@ -4,7 +4,7 @@ use ui::{
     Button, ButtonCommon, ButtonStyle, Clickable, KeyBinding, Label, LabelCommon, LabelSize,
     h_flex, v_flex,
 };
-use aagent_actions::workspace::OpenWithSystem;
+use aacode_actions::workspace::OpenWithSystem;
 use gpui::{
     App, Context, EventEmitter, FocusHandle, Focusable, InteractiveElement,
     ParentElement, Render, SharedString, Styled as _, Window,

@@ -64,7 +64,7 @@ pub fn initialize_workspace(_app_state: Arc<workspace::AppState>, cx: &mut App) 
 /// 对齐 Zed `crates/zed/src/zed.rs L602-L652`。
 /// 在 Workspace 创建后、initialize_panels 前，把所有非 dock 的状态栏按钮注册进 StatusBar。
 ///
-/// 目前只注册 AAgent 已有 crate 里的类型；缺失 crate（diagnostics, encoding_selector,
+/// 目前只注册 aacode 已有 crate 里的类型；缺失 crate（diagnostics, encoding_selector,
 /// language_selector, toolchain_selector, language_tools, which_key, line_ending_selector）
 /// 需要逐个从 Zed 搬过来后再加。
 fn register_status_bar_items(

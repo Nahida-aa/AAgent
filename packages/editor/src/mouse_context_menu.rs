@@ -6,8 +6,8 @@ use crate::{
     actions::{Format, FormatSelections},
     selections_collection::SelectionsCollection,
 };
-use aagent_actions::agent::AddSelectionToThread;
-use aagent_actions::preview::{
+use aacode_actions::agent::AddSelectionToThread;
+use aacode_actions::preview::{
     markdown::OpenPreview as OpenMarkdownPreview, svg::OpenPreview as OpenSvgPreview,
 };
 use gpui::prelude::FluentBuilder;
@@ -272,11 +272,11 @@ pub fn deploy_context_menu(
                 )
                 .action(
                     "Show Incoming Calls",
-                    Box::new(aagent_actions::ShowIncomingCalls),
+                    Box::new(aacode_actions::ShowIncomingCalls),
                 )
                 .action(
                     "Show Outgoing Calls",
-                    Box::new(aagent_actions::ShowOutgoingCalls),
+                    Box::new(aacode_actions::ShowOutgoingCalls),
                 )
                 .separator()
                 .action("Rename Symbol", Box::new(Rename))

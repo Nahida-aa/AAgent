@@ -41,7 +41,7 @@ use std::{
     sync::{Arc, OnceLock},
     time::{Duration, Instant},
 };
-use aagent_actions::{
+use aacode_actions::{
     buffer_search,
     search::{SelectNextMatch, SelectPreviousMatch, ToggleCaseSensitive},
 };

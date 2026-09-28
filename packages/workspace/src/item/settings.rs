@@ -2,7 +2,7 @@
 //!
 //! 对齐 Zed `ItemSettings` + `PreviewTabsSettings`。
 //! Zed 用 `#[derive(RegisterSetting)]` 注册到 settings store。
-//! AAgent 还没 settings 系统，先放纯数据结构占位。
+//! aacode 还没 settings 系统，先放纯数据结构占位。
 
 use settings::{
     ActivateOnClose, ClosePosition, RegisterSetting, Settings, ShowCloseButton, ShowDiagnostics,

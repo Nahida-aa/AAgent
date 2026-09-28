@@ -31,7 +31,7 @@ use ui::{
 };
 use util::ResultExt;
 use workspace::{ModalView, Workspace, WorkspaceSettings};
-use aagent_actions::{OpenZedUrl, command_palette::Toggle};
+use aacode_actions::{OpenZedUrl, command_palette::Toggle};
 
 actions!(command_palette, [RemoveSelected]);
 
@@ -720,7 +720,7 @@ impl PickerDelegate for CommandPaletteDelegate {
                 return;
             };
             let action_name = selected_command.action.name();
-            let open_keymap = Box::new(aagent_actions::ChangeKeybinding {
+            let open_keymap = Box::new(aacode_actions::ChangeKeybinding {
                 action: action_name.to_string(),
             });
             window.dispatch_action(open_keymap, cx);

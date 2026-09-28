@@ -107,7 +107,7 @@ uuid.workspace = true
 watch.workspace = true
 workspace.workspace = true
 git_ui_core.workspace = true
-aagent_actions.workspace = true
+aacode_actions.workspace = true
 image.workspace = true
 reqwest_client = { workspace = true, optional = true }
 

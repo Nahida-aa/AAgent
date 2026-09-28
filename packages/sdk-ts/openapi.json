@@ -271,7 +271,7 @@
     }
   },
   "info": {
-    "description": "AAgent HTTP/WS API 服务",
+    "description": "aacode HTTP/WS API 服务",
     "license": { "identifier": "MIT", "name": "MIT" },
     "title": "aa-server",
     "version": "0.1.0"
@@ -289,7 +289,7 @@
             "description": "Server health status"
           }
         },
-        "tags": ["AAgent"]
+        "tags": ["aacode"]
       }
     },
     "/sessions": {
@@ -309,7 +309,7 @@
           }
         },
         "summary": "List saved sessions (most recent first).",
-        "tags": ["AAgent"]
+        "tags": ["aacode"]
       }
     },
     "/sessions/{id}": {
@@ -323,7 +323,7 @@
           "404": { "description": "Session not found" }
         },
         "summary": "Delete a session by ID.",
-        "tags": ["AAgent"]
+        "tags": ["aacode"]
       }
     },
     "/tools": {
@@ -339,7 +339,7 @@
             "description": "List all available tools"
           }
         },
-        "tags": ["AAgent"]
+        "tags": ["aacode"]
       }
     },
     "/tools/{name}": {
@@ -376,9 +376,9 @@
             "description": "Tool execution failed"
           }
         },
-        "tags": ["AAgent"]
+        "tags": ["aacode"]
       }
     }
   },
-  "tags": [{ "description": "AAgent API", "name": "AAgent" }]
+  "tags": [{ "description": "aacode API", "name": "aacode" }]
 }

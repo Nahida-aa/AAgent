@@ -18,7 +18,7 @@ use picker::{Picker, PickerDelegate};
 use settings::SettingsStore;
 use ui::{DocumentationAside, IntoElement, prelude::*};
 use util::ResultExt;
-use aagent_actions::agent::OpenSettings;
+use aacode_actions::agent::OpenSettings;
 
 use crate::ui::{
     ModelSelectorFooter, ModelSelectorHeader, ModelSelectorListItem, documentation_aside_side,

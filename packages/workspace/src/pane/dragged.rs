@@ -9,7 +9,7 @@
 //!     pub pane: Entity<Pane>,
 //!     pub item: Box<dyn ItemHandle>,
 //!     pub ix: usize,
-//!     pub detail: usize,        // Zed 用来区分 preview vs full open，AAgent 暂不需要
+//!     pub detail: usize,        // Zed 用来区分 preview vs full open，aacode 暂不需要
 //!     pub is_active: bool,
 //! }
 //! ```

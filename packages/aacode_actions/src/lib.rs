@@ -39,13 +39,13 @@ actions!(
     zed,
     [
         /// Opens the settings editor.
-        #[action(deprecated_aliases = ["aagent_actions::OpenSettingsEditor"])]
+        #[action(deprecated_aliases = ["aacode_actions::OpenSettingsEditor"])]
         OpenSettings,
         /// Opens the settings JSON file.
-        #[action(deprecated_aliases = ["aagent_actions::OpenSettings"])]
+        #[action(deprecated_aliases = ["aacode_actions::OpenSettings"])]
         OpenSettingsFile,
         /// Opens project-specific settings.
-        #[action(deprecated_aliases = ["aagent_actions::OpenProjectSettings"])]
+        #[action(deprecated_aliases = ["aacode_actions::OpenProjectSettings"])]
         OpenProjectSettings,
         /// Opens the project tasks configuration.
         OpenProjectTasks,
@@ -54,10 +54,10 @@ actions!(
         /// Opens the default keymap file.
         OpenDefaultKeymap,
         /// Opens the user keymap file.
-        #[action(deprecated_aliases = ["aagent_actions::OpenKeymap"])]
+        #[action(deprecated_aliases = ["aacode_actions::OpenKeymap"])]
         OpenKeymapFile,
         /// Opens the keymap editor.
-        #[action(deprecated_aliases = ["aagent_actions::OpenKeymapEditor"])]
+        #[action(deprecated_aliases = ["aacode_actions::OpenKeymapEditor"])]
         OpenKeymap,
         /// Opens account settings.
         OpenAccountSettings,

@@ -135,8 +135,8 @@ pub use split_editor_view::SplitEditorView;
 pub use text::Bias;
 
 use ::git::{Blame, status::FileStatus};
-pub use aagent_actions::editor::RevealInFileManager;
-use aagent_actions::editor::{MoveDown, MoveUp};
+pub use aacode_actions::editor::RevealInFileManager;
+use aacode_actions::editor::{MoveDown, MoveUp};
 use aho_corasick::{AhoCorasick, AhoCorasickBuilder, BuildError};
 use anyhow::{Context as _, Result, anyhow, bail};
 use blink_manager::BlinkManager;
@@ -8914,7 +8914,7 @@ impl Editor {
 
     fn copy_path(
         &mut self,
-        _: &aagent_actions::workspace::CopyPath,
+        _: &aacode_actions::workspace::CopyPath,
         _window: &mut Window,
         cx: &mut Context<Self>,
     ) {
@@ -8929,7 +8929,7 @@ impl Editor {
 
     fn copy_relative_path(
         &mut self,
-        _: &aagent_actions::workspace::CopyRelativePath,
+        _: &aacode_actions::workspace::CopyRelativePath,
         _window: &mut Window,
         cx: &mut Context<Self>,
     ) {

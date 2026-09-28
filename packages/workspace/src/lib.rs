@@ -118,7 +118,7 @@ use settings::{
     update_settings_file,
 };
 
-use aagent_actions::{Spawn, feedback::FileBugReport, theme::ToggleMode};
+use aacode_actions::{Spawn, feedback::FileBugReport, theme::ToggleMode};
 use sqlez::{
     bindable::{Bind, Column, StaticColumnCount},
     statement::Statement,

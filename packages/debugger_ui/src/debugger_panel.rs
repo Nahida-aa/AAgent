@@ -46,7 +46,7 @@ use workspace::{
     Item, Pane, Workspace,
     dock::{DockPosition, Panel, PanelEvent},
 };
-use aagent_actions::debug_panel::ToggleFocus;
+use aacode_actions::debug_panel::ToggleFocus;
 
 pub struct DebuggerHistoryFeatureFlag;
 
@@ -646,7 +646,7 @@ impl DebugPanel {
             IconButton::new("debug-edit-debug-json", IconName::Code)
                 .icon_size(IconSize::Small)
                 .on_click(|_, window, cx| {
-                    window.dispatch_action(aagent_actions::OpenProjectDebugTasks.boxed_clone(), cx);
+                    window.dispatch_action(aacode_actions::OpenProjectDebugTasks.boxed_clone(), cx);
                 })
                 .tooltip(Tooltip::text("Edit debug.json"))
         };
@@ -1814,7 +1814,7 @@ impl Render for DebugPanel {
                                 )
                                 .on_click(|_, window, cx| {
                                     window.dispatch_action(
-                                        aagent_actions::OpenProjectDebugTasks.boxed_clone(),
+                                        aacode_actions::OpenProjectDebugTasks.boxed_clone(),
                                         cx,
                                     );
                                 }),
@@ -1840,9 +1840,9 @@ impl Render for DebugPanel {
                             )
                             .on_click(|_, window, cx| {
                                 window.dispatch_action(
-                                    aagent_actions::Extensions {
+                                    aacode_actions::Extensions {
                                         category_filter: Some(
-                                            aagent_actions::ExtensionCategoryFilter::DebugAdapters,
+                                            aacode_actions::ExtensionCategoryFilter::DebugAdapters,
                                         ),
                                         id: None,
                                     }

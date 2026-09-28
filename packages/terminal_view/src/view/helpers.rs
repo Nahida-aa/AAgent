@@ -16,8 +16,8 @@ pub(super) fn viewport_line_for_point(point: Point, display_offset: usize) -> Op
     }
 }
 
-pub(super) fn terminal_rerun_override(task: &TaskId) -> aagent_actions::Rerun {
-    aagent_actions::Rerun {
+pub(super) fn terminal_rerun_override(task: &TaskId) -> aacode_actions::Rerun {
+    aacode_actions::Rerun {
         task_id: Some(task.0.clone()),
         allow_concurrent_runs: Some(true),
         use_new_terminal: Some(false),

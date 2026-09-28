@@ -81,7 +81,7 @@ Zed 选 A 因为 sidebar crate 足够大（~8000 行）、独立演进需求强�
 
 ---
 
-## AAgent 当前状态
+## aacode 当前状态
 
 **暂用方案 C** — Sidebar entity 还在 `workspace/src/sidebar/` 子模块。循环依赖不存在，MultiWorkspace 强类型存 `Entity<Sidebar>`。
 

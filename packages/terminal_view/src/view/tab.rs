@@ -1,4 +1,4 @@
-use aagent_actions::Rerun;
+use aacode_actions::Rerun;
 use gpui::{
     AnyElement, App, AppContext, Context, IntoElement, ParentElement, SharedString, Styled, Task,
     Window,

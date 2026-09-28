@@ -57,7 +57,7 @@ use workspace::{
     notifications::{NotifyResultExt, NotifyTaskExt as _},
 };
 
-use aagent_actions::OpenRemote;
+use aacode_actions::OpenRemote;
 
 pub use onboarding_banner::restore_banner;
 
@@ -868,7 +868,7 @@ impl TitleBar {
                     .selected_style(ButtonStyle::Tinted(TintColor::Accent))
                     .when(!is_project_selected, |s| s.color(Color::Muted)),
                 move |_window, cx| {
-                    Tooltip::for_action("Recent Projects", &aagent_actions::OpenRecent::default(), cx)
+                    Tooltip::for_action("Recent Projects", &aacode_actions::OpenRecent::default(), cx)
                 },
             )
             .anchor(gpui::Anchor::TopLeft)
@@ -920,7 +920,7 @@ impl TitleBar {
                     .selected_style(ButtonStyle::Tinted(TintColor::Accent))
                     .when(!is_project_selected, |s| s.color(Color::Muted)),
                 move |_window, cx| {
-                    Tooltip::for_action("Recent Projects", &aagent_actions::OpenRecent::default(), cx)
+                    Tooltip::for_action("Recent Projects", &aacode_actions::OpenRecent::default(), cx)
                 },
             )
             .anchor(gpui::Anchor::TopLeft)
@@ -1023,7 +1023,7 @@ impl TitleBar {
                     move |_window, cx| {
                         Tooltip::with_meta(
                             "Worktree",
-                            Some(&aagent_actions::git::Worktree),
+                            Some(&aacode_actions::git::Worktree),
                             format!("Currently In Use: {}", worktree_label),
                             cx,
                         )
@@ -1081,7 +1081,7 @@ impl TitleBar {
                         };
                         Tooltip::with_meta(
                             "Branch & Stash",
-                            Some(&aagent_actions::git::Branch),
+                            Some(&aacode_actions::git::Branch),
                             meta,
                             cx,
                         )
@@ -1385,19 +1385,19 @@ impl TitleBar {
 
                         this.separator()
                     })
-                    .action("Settings", aagent_actions::OpenSettings.boxed_clone())
-                    .action("Keymap", Box::new(aagent_actions::OpenKeymap))
+                    .action("Settings", aacode_actions::OpenSettings.boxed_clone())
+                    .action("Keymap", Box::new(aacode_actions::OpenKeymap))
                     .action(
                         "Themes…",
-                        aagent_actions::theme_selector::Toggle::default().boxed_clone(),
+                        aacode_actions::theme_selector::Toggle::default().boxed_clone(),
                     )
                     .action(
                         "Icon Themes…",
-                        aagent_actions::icon_theme_selector::Toggle::default().boxed_clone(),
+                        aacode_actions::icon_theme_selector::Toggle::default().boxed_clone(),
                     )
                     .action(
                         "Extensions",
-                        aagent_actions::Extensions::default().boxed_clone(),
+                        aacode_actions::Extensions::default().boxed_clone(),
                     )
                     .when(ai_enabled, |menu| {
                         menu.separator()

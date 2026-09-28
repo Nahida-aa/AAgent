@@ -1,6 +1,6 @@
 //! Pane 事件类型。
 //!
-//! Zed 在 `pane.rs` 里直接定义 Event enum，AAgent 单独放这个模块
+//! Zed 在 `pane.rs` 里直接定义 Event enum，aacode 单独放这个模块
 //! 方便后续扩展（比如加 Zoom、Split 相关事件）。
 
 use super::*;

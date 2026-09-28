@@ -3,7 +3,7 @@ use std::rc::Rc;
 use gpui::{DismissEvent, Entity, EventEmitter, FocusHandle, Focusable, IntoElement};
 use ui::{Tooltip, prelude::*};
 use workspace::{ToastAction, ToastView};
-use aagent_actions::toast;
+use aacode_actions::toast;
 
 #[derive(RegisterComponent)]
 #[register_component(crate = "component")]

@@ -72,10 +72,10 @@ use workspace::{
 };
 
 use git_ui_core::worktree_service::{RemoteBranchName, worktree_create_targets};
-use aagent_actions::editor::{MoveDown, MoveUp};
-use aagent_actions::{CreateWorktree, NewWorktreeBranchTarget, OpenRecent};
+use aacode_actions::editor::{MoveDown, MoveUp};
+use aacode_actions::{CreateWorktree, NewWorktreeBranchTarget, OpenRecent};
 
-use aagent_actions::agents_sidebar::{FocusSidebarFilter, ToggleThreadSwitcher};
+use aacode_actions::agents_sidebar::{FocusSidebarFilter, ToggleThreadSwitcher};
 
 use crate::thread_switcher::{
     ThreadSwitcher, ThreadSwitcherEntry, ThreadSwitcherEvent, ThreadSwitcherSelection,

@@ -38,7 +38,7 @@ use workspace::{
     notifications::NotifyTaskExt,
     searchable::SearchableItemHandle,
 };
-use aagent_actions::agent::ReviewBranchDiff;
+use aacode_actions::agent::ReviewBranchDiff;
 
 /// The workspace item for a branch (merge-base) diff: "Changes since {branch}".
 /// It wraps a single [`DiffMultibuffer`] over [`DiffBase::Merge`] and delegates

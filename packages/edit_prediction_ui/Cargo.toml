@@ -36,7 +36,7 @@ theme_settings.workspace = true
 ui.workspace = true
 util.workspace = true
 workspace.workspace = true
-aagent_actions.workspace = true
+aacode_actions.workspace = true
 zeta_prompt.workspace = true
 
 [dev-dependencies]

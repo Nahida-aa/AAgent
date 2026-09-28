@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 publish = false
-description = "AAgent Sidebar entity (Agent Threads list + bottom bar)"
+description = "aacode Sidebar entity (Agent Threads list + bottom bar)"
 
 [features]
 default = []
@@ -45,7 +45,7 @@ unicode-segmentation.workspace = true
 util.workspace = true
 workspace.workspace = true
 git_ui_core.workspace = true
-aagent_actions.workspace = true
+aacode_actions.workspace = true
 
 [dev-dependencies]
 acp_thread = { workspace = true, features = ["test-support"] }

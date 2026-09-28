@@ -361,23 +361,23 @@ mod tests {
         ];
         for bindings in [
             vec![
-                KeyBinding::new("cmd-k cmd-s", aagent_actions::OpenKeymap, Some("Workspace"))
+                KeyBinding::new("cmd-k cmd-s", aacode_actions::OpenKeymap, Some("Workspace"))
                     .with_meta(KeybindSource::User.meta()),
-                KeyBinding::new("cmd-k cmd-s", aagent_actions::OpenSettings, Some("Workspace"))
+                KeyBinding::new("cmd-k cmd-s", aacode_actions::OpenSettings, Some("Workspace"))
                     .with_meta(KeybindSource::User.meta()),
             ],
             vec![
-                KeyBinding::new("cmd-k cmd-s", aagent_actions::OpenSettings, Some("Editor"))
+                KeyBinding::new("cmd-k cmd-s", aacode_actions::OpenSettings, Some("Editor"))
                     .with_meta(KeybindSource::Default.meta()),
-                KeyBinding::new("cmd-k cmd-s", aagent_actions::OpenKeymap, Some("Workspace"))
+                KeyBinding::new("cmd-k cmd-s", aacode_actions::OpenKeymap, Some("Workspace"))
                     .with_meta(KeybindSource::User.meta()),
             ],
             vec![
-                KeyBinding::new("cmd-k cmd-s", aagent_actions::OpenKeymap, Some("Workspace"))
+                KeyBinding::new("cmd-k cmd-s", aacode_actions::OpenKeymap, Some("Workspace"))
                     .with_meta(KeybindSource::Default.meta()),
                 KeyBinding::load(
                     "cmd-k cmd-s",
-                    Box::new(aagent_actions::OpenSettings),
+                    Box::new(aacode_actions::OpenSettings),
                     Some(
                         gpui::KeyBindingContextPredicate::parse("Workspace")
                             .expect("valid context")
@@ -396,7 +396,7 @@ mod tests {
             let first_match = matches.first().expect("matching binding");
             assert_eq!(
                 first_match.action().name(),
-                aagent_actions::OpenSettings.name()
+                aacode_actions::OpenSettings.name()
             );
 
             let candidates = keymap.possible_next_bindings_for_input(&input[..1], &contexts);
@@ -406,8 +406,8 @@ mod tests {
                     .map(|binding| binding.action().name())
                     .collect::<Vec<_>>(),
                 vec![
-                    aagent_actions::OpenSettings.name(),
-                    aagent_actions::OpenKeymap.name()
+                    aacode_actions::OpenSettings.name(),
+                    aacode_actions::OpenKeymap.name()
                 ],
             );
             let pending = candidates

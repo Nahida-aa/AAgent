@@ -1,4 +1,4 @@
-# AAgent
+# aacode
 
 个人 AI 助手平台。Rust 微内核 + WASM 插件 + LLM 集成 + 多前端。
 

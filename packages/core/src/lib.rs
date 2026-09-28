@@ -1,4 +1,4 @@
-//! AAgent 核心类型。
+//! aacode 核心类型。
 //!
 //! 定义了扩展系统（Extension trait、Registrar、生命周期事件）、
 //! LLM 抽象和存储接口。

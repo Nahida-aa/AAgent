@@ -23,7 +23,7 @@ theme_settings.workspace = true
 ui.workspace = true
 ui_input.workspace = true
 workspace.workspace = true
-aagent_actions.workspace = true
+aacode_actions.workspace = true
 util.workspace = true
 
 [dev-dependencies]

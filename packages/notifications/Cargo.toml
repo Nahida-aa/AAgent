@@ -25,7 +25,7 @@ time.workspace = true
 ui.workspace = true
 util.workspace = true
 workspace.workspace = true
-aagent_actions.workspace = true
+aacode_actions.workspace = true
 
 [dev-dependencies]
 client = { workspace = true, features = ["test-support"] }

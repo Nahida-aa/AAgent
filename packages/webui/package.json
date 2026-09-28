@@ -1,7 +1,7 @@
 {
   "name": "@aa/webui",
   "version": "0.1.0",
-  "description": "AAgent web frontend",
+  "description": "aacode web frontend",
   "license": "MIT",
   "type": "module",
   "imports": {

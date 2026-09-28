@@ -62,7 +62,7 @@ util.workspace = true
 watch.workspace = true
 workspace.workspace = true
 git_ui_core.workspace = true
-aagent_actions.workspace = true
+aacode_actions.workspace = true
 a_tracing.workspace = true
 
 [dev-dependencies]

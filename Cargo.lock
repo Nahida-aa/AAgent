@@ -43,7 +43,7 @@ dependencies = [
  "aa_gpui_kit_assets",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "acp_thread",
  "acp_tools",
  "action_log",
@@ -440,7 +440,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "aagent_actions"
+name = "aacode_actions"
 version = "0.1.0"
 dependencies = [
  "gpui",
@@ -924,7 +924,7 @@ dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "acp_thread",
  "action_log",
  "agent",
@@ -1050,7 +1050,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "client",
  "cloud_api_types",
  "gpui",
@@ -3534,7 +3534,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "call",
  "channel",
@@ -3613,7 +3613,7 @@ dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "client",
  "command_palette_hooks",
@@ -4985,7 +4985,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "bitflags 2.13.2",
  "collections",
@@ -5412,7 +5412,7 @@ dependencies = [
  "a_log",
  "aa_clock",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "ad_credentials_provider",
  "ai_onboarding",
  "anyhow",
@@ -5530,7 +5530,7 @@ name = "edit_prediction_ui"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "buffer_diff",
  "client",
@@ -5575,7 +5575,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
- "aagent_actions",
+ "aacode_actions",
  "aho-corasick",
  "anyhow",
  "base64 0.22.1",
@@ -6779,7 +6779,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
- "aagent_actions",
+ "aacode_actions",
  "agent_settings",
  "anyhow",
  "askpass",
@@ -6844,7 +6844,7 @@ dependencies = [
  "a_tracing",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "askpass",
  "buffer_diff",
@@ -9956,7 +9956,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "buffer_diff",
  "db",
@@ -10696,7 +10696,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "channel",
  "client",
@@ -11662,7 +11662,7 @@ dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "editor",
  "futures 0.3.34",
  "gpui",
@@ -11700,7 +11700,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "async-channel 2.5.0",
  "buffer_diff",
@@ -12605,7 +12605,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "db",
  "editor",
@@ -12726,7 +12726,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "gpui",
  "project",
  "settings",
@@ -13166,7 +13166,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "client",
  "collections",
@@ -13963,7 +13963,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "askpass",
  "chrono",
@@ -14281,7 +14281,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "async-dispatcher",
  "async-task",
@@ -15004,7 +15004,7 @@ dependencies = [
  "a_tracing",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "any_vec",
  "anyhow",
  "bitflags 2.13.2",
@@ -15425,7 +15425,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
- "aagent_actions",
+ "aacode_actions",
  "ad_credentials_provider",
  "agent",
  "agent_settings",
@@ -15593,7 +15593,7 @@ dependencies = [
  "aa_clock",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "acp_thread",
  "action_log",
  "agent",
@@ -16573,7 +16573,7 @@ checksum = "adb6935a6f5c20170eeceb1a3835a49e12e19d792f6dd344ccc76a985ca5a6ca"
 name = "task"
 version = "0.1.0"
 dependencies = [
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "collections",
  "futures 0.3.34",
@@ -16712,7 +16712,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "async-recursion",
  "breadcrumbs",
@@ -16840,7 +16840,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "editor",
  "fs",
  "fuzzy",
@@ -17063,7 +17063,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_icons",
- "aagent_actions",
+ "aacode_actions",
  "agent_settings",
  "anyhow",
  "arrayvec",
@@ -18295,7 +18295,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "anyhow",
  "async-compat",
  "async-trait",
@@ -19715,7 +19715,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aagent_actions",
+ "aacode_actions",
  "collections",
  "command_palette",
  "gpui",
@@ -20623,7 +20623,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
- "aagent_actions",
+ "aacode_actions",
  "agent_settings",
  "any_vec",
  "anyhow",

@@ -30,7 +30,7 @@ use utoipa::OpenApi;
         super::sessions::SessionSummary,
     )),
     tags(
-        (name = "AAgent", description = "AAgent API")
+        (name = "aacode", description = "aacode API")
     )
 )]
 pub(crate) struct ApiDoc;

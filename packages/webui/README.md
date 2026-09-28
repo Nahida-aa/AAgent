@@ -1,6 +1,6 @@
-# AAgent Web UI
+# aacode Web UI
 
-AAgent 的 Web 前端（Solid + TanStack Router + Tailwind），通过 HTTP/SSE 与 aa-server 通信。
+aacode 的 Web 前端（Solid + TanStack Router + Tailwind），通过 HTTP/SSE 与 aa-server 通信。
 
 ## 开发
 

@@ -14,7 +14,7 @@ use serde::Serialize;
 use std::{cmp::Reverse, path::PathBuf};
 use ui::prelude::*;
 use workspace::{ModalView, Workspace};
-use aagent_actions::ShowCallStats;
+use aacode_actions::ShowCallStats;
 
 const WEBRTC_AUDIO_SAMPLES_PER_MILLISECOND: f64 = 48.0;
 const PLAYBACK_FRAME_DURATION_MILLISECONDS: u64 = 10;

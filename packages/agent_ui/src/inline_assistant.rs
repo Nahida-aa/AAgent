@@ -50,7 +50,7 @@ use terminal_view::{TerminalView, panel::TerminalPanel};
 use ui::prelude::*;
 use util::{RangeExt, ResultExt, maybe};
 use workspace::{Toast, Workspace, dock::Panel, notifications::NotificationId};
-use aagent_actions::agent::OpenSettings;
+use aacode_actions::agent::OpenSettings;
 
 pub fn init(fs: Arc<dyn Fs>, prompt_builder: Arc<PromptBuilder>, cx: &mut App) {
     cx.set_global(InlineAssistant::new(fs, prompt_builder));
@@ -205,7 +205,7 @@ impl InlineAssistant {
 
     pub fn inline_assist(
         workspace: &mut Workspace,
-        action: &aagent_actions::assistant::InlineAssist,
+        action: &aacode_actions::assistant::InlineAssist,
         window: &mut Window,
         cx: &mut Context<Workspace>,
     ) {

@@ -43,8 +43,8 @@ use workspace::{
     WorkspaceDb, WorkspaceId,
 };
 
-use aagent_actions::agents_sidebar::FocusSidebarFilter;
-use aagent_actions::editor::{MoveDown, MoveUp};
+use aacode_actions::agents_sidebar::FocusSidebarFilter;
+use aacode_actions::editor::{MoveDown, MoveUp};
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 enum ThreadFilter {

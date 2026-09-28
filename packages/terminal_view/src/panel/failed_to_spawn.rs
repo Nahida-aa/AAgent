@@ -28,10 +28,10 @@ impl Render for FailedToSpawnTerminal {
             .menu(move |window, cx| {
                 Some(ContextMenu::build(window, cx, |context_menu, _, _| {
                     context_menu
-                        .action("Open Settings", aagent_actions::OpenSettings.boxed_clone())
+                        .action("Open Settings", aacode_actions::OpenSettings.boxed_clone())
                         .action(
                             "Edit settings.json",
-                            aagent_actions::OpenSettingsFile.boxed_clone(),
+                            aacode_actions::OpenSettingsFile.boxed_clone(),
                         )
                 }))
             })
@@ -66,7 +66,7 @@ impl Render for FailedToSpawnTerminal {
                             .child(Label::new("Edit Settings").size(LabelSize::Small))
                             .on_click(|_, window, cx| {
                                 window.dispatch_action(
-                                    aagent_actions::OpenSettings.boxed_clone(),
+                                    aacode_actions::OpenSettings.boxed_clone(),
                                     cx,
                                 );
                             }),

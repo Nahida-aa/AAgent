@@ -46,7 +46,7 @@ use workspace::searchable::{
     Direction, SearchEvent, SearchOptions, SearchToken, SearchableItem, SearchableItemHandle,
 };
 use workspace::{ItemId, Pane, SaveIntent, Workspace, WorkspaceId, delete_unloaded_items};
-use aagent_actions::{DecreaseBufferFontSize, IncreaseBufferFontSize, ResetBufferFontSize};
+use aacode_actions::{DecreaseBufferFontSize, IncreaseBufferFontSize, ResetBufferFontSize};
 
 use crate::markdown_preview_settings::MarkdownPreviewSettings;
 use crate::{

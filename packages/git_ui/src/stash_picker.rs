@@ -31,7 +31,7 @@ actions!(
 
 pub fn open(
     workspace: &mut Workspace,
-    _: &aagent_actions::git::ViewStash,
+    _: &aacode_actions::git::ViewStash,
     window: &mut Window,
     cx: &mut Context<Workspace>,
 ) {

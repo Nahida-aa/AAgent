@@ -84,7 +84,7 @@ use util::{
     serde::default_true,
 };
 use uuid::Uuid;
-use aagent_actions::{Spawn, feedback::FileBugReport, theme::ToggleMode};
+use aacode_actions::{Spawn, feedback::FileBugReport, theme::ToggleMode};
 
 pub mod app;
 pub mod core;

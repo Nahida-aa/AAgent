@@ -3,7 +3,7 @@ name = "settings"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "AAgent 设置系统 (RustEmbed default.json → gpui Global SettingsStore)"
+description = "aacode 设置系统 (RustEmbed default.json → gpui Global SettingsStore)"
 
 [features]
 test-support = ["gpui/test-support", "fs/test-support"]

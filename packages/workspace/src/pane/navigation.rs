@@ -13,7 +13,7 @@
 //! }
 //! ```
 //!
-//! AAgent 裁剪:
+//! aacode 裁剪:
 //! - `WeakItemHandle` → `EntityId`（没有 Send/Sync，GPUI 主线程）
 //! - `data` → `Option<()>` 占位（以后 Editor 存光标位置）
 //! - `timestamp` 保留，NavHistory 内部自增计数器

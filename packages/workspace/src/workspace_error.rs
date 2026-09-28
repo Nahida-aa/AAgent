@@ -1,7 +1,7 @@
 use std::{sync::Arc, time::Duration};
 
 use ui::{IconName, IconPosition};
-use aagent_actions::OpenBrowser;
+use aacode_actions::OpenBrowser;
 use gpui::{Action, SharedString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -71,9 +71,9 @@ pub fn register_action<A: Action>(
 
 This registers on the **entity's dispatch path** → Bubble window phase → executes BEFORE Bubble global → **propagate_event = false** → Bubble global never runs → no slot take issue.
 
-### Why AAgent Failed
+### Why aacode Failed
 
-AAgent had only Bubble global:
+aacode had only Bubble global:
 
 ```rust
 // BAD: Bubble global runs during take #2
@@ -146,7 +146,7 @@ for node_id in dispatch_path.iter().rev() {
 }
 ```
 
-Key finding: Zed dispatch_path node 3 (view_id=None, register_action registers on div chain not entity) had Bubble window phase Open listener with matching TypeId. AAgent had none.
+Key finding: Zed dispatch_path node 3 (view_id=None, register_action registers on div chain not entity) had Bubble window phase Open listener with matching TypeId. aacode had none.
 
 ### 3. TypeId Comparison
 

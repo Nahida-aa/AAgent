@@ -4,7 +4,7 @@ use std::{
 };
 
 use ui::{animation::DefaultAnimations, prelude::*};
-use aagent_actions::toast;
+use aacode_actions::toast;
 use gpui::{
     AnyView, DismissEvent, Entity, EntityId, FocusHandle, ManagedView, MouseButton, Subscription,
     Task,

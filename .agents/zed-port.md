@@ -1,9 +1,9 @@
-# 从 zed 搬包到 AAgent：踩过的坑与做法
+# 从 zed 搬包到 aacode：踩过的坑与做法
 
 搬 `project` 时（1000+ 错误 → 0）沉淀的规则。参照仓库在 `~/repos/learn_ls/zed`。
 **zed 源码是第一参照**，gpui-component / 自己的直觉都靠后。
 
-**AAgent crate edition: 2024** — 规则 #1 基于 Rust 2024 可见性变化。
+**aacode crate edition: 2024** — 规则 #1 基于 Rust 2024 可见性变化。
 
 ---
 
@@ -83,7 +83,7 @@ cd docs/visibility_lab && cargo check
 
 ## 2. 单文件 crate 拆多模块: 转发块什么时候需要
 
-> 这一节描述的是 **zed 原版 (单文件 project.rs) 拆成 AAgent 多模块** 的场景。
+> 这一节描述的是 **zed 原版 (单文件 project.rs) 拆成 aacode 多模块** 的场景。
 > 不是通用可见性修复模板。
 
 zed 的 `project.rs` (7000+ 行) 是 crate 根, 所有定义天然对整个 crate 可见。

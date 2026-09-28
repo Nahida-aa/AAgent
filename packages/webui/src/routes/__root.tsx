@@ -16,7 +16,7 @@ interface MyRouterContext {
 }
 export const Route = createRootRoute<MyRouterContext>({
   head: () => ({
-    title: "AAgent",
+    title: "aacode",
     meta: [
       {
         name: "viewport",

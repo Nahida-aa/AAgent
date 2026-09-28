@@ -225,7 +225,7 @@ impl Render for PendingKeystrokesIndicator {
 
         let button = ButtonLike::new("pending-keystrokes-indicator")
             .on_click(|_, window, cx| {
-                window.dispatch_action(aagent_actions::dev::OpenKeyContextView.boxed_clone(), cx);
+                window.dispatch_action(aacode_actions::dev::OpenKeyContextView.boxed_clone(), cx);
             })
             .when_some(render_state.timeout.as_ref(), |button, timeout| {
                 let remaining_fraction = if timeout.timeout_duration.is_zero() {
@@ -522,7 +522,7 @@ mod tests {
                 .on_action(|_: &LongerBinding, _, _| {})
                 .on_action(|_: &LongestBinding, _, _| {})
                 .on_action(
-                    cx.listener(|this, _: &aagent_actions::dev::OpenKeyContextView, _, _| {
+                    cx.listener(|this, _: &aacode_actions::dev::OpenKeyContextView, _, _| {
                         this.open_key_context_view_count
                             .set(this.open_key_context_view_count.get() + 1);
                     }),

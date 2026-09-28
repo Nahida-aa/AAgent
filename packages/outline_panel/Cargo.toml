@@ -31,7 +31,7 @@ ui.workspace = true
 util.workspace = true
 workspace.workspace = true
 worktree.workspace = true
-aagent_actions.workspace = true
+aacode_actions.workspace = true
 
 [dev-dependencies]
 buffer_diff.workspace = true

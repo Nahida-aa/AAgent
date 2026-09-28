@@ -77,7 +77,7 @@ const loaderMap = {
   paper: m.loader_paper,
   datapack: m.loader_datapack,
   bungeecord: m.loader_bungeecord,
-  javaagent: m.loader_javaagent,
+  javaacode: m.loader_javaacode,
   forge: m.loader_forge,
   iris: m.loader_iris,
   legacy_fabric: m.loader_legacy_fabric,

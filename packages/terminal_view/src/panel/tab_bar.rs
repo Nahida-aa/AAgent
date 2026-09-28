@@ -6,7 +6,7 @@ use terminal::Terminal;
 use ui::prelude::*;
 use ui::{ContextMenu, IconButton, IconName, IconSize, PopoverMenu, Tooltip};
 use workspace::{Pane, SplitDown, SplitLeft, SplitRight, SplitUp, ToggleZoom, Workspace};
-use aagent_actions::assistant::InlineAssist;
+use aacode_actions::assistant::InlineAssist;
 
 use super::TerminalPanel;
 
@@ -61,7 +61,7 @@ impl TerminalPanel {
                                         )
                                         .action(
                                             "Spawn Task",
-                                            aagent_actions::Spawn::modal().boxed_clone(),
+                                            aacode_actions::Spawn::modal().boxed_clone(),
                                         )
                                 });
 

@@ -13,7 +13,7 @@ use ui::Color;
 #[derive(Debug, Clone, Copy, Default)]
 pub struct TabContentParams {
     /// Zed 里有的 detail 字段 — 比如 terminal 显示 shell 名、
-    /// editor 显示 git status。AAgent 暂时不用，保留结构。
+    /// editor 显示 git status。aacode 暂时不用，保留结构。
     pub detail: Option<usize>,
     /// 当前 tab 是否被选中。
     pub selected: bool,
@@ -49,7 +49,7 @@ impl TabContentParams {
 
 /// Tab tooltip 内容 — 对齐 Zed `TabTooltipContent`。
 ///
-/// Zed 有两种：纯文本 / 自定义 view。AAgent 先只做文本版。
+/// Zed 有两种：纯文本 / 自定义 view。aacode 先只做文本版。
 pub enum TabTooltipContent {
     Text(SharedString),
     // 预留 Custom — 以后 Editor 可以显示完整路径 + git status 等

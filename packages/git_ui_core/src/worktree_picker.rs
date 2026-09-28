@@ -24,7 +24,7 @@ use workspace::{
 
 use crate::notifications::show_error_toast;
 use crate::worktree_service::{RemoteBranchName, WorktreeCreateTarget, worktree_create_targets};
-use aagent_actions::{
+use aacode_actions::{
     CreateWorktree, NewWorktreeBranchTarget, OpenWorktreeInNewWindow, OpenWorktreeSetupTasks,
     SwitchWorktree,
 };

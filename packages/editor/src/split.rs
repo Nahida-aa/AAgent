@@ -40,7 +40,7 @@ use crate::{
     actions::{DisableBreakpoint, EditLogBreakpoint, EnableBreakpoint, ToggleBreakpoint},
     display_map::Companion,
 };
-use aagent_actions::{OpenSettingsAt, assistant::InlineAssist};
+use aacode_actions::{OpenSettingsAt, assistant::InlineAssist};
 
 pub(crate) fn patches_for_lhs_range(
     rhs_snapshot: &MultiBufferSnapshot,

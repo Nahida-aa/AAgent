@@ -329,7 +329,7 @@ pub fn init(cx: &mut App) {
 
         workspace.register_action(|_, _: &ToggleProjectPanelFocus, window, cx| {
             if Vim::take_count(cx).is_none() {
-                window.dispatch_action(aagent_actions::project_panel::ToggleFocus.boxed_clone(), cx);
+                window.dispatch_action(aacode_actions::project_panel::ToggleFocus.boxed_clone(), cx);
             }
         });
 
@@ -358,7 +358,7 @@ pub fn init(cx: &mut App) {
             };
         });
 
-        workspace.register_action(|_, _: &aagent_actions::vim::OpenDefaultKeymap, _, cx| {
+        workspace.register_action(|_, _: &aacode_actions::vim::OpenDefaultKeymap, _, cx| {
             cx.emit(workspace::Event::OpenBundledFile {
                 text: settings::vim_keymap(),
                 title: "Default Vim Bindings",

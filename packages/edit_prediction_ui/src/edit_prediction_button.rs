@@ -40,7 +40,7 @@ use workspace::{
     HideStatusItem, StatusItemView, Toast, Workspace, create_and_open_local_file, item::ItemHandle,
     notifications::NotificationId,
 };
-use aagent_actions::{OpenBrowser, OpenSettingsAt};
+use aacode_actions::{OpenBrowser, OpenSettingsAt};
 
 use crate::{RatePredictions, rate_prediction_modal::PredictEditsRatePredictionsFeatureFlag};
 
@@ -411,7 +411,7 @@ impl Render for EditPredictionButton {
                                     source = "Edit Prediction Status Button"
                                 );
                                 window.dispatch_action(
-                                    aagent_actions::OpenZedPredictOnboarding.boxed_clone(),
+                                    aacode_actions::OpenZedPredictOnboarding.boxed_clone(),
                                     cx,
                                 );
                             })),

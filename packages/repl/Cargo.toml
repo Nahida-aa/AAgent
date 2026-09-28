@@ -50,7 +50,7 @@ util.workspace = true
 uuid.workspace = true
 workspace.workspace = true
 picker.workspace = true
-aagent_actions.workspace = true
+aacode_actions.workspace = true
 
 [dev-dependencies]
 async-trait.workspace = true

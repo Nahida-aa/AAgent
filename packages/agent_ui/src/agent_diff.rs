@@ -36,7 +36,7 @@ use workspace::{
     item::{ItemEvent, SaveOptions, TabContentParams, TabTooltipContent},
     searchable::SearchableItemHandle,
 };
-use aagent_actions::assistant::ToggleFocus;
+use aacode_actions::assistant::ToggleFocus;
 
 pub struct AgentDiffPane {
     multibuffer: Entity<MultiBuffer>,

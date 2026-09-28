@@ -10,7 +10,7 @@ use gpui::{
 };
 use ui::{AgentThreadStatus, ThreadItem, ThreadItemWorktreeInfo, WithScrollbar, prelude::*};
 use workspace::{ModalView, Workspace};
-use aagent_actions::agents_sidebar::ToggleThreadSwitcher;
+use aacode_actions::agents_sidebar::ToggleThreadSwitcher;
 
 use super::ThreadEntryWorkspace;
 

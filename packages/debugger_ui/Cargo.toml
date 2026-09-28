@@ -64,7 +64,7 @@ ui_input.workspace = true
 unindent = { workspace = true, optional = true }
 util.workspace = true
 workspace.workspace = true
-aagent_actions.workspace = true
+aacode_actions.workspace = true
 
 [dev-dependencies]
 dap = { workspace = true, features = ["test-support"] }

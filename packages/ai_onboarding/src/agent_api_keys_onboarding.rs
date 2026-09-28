@@ -139,7 +139,7 @@ impl RenderOnce for ApiKeysWithoutProviders {
                     .full_width()
                     .style(ButtonStyle::Outlined)
                     .on_click(move |_, window, cx| {
-                        window.dispatch_action(aagent_actions::agent::OpenSettings.boxed_clone(), cx);
+                        window.dispatch_action(aacode_actions::agent::OpenSettings.boxed_clone(), cx);
                     }),
             )
     }

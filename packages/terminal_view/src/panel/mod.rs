@@ -2,7 +2,7 @@
 //!
 //! 对齐 Zed `crates/terminal_view/src/terminal_panel.rs`。
 //! Zed 版持有完整 PaneGroup + 多 pane + 持久化 + action handler。
-//! AAgent 最小版：一个 active_pane，每次 new_terminal() 创建 TerminalView 加进去。
+//! aacode 最小版：一个 active_pane，每次 new_terminal() 创建 TerminalView 加进去。
 
 pub mod inline_assist_tab_bar_button;
 pub mod terminal_provider;

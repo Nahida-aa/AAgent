@@ -12,7 +12,7 @@ use theme_settings::{IconThemeName, IconThemeSelection, ThemeSettings};
 use ui::{ListItem, ListItemSpacing, prelude::*, v_flex};
 use util::ResultExt;
 use workspace::{ModalView, ui::HighlightedLabel};
-use aagent_actions::{ExtensionCategoryFilter, Extensions};
+use aacode_actions::{ExtensionCategoryFilter, Extensions};
 
 pub(crate) struct IconThemeSelector {
     picker: Entity<Picker<IconThemeSelectorDelegate>>,
@@ -425,7 +425,7 @@ mod tests {
         workspace: &Entity<workspace::Workspace>,
         cx: &mut VisualTestContext,
     ) -> Entity<Picker<IconThemeSelectorDelegate>> {
-        cx.dispatch_action(aagent_actions::icon_theme_selector::Toggle {
+        cx.dispatch_action(aacode_actions::icon_theme_selector::Toggle {
             themes_filter: None,
         });
         cx.run_until_parked();

@@ -340,7 +340,7 @@ mod tests {
         time::Duration,
     };
 
-    use aagent_actions::editor::MoveDown;
+    use aacode_actions::editor::MoveDown;
     use futures::StreamExt as _;
     use gpui::{App, TestAppContext};
     use language::highlight_ranges_from_text;

@@ -23,7 +23,7 @@ use ui::{
 };
 use util::rel_path::RelPath;
 use workspace::{ParticipantLocation, notifications::DetachAndPromptErr};
-use aagent_actions::ShowCallStats;
+use aacode_actions::ShowCallStats;
 
 use crate::TitleBar;
 

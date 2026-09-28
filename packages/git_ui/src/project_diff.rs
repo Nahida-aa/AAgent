@@ -37,7 +37,7 @@ use workspace::{
     item::{Item, ItemEvent, ItemHandle, SaveOptions},
     searchable::SearchableItemHandle,
 };
-use aagent_actions::git as git_actions;
+use aacode_actions::git as git_actions;
 
 actions!(
     git,
@@ -1029,7 +1029,7 @@ mod tests {
         });
     }
 
-    use aagent_actions::git as git_actions;
+    use aacode_actions::git as git_actions;
 
     use crate::project_diff::{self, ProjectDiff};
 

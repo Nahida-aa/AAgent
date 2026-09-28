@@ -18,7 +18,7 @@ use crate::{SettingsContent, SettingsLocation};
 /// 对齐 Zed：
 /// - `global_value` — 全局（worktree 级别）的 setting 值
 /// - `local_values` — per-worktree + per-project 的本地覆盖
-///   当前 AAgent 还没多 worktree / 多 workspace，Vec 始终为空，
+///   当前 aacode 还没多 worktree / 多 workspace，Vec 始终为空，
 ///   但 Zed 形状先完整搭好，以后直接填值。
 #[doc(hidden)]
 #[derive(Debug)]

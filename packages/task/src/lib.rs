@@ -18,7 +18,7 @@ mod vscode_format;
 
 pub mod static_source;
 
-pub use aagent_actions::RevealTarget;
+pub use aacode_actions::RevealTarget;
 pub use adapter_schema::{AdapterSchema, AdapterSchemas};
 pub use context::{SharedTaskContext, TaskContext};
 pub use debug_format::{

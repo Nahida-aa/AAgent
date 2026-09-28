@@ -1,6 +1,6 @@
 //! PaneGroup — 递归 split 树，对齐 zed `crates/workspace/src/pane_group.rs`。
 //!
-//! Zed PaneGroup 是普通 struct（非 GPUI entity），AAgent 保持一致。
+//! Zed PaneGroup 是普通 struct（非 GPUI entity），aacode 保持一致。
 //! - `Member::Pane(Entity<Pane>)` — 叶子
 //! - `Member::PaneGroup(PaneGroup)` — 内部节点（可以继续 split）
 //! - `axis: Axis` — 叶子们怎么排（Horizontal=上下, Vertical=左右）

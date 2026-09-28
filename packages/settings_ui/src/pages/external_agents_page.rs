@@ -287,7 +287,7 @@ pub(crate) fn render_add_agent_popover(
                         original_window
                             .update(cx, |_, window, cx| {
                                 window.activate_window();
-                                window.dispatch_action(Box::new(aagent_actions::AcpRegistry), cx);
+                                window.dispatch_action(Box::new(aacode_actions::AcpRegistry), cx);
                             })
                             .log_err();
                     }

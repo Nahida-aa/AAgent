@@ -13,7 +13,7 @@ use gpui::{
 use gpui::{WeakEntity, linear_color_stop, linear_gradient};
 use menu::{SelectNext, SelectPrevious};
 
-use aagent_actions::{
+use aacode_actions::{
     Extensions, OpenKeymap, OpenOnboarding, OpenSettings, assistant::ToggleFocus, command_palette,
 };
 use gpui_util::ResultExt;
@@ -319,7 +319,7 @@ impl WelcomePage {
                         })
                         .log_err();
                 } else {
-                    use aagent_actions::OpenRecent;
+                    use aacode_actions::OpenRecent;
                     window.dispatch_action(OpenRecent::default().boxed_clone(), cx);
                 }
             }

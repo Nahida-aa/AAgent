@@ -11,7 +11,7 @@ use settings::SidebarSide;
 use super::sidebar::DraggedSidebar;
 use super::{MultiWorkspace, SIDEBAR_RESIZE_HANDLE_SIZE};
 use crate::client_side_decorations;
-use aagent_actions::agents_sidebar::ToggleThreadSwitcher;
+use aacode_actions::agents_sidebar::ToggleThreadSwitcher;
 
 impl Render for MultiWorkspace {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {

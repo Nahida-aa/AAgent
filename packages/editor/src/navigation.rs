@@ -1157,7 +1157,7 @@ impl Editor {
                 cx.update(|window, cx| {
                     if parse_zed_link(&url, cx).is_some() {
                         window.dispatch_action(
-                            Box::new(aagent_actions::OpenZedUrl { url: url.into() }),
+                            Box::new(aacode_actions::OpenZedUrl { url: url.into() }),
                             cx,
                         );
                     } else {
@@ -1853,7 +1853,7 @@ impl Editor {
                         cx.update(|window, cx| {
                             if parse_zed_link(&url, cx).is_some() {
                                 window.dispatch_action(
-                                    Box::new(aagent_actions::OpenZedUrl { url: url.into() }),
+                                    Box::new(aacode_actions::OpenZedUrl { url: url.into() }),
                                     cx,
                                 );
                             } else {

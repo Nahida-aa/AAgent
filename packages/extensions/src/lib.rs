@@ -1,4 +1,4 @@
-//! AAgent Extension 加载器和运行时。
+//! aacode Extension 加载器和运行时。
 
 pub mod host_router;
 pub mod loader;

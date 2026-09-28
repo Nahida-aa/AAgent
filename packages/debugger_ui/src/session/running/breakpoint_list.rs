@@ -24,7 +24,7 @@ use ui::{
 };
 use util::paths::PathExt;
 use workspace::Workspace;
-use aagent_actions::{ToggleEnableBreakpoint, UnsetBreakpoint};
+use aacode_actions::{ToggleEnableBreakpoint, UnsetBreakpoint};
 
 actions!(
     debugger,

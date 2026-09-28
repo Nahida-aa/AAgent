@@ -44,7 +44,7 @@ util.workspace = true
 util_macros.workspace = true
 vim_mode_setting.workspace = true
 workspace.workspace = true
-aagent_actions.workspace = true
+aacode_actions.workspace = true
 
 [dev-dependencies]
 command_palette = { workspace = true, features = ["test-support"] }

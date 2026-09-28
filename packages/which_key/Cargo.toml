@@ -13,7 +13,7 @@ ui.workspace = true
 util.workspace = true
 vim_mode_setting.workspace = true
 workspace.workspace = true
-aagent_actions.workspace = true
+aacode_actions.workspace = true
 
 [dev-dependencies]
 collections.workspace = true

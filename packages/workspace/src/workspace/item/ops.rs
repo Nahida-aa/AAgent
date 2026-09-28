@@ -1,4 +1,4 @@
-// /home/aa/repos/ai_ls/AAgent/packages/workspace/src/workspace/item/ops.rs
+// /home/aa/repos/ai_ls/aacode/packages/workspace/src/workspace/item/ops.rs
 use super::*;
 impl Workspace {
     // 打开

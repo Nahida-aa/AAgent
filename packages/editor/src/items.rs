@@ -7,7 +7,7 @@ use crate::{
     persistence::{EditorDb, SerializedEditor},
     scroll::{ScrollAnchor, ScrollOffset},
 };
-use aagent_actions::preview::{
+use aacode_actions::preview::{
     markdown::OpenPreview as OpenMarkdownPreview, svg::OpenPreview as OpenSvgPreview,
 };
 use anyhow::{Context as _, Result, anyhow};

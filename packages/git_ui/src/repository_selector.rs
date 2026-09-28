@@ -13,7 +13,7 @@ pub fn register(workspace: &mut Workspace) {
 
 pub fn open(
     workspace: &mut Workspace,
-    _: &aagent_actions::git::SelectRepo,
+    _: &aacode_actions::git::SelectRepo,
     window: &mut Window,
     cx: &mut Context<Workspace>,
 ) {

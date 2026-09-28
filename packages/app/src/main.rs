@@ -1,4 +1,4 @@
-//! AAgent desktop — main entry.
+//! aacode desktop — main entry.
 //!
 //! 对齐 Zed `crates/zed/src/main.rs` 完整结构：
 //! - **app.run 闭包外层**：构建 `AppDatabase`、`RealFs`、启动 `Session::new` async task。
@@ -62,7 +62,7 @@ fn main() {
         // —— HTTP client（对齐 Zed main.rs L508-L528）——
         // 先给 gpui 一个 ReqwestClient，Client::production 内部要用；
         // 再用 client.http_client()（带 server URL 前缀的 HttpClientWithUrl）覆盖。
-        let user_agent = format!("AAgent/{}", env!("CARGO_PKG_VERSION"));
+        let user_agent = format!("aacode/{}", env!("CARGO_PKG_VERSION"));
         let http = {
             let _guard = gpui_tokio::Tokio::handle(cx).enter();
             reqwest_client::ReqwestClient::proxy_and_user_agent(None, &user_agent)
@@ -81,7 +81,7 @@ fn main() {
 
         // —— NodeRuntime ——
         // Zed 从 SettingsStore 变化建 watch channel 传 node binary options；
-        // AAgent 先传空 channel（None 作为 shell_env_loaded_rx，watch::channel(None) 作为 options）。
+        // aacode 先传空 channel（None 作为 shell_env_loaded_rx，watch::channel(None) 作为 options）。
         let (_node_options_tx, node_options_rx) = watch::channel(None);
         let node_runtime =
             node_runtime::NodeRuntime::new(client.http_client(), None, node_options_rx);
@@ -118,7 +118,7 @@ fn main() {
                     window_background: cx.theme().window_background_appearance(),
                     titlebar: Some(gpui::TitlebarOptions {
                         appears_transparent: true,
-                        title: Some(SharedString::from("AAgent")),
+                        title: Some(SharedString::from("aacode")),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -153,15 +153,15 @@ fn main() {
         aa_app_lib::initialize::initialize_workspace(app_state.clone(), cx);
 
         // —— 设置应用菜单（application_menu 靠 cx.get_menus() 读取数据）——
-        // Zed 原版由 app_menus.rs 构建完整菜单体系；AAgent 还没迁完整，
+        // Zed 原版由 app_menus.rs 构建完整菜单体系；aacode 还没迁完整，
         // 先提供简化版本让 application_menu 能渲染出来。
         // 放在 open_window 之前因为 title_bar::init 已在上面 observe 了 Workspace。
         cx.set_menus(vec![
             Menu {
-                name: "AAgent".into(),
+                name: "aacode".into(),
                 disabled: false,
                 items: vec![
-                    MenuItem::action("About AAgent", NoAction),
+                    MenuItem::action("About aacode", NoAction),
                     MenuItem::separator(),
                     MenuItem::action("Settings", NoAction),
                 ],
@@ -202,8 +202,8 @@ fn main() {
                     MenuItem::action("Toggle Terminal", NoAction),
                     MenuItem::action("Toggle Sidebar", NoAction),
                     MenuItem::separator(),
-                    MenuItem::action("Themes...", aagent_actions::theme_selector::Toggle { themes_filter: None }),
-                    MenuItem::action("Icon Themes...", aagent_actions::icon_theme_selector::Toggle { themes_filter: None }),
+                    MenuItem::action("Themes...", aacode_actions::theme_selector::Toggle { themes_filter: None }),
+                    MenuItem::action("Icon Themes...", aacode_actions::icon_theme_selector::Toggle { themes_filter: None }),
                     MenuItem::separator(),
                     MenuItem::action("Zoom In", NoAction),
                     MenuItem::action("Zoom Out", NoAction),

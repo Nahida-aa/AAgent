@@ -3,7 +3,7 @@
 //! Zed 在 `crates/workspace/src/item.rs` 定义了 ~50 个方法的大 trait +
 //! ItemSettings + PreviewTabsSettings + TabContentParams 等。
 //!
-//! AAgent 拆分成子模块：
+//! aacode 拆分成子模块：
 //! - [handle] — ItemHandle（强引用）+ WeakItemHandle（弱引用）+ Item（强类型）
 //! - [settings] — ItemSettings / PreviewTabsSettings / ClosePosition 等
 //! - [tab] — TabContentParams / TabTooltipContent / ItemBufferKind

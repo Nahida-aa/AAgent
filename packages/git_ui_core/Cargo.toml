@@ -34,7 +34,7 @@ ui.workspace = true
 util.workspace = true
 watch.workspace = true
 workspace.workspace = true
-aagent_actions.workspace = true
+aacode_actions.workspace = true
 zeroize.workspace = true
 a_tracing.workspace = true
 

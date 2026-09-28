@@ -10,7 +10,7 @@ use ui::{
     ButtonLike, ContextMenu, ContextMenuEntry, DocumentationSide, ElevationIndex, KeybindingHint,
     PopoverMenu, PopoverMenuHandle, SplitButton, Tooltip, prelude::*,
 };
-use aagent_actions::{DecreaseBufferFontSize, IncreaseBufferFontSize, ResetBufferFontSize};
+use aacode_actions::{DecreaseBufferFontSize, IncreaseBufferFontSize, ResetBufferFontSize};
 
 use editor::{Editor, EditorElement};
 use gpui::*;
@@ -393,7 +393,7 @@ impl CommitModal {
                     .color(Color::Placeholder),
             )
             .on_click(cx.listener(|_, _, window, cx| {
-                window.dispatch_action(aagent_actions::git::Branch.boxed_clone(), cx);
+                window.dispatch_action(aacode_actions::git::Branch.boxed_clone(), cx);
             }));
 
         let branch_picker = PopoverMenu::new("popover-button")
@@ -409,7 +409,7 @@ impl CommitModal {
             .with_handle(self.branch_list_handle.clone())
             .trigger_with_tooltip(
                 branch_picker_button,
-                Tooltip::for_action_title("Switch Branch", &aagent_actions::git::Branch),
+                Tooltip::for_action_title("Switch Branch", &aacode_actions::git::Branch),
             )
             .anchor(Anchor::BottomLeft)
             .offset(gpui::Point {
@@ -626,17 +626,17 @@ impl Render for CommitModal {
                 }))
             })
             .on_action(
-                cx.listener(|this, _: &aagent_actions::git::Branch, window, cx| {
+                cx.listener(|this, _: &aacode_actions::git::Branch, window, cx| {
                     this.toggle_branch_selector(window, cx);
                 }),
             )
             .on_action(
-                cx.listener(|this, _: &aagent_actions::git::CheckoutBranch, window, cx| {
+                cx.listener(|this, _: &aacode_actions::git::CheckoutBranch, window, cx| {
                     this.toggle_branch_selector(window, cx);
                 }),
             )
             .on_action(
-                cx.listener(|this, _: &aagent_actions::git::Switch, window, cx| {
+                cx.listener(|this, _: &aacode_actions::git::Switch, window, cx| {
                     this.toggle_branch_selector(window, cx);
                 }),
             )

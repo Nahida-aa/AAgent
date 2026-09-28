@@ -8,4 +8,4 @@ use super::*;
 pub mod debug;
 pub mod terminal;
 pub use terminal::TerminalProvider;
-pub(crate) use debug::DebuggerProvider;
+pub use debug::DebuggerProvider;

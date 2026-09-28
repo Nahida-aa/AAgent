@@ -215,7 +215,7 @@ impl Console {
                         let range = buffer.anchor_after(MultiBufferOffset(range.start))
                             ..buffer.anchor_before(MultiBufferOffset(range.end));
                         let style = HighlightStyle {
-                            color: Some(terminal_view::terminal_element::convert_color(
+                            color: Some(terminal_view::element::convert_color(
                                 &color,
                                 cx.theme(),
                             )),
@@ -791,7 +791,7 @@ fn background_color_fetcher(color: terminal::Color) -> impl Fn(&Theme) -> Hsla {
         if terminal::is_default_background_color(color) {
             theme.colors().terminal_background
         } else {
-            terminal_view::terminal_element::convert_color(&color, theme)
+            terminal_view::element::convert_color(&color, theme)
         }
     }
 }

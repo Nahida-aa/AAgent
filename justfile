@@ -1,6 +1,10 @@
 run-app:
     cargo run -p aa-app
 
+# 清理
+clean:
+    cargo clean
+
 # tools
 ## outline —— 打印源文件的符号大纲（zed 的 tree-sitter outline.scm）
 ## 用法：just outline <文件...> [fields=...]

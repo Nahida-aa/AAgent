@@ -214,12 +214,12 @@ pub use crate::workspace::{
         file::create_and_open_local_file
     },
 
-    pane::ops::move_active_item,
+    pane::ops::{move_active_item, move_item},
     registries::{
         FollowableViewRegistry, project_item::register_project_item,
         serializable_item::register_serializable_item,
     },
-    providers::{TerminalProvider},
+    providers::{TerminalProvider, DebuggerProvider},
     serialize::SERIALIZATION_THROTTLE_TIME,
     item::permalink::{copy_file_permalink, open_file_permalink},
 };
@@ -237,7 +237,6 @@ use workspace::{
     open::prompt::{PromptForNewPath, PromptForOpenPath},
     open::windows::workspace_windows_for_location,
     pane::ActivateInDirectionTarget,
-    providers::{DebuggerProvider, },
     registries::{ProjectItemRegistry, SerializableItemRegistry},
     serialize::WorkspaceLocation,
     serialize::flush::flush_windows_serialization,
@@ -247,7 +246,6 @@ use workspace::{
 use workspace::follow::{follower::Follower, state::FollowerView};
 
 use workspace::open::options::WorkspacePosition;
-use workspace::pane::ops::move_item;
 use workspace::registries::project_item::WorkspaceItemBuilder;
 // dock constant
 use dock::PANEL_SIZE_STATE_KEY;

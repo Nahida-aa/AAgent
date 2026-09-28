@@ -26,11 +26,13 @@ pub fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Ta
         let outline_panel = OutlinePanel::load(workspace_handle.clone(), cx.clone());
         let git_panel = GitPanel::load(workspace_handle.clone(), cx.clone());
         let collab_panel = CollabPanel::load(workspace_handle.clone(), cx.clone());
-        let debug_panel = DebugPanel::load(workspace_handle.clone(), cx.clone());
         let terminal_panel = TerminalPanel::load(workspace_handle.clone(), cx.clone());
         // AgentPanel: Zed 通过 setup_or_teardown_ai_panel 注册（crates/zed/src/zed.rs L820），
         // 简化版：直接 load + add_panel
         let agent_panel = AgentPanel::load(workspace_handle.clone(), cx.clone());
+        // DebugPanel::load takes &mut AsyncWindowContext (unlike other panels which take owned).
+        // Call last so cx is still available for preceding clone() calls.
+        let debug_panel = DebugPanel::load(workspace_handle.clone(), cx);
 
         async fn add_panel_when_ready(
             name: &str,

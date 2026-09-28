@@ -214,6 +214,7 @@ pub use crate::workspace::{
     },
     providers::{TerminalProvider},
     serialize::SERIALIZATION_THROTTLE_TIME,
+    item::permalink::{copy_file_permalink, open_file_permalink},
 };
 use workspace::{
     collab::room_project::join_in_room_project,
@@ -224,7 +225,6 @@ use workspace::{
     dock::render::DraggedDock,
     follow::leader_border_for_pane,
     follow::{AutoWatch, FollowerState},
-    item::permalink::{copy_file_permalink, open_file_permalink},
     open::local::{open_items, open_workspace_by_id},
     open::matching::{WorkspaceMatching, },
     open::options::{ OpenResult},

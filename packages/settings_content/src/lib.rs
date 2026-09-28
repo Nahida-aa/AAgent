@@ -107,8 +107,9 @@ pub use crate::{
         opening::{DefaultOpenBehavior, RestoreOnStartupBehavior},
         pane_split::BottomDockLayout,
         project_panel::{
-            ProjectPanelScrollbarSettingsContent, ProjectPanelSettingsContent,
-            ProjectPanelSortMode, ProjectPanelSortOrder,
+            ProjectPanelEntrySpacing, ProjectPanelScrollbarSettingsContent,
+            ProjectPanelSettingsContent, ProjectPanelSortMode, ProjectPanelSortOrder,
+            ProjectPanelTitleTooltipDelay,
         },
     },
 };
@@ -155,8 +156,7 @@ pub use theme::{
     WindowBackgroundContent,
     // font::FontSettingsContent,
 };
-pub use ui::{DockPosition, DockSide, ModalWidthContent};
-use ui::ShowIndentGuides;
+pub use ui::{DockPosition, DockSide, ModalWidthContent, ShowIndentGuides};
 pub use workspace::folder_indicator::FolderIndicator;
 
 #[with_fallible_options]

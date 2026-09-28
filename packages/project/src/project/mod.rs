@@ -205,4 +205,15 @@ impl Project {
     pub fn buffer_for_id(&self, remote_id: BufferId, cx: &App) -> Option<Entity<Buffer>> {
         self.buffer_store.read(cx).get(remote_id)
     }
+
+    /// Zed 远程项目功能 — 我们没移植，返回错误
+    pub fn download_file(
+        &mut self,
+        _worktree_id: WorktreeId,
+        _path: Arc<RelPath>,
+        _destination_path: std::path::PathBuf,
+        _cx: &mut Context<Self>,
+    ) -> Task<anyhow::Result<()>> {
+        Task::ready(Err(anyhow::anyhow!("download_file: remote projects not supported")))
+    }
 }

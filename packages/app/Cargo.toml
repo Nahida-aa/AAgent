@@ -139,6 +139,7 @@ terminal_view.workspace = true
 title_bar.workspace = true
 settings.workspace = true
 settings_ui.workspace = true
+release_channel.workspace = true
 tokio.workspace = true
 gpui_util.workspace = true
 util.workspace = true

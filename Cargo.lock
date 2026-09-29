@@ -115,6 +115,7 @@ dependencies = [
  "prompt_store",
  "rayon",
  "recent_projects",
+ "release_channel 0.1.0",
  "remote",
  "remote_server",
  "repl",

@@ -157,6 +157,9 @@ fn main() {
             cx,
         );
 
+        // —— Release channel（对齐 Zed main.rs L492）——
+        release_channel::init(semver::Version::new(0, 1, 0), cx);
+
         // —— Workspace 全局 action ——
         workspace::init(app_state.clone(), cx);
 

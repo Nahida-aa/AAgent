@@ -136,7 +136,7 @@ impl SandboxSection {
     }
 }
 
-#[derive(Clone, IntoElement, RegisterComponent)]
+#[derive(Clone, IntoElement)]
 pub enum SandboxStatusTooltip {
     Enabled {
         settings: SandboxSection,

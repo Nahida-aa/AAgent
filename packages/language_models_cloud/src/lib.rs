@@ -499,14 +499,12 @@ pub fn language_model(model: &cloud_llm_client::LanguageModel) -> LanguageModel 
             OpenAi => OPEN_AI_PROVIDER_ID,
             Google => GOOGLE_PROVIDER_ID,
             XAi => X_AI_PROVIDER_ID,
-            Baseten => OPEN_AI_PROVIDER_ID,
         }),
         upstream_provider_name: Some(match model.provider {
             Anthropic => ANTHROPIC_PROVIDER_NAME,
             OpenAi => OPEN_AI_PROVIDER_NAME,
             Google => GOOGLE_PROVIDER_NAME,
             XAi => X_AI_PROVIDER_NAME,
-            Baseten => OPEN_AI_PROVIDER_NAME,
         }),
         is_latest: model.is_latest,
         disabled_reason: if model.is_disabled {
@@ -899,8 +897,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
             // above holds, but a provider mismatch should degrade to the
             // same unsupported error rather than panic.
             cloud_llm_client::LanguageModelProvider::Google
-            | cloud_llm_client::LanguageModelProvider::XAi
-            | cloud_llm_client::LanguageModelProvider::Baseten => async {
+            | cloud_llm_client::LanguageModelProvider::XAi => async {
                 Err(LanguageModelCompletionError::Other(anyhow::anyhow!(
                     "this cloud model does not support explicit compaction"
                 )))
@@ -1059,8 +1056,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
                 });
                 async move { Ok(future.await?.boxed()) }.boxed()
             }
-            cloud_llm_client::LanguageModelProvider::OpenAi
-            | cloud_llm_client::LanguageModelProvider::Baseten => {
+            cloud_llm_client::LanguageModelProvider::OpenAi => {
                 let http_client = self.http_client.clone();
                 let token_provider = self.token_provider.clone();
                 let request = match open_ai_request(&config, request) {
@@ -1299,8 +1295,7 @@ pub fn provider_name(
 ) -> LanguageModelProviderName {
     match provider {
         cloud_llm_client::LanguageModelProvider::Anthropic => ANTHROPIC_PROVIDER_NAME,
-        cloud_llm_client::LanguageModelProvider::OpenAi
-        | cloud_llm_client::LanguageModelProvider::Baseten => OPEN_AI_PROVIDER_NAME,
+        cloud_llm_client::LanguageModelProvider::OpenAi => OPEN_AI_PROVIDER_NAME,
         cloud_llm_client::LanguageModelProvider::Google => GOOGLE_PROVIDER_NAME,
         cloud_llm_client::LanguageModelProvider::XAi => X_AI_PROVIDER_NAME,
     }

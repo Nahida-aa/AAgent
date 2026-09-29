@@ -5,7 +5,7 @@ use client::zed_urls;
 use gpui::{AnyElement, App, IntoElement, RenderOnce, Window};
 use ui::{Divider, Tooltip, prelude::*};
 
-#[derive(IntoElement, RegisterComponent)]
+#[derive(IntoElement)]
 pub struct EndTrialUpsell {
     dismiss_upsell: Arc<dyn Fn(&mut Window, &mut App)>,
 }

@@ -1168,7 +1168,6 @@ mod tests {
     }
 }
 
-#[derive(RegisterComponent)]
 pub struct ElicitationCardPreview;
 
 impl Component for ElicitationCardPreview {

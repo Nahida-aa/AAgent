@@ -6,12 +6,12 @@ use command_palette_hooks::CommandPaletteFilter;
 use edit_prediction::ResetOnboarding;
 use edit_prediction_context_view::EditPredictionContextView;
 use feature_flags::FeatureFlagAppExt as _;
-use gpui::{App,actions};
+use gpui::actions;
 use project::DisableAiSettings;
 use rate_prediction_modal::RatePredictionsModal;
 use settings::{Settings as _, SettingsStore};
 use std::any::{Any as _, TypeId};
-use ui::{ prelude::*};
+use ui::{App, prelude::*};
 use workspace::{SplitDirection, Workspace};
 
 pub use edit_prediction_button::{

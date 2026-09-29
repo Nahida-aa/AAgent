@@ -75,6 +75,7 @@ pub struct TerminalView {
     pub(super) rename_editor_subscription: Option<Subscription>,
     pub(super) _subscriptions: Vec<Subscription>,
     pub(super) _terminal_subscriptions: Vec<Subscription>,
+    pub(super) read_only: bool,
 }
 
 impl EventEmitter<Event> for TerminalView {}
@@ -161,7 +162,19 @@ impl TerminalView {
             rename_editor_subscription: None,
             _subscriptions: subscriptions,
             _terminal_subscriptions: terminal_subscriptions,
+            read_only: false,
         }
+    }
+
+    /// Returns whether this terminal view is in read-only mode.
+    pub fn is_read_only(&self) -> bool {
+        self.read_only
+    }
+
+    /// Sets whether this terminal view is in read-only mode.
+    pub fn with_read_only(mut self, read_only: bool) -> Self {
+        self.read_only = read_only;
+        self
     }
     ///Create a new Terminal in the current working directory or the user's home directory
     pub fn deploy(

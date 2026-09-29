@@ -14,7 +14,7 @@ pub struct TerminalSandboxWarning {
     pub docs_url: SharedString,
 }
 
-#[derive(IntoElement, RegisterComponent)]
+#[derive(IntoElement)]
 pub struct TerminalToolHeader {
     id: SharedString,
     hover_group: SharedString,

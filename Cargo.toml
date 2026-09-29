@@ -543,6 +543,7 @@ icons = { package = "aa_icons", git = "https://github.com/Nahida-aa/gpui_learn.g
 aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
 ui_input = { package = "aa_gpui_kit_ui_input", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
 component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
+aa_gpui_kit_component = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "c712ba162bd10c1a3a62d10c577acd8c06842249" }
 
 
 crashes = { git = "https://github.com/zed-industries/zed", rev = "bd747337d7be138834e20972b9e203c7b239cc47" }

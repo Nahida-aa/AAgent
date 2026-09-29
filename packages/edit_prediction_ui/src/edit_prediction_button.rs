@@ -1431,7 +1431,7 @@ async fn open_disabled_globs_setting_in_editor(
                         .edit_predictions
                         .get_or_insert_with(Default::default)
                         .disabled_globs
-                        .get_or_insert_with(Vec::new);
+                        .get_or_insert_with(<settings::SplicingVec as Default>::default);
                 })
                 .log_err()
             else {

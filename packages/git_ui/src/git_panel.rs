@@ -9393,7 +9393,7 @@ impl Render for GitPanelMessageTooltip {
     }
 }
 
-#[derive(IntoElement, RegisterComponent)]
+#[derive(IntoElement)]
 pub struct PanelRepoFooter {
     active_repository: SharedString,
     branch: Option<Branch>,

@@ -46,7 +46,7 @@ use project::{DisableAiSettings, Project};
 use prompt_store::PromptBuilder;
 use settings::{Settings, SettingsStore};
 
-use terminal_view::{TerminalView, terminal_panel::TerminalPanel};
+use terminal_view::{TerminalView, panel::TerminalPanel};
 use ui::prelude::*;
 use util::{RangeExt, ResultExt, maybe};
 use workspace::{Toast, Workspace, dock::Panel, notifications::NotificationId};

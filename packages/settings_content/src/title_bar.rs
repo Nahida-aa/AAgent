@@ -117,6 +117,10 @@ pub struct TitleBarSettingsContent {
     ///
     /// Default: false
     pub show_menus: Option<bool>,
+    /// Whether hovering over the title bar menus opens them immediately.
+    ///
+    /// Default: false
+    pub open_menus_on_hover: Option<bool>,
     /// The layout of window control buttons in the title bar (Linux only).
     ///
     /// This can be set to "platform_default" to follow the system configuration, or

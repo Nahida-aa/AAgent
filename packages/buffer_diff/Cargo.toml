@@ -7,6 +7,9 @@ license.workspace = true
 [features]
 test-support = ["settings"]
 
+[lib]
+doctest = false
+
 [dependencies]
 clock.workspace = true
 imara-diff.workspace = true

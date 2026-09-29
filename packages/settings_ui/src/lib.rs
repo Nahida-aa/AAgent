@@ -47,7 +47,7 @@ use workspace::{
     AppState, MultiWorkspace, OpenOptions, OpenVisible, Workspace, WorkspaceSettings,
     client_side_decorations,
 };
-use aacode_actions::{
+pub use aacode_actions::{
     AGENT_SKILLS_SETTINGS_PATH, OpenProjectSettings, OpenSettings, OpenSettingsAt,
     OpenSettingsAtTarget, OpenSettingsPage,
 };

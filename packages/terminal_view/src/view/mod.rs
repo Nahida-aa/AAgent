@@ -76,6 +76,7 @@ pub struct TerminalView {
     pub(super) _subscriptions: Vec<Subscription>,
     pub(super) _terminal_subscriptions: Vec<Subscription>,
     pub(super) read_only: bool,
+    pub(super) background_corner_radii: Option<gpui::Corners<gpui::Rems>>,
 }
 
 impl EventEmitter<Event> for TerminalView {}
@@ -163,6 +164,7 @@ impl TerminalView {
             _subscriptions: subscriptions,
             _terminal_subscriptions: terminal_subscriptions,
             read_only: false,
+            background_corner_radii: None,
         }
     }
 
@@ -175,6 +177,16 @@ impl TerminalView {
     pub fn with_read_only(mut self, read_only: bool) -> Self {
         self.read_only = read_only;
         self
+    }
+
+    /// Sets the background corner radii for this terminal view.
+    pub fn set_background_corner_radii(
+        &mut self,
+        corner_radii: Option<gpui::Corners<gpui::Rems>>,
+        cx: &mut gpui::Context<Self>,
+    ) {
+        self.background_corner_radii = corner_radii;
+        cx.notify();
     }
     ///Create a new Terminal in the current working directory or the user's home directory
     pub fn deploy(

@@ -840,11 +840,14 @@ impl Sidebar {
 
         AgentThreadWorktreeLabelFlag::watch(cx);
 
-        cx.observe_global::<SettingsStore>(|this, cx| {
+        let mut previous_default_width =
+            AgentSettings::get_global(cx).threads_sidebar.default_width;
+        cx.observe_global::<SettingsStore>(move |this, cx| {
             let width = AgentSettings::get_global(cx).threads_sidebar.default_width;
-            if !this.width_set_by_user && this.width != width {
-                this.width = width;
-                cx.notify();
+            if previous_default_width != width {
+                previous_default_width = width;
+                this.set_width(None, cx);
+                this.serialize(cx);
             }
         })
         .detach();

@@ -43,6 +43,7 @@ pub enum Event {
         name: Option<LanguageServerName>,
     },
     ToggleLspLogs {
+        peer_id: proto::PeerId,
         server_id: LanguageServerId,
         enabled: bool,
         toggled_log_kind: LogKind,

@@ -156,7 +156,7 @@ pub struct WorktreeSettingsContent {
     ///  ".env*",
     ///  "docker-compose.*.yml",
     /// ]
-    pub file_scan_inclusions: Option<Vec<String>>,
+    pub file_scan_inclusions: Option<SplicingVec>,
 
     /// When to scan content of linked directories.
     ///
@@ -180,7 +180,7 @@ pub struct WorktreeSettingsContent {
 
     /// Treat the files matching these globs as hidden files. You can hide hidden files in the project panel.
     /// Default: ["**/.*"]
-    pub hidden_files: Option<Vec<String>>,
+    pub hidden_files: Option<SplicingVec>,
 
     /// Treat the files matching these globs as read-only. These files can be opened and viewed,
     /// but cannot be edited. This is useful for generated files, build outputs, or files from

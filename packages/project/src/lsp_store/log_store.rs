@@ -628,6 +628,7 @@ impl LogStore {
                                 }
                             }
                             crate::Event::ToggleLspLogs {
+                                peer_id: _,
                                 server_id,
                                 enabled,
                                 toggled_log_kind,

@@ -167,6 +167,7 @@ impl Project {
         envelope: TypedEnvelope<proto::ToggleLspLogs>,
         mut cx: AsyncApp,
     ) -> Result<()> {
+        let peer_id = envelope.original_sender_id()?;
         let toggled_log_kind =
             match proto::toggle_lsp_logs::LogType::try_from(envelope.payload.log_type)
                 .ok()
@@ -178,6 +179,7 @@ impl Project {
             };
         project.update(&mut cx, |_, cx| {
             cx.emit(Event::ToggleLspLogs {
+                peer_id,
                 server_id: LanguageServerId::from_proto(envelope.payload.server_id),
                 enabled: envelope.payload.enabled,
                 toggled_log_kind,

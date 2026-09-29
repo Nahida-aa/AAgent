@@ -8825,6 +8825,42 @@ dependencies = [
 ]
 
 [[package]]
+name = "keymap_editor"
+version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_theme",
+ "aa_gpui_kit_ui",
+ "aa_gpui_kit_ui_input",
+ "aacode_actions",
+ "anyhow",
+ "collections",
+ "command_palette",
+ "db",
+ "editor",
+ "fs",
+ "fuzzy",
+ "gpui",
+ "itertools 0.14.0",
+ "json_schema_store",
+ "language",
+ "log",
+ "menu",
+ "notifications",
+ "paths",
+ "project",
+ "search",
+ "serde_json",
+ "settings",
+ "telemetry",
+ "tempfile",
+ "theme_settings",
+ "tree-sitter-json",
+ "tree-sitter-rust",
+ "util",
+ "workspace",
+]
+
+[[package]]
 name = "khronos-egl"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -16236,6 +16272,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0193cc4331cfd2f3d2011ef287590868599a2f33c3e69bc22c1a3d3acf9e02fb"
 
 [[package]]
+name = "svg_preview"
+version = "0.1.0"
+
+[[package]]
 name = "svgtypes"
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -16464,6 +16504,10 @@ dependencies = [
  "quote",
  "syn 3.0.6",
 ]
+
+[[package]]
+name = "syntax_theme"
+version = "0.1.0"
 
 [[package]]
 name = "sys-locale"

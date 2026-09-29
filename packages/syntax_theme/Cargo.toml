@@ -1,0 +1,18 @@
+[package]
+name = "syntax_theme"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+default = []
+test-support = ["gpui/test-support"]
+bundled-themes = ["dep:serde", "dep:serde_json"]
+
+[dependencies]
+gpui.workspace = true
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+
+[dev-dependencies]
+gpui = { workspace = true, features = ["test-support"] }

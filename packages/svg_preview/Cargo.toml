@@ -1,0 +1,14 @@
+[package]
+name = "svg_preview"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+multi_buffer.workspace = true
+file_icons.workspace = true
+gpui.workspace = true
+language.workspace = true
+ui.workspace = true
+workspace.workspace = true
+aacode_actions.workspace = true

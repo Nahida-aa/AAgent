@@ -36,6 +36,9 @@ impl TerminalView {
     /// updates the cursor locally without sending data to the shell, so there's no
     /// shell output to automatically trigger a re-render.
     fn process_keystroke(&mut self, keystroke: &Keystroke, cx: &mut Context<Self>) -> bool {
+        if self.read_only && !self.terminal.read(cx).vi_mode_enabled() {
+            return false;
+        }
         let (handled, vi_mode_enabled) = self.terminal.update(cx, |term, cx| {
             (
                 term.try_keystroke(keystroke, TerminalSettings::get_global(cx).option_as_meta),
@@ -50,6 +53,9 @@ impl TerminalView {
         handled
     }
     pub(super) fn send_text(&mut self, text: &SendText, _: &mut Window, cx: &mut Context<Self>) {
+        if self.read_only {
+            return;
+        }
         self.clear_bell(cx);
         self.blink_manager.update(cx, BlinkManager::pause_blinking);
         self.terminal.update(cx, |term, _| {
@@ -89,6 +95,9 @@ impl TerminalView {
 
     ///Attempt to paste the clipboard into the terminal
     pub(super) fn paste(&mut self, _: &Paste, window: &mut Window, cx: &mut Context<Self>) {
+        if self.read_only {
+            return;
+        }
         let Some(clipboard) = cx.read_from_clipboard() else {
             return;
         };
@@ -123,6 +132,9 @@ impl TerminalView {
 
     ///Attempt to paste the clipboard text into the terminal
     pub(super) fn paste_text(&mut self, _: &PasteText, _: &mut Window, cx: &mut Context<Self>) {
+        if self.read_only {
+            return;
+        }
         let Some(clipboard) = cx.read_from_clipboard() else {
             return;
         };
@@ -142,6 +154,9 @@ impl TerminalView {
     }
 
     pub fn add_paths_to_terminal(&self, paths: &[PathBuf], window: &mut Window, cx: &mut App) {
+        if self.read_only {
+            return;
+        }
         let mut text = paths
             .iter()
             .filter_map(|path| Some(format!(" {}", shlex::try_quote(path.to_str()?).ok()?)))

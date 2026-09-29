@@ -87,7 +87,9 @@ impl TerminalView {
     pub(super) fn focus_in(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         self.terminal.update(cx, |terminal, _| {
             terminal.set_cursor_shape(self.cursor_shape);
-            terminal.focus_in();
+            if !self.read_only {
+                terminal.focus_in();
+            }
         });
 
         let should_blink = match TerminalSettings::get_global(cx).blinking {
@@ -107,7 +109,9 @@ impl TerminalView {
     pub(super) fn focus_out(&mut self, _window: &mut Window, cx: &mut Context<Self>) {
         self.blink_manager.update(cx, BlinkManager::disable);
         self.terminal.update(cx, |terminal, _| {
-            terminal.focus_out();
+            if !self.read_only {
+                terminal.focus_out();
+            }
             terminal.set_cursor_shape(terminal::terminal_settings::CursorShape::Hollow);
         });
         cx.notify();
@@ -172,6 +176,9 @@ impl TerminalView {
     }
 
     pub(crate) fn set_marked_text(&mut self, text: String, cx: &mut Context<Self>) {
+        if self.read_only {
+            return;
+        }
         if text.is_empty() {
             return self.clear_marked_text(cx);
         }
@@ -193,7 +200,7 @@ impl TerminalView {
     }
 
     pub(crate) fn commit_text(&mut self, text: &str, cx: &mut Context<Self>) {
-        if !text.is_empty() {
+        if !self.read_only && !text.is_empty() {
             self.terminal.update(cx, |term, _| {
                 term.input(text.to_string().into_bytes());
             });

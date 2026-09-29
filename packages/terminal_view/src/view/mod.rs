@@ -188,6 +188,14 @@ impl TerminalView {
         self.background_corner_radii = corner_radii;
         cx.notify();
     }
+
+    pub(super) fn mouse_input_mode(&self) -> terminal::MouseInputMode {
+        if self.read_only {
+            terminal::MouseInputMode::LocalSelection
+        } else {
+            terminal::MouseInputMode::ReportToTerminal
+        }
+    }
     ///Create a new Terminal in the current working directory or the user's home directory
     pub fn deploy(
         workspace: &mut Workspace,

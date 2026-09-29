@@ -2,7 +2,7 @@ use gpui::{
     App, Context, DispatchPhase, Entity, FocusHandle, Hitbox, MouseButton, MouseMoveEvent, Pixels,
     Window,
 };
-use terminal::{Modes, Terminal};
+use terminal::{Modes, MouseInputMode, Terminal};
 
 use crate::view::{TerminalView, mode::{ContentMode, TerminalMode}};
 
@@ -13,7 +13,8 @@ impl TerminalElement {
         connection: Entity<Terminal>,
         focus_handle: FocusHandle,
         steal_focus: bool,
-        f: impl Fn(&mut Terminal, &E, &mut Context<Terminal>),
+        mode: MouseInputMode,
+        f: impl Fn(&mut Terminal, &E, &mut Context<Terminal>, MouseInputMode),
     ) -> impl Fn(&E, &mut Window, &mut App) {
         move |event, window, cx| {
             if steal_focus {
@@ -22,7 +23,7 @@ impl TerminalElement {
                 return;
             }
             connection.update(cx, |terminal, cx| {
-                f(terminal, event, cx);
+                f(terminal, event, cx, mode);
 
                 cx.notify();
             })
@@ -34,6 +35,7 @@ impl TerminalElement {
         mode: Modes,
         hitbox: &Hitbox,
         content_mode: &ContentMode,
+        mouse_input_mode: MouseInputMode,
         window: &mut Window,
     ) {
         let focus = self.focus.clone();
@@ -44,6 +46,7 @@ impl TerminalElement {
             let terminal = terminal.clone();
             let focus = focus.clone();
             let terminal_view = terminal_view.clone();
+            let mouse_input_mode = mouse_input_mode;
 
             move |e, window, cx| {
                 window.focus(&focus, cx);
@@ -54,7 +57,7 @@ impl TerminalElement {
                     if scroll_top > Pixels::ZERO {
                         adjusted_event.position.y += scroll_top;
                     }
-                    terminal.mouse_down(&adjusted_event, cx);
+                    terminal.mouse_down(&adjusted_event, mouse_input_mode, cx);
                     cx.notify();
                 })
             }
@@ -64,7 +67,8 @@ impl TerminalElement {
             let terminal = self.terminal.clone();
             let hitbox = hitbox.clone();
             let focus = focus.clone();
-            let terminal_view = terminal_view;
+            let terminal_view = terminal_view.clone();
+            let mouse_input_mode = mouse_input_mode;
             move |e: &MouseMoveEvent, phase, window, cx| {
                 if phase != DispatchPhase::Bubble {
                     return;
@@ -80,7 +84,7 @@ impl TerminalElement {
                             if scroll_top > Pixels::ZERO {
                                 adjusted_event.position.y += scroll_top;
                             }
-                            terminal.mouse_drag(&adjusted_event, hitbox.bounds, cx);
+                            terminal.mouse_drag(&adjusted_event, hitbox.bounds, mouse_input_mode, cx);
                             cx.notify();
                         }
                     })
@@ -88,7 +92,7 @@ impl TerminalElement {
 
                 if hitbox.is_hovered(window) {
                     terminal.update(cx, |terminal, cx| {
-                        terminal.mouse_move(e, cx);
+                        terminal.mouse_move(e, mouse_input_mode, cx);
                     })
                 }
             }
@@ -100,8 +104,9 @@ impl TerminalElement {
                 terminal.clone(),
                 focus.clone(),
                 false,
-                move |terminal, e, cx| {
-                    terminal.mouse_up(e, cx);
+                mouse_input_mode,
+                move |terminal, e, cx, mode| {
+                    terminal.mouse_up(e, mode, cx);
                 },
             ),
         );
@@ -111,8 +116,9 @@ impl TerminalElement {
                 terminal.clone(),
                 focus.clone(),
                 true,
-                move |terminal, e, cx| {
-                    terminal.mouse_down(e, cx);
+                mouse_input_mode,
+                move |terminal, e, cx, mode| {
+                    terminal.mouse_down(e, mode, cx);
                 },
             ),
         );
@@ -144,8 +150,9 @@ impl TerminalElement {
                     terminal.clone(),
                     focus.clone(),
                     true,
-                    move |terminal, e, cx| {
-                        terminal.mouse_down(e, cx);
+                    mouse_input_mode,
+                    move |terminal, e, cx, mode| {
+                        terminal.mouse_down(e, mode, cx);
                     },
                 ),
             );
@@ -155,8 +162,9 @@ impl TerminalElement {
                     terminal.clone(),
                     focus.clone(),
                     false,
-                    move |terminal, e, cx| {
-                        terminal.mouse_up(e, cx);
+                    mouse_input_mode,
+                    move |terminal, e, cx, mode| {
+                        terminal.mouse_up(e, mode, cx);
                     },
                 ),
             );
@@ -166,8 +174,9 @@ impl TerminalElement {
                     terminal,
                     focus,
                     false,
-                    move |terminal, e, cx| {
-                        terminal.mouse_up(e, cx);
+                    mouse_input_mode,
+                    move |terminal, e, cx, mode| {
+                        terminal.mouse_up(e, mode, cx);
                     },
                 ),
             );

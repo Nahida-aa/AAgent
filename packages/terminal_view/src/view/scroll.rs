@@ -13,6 +13,9 @@ use super::helpers::viewport_line_for_point;
 
 impl TerminalView {
     pub(super) fn clear(&mut self, _: &Clear, _: &mut Window, cx: &mut Context<Self>) {
+        if self.read_only {
+            return;
+        }
         self.scroll_top = px(0.);
         self.terminal.update(cx, |term, _| term.clear());
         cx.notify();
@@ -37,6 +40,7 @@ impl TerminalView {
             term.scroll_wheel(
                 event,
                 TerminalSettings::get_global(cx).scroll_multiplier.max(0.01),
+                self.mouse_input_mode(),
             )
         });
     }

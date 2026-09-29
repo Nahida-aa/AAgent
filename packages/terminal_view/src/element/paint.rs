@@ -49,7 +49,8 @@ pub(crate) fn paint(
             workspace: term_element.workspace.clone(),
         };
 
-        term_element.register_mouse_listeners(layout.mode, &layout.hitbox, &layout.content_mode, window);
+        let mouse_input_mode = term_element.terminal_view.read(cx).mouse_input_mode();
+        term_element.register_mouse_listeners(layout.mode, &layout.hitbox, &layout.content_mode, mouse_input_mode, window);
         if window.modifiers().secondary()
             && bounds.contains(&window.mouse_position())
             && term_element.terminal_view.read(cx).hover.is_some()

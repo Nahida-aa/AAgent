@@ -1,15 +1,18 @@
 #![allow(clippy::disallowed_methods, reason = "build scripts are exempt")]
 use std::process::Command;
 
-const ZED_MANIFEST: &str = include_str!("../app/Cargo.toml");
+const APP_MANIFEST: &str = include_str!("../app/Cargo.toml");
 
 fn main() {
-    let zed_cargo_toml: cargo_toml::Manifest =
-        toml::from_str(ZED_MANIFEST).expect("failed to parse zed Cargo.toml");
-    println!(
-        "cargo:rustc-env=ZED_PKG_VERSION={}",
-        zed_cargo_toml.package.unwrap().version.unwrap()
-    );
+    let version = APP_MANIFEST
+        .lines()
+        .find(|l| l.starts_with("version") && l.contains("="))
+        .and_then(|l| {
+            let val = l.split('=').nth(1)?.trim();
+            if val == "workspace" { None } else { Some(val.trim_matches('"')) }
+        })
+        .unwrap_or("0.62.0");
+    println!("cargo:rustc-env=ZED_PKG_VERSION={}", version);
     println!(
         "cargo:rustc-env=TARGET={}",
         std::env::var("TARGET").unwrap()

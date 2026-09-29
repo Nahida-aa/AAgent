@@ -4404,10 +4404,15 @@ impl GitStore {
         let repository_handle = Self::repository_for_request(&this, repository_id, &mut cx)?;
 
         let commit = repository_handle
-            .update(&mut cx, |repository_handle, _| {
-                repository_handle.show(envelope.payload.commit)
+            .update(&mut cx, |repository_handle, cx| {
+                if envelope.payload.commit.parse::<Oid>().is_ok() {
+                    repository_handle.show_commit(envelope.payload.commit, cx)
+                } else {
+                    let rx = repository_handle.show(envelope.payload.commit);
+                    cx.background_spawn(async move { rx.await? })
+                }
             })
-            .await??;
+            .await?;
         Ok(proto::GitCommitDetails {
             sha: commit.sha.into(),
             message: commit.message.into(),
@@ -4551,13 +4556,14 @@ impl GitStore {
         let repository_handle = Self::repository_for_request(&this, repository_id, &mut cx)?;
 
         let commit_diff = repository_handle
-            .update(&mut cx, |repository_handle, _| {
+            .update(&mut cx, |repository_handle, cx| {
                 repository_handle.load_commit_diff(
                     envelope.payload.commit,
                     envelope.payload.ignore_shallow_boundary,
+                    cx,
                 )
             })
-            .await??;
+            .await?;
         Ok(proto::LoadCommitDiffResponse {
             files: commit_diff
                 .files
@@ -7164,42 +7170,65 @@ impl Repository {
 
     pub fn show(&mut self, commit: String) -> oneshot::Receiver<Result<CommitDetails>> {
         let id = self.id;
-        self.send_job("show", None, move |git_repo, _cx| async move {
-            match git_repo {
-                RepositoryState::Local(LocalRepositoryState { backend, .. }) => {
-                    backend.show(commit).await
-                }
-                RepositoryState::Remote(RemoteRepositoryState { project_id, client }) => {
-                    let resp = client
-                        .request(proto::GitShow {
-                            project_id: project_id.0,
-                            repository_id: id.to_proto(),
-                            commit,
-                        })
-                        .await?;
-
-                    Ok(CommitDetails {
-                        sha: resp.sha.into(),
-                        message: resp.message.into(),
-                        commit_timestamp: resp.commit_timestamp,
-                        author_email: resp.author_email.into(),
-                        author_name: resp.author_name.into(),
-                    })
-                }
-            }
+        self.send_job("show", None, move |state, _cx| {
+            Self::show_internal(state, id, commit)
         })
     }
 
+    pub fn show_commit(&self, sha: String, cx: &App) -> Task<Result<CommitDetails>> {
+        let id = self.id;
+        let repository_state = self.repository_state.clone();
+        let object_read_limiter = self.object_read_limiter.clone();
+        cx.background_spawn(async move {
+            let _permit = object_read_limiter.acquire_arc().await;
+            let state = repository_state.await.map_err(|err| anyhow::anyhow!(err))?;
+            Self::show_internal(state, id, sha).await
+        })
+    }
+
+    async fn show_internal(
+        state: RepositoryState,
+        id: RepositoryId,
+        commit: String,
+    ) -> Result<CommitDetails> {
+        match state {
+            RepositoryState::Local(LocalRepositoryState { backend, .. }) => {
+                backend.show(commit).await
+            }
+            RepositoryState::Remote(RemoteRepositoryState { project_id, client }) => {
+                let resp = client
+                    .request(proto::GitShow {
+                        project_id: project_id.0,
+                        repository_id: id.to_proto(),
+                        commit,
+                    })
+                    .await?;
+
+                Ok(CommitDetails {
+                    sha: resp.sha.into(),
+                    message: resp.message.into(),
+                    commit_timestamp: resp.commit_timestamp,
+                    author_email: resp.author_email.into(),
+                    author_name: resp.author_name.into(),
+                })
+            }
+        }
+    }
+
     pub fn load_commit_diff(
-        &mut self,
+        &self,
         commit: String,
         ignore_shallow_boundary: bool,
-    ) -> oneshot::Receiver<Result<CommitDiff>> {
+        cx: &App,
+    ) -> Task<Result<CommitDiff>> {
         let id = self.id;
-        self.send_job("load_commit_diff", None, move |git_repo, cx| async move {
-            match git_repo {
+        let repository_state = self.repository_state.clone();
+        let object_read_limiter = self.object_read_limiter.clone();
+        cx.spawn(async move |cx| {
+            let _permit = object_read_limiter.acquire_arc().await;
+            match repository_state.await.map_err(|err| anyhow::anyhow!(err))? {
                 RepositoryState::Local(LocalRepositoryState { backend, .. }) => backend
-                    .load_commit(commit, ignore_shallow_boundary, cx)
+                    .load_commit(commit, ignore_shallow_boundary, cx.clone())
                     .await
                     .map(decode_commit_diff),
                 RepositoryState::Remote(RemoteRepositoryState {
@@ -8426,7 +8455,7 @@ impl Repository {
         is_dir: bool,
     ) -> oneshot::Receiver<Result<()>> {
         let id = self.id;
-        let repository_dir = self.snapshot.repository_dir_abs_path.clone();
+        let repository_dir = self.snapshot.common_dir_abs_path.clone();
         let path_display = repo_path.as_ref().display(PathStyle::Unix);
         let path = repo_path.as_unix_str().to_owned();
         let file_path_str = if is_dir {
@@ -10394,10 +10423,15 @@ impl Repository {
         })
     }
 
-    fn load_blob_content(&mut self, oid: Oid, cx: &App) -> Task<Result<String>> {
+    /// Bypasses the serial git job queue: blobs are content-addressed, so this read
+    /// doesn't depend on the status snapshot, and a diff issues one per changed file.
+    fn load_blob_content(&self, oid: Oid, cx: &App) -> Task<Result<String>> {
         let repository_id = self.snapshot.id;
-        let rx = self.send_job("load_blob_content", None, move |state, _| async move {
-            match state {
+        let repository_state = self.repository_state.clone();
+        let object_read_limiter = self.object_read_limiter.clone();
+        cx.background_spawn(async move {
+            let _permit = object_read_limiter.acquire_arc().await;
+            match repository_state.await.map_err(|err| anyhow::anyhow!(err))? {
                 RepositoryState::Local(LocalRepositoryState { backend, .. }) => {
                     decode_git_text(backend.load_blob_content(oid).await?)
                 }
@@ -10412,8 +10446,7 @@ impl Repository {
                     Ok(response.content)
                 }
             }
-        });
-        cx.spawn(|_: &mut AsyncApp| async move { rx.await? })
+        })
     }
 
     fn paths_changed(

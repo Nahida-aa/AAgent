@@ -17,9 +17,13 @@ use crate::{
 pub struct SearchToken(u64);
 
 impl SearchToken {
-    pub fn new(value: u64) -> Self { Self(value) }
+    pub fn new(value: u64) -> Self {
+        Self(value)
+    }
 
-    pub fn value(&self) -> u64 { self.0 }
+    pub fn value(&self) -> u64 {
+        self.0
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -66,6 +70,12 @@ pub enum FilteredSearchRange {
     Default,
 }
 
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+pub struct SelectSearchOptions {
+    pub case_sensitive: bool,
+    pub whole_word: bool,
+}
+
 pub trait SearchableItem: Item + EventEmitter<SearchEvent> {
     type Match: Any + Sync + Send + Clone;
 
@@ -89,7 +99,9 @@ pub trait SearchableItem: Item + EventEmitter<SearchEvent> {
     ) {
     }
 
-    fn has_filtered_search_ranges(&mut self) -> bool { self.supported_options().selection }
+    fn has_filtered_search_ranges(&mut self) -> bool {
+        self.supported_options().selection
+    }
 
     fn toggle_filtered_search_ranges(
         &mut self,
@@ -199,7 +211,8 @@ pub trait SearchableItem: Item + EventEmitter<SearchEvent> {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) -> Option<usize>;
-    fn set_search_is_case_sensitive(&mut self, _: Option<bool>, _: &mut Context<Self>) {}
+    fn set_select_search_options(&mut self, _: Option<SelectSearchOptions>, _: &mut Context<Self>) {
+    }
 }
 
 pub trait SearchableItemHandle: ItemHandle {
@@ -297,15 +310,21 @@ pub trait SearchableItemHandle: ItemHandle {
         cx: &mut App,
     );
 
-    fn set_search_is_case_sensitive(&self, is_case_sensitive: Option<bool>, cx: &mut App);
+    fn set_select_search_options(&self, search_options: Option<SelectSearchOptions>, cx: &mut App);
 }
 
 impl<T: SearchableItem> SearchableItemHandle for Entity<T> {
-    fn downgrade(&self) -> Box<dyn WeakSearchableItemHandle> { Box::new(self.downgrade()) }
+    fn downgrade(&self) -> Box<dyn WeakSearchableItemHandle> {
+        Box::new(self.downgrade())
+    }
 
-    fn boxed_clone(&self) -> Box<dyn SearchableItemHandle> { Box::new(self.clone()) }
+    fn boxed_clone(&self) -> Box<dyn SearchableItemHandle> {
+        Box::new(self.clone())
+    }
 
-    fn supported_options(&self, cx: &App) -> SearchOptions { self.read(cx).supported_options() }
+    fn supported_options(&self, cx: &App) -> SearchOptions {
+        self.read(cx).supported_options()
+    }
 
     fn subscribe_to_search_events(
         &self,
@@ -495,23 +514,29 @@ impl<T: SearchableItem> SearchableItemHandle for Entity<T> {
             this.toggle_filtered_search_ranges(enabled, window, cx)
         });
     }
-    fn set_search_is_case_sensitive(&self, enabled: Option<bool>, cx: &mut App) {
+    fn set_select_search_options(&self, search_options: Option<SelectSearchOptions>, cx: &mut App) {
         self.update(cx, |this, cx| {
-            this.set_search_is_case_sensitive(enabled, cx)
+            this.set_select_search_options(search_options, cx)
         });
     }
 }
 
 impl From<Box<dyn SearchableItemHandle>> for AnyView {
-    fn from(this: Box<dyn SearchableItemHandle>) -> Self { this.to_any_view() }
+    fn from(this: Box<dyn SearchableItemHandle>) -> Self {
+        this.to_any_view()
+    }
 }
 
 impl From<&Box<dyn SearchableItemHandle>> for AnyView {
-    fn from(this: &Box<dyn SearchableItemHandle>) -> Self { this.to_any_view() }
+    fn from(this: &Box<dyn SearchableItemHandle>) -> Self {
+        this.to_any_view()
+    }
 }
 
 impl PartialEq for Box<dyn SearchableItemHandle> {
-    fn eq(&self, other: &Self) -> bool { self.item_id() == other.item_id() }
+    fn eq(&self, other: &Self) -> bool {
+        self.item_id() == other.item_id()
+    }
 }
 
 impl Eq for Box<dyn SearchableItemHandle> {}
@@ -527,15 +552,21 @@ impl<T: SearchableItem> WeakSearchableItemHandle for WeakEntity<T> {
         Some(Box::new(self.upgrade()?))
     }
 
-    fn into_any(self) -> AnyWeakEntity { self.into() }
+    fn into_any(self) -> AnyWeakEntity {
+        self.into()
+    }
 }
 
 impl PartialEq for Box<dyn WeakSearchableItemHandle> {
-    fn eq(&self, other: &Self) -> bool { self.id() == other.id() }
+    fn eq(&self, other: &Self) -> bool {
+        self.id() == other.id()
+    }
 }
 
 impl Eq for Box<dyn WeakSearchableItemHandle> {}
 
 impl std::hash::Hash for Box<dyn WeakSearchableItemHandle> {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) { self.id().hash(state) }
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.id().hash(state)
+    }
 }

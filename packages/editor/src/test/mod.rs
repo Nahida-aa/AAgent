@@ -22,7 +22,9 @@ use util::test::{generate_marked_text, marked_text_offsets, marked_text_ranges};
 
 #[cfg(test)]
 #[ctor::ctor(unsafe)]
-fn init_logger() { a_log::init_test(); }
+fn init_logger() {
+    zlog::init_test();
+}
 
 pub fn test_font() -> Font {
     static TEST_FONT: LazyLock<Font> = LazyLock::new(|| {

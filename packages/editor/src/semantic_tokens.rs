@@ -47,9 +47,13 @@ impl SemanticTokenState {
         }
     }
 
-    pub(super) fn enabled(&self) -> bool { self.enabled }
+    pub(super) fn enabled(&self) -> bool {
+        self.enabled
+    }
 
-    pub(super) fn toggle_enabled(&mut self) { self.enabled = !self.enabled; }
+    pub(super) fn toggle_enabled(&mut self) {
+        self.enabled = !self.enabled;
+    }
 
     #[cfg(test)]
     pub(super) fn take_update_task(&mut self) -> Task<()> {
@@ -86,7 +90,9 @@ impl Editor {
         supports
     }
 
-    pub fn semantic_highlights_enabled(&self) -> bool { self.semantic_token_state.enabled() }
+    pub fn semantic_highlights_enabled(&self) -> bool {
+        self.semantic_token_state.enabled()
+    }
 
     pub fn toggle_semantic_highlights(
         &mut self,
@@ -928,7 +934,7 @@ mod tests {
         let app_state = cx.update(workspace::AppState::test);
 
         cx.update(|cx| {
-            aa_gpui_kit_assets::Assets.load_test_fonts(cx);
+            assets::Assets.load_test_fonts(cx);
             crate::init(cx);
             workspace::init(app_state.clone(), cx);
         });
@@ -1186,7 +1192,7 @@ mod tests {
         let app_state = cx.update(workspace::AppState::test);
 
         cx.update(|cx| {
-            aa_gpui_kit_assets::Assets.load_test_fonts(cx);
+            assets::Assets.load_test_fonts(cx);
             crate::init(cx);
             workspace::init(app_state.clone(), cx);
         });
@@ -1446,7 +1452,7 @@ mod tests {
         let app_state = cx.update(workspace::AppState::test);
 
         cx.update(|cx| {
-            aa_gpui_kit_assets::Assets.load_test_fonts(cx);
+            assets::Assets.load_test_fonts(cx);
             crate::init(cx);
             workspace::init(app_state.clone(), cx);
         });
@@ -1720,7 +1726,7 @@ mod tests {
 
         let app_state = cx.update(workspace::AppState::test);
         cx.update(|cx| {
-            aa_gpui_kit_assets::Assets.load_test_fonts(cx);
+            assets::Assets.load_test_fonts(cx);
             crate::init(cx);
             workspace::init(app_state.clone(), cx);
         });

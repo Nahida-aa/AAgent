@@ -7,7 +7,8 @@ use settings_macros::{MergeFrom, with_fallible_options};
 use std::sync::Arc;
 
 use crate::{
-    DelayMs, DocumentFoldingRanges, DocumentSymbols, ExtendingSet, SemanticTokens, merge_from,
+    DelayMs, DocumentFoldingRanges, DocumentSymbols, ExtendingSet, SemanticTokens, SplicingVec,
+    merge_from,
 };
 
 /// The state of the modifier keys at some point in time
@@ -132,10 +133,29 @@ impl EditPredictionProvider {
 pub struct EditPredictionSettingsContent {
     /// Determines which edit prediction provider to use.
     pub provider: Option<EditPredictionProvider>,
-    /// A list of globs representing files that edit predictions should be disabled for.
-    /// This list adds to a pre-existing, sensible default set of globs.
-    /// Any additional ones you add are combined with them.
-    pub disabled_globs: Option<Vec<String>>,
+    /// Disable edit predictions for files matching these glob patterns.
+    ///
+    /// Use `"..."` to add patterns without repeating Zed's defaults. In project
+    /// settings, it extends the user or parent configuration value. Omit
+    /// `"..."` to replace the inherited list.
+    ///
+    /// ```json
+    /// {
+    ///   "edit_predictions": {
+    ///     "disabled_globs": ["**/build/**", "..."]
+    ///   }
+    /// }
+    /// ```
+    ///
+    /// Inherited patterns are inserted at `"..."`, and duplicates keep their first
+    /// occurrence.
+    ///
+    /// Set `[]` to clear the inherited list. Omit this setting to inherit it unchanged.
+    ///
+    /// Relative patterns are matched against paths relative to the worktree root.
+    /// Absolute patterns are matched against absolute paths. A leading `~` is
+    /// expanded to your home folder.
+    pub disabled_globs: Option<SplicingVec>,
     /// The mode used to display edit predictions in the buffer.
     /// Provider support required.
     pub mode: Option<EditPredictionsMode>,
@@ -295,15 +315,21 @@ pub struct MercuryEditPredictionSettingsContent {
 pub struct OllamaModelName(pub String);
 
 impl AsRef<str> for OllamaModelName {
-    fn as_ref(&self) -> &str { &self.0 }
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
 }
 
 impl From<String> for OllamaModelName {
-    fn from(value: String) -> Self { Self(value) }
+    fn from(value: String) -> Self {
+        Self(value)
+    }
 }
 
 impl From<OllamaModelName> for String {
-    fn from(value: OllamaModelName) -> Self { value.0 }
+    fn from(value: OllamaModelName) -> Self {
+        value.0
+    }
 }
 
 #[with_fallible_options]
@@ -500,6 +526,34 @@ impl<'de> Deserialize<'de> for ConfiguredLanguageServer {
     }
 }
 
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    JsonSchema,
+    MergeFrom,
+    strum::EnumString,
+    strum::VariantArray,
+    strum::VariantNames,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum SoftWrapIndent {
+    /// Continuation lines start at column 0.
+    None,
+    /// Continuation lines match the original line's indentation.
+    #[default]
+    Same,
+    /// Continuation lines get 1 extra indent level beyond the original.
+    ExtraOne,
+    /// Continuation lines get 2 extra indent levels beyond the original.
+    ExtraTwo,
+}
+
 /// The settings for a particular language.
 #[with_fallible_options]
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
@@ -518,6 +572,10 @@ pub struct LanguageSettingsContent {
     ///
     /// Default: none
     pub soft_wrap: Option<SoftWrap>,
+    /// How to indent soft-wrapped continuation lines.
+    ///
+    /// Default: same
+    pub soft_wrap_indent: Option<SoftWrapIndent>,
     /// The column at which to soft-wrap lines, for buffers where soft-wrap
     /// is enabled.
     ///
@@ -630,13 +688,38 @@ pub struct LanguageSettingsContent {
     ///
     /// Default: true
     pub show_edit_predictions: Option<bool>,
-    /// Controls whether edit predictions are shown in the given language
-    /// scopes.
+    /// Disable edit predictions in these language scopes, such as "comment" and
+    /// "string".
     ///
-    /// Example: ["string", "comment"]
+    /// Default:
     ///
-    /// Default: []
-    pub edit_predictions_disabled_in: Option<Vec<String>>,
+    /// ```json
+    /// {
+    ///   "edit_predictions_disabled_in": []
+    /// }
+    /// ```
+    ///
+    /// Use `"..."` to add scopes without repeating the inherited list. In project
+    /// settings, it extends the user or parent configuration value. In
+    /// language-specific settings, it extends the scopes inherited by that
+    /// language. Omit `"..."` to replace the inherited list.
+    ///
+    /// ```json
+    /// {
+    ///   "edit_predictions_disabled_in": ["comment"],
+    ///   "languages": {
+    ///     "Go": {
+    ///       "edit_predictions_disabled_in": ["string", "..."]
+    ///     }
+    ///   }
+    /// }
+    /// ```
+    ///
+    /// Inherited scopes are inserted at `"..."`, and duplicates keep their first
+    /// occurrence.
+    ///
+    /// Set `[]` to clear the inherited list. Omit this setting to inherit it unchanged.
+    pub edit_predictions_disabled_in: Option<SplicingVec>,
     /// Whether to show tabs and spaces in the editor.
     pub show_whitespaces: Option<ShowWhitespaceSetting>,
     /// Visible characters used to render whitespace when show_whitespaces is enabled.
@@ -1072,7 +1155,9 @@ pub enum FormatterList {
 }
 
 impl Default for FormatterList {
-    fn default() -> Self { Self::Single(Formatter::default()) }
+    fn default() -> Self {
+        Self::Single(Formatter::default())
+    }
 }
 
 impl AsRef<[Formatter]> for FormatterList {
@@ -1231,7 +1316,9 @@ impl<'a> IntoIterator for &'a FileTypeMap {
     type Item = (&'a Arc<str>, &'a ExtendingSet<String>);
     type IntoIter = std::collections::hash_map::Iter<'a, Arc<str>, ExtendingSet<String>>;
 
-    fn into_iter(self) -> Self::IntoIter { self.0.iter() }
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.iter()
+    }
 }
 
 /// Determines how indent guides are colored.

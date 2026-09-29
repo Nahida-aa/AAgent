@@ -7,9 +7,6 @@ use crate::{
     persistence::{EditorDb, SerializedEditor},
     scroll::{ScrollAnchor, ScrollOffset},
 };
-use aacode_actions::preview::{
-    markdown::OpenPreview as OpenMarkdownPreview, svg::OpenPreview as OpenSvgPreview,
-};
 use anyhow::{Context as _, Result, anyhow};
 use collections::{HashMap, HashSet};
 use file_icons::FileIcons;
@@ -62,7 +59,7 @@ use workspace::{
     item::{FollowableItem, Item, ItemBufferKind, ItemEvent, ProjectItem, SaveOptions},
     searchable::{
         Direction, FilteredSearchRange, SearchEvent, SearchToken, SearchableItem,
-        SearchableItemHandle,
+        SearchableItemHandle, SelectSearchOptions,
     },
 };
 use workspace::{
@@ -70,11 +67,16 @@ use workspace::{
     item::{FollowEvent, ProjectItemKind},
     searchable::SearchOptions,
 };
+use aacode_actions::preview::{
+    markdown::OpenPreview as OpenMarkdownPreview, svg::OpenPreview as OpenSvgPreview,
+};
 
 pub const MAX_TAB_TITLE_LEN: usize = 24;
 
 impl FollowableItem for Editor {
-    fn remote_id(&self) -> Option<ViewId> { self.remote_id }
+    fn remote_id(&self) -> Option<ViewId> {
+        self.remote_id
+    }
 
     fn from_state_proto(
         workspace: Entity<Workspace>,
@@ -344,7 +346,9 @@ impl FollowableItem for Editor {
         })
     }
 
-    fn is_project_item(&self, _window: &Window, _cx: &App) -> bool { true }
+    fn is_project_item(&self, _window: &Window, _cx: &App) -> bool {
+        true
+    }
 
     fn dedup(&self, existing: &Self, _: &Window, cx: &App) -> Option<Dedup> {
         let self_singleton = self.buffer.read(cx).as_singleton()?;
@@ -709,7 +713,9 @@ impl Item for Editor {
         }
     }
 
-    fn telemetry_event_text(&self) -> Option<&'static str> { None }
+    fn telemetry_event_text(&self) -> Option<&'static str> {
+        None
+    }
 
     fn tab_content_text(&self, detail: usize, cx: &App) -> SharedString {
         if let Some(path) = path_for_buffer(&self.buffer, detail, true, cx) {
@@ -856,9 +862,13 @@ impl Item for Editor {
         self.active_buffer(cx)?.read(cx).project_path(cx)
     }
 
-    fn can_save_as(&self, cx: &App) -> bool { self.buffer.read(cx).is_singleton() }
+    fn can_save_as(&self, cx: &App) -> bool {
+        self.buffer.read(cx).is_singleton()
+    }
 
-    fn can_split(&self) -> bool { true }
+    fn can_split(&self) -> bool {
+        true
+    }
 
     fn clone_on_split(
         &self,
@@ -894,9 +904,13 @@ impl Item for Editor {
         self.hide_hovered_link(cx);
     }
 
-    fn is_dirty(&self, cx: &App) -> bool { self.buffer().read(cx).read(cx).is_dirty() }
+    fn is_dirty(&self, cx: &App) -> bool {
+        self.buffer().read(cx).read(cx).is_dirty()
+    }
 
-    fn capability(&self, cx: &App) -> Capability { self.capability(cx) }
+    fn capability(&self, cx: &App) -> Capability {
+        self.capability(cx)
+    }
 
     // Note: this mirrors the logic in `Editor::toggle_read_only`, but is reachable
     // without relying on focus-based action dispatch.
@@ -921,7 +935,9 @@ impl Item for Editor {
         self.buffer().read(cx).read(cx).has_deleted_file()
     }
 
-    fn has_conflict(&self, cx: &App) -> bool { self.buffer().read(cx).read(cx).has_conflict() }
+    fn has_conflict(&self, cx: &App) -> bool {
+        self.buffer().read(cx).read(cx).has_conflict()
+    }
 
     fn can_save(&self, cx: &App) -> bool {
         if self.read_only(cx) {
@@ -1237,11 +1253,15 @@ impl Item for Editor {
         actions
     }
 
-    fn preserve_preview(&self, cx: &App) -> bool { self.buffer.read(cx).preserve_preview(cx) }
+    fn preserve_preview(&self, cx: &App) -> bool {
+        self.buffer.read(cx).preserve_preview(cx)
+    }
 }
 
 impl SerializableItem for Editor {
-    fn serialized_item_kind() -> &'static str { "Editor" }
+    fn serialized_item_kind() -> &'static str {
+        "Editor"
+    }
 
     fn cleanup(
         workspace_id: WorkspaceId,
@@ -1548,7 +1568,9 @@ pub struct RestorationData {
 impl ProjectItem for Editor {
     type Item = Buffer;
 
-    fn project_item_kind() -> Option<ProjectItemKind> { Some(ProjectItemKind("Editor")) }
+    fn project_item_kind() -> Option<ProjectItemKind> {
+        Some(ProjectItemKind("Editor"))
+    }
 
     fn for_project_item(
         project: Entity<Project>,
@@ -2099,12 +2121,18 @@ impl SearchableItem for Editor {
         self.expect_bounds_change = self.last_bounds;
     }
 
-    fn set_search_is_case_sensitive(
+    fn set_select_search_options(
         &mut self,
-        case_sensitive: Option<bool>,
+        select_search_options: Option<SelectSearchOptions>,
         _cx: &mut Context<Self>,
     ) {
-        self.select_next_is_case_sensitive = case_sensitive;
+        if self.select_next_options == select_search_options {
+            return;
+        }
+
+        self.select_next_options = select_search_options;
+        self.select_next_state = None;
+        self.select_prev_state = None;
     }
 }
 

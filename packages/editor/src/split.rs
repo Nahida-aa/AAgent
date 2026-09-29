@@ -421,7 +421,9 @@ pub struct DiffStyleControls {
 }
 
 impl DiffStyleControls {
-    pub fn new(splittable_editor: Entity<SplittableEditor>) -> Self { Self { splittable_editor } }
+    pub fn new(splittable_editor: Entity<SplittableEditor>) -> Self {
+        Self { splittable_editor }
+    }
 
     fn set_diff_view_style(
         splittable_editor: &Entity<SplittableEditor>,
@@ -553,9 +555,13 @@ struct LhsEditor {
 }
 
 impl SplittableEditor {
-    pub fn rhs_editor(&self) -> &Entity<Editor> { &self.rhs_editor }
+    pub fn rhs_editor(&self) -> &Entity<Editor> {
+        &self.rhs_editor
+    }
 
-    pub fn lhs_editor(&self) -> Option<&Entity<Editor>> { self.lhs.as_ref().map(|s| &s.editor) }
+    pub fn lhs_editor(&self) -> Option<&Entity<Editor>> {
+        self.lhs.as_ref().map(|s| &s.editor)
+    }
 
     pub fn update_editors(
         &self,
@@ -568,9 +574,13 @@ impl SplittableEditor {
         self.rhs_editor.update(cx, &f);
     }
 
-    pub fn diff_view_style(&self) -> DiffViewStyle { self.diff_view_style }
+    pub fn diff_view_style(&self) -> DiffViewStyle {
+        self.diff_view_style
+    }
 
-    pub fn is_split(&self) -> bool { self.lhs.is_some() }
+    pub fn is_split(&self) -> bool {
+        self.lhs.is_some()
+    }
 
     pub fn set_diff_hunk_renderer(
         &self,
@@ -1267,7 +1277,9 @@ impl SplittableEditor {
         }
     }
 
-    fn search_token(&self) -> SearchToken { SearchToken::new(self.focused_side() as u64) }
+    fn search_token(&self) -> SearchToken {
+        SearchToken::new(self.focused_side() as u64)
+    }
 
     fn editor_for_token(&self, token: SearchToken) -> Option<&Entity<Editor>> {
         if token.value() == SplitSide::Left as u64 {
@@ -1663,7 +1675,9 @@ impl SplittableEditor {
         let lhs_blocks = build_block_map(&lhs_snapshot, lhs_max_row);
         let rhs_blocks = build_block_map(&rhs_snapshot, rhs_max_row);
 
-        fn display_width(s: &str) -> usize { unicode_width::UnicodeWidthStr::width(s) }
+        fn display_width(s: &str) -> usize {
+            unicode_width::UnicodeWidthStr::width(s)
+        }
 
         fn truncate_line(line: &str, max_width: usize) -> String {
             let line_width = display_width(line);
@@ -1947,25 +1961,37 @@ impl Item for SplittableEditor {
         self.rhs_editor.read(cx).for_each_project_item(cx, f)
     }
 
-    fn buffer_kind(&self, cx: &App) -> ItemBufferKind { self.rhs_editor.read(cx).buffer_kind(cx) }
+    fn buffer_kind(&self, cx: &App) -> ItemBufferKind {
+        self.rhs_editor.read(cx).buffer_kind(cx)
+    }
 
     fn active_project_path(&self, cx: &App) -> Option<project::ProjectPath> {
         self.rhs_editor.read(cx).active_project_path(cx)
     }
 
-    fn is_dirty(&self, cx: &App) -> bool { self.rhs_editor.read(cx).is_dirty(cx) }
+    fn is_dirty(&self, cx: &App) -> bool {
+        self.rhs_editor.read(cx).is_dirty(cx)
+    }
 
-    fn has_conflict(&self, cx: &App) -> bool { self.rhs_editor.read(cx).has_conflict(cx) }
+    fn has_conflict(&self, cx: &App) -> bool {
+        self.rhs_editor.read(cx).has_conflict(cx)
+    }
 
-    fn has_deleted_file(&self, cx: &App) -> bool { self.rhs_editor.read(cx).has_deleted_file(cx) }
+    fn has_deleted_file(&self, cx: &App) -> bool {
+        self.rhs_editor.read(cx).has_deleted_file(cx)
+    }
 
     fn capability(&self, cx: &App) -> language::Capability {
         self.rhs_editor.read(cx).capability(cx)
     }
 
-    fn can_save(&self, cx: &App) -> bool { self.rhs_editor.read(cx).can_save(cx) }
+    fn can_save(&self, cx: &App) -> bool {
+        self.rhs_editor.read(cx).can_save(cx)
+    }
 
-    fn can_save_as(&self, cx: &App) -> bool { self.rhs_editor.read(cx).can_save_as(cx) }
+    fn can_save_as(&self, cx: &App) -> bool {
+        self.rhs_editor.read(cx).can_save_as(cx)
+    }
 
     fn save(
         &mut self,

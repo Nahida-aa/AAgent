@@ -312,9 +312,13 @@ impl SignatureHelpState {
     }
 
     #[cfg(test)]
-    pub fn popover(&self) -> Option<&SignatureHelpPopover> { self.popover.as_ref() }
+    pub fn popover(&self) -> Option<&SignatureHelpPopover> {
+        self.popover.as_ref()
+    }
 
-    pub fn popover_mut(&mut self) -> Option<&mut SignatureHelpPopover> { self.popover.as_mut() }
+    pub fn popover_mut(&mut self) -> Option<&mut SignatureHelpPopover> {
+        self.popover.as_mut()
+    }
 
     fn set_popover(&mut self, popover: SignatureHelpPopover) {
         self.popover = Some(popover);
@@ -332,7 +336,9 @@ impl SignatureHelpState {
         self.hidden_by == Some(SignatureHelpHiddenBy::Selection)
     }
 
-    pub fn is_shown(&self) -> bool { self.popover.is_some() }
+    pub fn is_shown(&self) -> bool {
+        self.popover.is_some()
+    }
 
     pub fn has_multiple_signatures(&self) -> bool {
         self.popover
@@ -343,7 +349,9 @@ impl SignatureHelpState {
 
 #[cfg(test)]
 impl SignatureHelpState {
-    pub fn task(&self) -> Option<&Task<()>> { self.task.as_ref() }
+    pub fn task(&self) -> Option<&Task<()>> {
+        self.task.as_ref()
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]

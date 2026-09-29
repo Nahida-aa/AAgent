@@ -6,7 +6,6 @@ use gpui::{AnyElement, App, IntoElement, RenderOnce, Window};
 use ui::{Divider, Tooltip, prelude::*};
 
 #[derive(IntoElement, RegisterComponent)]
-#[register_component(crate = "component")]
 pub struct EndTrialUpsell {
     dismiss_upsell: Arc<dyn Fn(&mut Window, &mut App)>,
 }

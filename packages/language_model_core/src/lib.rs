@@ -17,7 +17,9 @@ use std::sync::Arc;
 use std::time::Duration;
 use std::{fmt, io};
 use thiserror::Error;
-fn is_default<T: Default + PartialEq>(value: &T) -> bool { *value == T::default() }
+fn is_default<T: Default + PartialEq>(value: &T) -> bool {
+    *value == T::default()
+}
 
 pub use crate::provider::*;
 pub use crate::rate_limiter::*;
@@ -28,6 +30,12 @@ pub use crate::util::{
     parse_tool_arguments,
 };
 pub use gpui_shared_string::SharedString;
+
+/// The events of a streaming completion, as produced by a provider.
+pub type LanguageModelCompletionStream = futures::stream::BoxStream<
+    'static,
+    Result<LanguageModelCompletionEvent, LanguageModelCompletionError>,
+>;
 
 /// A completion event from a language model.
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
@@ -241,6 +249,13 @@ pub enum LanguageModelCompletionError {
     },
     #[error("stream from {provider} ended unexpectedly")]
     StreamEndedUnexpectedly { provider: LanguageModelProviderName },
+    /// The provider no longer offers a model with this id, for example after
+    /// its settings or fetched model list changed.
+    #[error("{provider} no longer offers the model {}", model.0)]
+    ModelUnavailable {
+        provider: LanguageModelProviderName,
+        model: LanguageModelId,
+    },
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }
@@ -395,6 +410,7 @@ impl LanguageModelCompletionError {
             | Self::BuildRequestBody { .. }
             | Self::DeserializeResponse { .. }
             | Self::StreamEndedUnexpectedly { .. }
+            | Self::ModelUnavailable { .. }
             | Self::Other(_) => false,
         }
     }
@@ -424,6 +440,7 @@ impl LanguageModelCompletionError {
             | Self::BuildRequestBody { .. }
             | Self::DeserializeResponse { .. }
             | Self::StreamEndedUnexpectedly { .. }
+            | Self::ModelUnavailable { .. }
             | Self::Other(_) => None,
         }
     }
@@ -558,14 +575,18 @@ impl Sub<TokenUsage> for TokenUsage {
 pub struct LanguageModelToolUseId(Arc<str>);
 
 impl fmt::Display for LanguageModelToolUseId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { write!(f, "{}", self.0) }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
 }
 
 impl<T> From<T> for LanguageModelToolUseId
 where
     T: Into<Arc<str>>,
 {
-    fn from(value: T) -> Self { Self(value.into()) }
+    fn from(value: T) -> Self {
+        Self(value.into())
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Serialize, Deserialize)]
@@ -668,7 +689,7 @@ impl LanguageModelToolUseInput {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LanguageModelEffortLevel {
     pub name: SharedString,
     pub value: SharedString,
@@ -699,43 +720,63 @@ pub struct LanguageModelProviderId(pub SharedString);
 pub struct LanguageModelProviderName(pub SharedString);
 
 impl LanguageModelProviderId {
-    pub const fn new(id: &'static str) -> Self { Self(SharedString::new_static(id)) }
+    pub const fn new(id: &'static str) -> Self {
+        Self(SharedString::new_static(id))
+    }
 }
 
 impl LanguageModelProviderName {
-    pub const fn new(id: &'static str) -> Self { Self(SharedString::new_static(id)) }
+    pub const fn new(id: &'static str) -> Self {
+        Self(SharedString::new_static(id))
+    }
 }
 
 impl fmt::Display for LanguageModelProviderId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { write!(f, "{}", self.0) }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
 }
 
 impl fmt::Display for LanguageModelProviderName {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { write!(f, "{}", self.0) }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
 }
 
 impl From<String> for LanguageModelId {
-    fn from(value: String) -> Self { Self(SharedString::from(value)) }
+    fn from(value: String) -> Self {
+        Self(SharedString::from(value))
+    }
 }
 
 impl From<String> for LanguageModelName {
-    fn from(value: String) -> Self { Self(SharedString::from(value)) }
+    fn from(value: String) -> Self {
+        Self(SharedString::from(value))
+    }
 }
 
 impl From<String> for LanguageModelProviderId {
-    fn from(value: String) -> Self { Self(SharedString::from(value)) }
+    fn from(value: String) -> Self {
+        Self(SharedString::from(value))
+    }
 }
 
 impl From<String> for LanguageModelProviderName {
-    fn from(value: String) -> Self { Self(SharedString::from(value)) }
+    fn from(value: String) -> Self {
+        Self(SharedString::from(value))
+    }
 }
 
 impl From<Arc<str>> for LanguageModelProviderId {
-    fn from(value: Arc<str>) -> Self { Self(SharedString::from(value)) }
+    fn from(value: Arc<str>) -> Self {
+        Self(SharedString::from(value))
+    }
 }
 
 impl From<Arc<str>> for LanguageModelProviderName {
-    fn from(value: Arc<str>) -> Self { Self(SharedString::from(value)) }
+    fn from(value: Arc<str>) -> Self {
+        Self(SharedString::from(value))
+    }
 }
 
 /// Settings-layer–free model mode enum.

@@ -59,7 +59,9 @@ pub trait AgentServer: Send {
 
     fn into_any(self: Rc<Self>) -> Rc<dyn Any>;
 
-    fn default_mode(&self, _cx: &App) -> Option<acp_schema::SessionModeId> { None }
+    fn default_mode(&self, _cx: &App) -> Option<acp_schema::SessionModeId> {
+        None
+    }
 
     fn set_default_mode(
         &self,

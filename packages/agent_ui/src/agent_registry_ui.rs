@@ -552,7 +552,7 @@ impl AgentRegistryPage {
                             }
                         });
                         window.dispatch_action(
-                            Box::new(aacode_actions::agent::SelectAgent {
+                            Box::new(zed_actions::agent::SelectAgent {
                                 agent: agent_id.clone(),
                             }),
                             cx,

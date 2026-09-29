@@ -25,13 +25,19 @@ pub struct CustomAgentServer {
 }
 
 impl CustomAgentServer {
-    pub fn new(agent_id: AgentId) -> Self { Self { agent_id } }
+    pub fn new(agent_id: AgentId) -> Self {
+        Self { agent_id }
+    }
 }
 
 impl AgentServer for CustomAgentServer {
-    fn agent_id(&self) -> AgentId { self.agent_id.clone() }
+    fn agent_id(&self) -> AgentId {
+        self.agent_id.clone()
+    }
 
-    fn logo(&self) -> IconName { IconName::Terminal }
+    fn logo(&self) -> IconName {
+        IconName::Terminal
+    }
 
     fn default_mode(&self, cx: &App) -> Option<acp::SessionModeId> {
         let settings = cx.read_global(|settings: &SettingsStore, _| {
@@ -274,7 +280,9 @@ impl AgentServer for CustomAgentServer {
         })
     }
 
-    fn into_any(self: Rc<Self>) -> Rc<dyn std::any::Any> { self }
+    fn into_any(self: Rc<Self>) -> Rc<dyn std::any::Any> {
+        self
+    }
 }
 
 fn api_key_for_gemini_cli(cx: &mut App) -> Task<Result<String>> {

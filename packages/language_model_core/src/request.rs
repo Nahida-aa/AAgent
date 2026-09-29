@@ -22,11 +22,17 @@ pub struct LanguageModelImage {
 }
 
 impl LanguageModelImage {
-    pub fn len(&self) -> usize { self.source.len() }
+    pub fn len(&self) -> usize {
+        self.source.len()
+    }
 
-    pub fn is_empty(&self) -> bool { self.source.is_empty() }
+    pub fn is_empty(&self) -> bool {
+        self.source.is_empty()
+    }
 
-    pub fn empty() -> Self { Self { source: "".into() } }
+    pub fn empty() -> Self {
+        Self { source: "".into() }
+    }
 
     /// Parse Self from a JSON object with case-insensitive field names
     pub fn from_json(obj: &serde_json::Map<String, serde_json::Value>) -> Option<Self> {
@@ -45,7 +51,9 @@ impl LanguageModelImage {
         })
     }
 
-    pub fn to_base64_url(&self) -> String { format!("data:image/png;base64,{}", self.source) }
+    pub fn to_base64_url(&self) -> String {
+        format!("data:image/png;base64,{}", self.source)
+    }
 }
 
 impl std::fmt::Debug for LanguageModelImage {
@@ -80,7 +88,9 @@ impl LanguageModelToolResult {
     }
 
     /// Returns true when there are no content parts, or every part is empty.
-    pub fn is_content_empty(&self) -> bool { self.content.iter().all(|part| part.is_empty()) }
+    pub fn is_content_empty(&self) -> bool {
+        self.content.iter().all(|part| part.is_empty())
+    }
 
     /// Returns an iterator over all the images presents in the content parts.
     pub fn images(&self) -> impl Iterator<Item = &LanguageModelImage> {
@@ -227,19 +237,27 @@ impl LanguageModelToolResultContent {
 }
 
 impl From<&str> for LanguageModelToolResultContent {
-    fn from(value: &str) -> Self { Self::Text(Arc::from(value)) }
+    fn from(value: &str) -> Self {
+        Self::Text(Arc::from(value))
+    }
 }
 
 impl From<String> for LanguageModelToolResultContent {
-    fn from(value: String) -> Self { Self::Text(Arc::from(value)) }
+    fn from(value: String) -> Self {
+        Self::Text(Arc::from(value))
+    }
 }
 
 impl From<anyhow::Error> for LanguageModelToolResultContent {
-    fn from(error: anyhow::Error) -> Self { Self::Text(Arc::from(error.to_string())) }
+    fn from(error: anyhow::Error) -> Self {
+        Self::Text(Arc::from(error.to_string()))
+    }
 }
 
 impl From<LanguageModelImage> for LanguageModelToolResultContent {
-    fn from(image: LanguageModelImage) -> Self { Self::Image(image) }
+    fn from(image: LanguageModelImage) -> Self {
+        Self::Image(image)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Hash)]
@@ -294,11 +312,17 @@ impl ProviderCompactionState {
         }
     }
 
-    pub fn provider_id(&self) -> &LanguageModelProviderId { &self.provider_id }
+    pub fn provider_id(&self) -> &LanguageModelProviderId {
+        &self.provider_id
+    }
 
-    pub fn format(&self) -> &str { &self.format }
+    pub fn format(&self) -> &str {
+        &self.format
+    }
 
-    pub fn payload(&self) -> &str { &self.payload }
+    pub fn payload(&self) -> &str {
+        &self.payload
+    }
 }
 
 impl MessageContent {
@@ -316,11 +340,15 @@ impl MessageContent {
 }
 
 impl From<String> for MessageContent {
-    fn from(value: String) -> Self { MessageContent::Text(value) }
+    fn from(value: String) -> Self {
+        MessageContent::Text(value)
+    }
 }
 
 impl From<&str> for MessageContent {
-    fn from(value: &str) -> Self { MessageContent::Text(value.to_string()) }
+    fn from(value: &str) -> Self {
+        MessageContent::Text(value.to_string())
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Hash)]
@@ -359,7 +387,9 @@ impl LanguageModelRequestMessage {
         buffer
     }
 
-    pub fn contents_empty(&self) -> bool { self.content.iter().all(|content| content.is_empty()) }
+    pub fn contents_empty(&self) -> bool {
+        self.content.iter().all(|content| content.is_empty())
+    }
 }
 
 #[derive(Debug, PartialEq, Hash, Clone, Serialize, Deserialize)]
@@ -439,6 +469,11 @@ pub enum CompletionIntent {
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct LanguageModelRequest {
     pub thread_id: Option<String>,
+    /// Provider cache affinity, independent of conversation and transport session identity.
+    ///
+    /// Supporting providers fall back to `thread_id` when absent for legacy callers.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt_cache_key: Option<String>,
     pub prompt_id: Option<String>,
     pub intent: Option<CompletionIntent>,
     pub messages: Vec<LanguageModelRequestMessage>,
@@ -514,6 +549,33 @@ pub struct LanguageModelResponseMessage {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn request_prompt_cache_key_serialization() -> serde_json::Result<()> {
+        let request = LanguageModelRequest {
+            thread_id: Some("thread".into()),
+            ..Default::default()
+        };
+        let mut serialized = serde_json::to_value(&request)?;
+        assert!(serialized.get("prompt_cache_key").is_none());
+        assert_eq!(
+            serde_json::from_value::<LanguageModelRequest>(serialized.clone())?,
+            request
+        );
+
+        serialized["prompt_cache_key"] = serde_json::json!("cache-affinity");
+        let explicit: LanguageModelRequest = serde_json::from_value(serialized.clone())?;
+        assert_eq!(explicit.prompt_cache_key.as_deref(), Some("cache-affinity"));
+        assert_eq!(explicit.thread_id, request.thread_id);
+        assert_eq!(serde_json::to_value(explicit)?, serialized);
+
+        serialized["prompt_cache_key"] = serde_json::Value::Null;
+        assert_eq!(
+            serde_json::from_value::<LanguageModelRequest>(serialized)?,
+            request
+        );
+        Ok(())
+    }
 
     #[test]
     fn request_output_limit_serialization() -> serde_json::Result<()> {

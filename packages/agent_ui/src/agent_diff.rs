@@ -36,7 +36,7 @@ use workspace::{
     item::{ItemEvent, SaveOptions, TabContentParams, TabTooltipContent},
     searchable::SearchableItemHandle,
 };
-use aacode_actions::assistant::ToggleFocus;
+use zed_actions::assistant::ToggleFocus;
 
 pub struct AgentDiffPane {
     multibuffer: Entity<MultiBuffer>,
@@ -1470,6 +1470,7 @@ impl AgentDiff {
             AcpThreadEvent::TitleUpdated
             | AcpThreadEvent::StatusChanged
             | AcpThreadEvent::TokenUsageUpdated
+            | AcpThreadEvent::NoticesUpdated
             | AcpThreadEvent::SubagentSpawned(_)
             | AcpThreadEvent::EntriesRemoved(_)
             | AcpThreadEvent::ToolAuthorizationRequested(_)

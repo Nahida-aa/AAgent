@@ -7,6 +7,13 @@
 mod schema;
 pub mod settings;
 
+pub mod bundled_themes;
+
+pub use bundled_themes::{
+    load_bundled_themes, merge_accent_colors, merge_player_colors, refine_theme,
+    refine_theme_family,
+};
+
 pub use schema::{
     ThemeContent, ThemeFamilyContent, status_colors_refinement, syntax_overrides,
     theme_colors_refinement,
@@ -67,7 +74,17 @@ use ::settings::SettingsStore;
 pub fn init(themes_to_load: LoadThemes, cx: &mut App) {
     // 1. 基础主题系统装配（对齐 Zed `theme::init`）。
     // gpui_learn 的 theme::init 封装了 SystemAppearance::init + ThemeRegistry::set_global。
+    // `themes_to_load` 会被它消费掉，所以「要不要装资产主题」得先记下来
+    // （对齐 Zed L69：`let load_user_themes = matches!(&themes_to_load, LoadThemes::All(_))`）。
+    let load_bundled = matches!(&themes_to_load, LoadThemes::All(_));
     theme::init(themes_to_load, cx);
+
+    // 1b. 装资产里 `themes/**/*.json`（对齐 Zed L79）。必须在解析初始主题
+    // **之前**：内置 Catppuccin 主题（含 102 个语法 capture）来自这里，
+    // 晚一步的话 `configured_theme` 拿到的还是手写兜底那份。
+    if load_bundled {
+        load_bundled_themes(&ThemeRegistry::global(cx));
+    }
 
     // 2. 从 SettingsStore 解析初始主题 + 图标主题（SettingsStore 此时应已存在）
     let theme = configured_theme(cx);

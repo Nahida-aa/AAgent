@@ -50,7 +50,12 @@ fn main() {
         // （theme_settings::init 需要 SettingsStore 存在才能读 ThemeSettings）
         gpui_tokio::init(cx);
         settings::init(cx);
-        theme_settings::init(theme::LoadThemes::JustBase, cx);
+        // 传资产源：theme_settings 据此装载内嵌的 `themes/**/*.json`
+        // （内置 Catppuccin 主题 —— 语法高亮的 102 个 capture 都来自那份 JSON）。
+        theme_settings::init(
+            theme::LoadThemes::All(Box::new(aa_gpui_kit_assets::Assets)),
+            cx,
+        );
         editor::init(cx);
         terminal_view::init(cx);
         title_bar::init(cx); // 内部 observe_new(|ws| ws.set_titlebar_item)

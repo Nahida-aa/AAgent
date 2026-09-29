@@ -20,6 +20,9 @@ settings_macros.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 palette = { workspace = true, default-features = false, features = ["std"] }
+# bundled_themes：把 JSON 内容 refine 进 ThemeColors / StatusColors
+# （`Refineable::refine`，与 zed 同款）。
+refineable.workspace = true
 schemars.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
@@ -27,3 +30,5 @@ tracing.workspace = true
 [dev-dependencies]
 gpui = { workspace = true, features = ["test-support"] }
 settings = { workspace = true, features = ["test-support"] }
+# 测试里用真实资产源装载内嵌的主题 JSON。
+aa_gpui_kit_assets = { workspace = true }

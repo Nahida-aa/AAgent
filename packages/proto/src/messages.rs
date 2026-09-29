@@ -357,7 +357,8 @@ messages!(
     (LoadCommitTemplateResponse, Background),
     (GitClone, Background),
     (GitCloneResponse, Background),
-    (ToggleLspLogs, Background),
+    // Reconnect reconciliation must stay ordered with subsequent user toggles.
+    (ToggleLspLogs, Foreground),
     (GetDirectoryEnvironment, Background),
     (DirectoryEnvironment, Background),
     (GetAgentServerCommand, Background),

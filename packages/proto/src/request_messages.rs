@@ -213,7 +213,6 @@ request_messages!(
     (LoadCommitTemplate, LoadCommitTemplateResponse),
     (GetTreeDiff, GetTreeDiffResponse),
     (GitClone, GitCloneResponse),
-    (ToggleLspLogs, Ack),
     (GetDirectoryEnvironment, DirectoryEnvironment),
     (GetProcesses, GetProcessesResponse),
     (GetAgentServerCommand, AgentServerCommand),

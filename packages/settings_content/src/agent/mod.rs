@@ -72,6 +72,11 @@ pub struct AgentSettingsContent {
     /// Don't use this field.
     #[schemars(skip)]
     pub threads_sidebar_default_width: Option<crate::PixelSetting>,
+    /// The deprecated version of `threads_sidebar.auto_open`.
+    ///
+    /// Don't use this field.
+    #[schemars(skip)]
+    pub threads_sidebar_auto_open: Option<bool>,
     /// Default fixed width in pixels when the agent panel is docked to the left or right and
     /// `flexible` is false.
     ///
@@ -236,6 +241,11 @@ impl AgentSettingsContent {
     ) {
         self.threads_sidebar_default_width = None;
         self.threads_sidebar.get_or_insert_default().default_width = default_width;
+    }
+
+    pub fn set_threads_sidebar_auto_open(&mut self, auto_open: Option<bool>) {
+        self.threads_sidebar_auto_open = None;
+        self.threads_sidebar.get_or_insert_default().auto_open = auto_open;
     }
 
     pub fn set_flexible_size(&mut self, flexible: bool) { self.flexible = Some(flexible); }

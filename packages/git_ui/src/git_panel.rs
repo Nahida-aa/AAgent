@@ -102,7 +102,7 @@ use workspace::{
     dock::{DockPosition, Panel, PanelEvent},
     notifications::{DetachAndPromptErr, NotificationId, NotifyTaskExt},
 };
-use zed_actions::{
+use aacode_actions::{
     DecreaseBufferFontSize, IncreaseBufferFontSize, ResetBufferFontSize,
     git_panel::ToggleFocus,
     workspace::{CopyPath, CopyRelativePath},
@@ -344,7 +344,7 @@ fn git_panel_context_menu(
                 )
             })
             .action_disabled_when(!has_stash_items, "Stash Pop", StashPop.boxed_clone())
-            .action("View Stash", zed_actions::git::ViewStash.boxed_clone())
+            .action("View Stash", aacode_actions::git::ViewStash.boxed_clone())
             .when(include_copy_paths, |context_menu| {
                 context_menu
                     .separator()
@@ -6014,7 +6014,7 @@ impl GitPanel {
                         // button is pressed.
                         this.action("Create Pull Request", move |window, cx| {
                             window
-                                .dispatch_action(Box::new(zed_actions::git::CreatePullRequest), cx);
+                                .dispatch_action(Box::new(aacode_actions::git::CreatePullRequest), cx);
                         })
                     }
                     (Toast, false) => this,
@@ -6715,10 +6715,10 @@ impl GitPanel {
                                     .h_full()
                                     .flex_grow_1()
                                     .cursor_text()
-                                    .on_action(|&zed_actions::editor::MoveUp, _, cx| {
+                                    .on_action(|&aacode_actions::editor::MoveUp, _, cx| {
                                         cx.stop_propagation();
                                     })
-                                    .on_action(|&zed_actions::editor::MoveDown, _, cx| {
+                                    .on_action(|&aacode_actions::editor::MoveDown, _, cx| {
                                         cx.stop_propagation();
                                     })
                                     .child(EditorElement::new(
@@ -8999,7 +8999,7 @@ impl Render for GenerateCommitMessageConfigurationTooltip {
                                 .label_size(LabelSize::Small)
                                 .on_click(|_, window, cx| {
                                     window.dispatch_action(
-                                        zed_actions::OpenSettingsAt {
+                                        aacode_actions::OpenSettingsAt {
                                             path: "llm_providers".to_string(),
                                             target: None,
                                         }
@@ -9503,7 +9503,7 @@ impl RenderOnce for PanelRepoFooter {
             .label_size(LabelSize::Small)
             .truncate(true)
             .on_click(|_, window, cx| {
-                window.dispatch_action(zed_actions::git::Switch.boxed_clone(), cx);
+                window.dispatch_action(aacode_actions::git::Switch.boxed_clone(), cx);
             });
 
         let branch_selector = PopoverMenu::new("popover-button")
@@ -9514,7 +9514,7 @@ impl RenderOnce for PanelRepoFooter {
             })
             .trigger_with_tooltip(
                 branch_selector_button,
-                Tooltip::for_action_title("Switch Branch", &zed_actions::git::Switch),
+                Tooltip::for_action_title("Switch Branch", &aacode_actions::git::Switch),
             )
             .anchor(Anchor::BottomLeft)
             .offset(gpui::Point {

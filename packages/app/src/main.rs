@@ -243,6 +243,18 @@ fn main() {
             },
         ]);
 
+        // —— 语法高亮：把当前主题灌进语言注册表（对齐 Zed main.rs L830-L839）——
+        // LanguageRegistryState.theme 为 None 时，每个加载的语言都会跳过
+        // `language.set_theme`，highlight map 全空 → 编辑器没有语法高亮。
+        app_state.languages.set_theme(cx.theme().clone());
+        cx.observe_global::<theme::GlobalTheme>({
+            let languages = app_state.languages.clone();
+            move |cx| {
+                languages.set_theme(cx.theme().clone());
+            }
+        })
+        .detach();
+
         // —— 主题变化时更新所有窗口的 background_appearance（对齐 Zed main.rs L795-L829）——
         // 必须在 open_window 之前注册，这样第一个窗口创建后主题变化也能生效。
         cx.observe_global::<theme::GlobalTheme>(|cx| {

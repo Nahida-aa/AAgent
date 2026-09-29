@@ -46,6 +46,7 @@ scap.workspace = true
 core-foundation.workspace = true
 core-video.workspace = true
 coreaudio-rs = "0.12.1"
+objc2-core-foundation.workspace = true
 
 [dev-dependencies]
 collections = { workspace = true, features = ["test-support"] }

@@ -18,7 +18,7 @@ use gpui::{
     Action, Anchor, AnyElement, App, Bounds, ClickEvent, ClipboardItem, DefiniteLength,
     DismissEvent, DragMoveEvent, ElementId, Empty, Entity, EventEmitter, FocusHandle, Focusable,
     Hsla, MouseButton, MouseDownEvent, PathBuilder, Pixels, Point, ScrollHandle, ScrollStrategy,
-    ScrollWheelEvent, SharedString, Subscription, Task, TextStyleRefinement, Rems,
+    ScrollWheelEvent, SharedString, Subscription, Task, TextStyleRefinement,
     UniformListScrollHandle, WeakEntity, Window, actions, anchored, deferred, point, prelude::*,
     px, uniform_list,
 };
@@ -41,7 +41,7 @@ use std::{
     sync::{Arc, OnceLock},
     time::{Duration, Instant},
 };
-use aacode_actions::{
+use zed_actions::{
     buffer_search,
     search::{SelectNextMatch, SelectPreviousMatch, ToggleCaseSensitive},
 };
@@ -2156,11 +2156,11 @@ impl GitGraph {
 
         self.load_selected_commit_message(cx, &commit_message_handle, &repository);
 
-        let diff_receiver =
-            repository.update(cx, |repo, _| repo.load_commit_diff(diff_handle, false));
+        let diff_task =
+            repository.update(cx, |repo, cx| repo.load_commit_diff(diff_handle, false, cx));
 
         self._commit_diff_task = Some(cx.spawn(async move |this, cx| {
-            if let Ok(Ok(diff)) = diff_receiver.await {
+            if let Ok(diff) = diff_task.await {
                 this.update(cx, |this, cx| {
                     let stats = compute_diff_stats(&diff);
                     this.selected_commit_diff = Some(diff);

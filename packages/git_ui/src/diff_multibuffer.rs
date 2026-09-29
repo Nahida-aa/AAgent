@@ -35,7 +35,7 @@ use workspace::{
     CloseActiveItem, ItemNavHistory, Workspace,
     item::{Item, SaveOptions},
 };
-use a_tracing::instrument;
+use ztracing::instrument;
 
 /// Loading every changed file at once makes the first one land no sooner than the
 /// last, leaving a large diff on a spinner. Throughput flattens past this point.
@@ -670,7 +670,7 @@ impl DiffMultibuffer {
                     editor.rhs_editor().update(cx, |editor, cx| {
                         conflict_view::buffers_removed(editor, &[buffer_id], cx);
                     });
-                    let _span = a_tracing::info_span!("remove_excerpts_for_path");
+                    let _span = ztracing::info_span!("remove_excerpts_for_path");
                     _span.enter();
                     editor.remove_excerpts_for_path(path, cx);
                 }

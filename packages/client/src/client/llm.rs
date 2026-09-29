@@ -15,17 +15,13 @@ impl Client {
     ) -> Result<String, ClientApiError> {
         let system_id = self.telemetry().system_id().map(|x| x.to_string());
         let cloud_client = self.cloud_client();
-        match llm_token
+        let result = llm_token
             .cached(&cloud_client, system_id, organization_id)
-            .await
-        {
-            Ok(token) => Ok(token),
-            Err(ClientApiError::Unauthorized) => {
-                self.request_sign_out();
-                Err(ClientApiError::Unauthorized)
-            }
-            Err(err) => Err(err),
+            .await;
+        if let Err(ClientApiError::Unauthorized) = result {
+            self.request_sign_out();
         }
+        result
     }
 
     /// Sends an authenticated request to the Zed LLM service, retrying once

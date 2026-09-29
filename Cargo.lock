@@ -16887,12 +16887,14 @@ dependencies = [
 name = "theme_settings"
 version = "0.1.0"
 dependencies = [
+ "aa_gpui_kit_assets",
  "aa_gpui_kit_theme",
  "anyhow",
  "collections",
  "gpui",
  "inventory",
  "palette",
+ "refineable",
  "schemars 1.2.2",
  "serde",
  "serde_json",

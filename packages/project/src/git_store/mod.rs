@@ -15,6 +15,7 @@ use crate::{
 };
 use anyhow::{Context as _, Result, anyhow, bail};
 use askpass::{AskPassDelegate, EncryptedPassword, IKnowWhatIAmDoingAndIHaveReadTheDocs};
+use async_lock::Semaphore;
 use buffer_diff::{
     BufferDiff, DiffHunk, DiffHunkSecondaryStatus, DiffOperations, PendingHunk, PendingSense,
 };
@@ -115,10 +116,12 @@ pub struct GitStore {
     diffs: HashMap<BufferId, Entity<BufferGitState>>,
     buffer_ids_by_index_text_buffer_id: HashMap<BufferId, BufferId>,
     shared_diffs: HashMap<proto::PeerId, HashMap<BufferId, SharedDiffs>>,
+    object_read_limiter: Arc<Semaphore>,
     _subscriptions: Vec<Subscription>,
 }
 
 const MIN_PARKED_REPOSITORY_DEPTH: usize = 2;
+pub const MAX_CONCURRENT_OBJECT_READS: usize = 16;
 
 #[derive(Clone, Debug)]
 pub struct ParkedRepository {
@@ -683,6 +686,7 @@ pub struct Repository {
     unshallow_state: UnshallowState,
     commit_message_buffer: Option<Entity<Buffer>>,
     git_store: WeakEntity<GitStore>,
+    object_read_limiter: Arc<Semaphore>,
     // For a local repository, holds paths that have had worktree events since the last status scan completed,
     // and that should be examined during the next status scan.
     paths_needing_status_update: Vec<Vec<RepoPath>>,
@@ -1019,6 +1023,7 @@ impl GitStore {
             _subscriptions,
             loading_diffs: HashMap::default(),
             shared_diffs: HashMap::default(),
+            object_read_limiter: Arc::new(Semaphore::new(MAX_CONCURRENT_OBJECT_READS)),
             diffs: HashMap::default(),
             buffer_ids_by_index_text_buffer_id: HashMap::default(),
         }
@@ -2912,6 +2917,7 @@ impl GitStore {
 
         let id = RepositoryId(next_repository_id.fetch_add(1, atomic::Ordering::Release));
         let git_store = cx.weak_entity();
+        let object_read_limiter = self.object_read_limiter.clone();
         let repo = cx.new(|cx| {
             let mut repo = Repository::local(
                 id,
@@ -2923,6 +2929,7 @@ impl GitStore {
                 fs,
                 is_trusted,
                 git_store,
+                object_read_limiter,
                 cx,
             );
             if let Some(updates_tx) = updates_tx.as_ref() {
@@ -3391,6 +3398,7 @@ impl GitStore {
                 .map(|p| Path::new(p).into());
 
             let mut repo_subscription = None;
+            let object_read_limiter = this.object_read_limiter.clone();
             let repo = this.repositories.entry(id).or_insert_with(|| {
                 let git_store = cx.weak_entity();
                 let repo = cx.new(|cx| {
@@ -3403,6 +3411,7 @@ impl GitStore {
                         ProjectId(update.project_id),
                         client,
                         git_store,
+                        object_read_limiter,
                         cx,
                     )
                 });
@@ -6530,6 +6539,7 @@ impl Repository {
         fs: Arc<dyn Fs>,
         is_trusted: bool,
         git_store: WeakEntity<GitStore>,
+        object_read_limiter: Arc<Semaphore>,
         cx: &mut Context<Self>,
     ) -> Self {
         let snapshot = RepositorySnapshot::empty(
@@ -6544,6 +6554,7 @@ impl Repository {
         let mut repo = Repository {
             this: cx.weak_entity(),
             git_store,
+            object_read_limiter,
             snapshot,
             unshallow_state: UnshallowState::default(),
             pending_ops: Default::default(),
@@ -6575,6 +6586,7 @@ impl Repository {
         project_id: ProjectId,
         client: AnyProtoClient,
         git_store: WeakEntity<GitStore>,
+        object_read_limiter: Arc<Semaphore>,
         cx: &mut Context<Self>,
     ) -> Self {
         let snapshot = RepositorySnapshot::empty(
@@ -6597,6 +6609,7 @@ impl Repository {
             unshallow_state: UnshallowState::default(),
             commit_message_buffer: None,
             git_store,
+            object_read_limiter,
             pending_ops: Default::default(),
             paths_needing_status_update: Default::default(),
             job_sender,

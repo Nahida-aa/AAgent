@@ -1857,13 +1857,16 @@ impl BufferSearchBar {
     /// Clears the case sensitivity when the search bar is dismissed so that
     /// only the editor's settings are respected.
     fn sync_select_next_case_sensitivity(&self, cx: &mut Context<Self>) {
-        let case_sensitive = match self.dismissed {
+        let search_options = match self.dismissed {
             true => None,
-            false => Some(self.search_options.contains(SearchOptions::CASE_SENSITIVE)),
+            false => Some(workspace::searchable::SelectSearchOptions {
+                case_sensitive: self.search_options.contains(SearchOptions::CASE_SENSITIVE),
+                whole_word: false,
+            }),
         };
 
         if let Some(active_searchable_item) = self.active_searchable_item.as_ref() {
-            active_searchable_item.set_search_is_case_sensitive(case_sensitive, cx);
+            active_searchable_item.set_select_search_options(search_options, cx);
         }
     }
 }

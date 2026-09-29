@@ -103,6 +103,7 @@ pub use git_store::{
 };
 pub use image_store::{ImageItem, ImageStore};
 pub use manifest_tree::{ManifestProvidersStore, ManifestTree};
+pub use prettier_store::PrettierStore;
 pub use project_search::{Search, SearchResults};
 pub use project_settings::{ProjectSettings, SettingsObserver, SettingsObserverEvent};
 pub use snippet_provider;

@@ -9061,6 +9061,23 @@ dependencies = [
 [[package]]
 name = "language_extension"
 version = "0.1.0"
+dependencies = [
+ "a_tracing",
+ "anyhow",
+ "async-trait",
+ "collections",
+ "extension",
+ "futures 0.3.34",
+ "gpui",
+ "language",
+ "log",
+ "lsp",
+ "project",
+ "serde",
+ "serde_json",
+ "tracing",
+ "util",
+]
 
 [[package]]
 name = "language_model"

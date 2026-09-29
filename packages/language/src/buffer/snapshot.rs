@@ -430,24 +430,28 @@ impl BufferSnapshot {
                     basis_row: prev_row,
                     delta: Ordering::Equal,
                     within_error: within_error && !from_regex,
+                    explicit_outdent: true,
                 })
             } else if indent_from_prev_row {
                 Some(IndentSuggestion {
                     basis_row: prev_row,
                     delta: Ordering::Greater,
                     within_error: within_error && !from_regex,
+                    explicit_outdent: false,
                 })
             } else if outdent_to_row < prev_row {
                 Some(IndentSuggestion {
                     basis_row: outdent_to_row,
                     delta: Ordering::Equal,
                     within_error: within_error && !from_regex,
+                    explicit_outdent: true,
                 })
             } else if outdent_from_prev_row {
                 Some(IndentSuggestion {
                     basis_row: prev_row,
                     delta: Ordering::Less,
                     within_error: within_error && !from_regex,
+                    explicit_outdent: true,
                 })
             } else if config.auto_indent_using_last_non_empty_line || !self.is_line_blank(prev_row)
             {
@@ -455,6 +459,7 @@ impl BufferSnapshot {
                     basis_row: prev_row,
                     delta: Ordering::Equal,
                     within_error: within_error && !from_regex,
+                    explicit_outdent: false,
                 })
             } else {
                 None

@@ -63,6 +63,9 @@ pub(crate) struct AutoindentRequestEntry {
     pub(crate) old_row: Option<u32>,
     pub(crate) indent_size: IndentSize,
     pub(crate) original_indent_column: Option<u32>,
+    /// If true, only syntax-triggered outdents (not indent-from-previous-row) are applied.
+    /// Used by `AutoindentMode::PreserveSingleLine` for single-line edits.
+    pub(crate) only_explicit_outdents: bool,
 }
 
 #[derive(Debug)]
@@ -70,6 +73,9 @@ pub(crate) struct IndentSuggestion {
     pub(crate) basis_row: u32,
     pub(crate) delta: Ordering,
     pub(crate) within_error: bool,
+    /// If true, this suggestion is a syntax-triggered outdent that should be
+    /// preserved even when `only_explicit_outdents` is set.
+    pub(crate) explicit_outdent: bool,
 }
 
 #[derive(Clone, Copy, Debug)]

@@ -1227,7 +1227,11 @@ impl Buffer {
                     if let Some(old_row) = entry.old_row {
                         old_to_new_rows.insert(old_row, new_row);
                     }
-                    row_ranges.push((new_row..new_end_row, entry.original_indent_column));
+                    row_ranges.push((
+                        new_row..new_end_row,
+                        entry.original_indent_column,
+                        entry.only_explicit_outdents,
+                    ));
                 }
 
                 // Build a map containing the suggested indentation for each of the edited lines
@@ -1279,7 +1283,7 @@ impl Buffer {
                 // if they differ from the old suggestion for that line.
                 let mut language_indent_sizes = language_indent_sizes_by_new_row.iter().peekable();
                 let mut language_indent_size = IndentSize::default();
-                for (row_range, original_indent_column) in row_ranges {
+                for (row_range, original_indent_column, only_explicit_outdents) in row_ranges {
                     let new_edited_row_range = if request.is_block_mode {
                         row_range.start..row_range.start + 1
                     } else {
@@ -1315,7 +1319,7 @@ impl Buffer {
                                     suggested_indent != *old_indentation
                                         && (!suggestion.within_error || *was_within_error)
                                 },
-                            ) {
+                            ) && (!only_explicit_outdents || suggestion.explicit_outdent) {
                                 indent_sizes.insert(
                                     new_row,
                                     (suggested_indent, request.ignore_empty_lines),
@@ -2125,6 +2129,9 @@ impl Buffer {
 
                     AutoindentRequestEntry {
                         original_indent_column,
+                        only_explicit_outdents: matches!(mode, AutoindentMode::PreserveSingleLine)
+                            && old_start.row == old_end.row
+                            && !new_text.contains('\n'),
                         old_row: if first_line_is_new {
                             None
                         } else {
@@ -2196,6 +2203,7 @@ impl Buffer {
                 old_row: None,
                 indent_size: before_edit.language_indent_size_at(range.start, cx),
                 original_indent_column: None,
+                only_explicit_outdents: false,
             })
             .collect();
         self.autoindent_requests.push(Arc::new(AutoindentRequest {

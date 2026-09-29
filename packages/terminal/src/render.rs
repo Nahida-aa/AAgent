@@ -3,6 +3,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant};
 
 use super::task::{TaskStatus, task_summary};
+use vte::ansi::{Processor, StdSyncHandler};
 
 use crate::bounds::normalize_terminal_bounds;
 use crate::cell::{GridLinesChange, RenderableCells};
@@ -93,14 +94,19 @@ impl Terminal {
         last_non_empty_lines(&terminal, n)
     }
 
+    /// Normalizes line endings so text captured outside a PTY starts each line at column zero.
     pub fn write_output(&mut self, bytes: &[u8], cx: &mut Context<Self>) {
-        // Inject bytes directly into the terminal emulator and refresh the UI.
-        // This bypasses the PTY/event loop for display-only terminals.
         let mut previous_byte_was_cr = false;
         let converted = convert_lf_to_crlf(bytes, &mut previous_byte_was_cr);
+        self.write_raw_output(&converted, cx);
+    }
 
+    /// Terminal byte streams already contain their control sequences and must not be normalized.
+    fn write_raw_output(&mut self, bytes: &[u8], cx: &mut Context<Self>) {
         let mut term = self.term.lock();
-        self.output_processor.advance(&mut *term, &converted);
+        self.output_processor
+            .get_or_insert_with(Processor::<StdSyncHandler>::new)
+            .advance(&mut *term, bytes);
         drop(term);
         self.detect_init_command_startup_marker();
         cx.emit(Event::Wakeup);

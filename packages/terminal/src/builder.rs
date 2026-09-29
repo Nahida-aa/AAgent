@@ -102,7 +102,7 @@ impl TerminalBuilder {
             completion_tx: None,
             term,
             term_config: config,
-            output_processor: Processor::<StdSyncHandler>::new(),
+            output_processor: None,
             title_override: None,
             events: VecDeque::with_capacity(10),
             last_content: Content {
@@ -389,7 +389,7 @@ impl TerminalBuilder {
                 completion_tx,
                 term,
                 term_config: config,
-                output_processor: Processor::<StdSyncHandler>::new(),
+                output_processor: None,
                 title_override: terminal_title_override,
                 events: VecDeque::with_capacity(10), //Should never get this high.
                 last_content: Default::default(),

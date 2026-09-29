@@ -9631,6 +9631,7 @@ dependencies = [
  "livekit_api",
  "log",
  "nanoid",
+ "objc2-core-foundation",
  "parking_lot",
  "postage",
  "rodio",

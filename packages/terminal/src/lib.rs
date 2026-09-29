@@ -99,6 +99,12 @@ enum TerminalType {
     DisplayOnly,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum MouseInputMode {
+    ReportToTerminal,
+    LocalSelection,
+}
+
 pub struct Terminal {
     pub(crate) terminal_type: TerminalType,
     /// Set for non-PTY terminals (see [`HeadlessTerminal`]); owns the spawned
@@ -107,7 +113,7 @@ pub struct Terminal {
     pub(crate) completion_tx: Option<Sender<Option<ExitStatus>>>,
     pub(crate) term: Arc<AlacrittyTermLock>,
     pub(crate) term_config: AlacrittyTermConfig,
-    pub(crate) output_processor: Processor<StdSyncHandler>,
+    pub(crate) output_processor: Option<Processor<StdSyncHandler>>,
     pub(crate) events: VecDeque<InternalEvent>,
     /// This is only used for mouse mode cell change detection
     pub(crate) last_mouse: Option<(Point, SelectionSide)>,

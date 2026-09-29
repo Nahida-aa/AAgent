@@ -106,16 +106,26 @@ impl PartialEq for FoldPlaceholder {
 pub struct FoldPoint(pub Point);
 
 impl FoldPoint {
-    pub fn new(row: u32, column: u32) -> Self { Self(Point::new(row, column)) }
+    pub fn new(row: u32, column: u32) -> Self {
+        Self(Point::new(row, column))
+    }
 
-    pub fn row(self) -> u32 { self.0.row }
+    pub fn row(self) -> u32 {
+        self.0.row
+    }
 
-    pub fn column(self) -> u32 { self.0.column }
+    pub fn column(self) -> u32 {
+        self.0.column
+    }
 
-    pub fn row_mut(&mut self) -> &mut u32 { &mut self.0.row }
+    pub fn row_mut(&mut self) -> &mut u32 {
+        &mut self.0.row
+    }
 
     #[cfg(test)]
-    pub fn column_mut(&mut self) -> &mut u32 { &mut self.0.column }
+    pub fn column_mut(&mut self) -> &mut u32 {
+        &mut self.0.column
+    }
 
     #[a_tracing::instrument(skip_all)]
     pub fn to_inlay_point(self, snapshot: &FoldSnapshot) -> InlayPoint {
@@ -146,7 +156,9 @@ impl FoldPoint {
 }
 
 impl<'a> sum_tree::Dimension<'a, TransformSummary> for FoldPoint {
-    fn zero(_cx: ()) -> Self { Default::default() }
+    fn zero(_cx: ()) -> Self {
+        Default::default()
+    }
 
     fn add_summary(&mut self, summary: &'a TransformSummary, _: ()) {
         self.0 += &summary.output.lines;
@@ -506,14 +518,11 @@ impl FoldMap {
                     ((edit.new.start + edit.old_len()).0.0 as isize + delta) as usize,
                 ));
 
-                let anchor = inlay_snapshot
-                    .buffer
-                    .anchor_before(inlay_snapshot.to_buffer_offset(edit.new.start));
                 let mut folds_cursor = self
                     .snapshot
                     .folds
                     .cursor::<FoldRange>(&inlay_snapshot.buffer);
-                folds_cursor.seek(&FoldRange(anchor..Anchor::Max), Bias::Left);
+                folds_cursor.seek(&inlay_snapshot.to_buffer_offset(edit.new.start), Bias::Left);
 
                 let mut folds = iter::from_fn({
                     let inlay_snapshot = &inlay_snapshot;
@@ -622,6 +631,8 @@ impl FoldMap {
 
             let mut fold_edits = Vec::with_capacity(inlay_edits.len());
             {
+                let old_len = self.snapshot.inlay_snapshot.len();
+                let new_len = inlay_snapshot.len();
                 let mut old_transforms = self
                     .snapshot
                     .transforms
@@ -629,34 +640,92 @@ impl FoldMap {
                 let mut new_transforms =
                     new_transforms.cursor::<Dimensions<InlayOffset, FoldOffset>>(());
 
-                for mut edit in inlay_edits {
-                    old_transforms.seek(&edit.old.start, Bias::Left);
-                    if old_transforms.item().is_some_and(|t| t.is_fold()) {
-                        edit.old.start = old_transforms.start().0;
+                let mut widened_edits = Vec::<InlayEdit>::with_capacity(inlay_edits.len());
+                let mut inlay_edits_iter = inlay_edits.into_iter().peekable();
+                while let Some(mut edit) = inlay_edits_iter.next() {
+                    let previous_edit = widened_edits.last();
+                    let mut merge_with_previous =
+                        previous_edit.is_some_and(|previous| previous.old.end >= edit.old.start);
+                    if !merge_with_previous {
+                        let mut limit = match previous_edit {
+                            Some(previous) => (edit.old.start - previous.old.end)
+                                .min(edit.new.start - previous.new.end),
+                            None => edit.old.start.0.0.min(edit.new.start.0.0),
+                        };
+                        loop {
+                            old_transforms.seek(&edit.old.start, Bias::Left);
+                            new_transforms.seek(&edit.new.start, Bias::Left);
+                            let old_pull = if old_transforms.item().is_some_and(|t| t.is_fold()) {
+                                edit.old.start - old_transforms.start().0
+                            } else {
+                                0
+                            };
+                            let new_pull = if new_transforms.item().is_some_and(|t| t.is_fold()) {
+                                edit.new.start - new_transforms.start().0
+                            } else {
+                                0
+                            };
+                            let pull = old_pull.max(new_pull).min(limit);
+                            if pull == 0 {
+                                break;
+                            }
+                            edit.old.start -= pull;
+                            edit.new.start -= pull;
+                            limit -= pull;
+                        }
+                        merge_with_previous = previous_edit.is_some() && limit == 0;
                     }
+
+                    let mut limit = match inlay_edits_iter.peek() {
+                        Some(next) => {
+                            (next.old.start - edit.old.end).min(next.new.start - edit.new.end)
+                        }
+                        None => (old_len - edit.old.end).min(new_len - edit.new.end),
+                    };
+                    loop {
+                        old_transforms.seek_forward(&edit.old.end, Bias::Right);
+                        new_transforms.seek_forward(&edit.new.end, Bias::Right);
+                        let old_extension = if old_transforms.item().is_some_and(|t| t.is_fold()) {
+                            old_transforms.end().0 - edit.old.end
+                        } else {
+                            0
+                        };
+                        let new_extension = if new_transforms.item().is_some_and(|t| t.is_fold()) {
+                            new_transforms.end().0 - edit.new.end
+                        } else {
+                            0
+                        };
+                        let extension = old_extension.max(new_extension).min(limit);
+                        if extension == 0 {
+                            break;
+                        }
+                        edit.old.end += extension;
+                        edit.new.end += extension;
+                        limit -= extension;
+                    }
+
+                    if merge_with_previous {
+                        if let Some(previous) = widened_edits.last_mut() {
+                            previous.old.end = edit.old.end;
+                            previous.new.end = edit.new.end;
+                        }
+                    } else {
+                        widened_edits.push(edit);
+                    }
+                }
+
+                for edit in widened_edits {
+                    old_transforms.seek(&edit.old.start, Bias::Left);
                     let old_start =
                         old_transforms.start().1.0 + (edit.old.start - old_transforms.start().0);
-
                     old_transforms.seek_forward(&edit.old.end, Bias::Right);
-                    if old_transforms.item().is_some_and(|t| t.is_fold()) {
-                        old_transforms.next();
-                        edit.old.end = old_transforms.start().0;
-                    }
                     let old_end =
                         old_transforms.start().1.0 + (edit.old.end - old_transforms.start().0);
 
                     new_transforms.seek(&edit.new.start, Bias::Left);
-                    if new_transforms.item().is_some_and(|t| t.is_fold()) {
-                        edit.new.start = new_transforms.start().0;
-                    }
                     let new_start =
                         new_transforms.start().1.0 + (edit.new.start - new_transforms.start().0);
-
                     new_transforms.seek_forward(&edit.new.end, Bias::Right);
-                    if new_transforms.item().is_some_and(|t| t.is_fold()) {
-                        new_transforms.next();
-                        edit.new.end = new_transforms.start().0;
-                    }
                     let new_end =
                         new_transforms.start().1.0 + (edit.new.end - new_transforms.start().0);
 
@@ -689,11 +758,15 @@ pub struct FoldSnapshot {
 impl Deref for FoldSnapshot {
     type Target = InlaySnapshot;
 
-    fn deref(&self) -> &Self::Target { &self.inlay_snapshot }
+    fn deref(&self) -> &Self::Target {
+        &self.inlay_snapshot
+    }
 }
 
 impl FoldSnapshot {
-    pub fn buffer(&self) -> &MultiBufferSnapshot { &self.inlay_snapshot.buffer }
+    pub fn buffer(&self) -> &MultiBufferSnapshot {
+        &self.inlay_snapshot.buffer
+    }
 
     #[a_tracing::instrument(skip_all)]
     fn fold_width(&self, fold_id: &FoldId) -> Option<Pixels> {
@@ -715,10 +788,14 @@ impl FoldSnapshot {
     }
 
     #[cfg(test)]
-    pub fn fold_count(&self) -> usize { self.folds.items(&self.inlay_snapshot.buffer).len() }
+    pub fn fold_count(&self) -> usize {
+        self.folds.items(&self.inlay_snapshot.buffer).len()
+    }
 
     #[inline(always)]
-    pub fn has_folds(&self) -> bool { !self.folds.is_empty() }
+    pub fn has_folds(&self) -> bool {
+        !self.folds.is_empty()
+    }
 
     #[a_tracing::instrument(skip_all)]
     pub fn text_summary_for_range(&self, range: Range<FoldPoint>) -> MBTextSummary {
@@ -801,7 +878,9 @@ impl FoldSnapshot {
     }
 
     #[a_tracing::instrument(skip_all)]
-    pub fn len(&self) -> FoldOffset { FoldOffset(self.transforms.summary().output.len) }
+    pub fn len(&self) -> FoldOffset {
+        FoldOffset(self.transforms.summary().output.len)
+    }
 
     #[a_tracing::instrument(skip_all)]
     pub fn line_len(&self, row: u32) -> u32 {
@@ -838,10 +917,14 @@ impl FoldSnapshot {
     }
 
     #[a_tracing::instrument(skip_all)]
-    pub fn max_point(&self) -> FoldPoint { FoldPoint(self.transforms.summary().output.lines) }
+    pub fn max_point(&self) -> FoldPoint {
+        FoldPoint(self.transforms.summary().output.lines)
+    }
 
     #[cfg(test)]
-    pub fn longest_row(&self) -> u32 { self.transforms.summary().output.longest_row }
+    pub fn longest_row(&self) -> u32 {
+        self.transforms.summary().output.longest_row
+    }
 
     #[a_tracing::instrument(skip_all)]
     pub fn folds_in_range<T>(&self, range: Range<T>) -> impl Iterator<Item = &Fold>
@@ -898,6 +981,14 @@ impl FoldSnapshot {
                 cursor.seek(&inlay_point, Bias::Right);
             }
         }
+    }
+
+    pub(crate) fn placeholder_range_at(&self, point: FoldPoint) -> Option<Range<FoldPoint>> {
+        let (start, end, item) = self
+            .transforms
+            .find::<FoldPoint, _>((), &point, Bias::Right);
+        item.filter(|transform| transform.placeholder.is_some())
+            .map(|_| start..end)
     }
 
     #[a_tracing::instrument(skip_all)]
@@ -1011,7 +1102,9 @@ pub struct FoldPointCursor<'transforms> {
 
 impl FoldPointCursor<'_> {
     /// Resets the cursor to the start so it can seek backward again.
-    pub fn reset(&mut self) { self.cursor.reset(); }
+    pub fn reset(&mut self) {
+        self.cursor.reset();
+    }
 
     #[a_tracing::instrument(skip_all)]
     pub fn map(&mut self, point: InlayPoint, bias: Bias) -> FoldPoint {
@@ -1167,7 +1260,9 @@ struct TransformPlaceholder {
 }
 
 impl Transform {
-    fn is_fold(&self) -> bool { self.placeholder.is_some() }
+    fn is_fold(&self) -> bool {
+        self.placeholder.is_some()
+    }
 }
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
@@ -1179,11 +1274,15 @@ struct TransformSummary {
 impl sum_tree::Item for Transform {
     type Summary = TransformSummary;
 
-    fn summary(&self, _cx: ()) -> Self::Summary { self.summary.clone() }
+    fn summary(&self, _cx: ()) -> Self::Summary {
+        self.summary.clone()
+    }
 }
 
 impl sum_tree::ContextLessSummary for TransformSummary {
-    fn zero() -> Self { Default::default() }
+    fn zero() -> Self {
+        Default::default()
+    }
 
     fn add_summary(&mut self, other: &Self) {
         self.input += other.input;
@@ -1195,7 +1294,9 @@ impl sum_tree::ContextLessSummary for TransformSummary {
 pub struct FoldId(pub(super) usize);
 
 impl From<FoldId> for ElementId {
-    fn from(val: FoldId) -> Self { val.0.into() }
+    fn from(val: FoldId) -> Self {
+        val.0.into()
+    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -1211,15 +1312,21 @@ pub struct FoldRange(pub(crate) Range<Anchor>);
 impl Deref for FoldRange {
     type Target = Range<Anchor>;
 
-    fn deref(&self) -> &Self::Target { &self.0 }
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
 impl DerefMut for FoldRange {
-    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
 }
 
 impl Default for FoldRange {
-    fn default() -> Self { Self(Anchor::Min..Anchor::Max) }
+    fn default() -> Self {
+        Self(Anchor::Min..Anchor::Max)
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -1266,7 +1373,9 @@ impl Default for FoldSummary {
 impl sum_tree::Summary for FoldSummary {
     type Context<'a> = &'a MultiBufferSnapshot;
 
-    fn zero(_cx: &MultiBufferSnapshot) -> Self { Default::default() }
+    fn zero(_cx: &MultiBufferSnapshot) -> Self {
+        Default::default()
+    }
 
     fn add_summary(&mut self, other: &Self, buffer: Self::Context<'_>) {
         if other.min_start.cmp(&self.min_start, buffer) == Ordering::Less {
@@ -1292,7 +1401,9 @@ impl sum_tree::Summary for FoldSummary {
 }
 
 impl<'a> sum_tree::Dimension<'a, FoldSummary> for FoldRange {
-    fn zero(_cx: &MultiBufferSnapshot) -> Self { Default::default() }
+    fn zero(_cx: &MultiBufferSnapshot) -> Self {
+        Default::default()
+    }
 
     fn add_summary(&mut self, summary: &'a FoldSummary, _: &MultiBufferSnapshot) {
         self.0.start = summary.start;
@@ -1306,8 +1417,16 @@ impl sum_tree::SeekTarget<'_, FoldSummary, FoldRange> for FoldRange {
     }
 }
 
+impl sum_tree::SeekTarget<'_, FoldSummary, FoldRange> for MultiBufferOffset {
+    fn cmp(&self, cursor_location: &FoldRange, buffer: &MultiBufferSnapshot) -> Ordering {
+        Ord::cmp(self, &cursor_location.start.to_offset(buffer))
+    }
+}
+
 impl<'a> sum_tree::Dimension<'a, FoldSummary> for MultiBufferOffset {
-    fn zero(_cx: &MultiBufferSnapshot) -> Self { Default::default() }
+    fn zero(_cx: &MultiBufferSnapshot) -> Self {
+        Default::default()
+    }
 
     fn add_summary(&mut self, summary: &'a FoldSummary, _: &MultiBufferSnapshot) {
         *self += summary.count;
@@ -1429,11 +1548,15 @@ impl fmt::Debug for ChunkRenderer {
 impl Deref for ChunkRendererContext<'_, '_> {
     type Target = App;
 
-    fn deref(&self) -> &Self::Target { self.context }
+    fn deref(&self) -> &Self::Target {
+        self.context
+    }
 }
 
 impl DerefMut for ChunkRendererContext<'_, '_> {
-    fn deref_mut(&mut self) -> &mut Self::Target { self.context }
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.context
+    }
 }
 
 pub struct FoldChunks<'a> {
@@ -1612,20 +1735,26 @@ impl FoldOffset {
 impl Add for FoldOffset {
     type Output = Self;
 
-    fn add(self, rhs: Self) -> Self::Output { Self(self.0 + rhs.0) }
+    fn add(self, rhs: Self) -> Self::Output {
+        Self(self.0 + rhs.0)
+    }
 }
 
 impl Sub for FoldOffset {
     type Output = <MultiBufferOffset as Sub>::Output;
 
-    fn sub(self, rhs: Self) -> Self::Output { self.0 - rhs.0 }
+    fn sub(self, rhs: Self) -> Self::Output {
+        self.0 - rhs.0
+    }
 }
 
 impl<T> SubAssign<T> for FoldOffset
 where
     MultiBufferOffset: SubAssign<T>,
 {
-    fn sub_assign(&mut self, rhs: T) { self.0 -= rhs; }
+    fn sub_assign(&mut self, rhs: T) {
+        self.0 -= rhs;
+    }
 }
 
 impl<T> Add<T> for FoldOffset
@@ -1634,22 +1763,30 @@ where
 {
     type Output = Self;
 
-    fn add(self, rhs: T) -> Self::Output { Self(self.0 + rhs) }
+    fn add(self, rhs: T) -> Self::Output {
+        Self(self.0 + rhs)
+    }
 }
 
 impl AddAssign for FoldOffset {
-    fn add_assign(&mut self, rhs: Self) { self.0 += rhs.0; }
+    fn add_assign(&mut self, rhs: Self) {
+        self.0 += rhs.0;
+    }
 }
 
 impl<T> AddAssign<T> for FoldOffset
 where
     MultiBufferOffset: AddAssign<T>,
 {
-    fn add_assign(&mut self, rhs: T) { self.0 += rhs; }
+    fn add_assign(&mut self, rhs: T) {
+        self.0 += rhs;
+    }
 }
 
 impl<'a> sum_tree::Dimension<'a, TransformSummary> for FoldOffset {
-    fn zero(_cx: ()) -> Self { Default::default() }
+    fn zero(_cx: ()) -> Self {
+        Default::default()
+    }
 
     fn add_summary(&mut self, summary: &'a TransformSummary, _: ()) {
         self.0 += summary.output.len;
@@ -1657,7 +1794,9 @@ impl<'a> sum_tree::Dimension<'a, TransformSummary> for FoldOffset {
 }
 
 impl<'a> sum_tree::Dimension<'a, TransformSummary> for InlayPoint {
-    fn zero(_cx: ()) -> Self { Default::default() }
+    fn zero(_cx: ()) -> Self {
+        Default::default()
+    }
 
     fn add_summary(&mut self, summary: &'a TransformSummary, _: ()) {
         self.0 += &summary.input.lines;
@@ -1665,9 +1804,13 @@ impl<'a> sum_tree::Dimension<'a, TransformSummary> for InlayPoint {
 }
 
 impl<'a> sum_tree::Dimension<'a, TransformSummary> for InlayOffset {
-    fn zero(_cx: ()) -> Self { Default::default() }
+    fn zero(_cx: ()) -> Self {
+        Default::default()
+    }
 
-    fn add_summary(&mut self, summary: &'a TransformSummary, _: ()) { self.0 += summary.input.len; }
+    fn add_summary(&mut self, summary: &'a TransformSummary, _: ()) {
+        self.0 += summary.input.len;
+    }
 }
 
 pub type FoldEdit = Edit<FoldOffset>;

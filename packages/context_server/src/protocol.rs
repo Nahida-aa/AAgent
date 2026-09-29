@@ -21,7 +21,9 @@ pub struct ModelContextProtocol {
 }
 
 impl ModelContextProtocol {
-    pub(crate) fn new(inner: Client) -> Self { Self { inner } }
+    pub(crate) fn new(inner: Client) -> Self {
+        Self { inner }
+    }
 
     fn supported_protocols() -> Vec<types::ProtocolVersion> {
         vec![

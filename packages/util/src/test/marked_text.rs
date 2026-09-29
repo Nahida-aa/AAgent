@@ -246,7 +246,9 @@ impl TextRangeMarker {
 }
 
 impl From<char> for TextRangeMarker {
-    fn from(marker: char) -> Self { Self::Empty(marker) }
+    fn from(marker: char) -> Self {
+        Self::Empty(marker)
+    }
 }
 
 impl From<(char, char)> for TextRangeMarker {

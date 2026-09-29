@@ -44,8 +44,8 @@ use workspace::{
     WorkspaceDb, WorkspaceId,
 };
 
-use zed_actions::agents_sidebar::FocusSidebarFilter;
-use zed_actions::editor::{MoveDown, MoveUp};
+use aacode_actions::agents_sidebar::FocusSidebarFilter;
+use aacode_actions::editor::{MoveDown, MoveUp};
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 enum ThreadFilter {

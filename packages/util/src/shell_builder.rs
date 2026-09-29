@@ -1,24 +1,17 @@
-//! ShellBuilder — 把用户 task 请求翻译成 shell 可执行的程序 + 参数。
-//!
-//! 对齐 Zed `crates/util/src/shell_builder.rs`。
-//! 供 task crate（SpawnInTerminal）和 future PTY backend 调用。
-
 use std::borrow::Cow;
 
-use crate::shell::{Shell, ShellKind, get_system_shell};
+use crate::shell::get_system_shell;
+use crate::shell::{Shell, ShellKind};
 
 /// ShellBuilder is used to turn a user-requested task into a
 /// program that can be executed by the shell.
 pub struct ShellBuilder {
-    /// The shell program to run (e.g. `bash`, `powershell`, `cmd.exe`).
+    /// The shell to run
     program: String,
-    /// Extra args to pass to the shell before the `-c` / `-C` / `/C` command.
     args: Vec<String>,
-    /// Whether to run the shell interactively (`-i` flag for POSIX/Fish/Nushell).
     interactive: bool,
-    /// Whether to redirect stdin to /dev/null for the spawned command.
+    /// Whether to redirect stdin to /dev/null for the spawned command as a subshell.
     redirect_stdin: bool,
-    /// Detected shell kind — drives quoting, command separator, variable syntax.
     kind: ShellKind,
 }
 
@@ -40,20 +33,12 @@ impl ShellBuilder {
             redirect_stdin: false,
         }
     }
-
-    /// Headless hosts (e.g. eval CLI) should use this — no `-i` flag.
     pub fn non_interactive(mut self) -> Self {
         self.interactive = false;
         self
     }
 
-    /// Redirect stdin so the spawned command doesn't get stuck reading from it.
-    pub fn redirect_stdin_to_dev_null(mut self) -> Self {
-        self.redirect_stdin = true;
-        self
-    }
-
-    /// Returns the label to show in the terminal tab.
+    /// Returns the label to show in the terminal tab
     pub fn command_label(&self, command_to_use_in_label: &str) -> String {
         if command_to_use_in_label.trim().is_empty() {
             self.program.clone()
@@ -83,16 +68,18 @@ impl ShellBuilder {
         }
     }
 
+    pub fn redirect_stdin_to_dev_null(mut self) -> Self {
+        self.redirect_stdin = true;
+        self
+    }
+
     /// Returns the program and arguments to run this task in a shell.
-    ///
-    /// 这是 terminal-provider / PTY backend 应该调用的入口。
     pub fn build(
         mut self,
         task_command: Option<String>,
         task_args: &[String],
     ) -> (String, Vec<String>) {
         if let Some(task_command) = task_command {
-            // 有 args 时才需要 command prefix aware quoting
             let task_command = if !task_args.is_empty() {
                 match self.kind.try_quote_prefix_aware(&task_command) {
                     Some(task_command) => task_command.into_owned(),
@@ -101,8 +88,6 @@ impl ShellBuilder {
             } else {
                 task_command
             };
-
-            // 拼 combined_command：command + 空格分隔的 quoted args
             let mut combined_command = task_args.iter().fold(task_command, |mut command, arg| {
                 command.push(' ');
                 let shell_variable = self.kind.to_shell_variable(arg);
@@ -112,12 +97,14 @@ impl ShellBuilder {
                 });
                 command
             });
-
-            // stdin 重定向（如果配置了）
             if self.redirect_stdin {
                 match self.kind {
                     ShellKind::Posix => {
-                        // 先重定向，让语法错误也能工作
+                        // Perform the STDIN redirection prior to the actual
+                        // command on a separate line, so that it is already
+                        // active if the command contains a syntax error.
+                        // Otherwise, with -i, dash will fall back to an
+                        // interactive shell in this case.
                         combined_command.insert_str(0, "exec </dev/null\n");
                     }
                     ShellKind::Fish => {
@@ -143,7 +130,6 @@ impl ShellBuilder {
                 }
             }
 
-            // shell 参数：-i / -c / -C / /C 等
             self.args
                 .extend(self.kind.args_for_shell(self.interactive, combined_command));
         }
@@ -151,7 +137,7 @@ impl ShellBuilder {
         (self.program, self.args)
     }
 
-    /// 不做 quoting 的 build — Zed 说"should not exist but task infra broken"。
+    // This should not exist, but our task infra is broken beyond repair right now
     #[doc(hidden)]
     pub fn build_no_quote(
         mut self,
@@ -164,7 +150,6 @@ impl ShellBuilder {
                 command.push_str(&self.kind.to_shell_variable(arg));
                 command
             });
-
             if self.redirect_stdin {
                 match self.kind {
                     ShellKind::Posix => {
@@ -250,12 +235,13 @@ impl ShellBuilder {
         child
     }
 
-    /// Detected ShellKind — 供外部查询 shell 类型。
-    pub fn kind(&self) -> ShellKind { self.kind }
+    pub fn kind(&self) -> ShellKind {
+        self.kind
+    }
 }
 
 #[cfg(test)]
-mod tests {
+mod test {
     use super::*;
 
     #[test]
@@ -287,7 +273,7 @@ mod tests {
     }
 
     #[test]
-    fn test_redirect_stdin_to_dev_null_precedence() {
+    fn redirect_stdin_to_dev_null_precedence() {
         let shell = Shell::Program("nu".to_owned());
         let shell_builder = ShellBuilder::new(&shell, false);
 
@@ -300,7 +286,7 @@ mod tests {
     }
 
     #[test]
-    fn test_redirect_stdin_to_dev_null_fish() {
+    fn redirect_stdin_to_dev_null_fish() {
         let shell = Shell::Program("fish".to_owned());
         let shell_builder = ShellBuilder::new(&shell, false);
 
@@ -313,7 +299,7 @@ mod tests {
     }
 
     #[test]
-    fn test_redirect_stdin_to_dev_null_preserves_heredoc() {
+    fn redirect_stdin_to_dev_null_preserves_heredoc() {
         let shell = Shell::Program("sh".to_owned());
         let shell_builder = ShellBuilder::new(&shell, false);
 
@@ -330,7 +316,9 @@ mod tests {
     }
 
     #[test]
-    fn test_non_interactive_omits_interactive_flag() {
+    fn non_interactive_omits_interactive_flag() {
+        // Headless hosts (e.g. the eval CLI) build the agent's shell command
+        // non-interactively so it works without a controlling TTY.
         let shell = Shell::Program("sh".to_owned());
         let shell_builder = ShellBuilder::new(&shell, false).non_interactive();
 
@@ -345,11 +333,12 @@ mod tests {
     }
 
     #[test]
-    fn test_does_not_quote_sole_command_only() {
+    fn does_not_quote_sole_command_only() {
         let shell = Shell::Program("fish".to_owned());
         let shell_builder = ShellBuilder::new(&shell, false);
 
         let (program, args) = shell_builder.build(Some("echo".into()), &[]);
+
         assert_eq!(program, "fish");
         assert_eq!(args, vec!["-i", "-c", "echo"]);
 
@@ -357,29 +346,42 @@ mod tests {
         let shell_builder = ShellBuilder::new(&shell, false);
 
         let (program, args) = shell_builder.build(Some("echo oo".into()), &[]);
+
         assert_eq!(program, "fish");
         assert_eq!(args, vec!["-i", "-c", "echo oo"]);
     }
 
     #[test]
-    fn test_command_label() {
-        let shell = Shell::Program("bash".to_owned());
-        let builder = ShellBuilder::new(&shell, false);
-        assert_eq!(builder.command_label("echo hi"), "bash -i -c 'echo hi'");
-        assert_eq!(
-            builder.non_interactive().command_label("echo hi"),
-            "bash -c 'echo hi'"
-        );
+    fn windows_powershell_preserves_spaced_arg_as_single_shell_argument() {
+        let worktree_root = r"C:\worktrees\Godot Projects\sample-game";
+        let shell = Shell::Program("powershell".to_owned());
 
-        let ps = Shell::Program("powershell".to_owned());
-        let builder = ShellBuilder::new(&ps, true);
-        assert_eq!(
-            builder.command_label("Write-Host hi"),
-            "powershell -C 'Write-Host hi'"
-        );
+        let (program, args) = ShellBuilder::new(&shell, true)
+            .build(Some("echo".into()), &[worktree_root.to_string()]);
 
-        let cmd = Shell::Program("cmd.exe".to_owned());
-        let builder = ShellBuilder::new(&cmd, true);
-        assert_eq!(builder.command_label("dir"), "cmd.exe /C \"dir\"");
+        assert_eq!(program, "powershell");
+        assert_eq!(
+            args,
+            vec!["-C".to_string(), format!("echo '{worktree_root}'")]
+        );
+    }
+
+    #[test]
+    fn windows_cmd_preserves_spaced_arg_as_single_shell_argument() {
+        let worktree_root = r"C:\worktrees\Godot Projects\sample-game";
+        let shell = Shell::Program("cmd".to_owned());
+
+        let (program, args) = ShellBuilder::new(&shell, true)
+            .build(Some("echo".into()), &[worktree_root.to_string()]);
+
+        assert_eq!(program, "cmd");
+        assert_eq!(
+            args,
+            vec![
+                "/S".to_string(),
+                "/C".to_string(),
+                format!("\"echo ^\"{worktree_root}^\"\""),
+            ]
+        );
     }
 }

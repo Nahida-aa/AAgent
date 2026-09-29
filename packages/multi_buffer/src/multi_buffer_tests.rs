@@ -14,7 +14,9 @@ use util::rel_path::rel_path;
 use util::test::sample_text;
 
 #[ctor::ctor(unsafe)]
-fn init_logger() { a_log::init_test(); }
+fn init_logger() {
+    zlog::init_test();
+}
 
 #[gpui::test]
 fn test_empty_singleton(cx: &mut App) {
@@ -1318,6 +1320,45 @@ fn test_expand_excerpts(cx: &mut App) {
             "rrr",   // End of excerpt
         )
     );
+}
+
+#[gpui::test]
+fn test_expand_excerpts_with_anchor_for_removed_path(cx: &mut App) {
+    let buffer_a = cx.new(|cx| Buffer::local(sample_text(10, 3, 'a'), cx));
+    let buffer_b = cx.new(|cx| Buffer::local(sample_text(10, 3, 'a'), cx));
+    let multibuffer = cx.new(|_| MultiBuffer::new(Capability::ReadWrite));
+
+    multibuffer.update(cx, |multibuffer, cx| {
+        multibuffer.set_excerpts_for_path(
+            PathKey::sorted(0),
+            buffer_a,
+            vec![Point::new(3, 0)..Point::new(3, 3)],
+            1,
+            cx,
+        );
+        multibuffer.set_excerpts_for_path(
+            PathKey::sorted(1),
+            buffer_b,
+            vec![Point::new(3, 0)..Point::new(3, 3)],
+            1,
+            cx,
+        );
+    });
+
+    let anchor_in_a = multibuffer
+        .read(cx)
+        .snapshot(cx)
+        .anchor_before(Point::new(1, 0));
+    multibuffer.update(cx, |multibuffer, cx| {
+        multibuffer.remove_excerpts(PathKey::sorted(0), cx);
+    });
+    assert_eq!(multibuffer.read(cx).snapshot(cx).text(), "ccc\nddd\neee");
+
+    multibuffer.update(cx, |multibuffer, cx| {
+        multibuffer.expand_excerpts([anchor_in_a], 1, ExpandExcerptDirection::UpAndDown, cx);
+    });
+
+    assert_eq!(multibuffer.read(cx).snapshot(cx).text(), "ccc\nddd\neee");
 }
 
 #[gpui::test(iterations = 100)]
@@ -6261,6 +6302,24 @@ fn test_range_to_buffer_ranges(cx: &mut App) {
         "Should include trailing empty excerpts"
     );
     assert_eq!(ranges_half_open_max[1].1, BufferOffset(0)..BufferOffset(0));
+
+    for snapshot in [&snapshot, &snapshot_trailing] {
+        for start in 0..=snapshot.len().0 {
+            for end in start..=snapshot.len().0 {
+                let range = MultiBufferOffset(start)..MultiBufferOffset(end);
+                let expected = snapshot
+                    .range_to_buffer_ranges(range.clone())
+                    .into_iter()
+                    .map(|(buffer, range, _)| (buffer.remote_id(), range, None))
+                    .collect::<Vec<_>>();
+                let actual = snapshot
+                    .range_to_buffer_ranges_with_deleted_hunks(range.clone())
+                    .map(|(buffer, range, anchor)| (buffer.remote_id(), range, anchor))
+                    .collect::<Vec<_>>();
+                assert_eq!(actual, expected, "{range:?}");
+            }
+        }
+    }
 }
 
 #[gpui::test]

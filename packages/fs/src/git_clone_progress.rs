@@ -56,7 +56,9 @@ impl GitCloneProgress {
         }
     }
 
-    fn finish(&mut self, mut on_progress: impl FnMut(String)) { self.flush(&mut on_progress); }
+    fn finish(&mut self, mut on_progress: impl FnMut(String)) {
+        self.flush(&mut on_progress);
+    }
 
     fn flush(&mut self, on_progress: &mut impl FnMut(String)) {
         if self.pending.is_empty() {

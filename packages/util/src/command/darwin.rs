@@ -26,11 +26,17 @@ pub enum Stdio {
 }
 
 impl Stdio {
-    pub fn piped() -> Self { Self::Piped }
+    pub fn piped() -> Self {
+        Self::Piped
+    }
 
-    pub fn inherit() -> Self { Self::Inherit }
+    pub fn inherit() -> Self {
+        Self::Inherit
+    }
 
-    pub fn null() -> Self { Self::Null }
+    pub fn null() -> Self {
+        Self::Null
+    }
 }
 
 unsafe extern "C" {
@@ -216,7 +222,9 @@ impl Command {
         child.status().await
     }
 
-    pub fn get_program(&self) -> &OsStr { self.program.as_os_str() }
+    pub fn get_program(&self) -> &OsStr {
+        self.program.as_os_str()
+    }
 }
 
 #[derive(Debug)]
@@ -228,11 +236,17 @@ pub struct Child {
 }
 
 impl Child {
-    pub fn id(&self) -> u32 { self.inner.id() }
+    pub fn id(&self) -> u32 {
+        self.inner.id()
+    }
 
-    pub fn kill(&mut self) -> io::Result<()> { self.inner.kill() }
+    pub fn kill(&mut self) -> io::Result<()> {
+        self.inner.kill()
+    }
 
-    pub fn try_status(&mut self) -> io::Result<Option<ExitStatus>> { self.inner.try_status() }
+    pub fn try_status(&mut self) -> io::Result<Option<ExitStatus>> {
+        self.inner.try_status()
+    }
 
     pub fn status(
         &mut self,

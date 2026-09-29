@@ -25,8 +25,22 @@ pub use text::{
 
 #[derive(Clone, Debug)]
 pub enum AutoindentMode {
+    /// Indent each line of inserted text.
     EachLine,
+    /// Autoindent multiline edits, but only apply syntax-triggered outdents to single-line edits.
+    PreserveSingleLine,
+    /// Apply the same indentation adjustment to all of the lines
+    /// in a given insertion.
     Block {
+        /// The original indentation column of the first line of each
+        /// insertion, if it has been copied.
+        ///
+        /// Knowing this makes it possible to preserve the relative indentation
+        /// of every line in the insertion from when it was copied.
+        ///
+        /// If the original indent column is `a`, and the first line of insertion
+        /// is then auto-indented to column `b`, then every other line of
+        /// the insertion will be auto-indented to column `b - a`
         original_indent_columns: Vec<Option<u32>>,
     },
 }

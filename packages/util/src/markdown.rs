@@ -79,7 +79,9 @@ pub fn source_position_from_fragment(fragment: &str) -> Option<(u32, u32)> {
 pub struct MarkdownString(pub String);
 
 impl Display for MarkdownString {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result { write!(f, "{}", self.0) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
 }
 
 /// Escapes markdown special characters in markdown text blocks. Markdown code blocks follow

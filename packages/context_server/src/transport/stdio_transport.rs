@@ -142,5 +142,7 @@ impl Transport for StdioTransport {
 }
 
 impl Drop for StdioTransport {
-    fn drop(&mut self) { let _ = self.server.kill(); }
+    fn drop(&mut self) {
+        let _ = self.server.kill();
+    }
 }

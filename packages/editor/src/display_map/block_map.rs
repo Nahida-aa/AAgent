@@ -84,14 +84,18 @@ pub struct BlockSnapshot {
 impl Deref for BlockSnapshot {
     type Target = WrapSnapshot;
 
-    fn deref(&self) -> &Self::Target { &self.wrap_snapshot }
+    fn deref(&self) -> &Self::Target {
+        &self.wrap_snapshot
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct CustomBlockId(pub usize);
 
 impl From<CustomBlockId> for ElementId {
-    fn from(val: CustomBlockId) -> Self { val.0.into() }
+    fn from(val: CustomBlockId) -> Self {
+        val.0.into()
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -110,7 +114,9 @@ impl_for_row_types! {
 }
 
 impl BlockPoint {
-    pub fn row(&self) -> BlockRow { BlockRow(self.0.row) }
+    pub fn row(&self) -> BlockRow {
+        BlockRow(self.0.row)
+    }
 }
 
 /// Forward-only cursor mapping [`WrapPoint`]s to [`BlockPoint`]s, reusing its
@@ -124,7 +130,9 @@ pub struct BlockPointCursor<'a> {
 
 impl BlockPointCursor<'_> {
     /// Resets the cursor to the start so it can seek backward again.
-    pub fn reset(&mut self) { self.cursor.reset(); }
+    pub fn reset(&mut self) {
+        self.cursor.reset();
+    }
 
     pub fn map(&mut self, wrap_point: WrapPoint) -> BlockPoint {
         let cursor = &mut self.cursor;
@@ -1127,7 +1135,6 @@ impl BlockMap {
 
             // For each of these blocks, insert a new isomorphic transform preceding the block,
             // and then insert the block itself.
-            let mut just_processed_folded_buffer = false;
             for (block_placement, block) in blocks_in_edit.drain(..) {
                 let span =
                     a_tracing::debug_span!("for block in edits", block_height = block.height());
@@ -1149,12 +1156,8 @@ impl BlockMap {
                             continue;
                         };
                         rows_before_block = delta;
-                        just_processed_folded_buffer = false;
                     }
                     &BlockPlacement::Near(position) | &BlockPlacement::Below(position) => {
-                        if just_processed_folded_buffer {
-                            continue;
-                        }
                         let Some(delta) = (position + RowDelta(1)).checked_sub(input_rows) else {
                             continue;
                         };
@@ -1166,7 +1169,6 @@ impl BlockMap {
                         };
                         rows_before_block = delta;
                         summary.input_rows = WrapRow(1) + (*range.end() - *range.start());
-                        just_processed_folded_buffer = matches!(block, Block::FoldedBuffer { .. });
                     }
                 }
 
@@ -1619,6 +1621,7 @@ impl BlockMap {
         });
         blocks.dedup_by(|right, left| match (left.0.clone(), right.0.clone()) {
             (BlockPlacement::Replace(range), BlockPlacement::Above(row))
+            | (BlockPlacement::Replace(range), BlockPlacement::Near(row))
             | (BlockPlacement::Replace(range), BlockPlacement::Below(row)) => range.contains(&row),
             (BlockPlacement::Replace(range_a), BlockPlacement::Replace(range_b)) => {
                 if range_a.end() >= range_b.start() && range_a.start() <= range_b.end() {
@@ -1673,27 +1676,37 @@ fn push_isomorphic(tree: &mut SumTree<Transform>, rows: RowDelta, wrap_snapshot:
 }
 
 impl BlockPoint {
-    pub fn new(row: BlockRow, column: u32) -> Self { Self(Point::new(row.0, column)) }
+    pub fn new(row: BlockRow, column: u32) -> Self {
+        Self(Point::new(row.0, column))
+    }
 }
 
 impl Deref for BlockPoint {
     type Target = Point;
 
-    fn deref(&self) -> &Self::Target { &self.0 }
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
 impl std::ops::DerefMut for BlockPoint {
-    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
 }
 
 impl Deref for BlockMapReader<'_> {
     type Target = BlockSnapshot;
 
-    fn deref(&self) -> &Self::Target { &self.snapshot }
+    fn deref(&self) -> &Self::Target {
+        &self.snapshot
+    }
 }
 
 impl DerefMut for BlockMapReader<'_> {
-    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.snapshot }
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.snapshot
+    }
 }
 
 impl BlockMapReader<'_> {
@@ -2380,7 +2393,9 @@ impl BlockSnapshot {
     }
 
     #[a_tracing::instrument(skip_all)]
-    pub fn longest_row(&self) -> BlockRow { self.transforms.summary().longest_row }
+    pub fn longest_row(&self) -> BlockRow {
+        self.transforms.summary().longest_row
+    }
 
     #[a_tracing::instrument(skip_all)]
     pub fn longest_row_in_range(&self, range: Range<BlockRow>) -> BlockRow {
@@ -2608,6 +2623,11 @@ impl BlockSnapshot {
             self.wrap_snapshot.max_point()
         }
     }
+
+    pub(super) fn replacement_block_input_range(&self, row: WrapRow) -> Option<Range<WrapRow>> {
+        let (start, end, item) = self.transforms.find::<WrapRow, _>((), &row, Bias::Right);
+        item?.block.as_ref()?.is_replacement().then_some(start..end)
+    }
 }
 
 impl BlockChunks<'_> {
@@ -2813,7 +2833,9 @@ impl sum_tree::Item for Transform {
 }
 
 impl sum_tree::ContextLessSummary for TransformSummary {
-    fn zero() -> Self { Default::default() }
+    fn zero() -> Self {
+        Default::default()
+    }
 
     fn add_summary(&mut self, summary: &Self) {
         if summary.longest_row_chars > self.longest_row_chars {
@@ -2827,13 +2849,19 @@ impl sum_tree::ContextLessSummary for TransformSummary {
 }
 
 impl<'a> sum_tree::Dimension<'a, TransformSummary> for WrapRow {
-    fn zero(_cx: ()) -> Self { Default::default() }
+    fn zero(_cx: ()) -> Self {
+        Default::default()
+    }
 
-    fn add_summary(&mut self, summary: &'a TransformSummary, _: ()) { *self += summary.input_rows; }
+    fn add_summary(&mut self, summary: &'a TransformSummary, _: ()) {
+        *self += summary.input_rows;
+    }
 }
 
 impl<'a> sum_tree::Dimension<'a, TransformSummary> for BlockRow {
-    fn zero(_cx: ()) -> Self { Default::default() }
+    fn zero(_cx: ()) -> Self {
+        Default::default()
+    }
 
     fn add_summary(&mut self, summary: &'a TransformSummary, _: ()) {
         *self += summary.output_rows;
@@ -2843,24 +2871,36 @@ impl<'a> sum_tree::Dimension<'a, TransformSummary> for BlockRow {
 impl Deref for BlockContext<'_, '_> {
     type Target = App;
 
-    fn deref(&self) -> &Self::Target { self.app }
+    fn deref(&self) -> &Self::Target {
+        self.app
+    }
 }
 
 impl DerefMut for BlockContext<'_, '_> {
-    fn deref_mut(&mut self) -> &mut Self::Target { self.app }
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.app
+    }
 }
 
 impl CustomBlock {
     #[a_tracing::instrument(skip_all)]
-    pub fn render(&self, cx: &mut BlockContext) -> AnyElement { self.render.lock()(cx) }
+    pub fn render(&self, cx: &mut BlockContext) -> AnyElement {
+        self.render.lock()(cx)
+    }
 
     #[a_tracing::instrument(skip_all)]
-    pub fn start(&self) -> Anchor { *self.placement.start() }
+    pub fn start(&self) -> Anchor {
+        *self.placement.start()
+    }
 
     #[a_tracing::instrument(skip_all)]
-    pub fn end(&self) -> Anchor { *self.placement.end() }
+    pub fn end(&self) -> Anchor {
+        *self.placement.end()
+    }
 
-    pub fn style(&self) -> BlockStyle { self.style }
+    pub fn style(&self) -> BlockStyle {
+        self.style
+    }
 
     pub fn properties(&self) -> BlockProperties<Anchor> {
         BlockProperties {
@@ -2911,8 +2951,8 @@ mod tests {
     use super::*;
     use crate::{
         display_map::{
-            Companion, fold_map::FoldMap, fold_map::FoldPlaceholder, inlay_map::InlayMap,
-            tab_map::TabMap, wrap_map::WrapMap,
+            Companion, DisplayMap, fold_map::FoldMap, fold_map::FoldPlaceholder,
+            inlay_map::InlayMap, tab_map::TabMap, wrap_map::WrapMap,
         },
         test::test_font,
     };
@@ -2921,6 +2961,7 @@ mod tests {
     use itertools::Itertools;
     use language::{Buffer, Capability, Point};
     use multi_buffer::{MultiBuffer, PathKey};
+    use project::project_settings::DiagnosticSeverity;
     use rand::prelude::*;
     use settings::SettingsStore;
     use std::env;
@@ -5578,11 +5619,96 @@ mod tests {
         assert_eq!(snapshot.snapshot.text(), "aaa\nbbb\nccc\nddd\neee\n");
     }
 
+    #[gpui::test]
+    fn test_replacement_input_ranges_preserve_partial_tab_rows(cx: &mut gpui::TestAppContext) {
+        cx.update(|cx| {
+            init_test(cx);
+            crate::init(cx);
+        });
+        let buffer = cx.update(|cx| {
+            MultiBuffer::build_simple("one two three\nfour five six\nseven eight", cx)
+        });
+        let map = cx.new(|cx| {
+            DisplayMap::new(
+                buffer,
+                font("Helvetica"),
+                px(14.0),
+                Some(px(90.)),
+                1,
+                1,
+                FoldPlaceholder::test(),
+                DiagnosticSeverity::Warning,
+                cx,
+            )
+        });
+        let mut snapshot = map.update(cx, |map, cx| map.snapshot(cx));
+        let wraps = snapshot.wrap_snapshot().clone();
+        assert_eq!(
+            wraps.text(),
+            "one two \nthree\nfour five \nsix\nseven \neight"
+        );
+        for height in [0, 1, 4] {
+            let block = Block::Custom(Arc::new(CustomBlock {
+                id: CustomBlockId(0),
+                placement: BlockPlacement::Replace(Anchor::Min..=Anchor::Max),
+                height: Some(height),
+                style: BlockStyle::Fixed,
+                render: Arc::new(Mutex::new(Arc::new(|_| div().into_any()))),
+                priority: 0,
+            }));
+            for (hidden, expected) in [
+                (0..6, [Some(0..=2), Some(0..=2), Some(0..=2)]),
+                (1..5, [None, Some(1..=1), None]),
+                (0..5, [Some(0..=1), Some(0..=1), None]),
+                (1..6, [None, Some(1..=2), Some(1..=2)]),
+                (2..4, [None, Some(1..=1), None]),
+                (0..2, [Some(0..=0), None, None]),
+                (4..6, [None, None, Some(2..=2)]),
+                (0..1, [None, None, None]),
+                (5..6, [None, None, None]),
+            ] {
+                let mut transforms = SumTree::new(());
+                push_isomorphic(&mut transforms, RowDelta(hidden.start), &wraps);
+                transforms.push(
+                    Transform {
+                        summary: TransformSummary {
+                            input_rows: WrapRow(hidden.end - hidden.start),
+                            output_rows: BlockRow(height),
+                            ..TransformSummary::default()
+                        },
+                        block: Some(block.clone()),
+                    },
+                    (),
+                );
+                push_isomorphic(&mut transforms, RowDelta(6 - hidden.end), &wraps);
+                snapshot.block_snapshot.transforms = transforms;
+                assert_eq!(
+                    (0..3)
+                        .map(|row| snapshot.fully_replaced_tab_rows(row))
+                        .collect::<Vec<_>>(),
+                    expected,
+                    "hidden: {hidden:?}, height: {height}"
+                );
+                for row in 0..=6 {
+                    assert_eq!(
+                        snapshot
+                            .block_snapshot
+                            .replacement_block_input_range(WrapRow(row)),
+                        hidden
+                            .contains(&row)
+                            .then_some(WrapRow(hidden.start)..WrapRow(hidden.end)),
+                        "row: {row}, hidden: {hidden:?}, height: {height}"
+                    );
+                }
+            }
+        }
+    }
+
     fn init_test(cx: &mut gpui::App) {
         let settings = SettingsStore::test(cx);
         cx.set_global(settings);
         theme_settings::init(theme::LoadThemes::JustBase, cx);
-        aa_gpui_kit_assets::Assets.load_test_fonts(cx);
+        assets::Assets.load_test_fonts(cx);
     }
 
     /// Verifies the edit coverage invariant at the wrap boundary: applying the

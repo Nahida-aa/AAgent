@@ -25,13 +25,17 @@ pub struct PathList {
 }
 
 impl PartialEq for PathList {
-    fn eq(&self, other: &Self) -> bool { self.paths == other.paths }
+    fn eq(&self, other: &Self) -> bool {
+        self.paths == other.paths
+    }
 }
 
 impl Eq for PathList {}
 
 impl Hash for PathList {
-    fn hash<H: Hasher>(&self, state: &mut H) { self.paths.hash(state); }
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.paths.hash(state);
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -57,7 +61,9 @@ impl PathList {
         Self { order, paths }
     }
 
-    pub fn is_empty(&self) -> bool { self.paths.is_empty() }
+    pub fn is_empty(&self) -> bool {
+        self.paths.is_empty()
+    }
 
     /// Returns a new `PathList` with the given path removed.
     pub fn without_path(&self, path_to_remove: &Path) -> PathList {
@@ -70,13 +76,19 @@ impl PathList {
     }
 
     /// Get the paths in lexicographic order.
-    pub fn paths(&self) -> &[PathBuf] { self.paths.as_ref() }
+    pub fn paths(&self) -> &[PathBuf] {
+        self.paths.as_ref()
+    }
 
     /// Get the paths in the lexicographic order.
-    pub fn paths_owned(&self) -> Arc<[PathBuf]> { self.paths.clone() }
+    pub fn paths_owned(&self) -> Arc<[PathBuf]> {
+        self.paths.clone()
+    }
 
     /// Get the order in which the paths were provided.
-    pub fn order(&self) -> &[usize] { self.order.as_ref() }
+    pub fn order(&self) -> &[usize] {
+        self.order.as_ref()
+    }
 
     /// Get the paths in the original order.
     pub fn ordered_paths(&self) -> impl Iterator<Item = &PathBuf> {

@@ -1200,7 +1200,7 @@ impl LanguageServer {
         Some(async move {
             log::debug!("language server shutdown started");
 
-            select! {
+            let shutdown_timed_out = select! {
                 request_result = shutdown_request.fuse() => {
                     match request_result {
                         ConnectionResult::Timeout => {
@@ -1214,19 +1214,32 @@ impl LanguageServer {
                         },
                         ConnectionResult::Result(Ok(())) => {}
                     }
+                    false
                 }
 
                 _ = timer => {
                     log::info!("timeout waiting for language server {name} (id {server_id}) to shutdown");
+                    true
                 },
-            }
+            };
 
             response_handlers.lock().take();
             Self::notify_internal::<notification::Exit>(&notification_serializers, ()).ok();
             notification_serializers.close();
-            output_done.recv().await;
-            server.lock().take().map(|mut child| child.kill());
+            if !shutdown_timed_out {
+                select! {
+                    _ = output_done.recv().fuse() => {},
+                    _ = timer => {
+                        log::info!("timeout draining output for language server {name} (id {server_id}) during shutdown");
+                    },
+                }
+            }
             drop(tasks);
+            if let Some(mut child) = server.lock().take()
+                && let Err(error) = child.kill()
+            {
+                log::warn!("failed to kill language server {name} (id {server_id}): {error}");
+            }
             log::debug!("language server shutdown finished");
             Some(())
         })

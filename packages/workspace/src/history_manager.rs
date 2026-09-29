@@ -1,8 +1,7 @@
 use std::{path::PathBuf, sync::Arc};
 
 use fs::Fs;
-use gpui::{App, Context};
-use gpui::{AppContext, Entity, Global, MenuItem};
+use gpui::{App, AppContext, Context, Entity, Global, MenuItem};
 use gpui_util::ResultExt;
 use smallvec::SmallVec;
 use util::paths::PathExt;

@@ -5,9 +5,6 @@ use std::{
 
 use gpui::{Bounds, Point, point, size};
 use terminal::Terminal;
-// 对齐 zed `terminal_view/src/terminal_scrollbar.rs`：`Pixels` / `px` 其实是
-// 从 ui 的 prelude 转出的，`ScrollableHandle` 是 ui 自己的 trait
-// （`git_ui` 也这么 import）。之前这里误以为 aa_gpui_kit_ui 没有该 trait。
 use ui::{Pixels, ScrollableHandle, px};
 
 #[derive(Debug)]

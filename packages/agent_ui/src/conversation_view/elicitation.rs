@@ -1168,6 +1168,8 @@ mod tests {
     }
 }
 
+#[derive(RegisterComponent)]
+#[register_component(crate = "component")]
 pub struct ElicitationCardPreview;
 
 impl Component for ElicitationCardPreview {

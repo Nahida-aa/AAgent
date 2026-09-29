@@ -68,6 +68,8 @@ fn preview_notice(id: impl Into<ElementId>, notice: acp::Notice) -> AnyElement {
     SessionNotice::new(id, &notice, |_, _, _| {}).into_any_element()
 }
 
+#[derive(RegisterComponent)]
+#[register_component(crate = "component")]
 pub struct SessionNoticePreview;
 
 impl Component for SessionNoticePreview {

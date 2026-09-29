@@ -17,7 +17,7 @@ use sum_tree::TreeMap;
 
 use crate::element::{AnyDiv, MetadataCellStyle, TableState};
 use crate::CheckboxToggleCallback;
-use crate::highlights::{HighlightedLine, MarkdownHighlights};
+use crate::highlights::MarkdownHighlights;
 use crate::parsed::{CodeBlockHighlights, ParsedMarkdown};
 use crate::rendered::{
     RenderedFootnoteRef, RenderedImageLink, RenderedLine, RenderedLink, RenderedMarkdown,
@@ -423,6 +423,7 @@ impl MarkdownElementBuilder {
         let styled_text = StyledText::new(text).with_runs(vec![text_style.to_run(text.len())]);
         self.rendered_lines.push(Rc::new(RenderedLine {
             layout: styled_text.layout().clone(),
+            visible_bounds: Cell::new(None),
             source_mappings: vec![SourceMapping {
                 rendered_index: 0,
                 source_index: source_range.start,
@@ -460,6 +461,7 @@ impl MarkdownElementBuilder {
         let text = StyledText::new(line.text).with_runs(line.runs);
         let rendered_line = Rc::new(RenderedLine {
             layout: text.layout().clone(),
+            visible_bounds: Cell::new(None),
             source_mappings: line.source_mappings,
             source_end: self.current_source_index,
             language: self
@@ -471,19 +473,14 @@ impl MarkdownElementBuilder {
             highlights,
             code_chips: line.code_chips.into_iter().collect(),
         });
-        if rendered_line.highlights.is_empty() && rendered_line.code_chips.is_empty() {
-            self.rendered_lines.push(rendered_line);
-            self.append_child(text.into_any());
-        } else {
-            self.rendered_lines.push(rendered_line.clone());
-            self.append_child(
-                HighlightedLine {
-                    text: text.into_any(),
-                    line: rendered_line,
-                }
-                .into_any_element(),
-            );
-        }
+        self.rendered_lines.push(rendered_line.clone());
+        self.append_child(
+            crate::highlights::RenderedLineElement {
+                text,
+                line: rendered_line,
+            }
+            .into_any_element(),
+        );
     }
 
     pub(super) fn build(mut self) -> RenderedMarkdown {

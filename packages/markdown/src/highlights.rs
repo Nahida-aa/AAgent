@@ -3,9 +3,10 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 use gpui::{
-    AnyElement, App, Bounds, Element, ElementId, GlobalElementId, Hsla, InspectorElementId,
-    IntoElement, Pixels, Style, Window,
+    App, Bounds, Element, ElementId, GlobalElementId, Hsla, IntoElement, Pixels, StyledText,
+    Window, px,
 };
+use gpui_util::ResultExt;
 use smallvec::SmallVec;
 
 use crate::rendered::RenderedLine;
@@ -64,15 +65,14 @@ impl MarkdownHighlights {
     }
 }
 
-/// Wraps a rendered line's text and paints the line's highlight quads during the
-/// line's own paint, so the ancestor content masks clip them like they clip the
-/// glyphs themselves.
-pub(crate) struct HighlightedLine {
-    pub(crate) text: AnyElement,
+/// Wraps a rendered line so its code chips and highlights share the glyphs'
+/// ancestor content masks, and records the clipped bounds for platform text hit testing.
+pub(crate) struct RenderedLineElement {
+    pub(crate) text: StyledText,
     pub(crate) line: Rc<RenderedLine>,
 }
 
-impl Element for HighlightedLine {
+impl Element for RenderedLineElement {
     type RequestLayoutState = ();
     type PrepaintState = ();
 
@@ -83,23 +83,27 @@ impl Element for HighlightedLine {
     fn request_layout(
         &mut self,
         _id: Option<&GlobalElementId>,
-        _inspector_id: Option<&gpui::InspectorElementId>,
+        inspector_id: Option<&gpui::InspectorElementId>,
         window: &mut Window,
         cx: &mut App,
     ) -> (gpui::LayoutId, Self::RequestLayoutState) {
-        (self.text.request_layout(window, cx), ())
+        self.text.request_layout(None, inspector_id, window, cx)
     }
 
     fn prepaint(
         &mut self,
         _id: Option<&GlobalElementId>,
-        _inspector_id: Option<&gpui::InspectorElementId>,
-        _bounds: Bounds<Pixels>,
-        _request_layout: &mut Self::RequestLayoutState,
+        inspector_id: Option<&gpui::InspectorElementId>,
+        bounds: Bounds<Pixels>,
+        request_layout: &mut Self::RequestLayoutState,
         window: &mut Window,
         cx: &mut App,
     ) -> Self::PrepaintState {
-        self.text.prepaint(window, cx);
+        self.line
+            .visible_bounds
+            .set(Some(bounds.intersect(&window.content_mask().bounds)));
+        self.text
+            .prepaint(None, inspector_id, bounds, request_layout, window, cx);
     }
 
     fn paint(
@@ -112,13 +116,15 @@ impl Element for HighlightedLine {
         window: &mut Window,
         cx: &mut App,
     ) {
+        let layout = self.text.layout();
         self.line.paint_code_chips(window);
-        self.text.paint(window, cx);
+        layout.paint_background(window, cx).log_err();
         self.line.paint_highlights(window);
+        layout.paint_foreground(window, cx).log_err();
     }
 }
 
-impl IntoElement for HighlightedLine {
+impl IntoElement for RenderedLineElement {
     type Element = Self;
 
     fn into_element(self) -> Self::Element { self }

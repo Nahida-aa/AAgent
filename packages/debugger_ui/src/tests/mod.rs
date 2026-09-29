@@ -7,7 +7,7 @@ use gpui::{Entity, TestAppContext, WindowHandle};
 use project::{Project, debugger::session::Session};
 use settings::SettingsStore;
 use task::SharedTaskContext;
-use terminal_view::terminal_panel::TerminalPanel;
+use terminal_view::panel::TerminalPanel;
 use workspace::MultiWorkspace;
 
 use crate::{debugger_panel::DebugPanel, session::DebugSession};

@@ -12,12 +12,12 @@ use aa_gpui_kit_ui::{
 };
 use gpui::{
     AnyElement, App, Bounds, ClipboardItem, CursorStyle, DispatchPhase, Div, Element, ElementId,
-    Entity, FontStyle, FontWeight, GlobalElementId, Hitbox, HitboxBehavior, Hsla, Image,
-    ImageSource, IntoElement, KeyContext, MouseButton, MouseDownEvent, MouseEvent, MouseMoveEvent,
-    MouseUpEvent, ParentElement, Pixels, Point, ScrollHandle, SharedString, Stateful,
-    StrikethroughStyle, StyleRefinement, Styled, StyledImage, StyledText, Subscription, Task,
-    TextAlign, TextStyleRefinement, VisualContext, Window, actions, canvas, div, img, point, px,
-    quad, rems, relative, size,
+    Entity, FocusHandle, FontStyle, FontWeight, GlobalElementId, Hitbox, HitboxBehavior, Hsla,
+    Image, ImageSource, IntoElement, KeyContext, MouseButton, MouseDownEvent, MouseEvent,
+    MouseMoveEvent, MouseUpEvent, ParentElement, Pixels, Point, ScrollHandle, SharedString,
+    Stateful, StrikethroughStyle, StyleRefinement, Styled, StyledImage, StyledText,
+    Subscription, Task, TextAlign, TextStyleRefinement, VisualContext, Window, actions, canvas,
+    div, img, point, px, quad, rems, relative, size,
 };
 use gpui_util::{ResultExt as _, maybe};
 use language::{Language, LanguageRegistry, ResolvedHighlights};
@@ -49,6 +49,7 @@ pub struct MarkdownElement {
     pub(super) markdown: Entity<Markdown>,
     pub(super) style: MarkdownStyle,
     code_block_renderer: CodeBlockRenderer,
+    input_focus_handle: Option<FocusHandle>,
     on_url_click: Option<Rc<dyn Fn(SharedString, &mut Window, &mut App)>>,
     on_url_hover: Option<UrlHoverCallback>,
     code_span_link: Option<CodeSpanLinkCallback>,
@@ -75,6 +76,7 @@ impl MarkdownElement {
                 wrap_button_visibility: WrapButtonVisibility::Hidden,
                 border: false,
             },
+            input_focus_handle: None,
             on_url_click: None,
             on_url_hover: None,
             code_span_link: None,
@@ -112,6 +114,11 @@ impl MarkdownElement {
 
     pub fn code_block_renderer(mut self, variant: CodeBlockRenderer) -> Self {
         self.code_block_renderer = variant;
+        self
+    }
+
+    pub fn input_focus_handle(mut self, focus_handle: FocusHandle) -> Self {
+        self.input_focus_handle = Some(focus_handle);
         self
     }
 
@@ -1660,6 +1667,23 @@ impl Element for MarkdownElement {
         let mut context = KeyContext::default();
         context.add("Markdown");
         window.set_key_context(context);
+
+        let markdown_focus_handle = self.markdown.read(cx).focus_handle.clone();
+        let input_focus_handle = if markdown_focus_handle.is_focused(window) {
+            Some(markdown_focus_handle)
+        } else {
+            self.input_focus_handle
+                .clone()
+                .filter(|focus_handle| focus_handle.is_focused(window))
+        };
+        if let Some(input_focus_handle) = input_focus_handle {
+            window.handle_input(
+                &input_focus_handle,
+                crate::MarkdownInputHandler::new(self.markdown.clone(), rendered_markdown.text.clone()),
+                cx,
+            );
+        }
+
         window.on_action(std::any::TypeId::of::<crate::entity::Copy>(), {
             let entity = self.markdown.clone();
             let text = rendered_markdown.text.clone();

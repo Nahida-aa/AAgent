@@ -56,7 +56,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Instant;
 use std::{rc::Rc, time::Duration};
-use terminal_view::terminal_panel::TerminalPanel;
+use terminal_view::panel::TerminalPanel;
 use text::Anchor;
 use theme_settings::{AgentBufferFontSize, AgentUiFontSize};
 use ui::{

@@ -8,10 +8,8 @@ use gpui::{
     TextAlign, TextLayout, TextStyle, Window, WrappedLineLayout, point, px, quad, size,
 };
 use gpui_util::maybe;
-use language::{CharClassifier, Language};
+use language::{Bias, CharClassifier, Language, OffsetUtf16, Rope};
 use smallvec::SmallVec;
-
-use crate::highlights::HighlightedLine;
 
 pub struct RenderedMarkdown {
     pub(crate) element: AnyElement,
@@ -54,8 +52,7 @@ pub(crate) struct RenderedFootnoteRef {
 }
 
 impl RenderedText {
-    #[cfg(test)]
-    fn bounds_for_source_range(&self, range: Range<usize>) -> Vec<Bounds<Pixels>> {
+    pub(crate) fn bounds_for_source_range(&self, range: Range<usize>) -> Vec<Bounds<Pixels>> {
         let mut all_bounds = Vec::new();
         for line in self.lines.iter() {
             let Some(first_mapping) = line.source_mappings.first() else {
@@ -114,6 +111,86 @@ impl RenderedText {
         }
 
         Err(self.lines.last().map_or(0, |line| line.source_end))
+    }
+
+    pub(crate) fn utf16_index_for_source_index(&self, source_index: usize) -> usize {
+        self.text_for_range(0..source_index).encode_utf16().count()
+    }
+
+    pub(crate) fn utf16_range_for_source_range(&self, range: Range<usize>) -> Range<usize> {
+        self.utf16_index_for_source_index(range.start)..self.utf16_index_for_source_index(range.end)
+    }
+
+    pub(crate) fn source_index_for_utf16_index(&self, utf16_index: usize) -> usize {
+        let mut line_start_utf16 = 0;
+        let mut last_source_end = 0;
+
+        for (line_index, line) in self.lines.iter().enumerate() {
+            let line_text = line.layout.text();
+            let line_utf16_len = line_text.encode_utf16().count();
+            let line_end_utf16 = line_start_utf16 + line_utf16_len;
+            last_source_end = line.source_end;
+
+            if utf16_index <= line_end_utf16 {
+                let local_utf16_index = utf16_index.saturating_sub(line_start_utf16);
+                let rendered_text = Rope::from(line_text.as_str());
+                let rendered_index = rendered_text.offset_utf16_to_offset(
+                    rendered_text.clip_offset_utf16(OffsetUtf16(local_utf16_index), Bias::Left),
+                );
+                return line.source_index_for_rendered_index(rendered_index);
+            }
+
+            line_start_utf16 = line_end_utf16;
+            if line_index + 1 < self.lines.len() {
+                line_start_utf16 += 1;
+            }
+        }
+
+        last_source_end
+    }
+
+    pub(crate) fn source_range_for_utf16_range(&self, range_utf16: Range<usize>) -> Range<usize> {
+        self.source_index_for_utf16_index(range_utf16.start)
+            ..self.source_index_for_utf16_index(range_utf16.end)
+    }
+
+    pub(crate) fn text_for_utf16_range(
+        &self,
+        range_utf16: Range<usize>,
+        adjusted_range: &mut Option<Range<usize>>,
+    ) -> String {
+        let mut rendered_text = String::new();
+        for (line_index, line) in self.lines.iter().enumerate() {
+            if line_index > 0 {
+                rendered_text.push('\n');
+            }
+            rendered_text.push_str(&line.layout.text());
+        }
+
+        let rendered_text = Rope::from(rendered_text);
+        let start = rendered_text.clip_offset_utf16(OffsetUtf16(range_utf16.start), Bias::Left);
+        let end = rendered_text.clip_offset_utf16(OffsetUtf16(range_utf16.end), Bias::Right);
+
+        if (start.0..end.0) != range_utf16 {
+            adjusted_range.replace(start.0..end.0);
+        }
+
+        rendered_text
+            .chunks_in_range(
+                rendered_text.offset_utf16_to_offset(start)
+                    ..rendered_text.offset_utf16_to_offset(end),
+            )
+            .collect()
+    }
+
+    pub(crate) fn source_index_for_visible_position(&self, position: Point<Pixels>) -> Option<usize> {
+        self.lines.iter().find_map(|line| {
+            if line.visible_bounds.get()?.contains(&position) {
+                line.source_index_for_position(position).ok()
+            } else {
+                None
+            }
+        })
     }
 
     pub(crate) fn position_for_source_index(&self, source_index: usize) -> Option<(Point<Pixels>, Pixels)> {
@@ -254,6 +331,7 @@ impl RenderedText {
 
 pub(crate) struct RenderedLine {
     pub(crate) layout: TextLayout,
+    pub(crate) visible_bounds: Cell<Option<Bounds<Pixels>>>,
     pub(crate) source_mappings: Vec<SourceMapping>,
     pub(crate) source_end: usize,
     pub(crate) language: Option<Arc<Language>>,
@@ -311,6 +389,8 @@ impl RenderedLine {
         }
     }
 
+    /// Painted between the text run backgrounds and the glyphs, so opaque highlight
+    /// colors neither hide the text nor get hidden by run backgrounds
     pub(crate) fn paint_highlights(&self, window: &mut Window) {
         if self.highlights.is_empty() {
             return;

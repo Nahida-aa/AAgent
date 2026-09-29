@@ -786,7 +786,13 @@ impl Markdown {
             let mut fallback_code_block_language = None;
             if let Some(registry) = language_registry.as_ref() {
                 for name in language_names {
-                    if let Ok(language) = registry.language_for_name_or_extension(&name).await {
+                    let mut language = registry.language_for_name_or_extension(&name).await;
+                    if language.is_err()
+                        && let Some((first_word, _)) = name.split_once(char::is_whitespace)
+                    {
+                        language = registry.language_for_name_or_extension(first_word).await;
+                    }
+                    if let Ok(language) = language {
                         languages_by_name.insert(name, language);
                     }
                 }

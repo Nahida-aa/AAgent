@@ -69,7 +69,7 @@ W3 与它们无依赖，可按 crate 多人并行。
 | `017f9b89aa` | `agent_ui` | ✓（1 行，L1 已知变换内） | agent_ui: Hide wrap guides in the agent message editor (#64886) | `69031de` | — |
 | `5d5963361f` | `project` | ✓ | Diff LSP format responses that replace the whole buffer (#57269) | `0e73083` | — |
 | `1dc8844439` | `which_key` | ✓ | which_key: Show task names for task::Spawn bindings (#64937) | `7ef1a04` | — |
-| `c87632ef44` | `project`, `proto`, `remote_server` | ? | Read remote shell config when creating a terminal shell (#61451) | | |
+| `c87632ef44` | `project`, `proto`, `remote_server` | ✓ | Read remote shell config when creating a terminal shell (#61451) | `5097d8a` | — |
 | `14dd03e896` | `acp_thread`, `agent_ui` | ? | agent_ui: Guard follow-up sends from stale send results (#64917) | | |
 | `12f79c0aeb` | `client`, `cloud_api_client` | ? | cloud_api_client: Use the platform TLS verifier for the cloud websocket (#63686) | | |
 | `c32938c34c` | `open_ai` | ? | open_ai: Fix issues with optional arguments when model calls a tool (#64920) | | |

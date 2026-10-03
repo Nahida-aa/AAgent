@@ -118,12 +118,19 @@ L2 只能筛出「与上游 old 不同、且不像机械变换」的文件，**�
 
 ### L2 逐个确认
 
-```sh
-git log --oneline -- <本地路径>                # aacode 侧改动史
-git -C /home/aa/repos/ide_ls/learn_ls/zed diff bd747337d7be138834e20972b9e203c7b239cc47..afecd6d719aad92aecfa2860f49c4f2956708831 -- <上游路径>   # 上游这次改了什么
-diff <(git -C /home/aa/repos/ide_ls/learn_ls/zed show bd747337d7be138834e20972b9e203c7b239cc47:<上游路径>) <本地路径>   # 当前分歧点
-```
+**remote_editing_tests.rs**（packages/remote_server/src/remote_editing_tests.rs）
+- aacode 在 old（bd747337）时就与上游不同：上游版本完整，aacode 版本已做大量裁剪（差异 550 行，主要是删除测试函数）。
+- 结论：这是**有意裁剪的本地改动**（aacode 不跑这些 remote editing 集成测试），不属于「冲突」而是「设计偏离」。
+- 同步策略：**不要一刀替换整个文件**。遇到上游在这个文件有改动时，按需 cherry-pick/手动合并，优先保留 aacode 现有裁剪，不要把测试全集强行搬回来。
 
+其余 L2（Cargo.toml）已归一化判定为 L1。
+
+```sh
+# 通用核对命令
+git log --oneline -- <本地路径>
+git -C ~/repos/ide_ls/learn_ls/zed diff bd747337d7be138834e20972b9e203c7b239cc47..afecd6d719aad92aecfa2860f49c4f2956708831 -- <上游路径>
+diff <(git -C ~/repos/ide_ls/learn_ls/zed show bd747337d7be138834e20972b9e203c7b239cc47:<上游路径>) <本地路径>
+```
 ## 5. 验收
 
 - [ ] `cargo check -p app -p workspace -p ui`

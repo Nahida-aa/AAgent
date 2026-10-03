@@ -116,12 +116,13 @@ PORT_PAT='zed_actions|aacode_actions|aagent|aacode|zlog|a_log|zed_credentials_pr
 norm_manifest() {
   sed -E 's/^[<>] //' \
     | sed -E 's/\.(workspace)\b//g' \
-    | grep -vE '^(version|license|publish|description|homepage|repository|rust-version|edition|publish|authors|categories|keywords|readme|versioned_file_path)[[:space:]]*=' \
-    | grep -vE '^\[(lints|lib|bin|\[\[bin\]\]|package\.metadata\.cargo-shear|package\.metadata\.component|package\.metadata\.rzup)\][[:space:]]*$' \
-    | grep -vE '^(path|doctest|name|ignored|harness|crate-type)[[:space:]]*=' \
+    | grep -vE '^(version|versioned_file_path|license|license-file|publish|description|homepage|repository|documentation|rust-version|edition|edition2021|edition2024|authors|categories|keywords|readme|resolver)[[:space:]]*=' \
+    | grep -vE '^\[(lints|lib|\[\[bin\]\]|package\.metadata\.cargo-shear|package\.metadata\.component|package\.metadata\.rzup|features|profile|workspace)\][[:space:]]*$' \
+    | grep -vE '^(path|doctest|name|ignored|harness|crate-type|required-features|test|bench|doc|proc-macro)[[:space:]]*=' \
     | grep -vE '^#' \
     | grep -vE '^[[:space:]]*$' \
-    | sed -E 's/\bzed_actions\b/aacode_actions/g; s/\bzlog\b/a_log/g; s/\bzed_credentials_provider\b/ad_credentials_provider/g; s/\bzed_resource_manager\b/a_resource_manager/g'
+    | sed -E 's/\bzed_actions\b/aacode_actions/g; s/\bzlog\b/a_log/g; s/\bzed_credentials_provider\b/ad_credentials_provider/g; s/\bzed_resource_manager\b/a_resource_manager/g; s/\bzed_application\b/aagent_application/g' \
+    | sort
 }
 
 unexplained_of() {

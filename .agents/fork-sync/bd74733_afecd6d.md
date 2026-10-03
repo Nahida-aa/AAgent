@@ -98,11 +98,11 @@ L2 只能筛出「与上游 old 不同、且不像机械变换」的文件，**�
 | `packages/agent_ui/src/conversation_view.rs` | `crates/agent_ui/src/conversation_view.rs` | **L0** | 0 | — |
 | `packages/agent_ui/src/conversation_view/thread_view.rs` | `crates/agent_ui/src/conversation_view/thread_view.rs` | **L1** | 0 | — |
 | `packages/agent_ui/src/message_editor.rs` | `crates/agent_ui/src/message_editor.rs` | **L1** | 0 | — |
-| `packages/client/Cargo.toml` | `crates/client/Cargo.toml` | **L2** | 1 | < workspace = true; |
-| `packages/cloud_api_client/Cargo.toml` | `crates/cloud_api_client/Cargo.toml` | **L2** | 1 | < workspace = true; |
+| `packages/client/Cargo.toml` | `crates/client/Cargo.toml` | **L1** | 1 | < workspace = true; |
+| `packages/cloud_api_client/Cargo.toml` | `crates/cloud_api_client/Cargo.toml` | **L1** | 1 | < workspace = true; |
 | `packages/cloud_api_client/src/websocket/native.rs` | `crates/cloud_api_client/src/websocket/native.rs` | **L0** | 0 | — |
 | `packages/http_client/src/github.rs` | `crates/http_client/src/github.rs` | **L0** | 0 | — |
-| `packages/node_runtime/Cargo.toml` | `crates/node_runtime/Cargo.toml` | **L2** | 1 | < workspace = true; |
+| `packages/node_runtime/Cargo.toml` | `crates/node_runtime/Cargo.toml` | **L1** | 1 | < workspace = true; |
 | `packages/node_runtime/src/node_runtime.rs` | `crates/node_runtime/src/node_runtime.rs` | **L0** | 0 | — |
 | `packages/open_ai/src/completion.rs` | `crates/open_ai/src/completion.rs` | **L0** | 0 | — |
 | `packages/project/src/lsp_store.rs` | `crates/project/src/lsp_store.rs` | **L0** | 0 | — |
@@ -111,7 +111,7 @@ L2 只能筛出「与上游 old 不同、且不像机械变换」的文件，**�
 | `packages/proto/proto/task.proto` | `crates/proto/proto/task.proto` | **L0** | 0 | — |
 | `packages/proto/proto/zed.proto` | `crates/proto/proto/zed.proto` | **L0** | 0 | — |
 | `packages/proto/src/proto.rs` | `crates/proto/src/proto.rs` | **L0** | 0 | — |
-| `packages/remote_server/Cargo.toml` | `crates/remote_server/Cargo.toml` | **L2** | 2 | < workspace = true;< [[bin]]; |
+| `packages/remote_server/Cargo.toml` | `crates/remote_server/Cargo.toml` | **L1** | 2 | < [[bin]];< workspace = true; |
 | `packages/remote_server/src/headless_project.rs` | `crates/remote_server/src/headless_project.rs` | **L0** | 0 | — |
 | `packages/remote_server/src/remote_editing_tests.rs` | `crates/remote_server/src/remote_editing_tests.rs` | **L2** | 550 |     CompletionSource, LanguageServerLogType, ProgressToken, Project, ProjectPath,;    LanguageServerLogType, ProgressToken, Project, ProjectPath,;    lsp_store: |
 | `packages/which_key/src/which_key.rs` | `crates/which_key/src/which_key.rs` | **L0** | 0 | — |
@@ -126,12 +126,12 @@ diff <(git -C /home/aa/repos/ide_ls/learn_ls/zed show bd747337d7be138834e20972b9
 
 ## 5. 验收
 
-- [ ] W1 gpui_learn rev 换完、适配、检查通过（可选的 Web/Android 示例 build 情况记录）
-- [ ] W2 aacode rev 换完、适配（主线 `app`/`workspace`/`ui` `cargo check` 通过）
-- [ ] W3 每条 fork 同步按「一个上游 sha 一个 commit」原则完成，L2 文件逐个确认并记录结论
-- [ ] `cargo check -p app -p workspace -p ui`（主线门槛）
-- [ ] 必要时 `cargo check --workspace`（主线相关包通过即可，见 AGENTS.md 主线声明）
-- [ ] 回 §16.6 索引表更新状态、负责人；本文件标记 🟢 并补充完成日与实测数据
+- [ ] `cargo check -p app -p workspace -p ui`
+- [ ] `cargo check --workspace`
+- [ ] 每条 fork 同步都确认过「该文件 aacode 自己没改动」，有的已在 commit 里说明
+- [ ] gpui_learn 侧的 Web/Android 示例仍能 build
+- [ ] 回来更新 zed-port.md §16 索引与本文件状态
+
 ## 6. 踩的坑
 
 <!-- 做的时候随手记，这里是后来人最需要的东西 -->

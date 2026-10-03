@@ -71,7 +71,8 @@ skill for more detailed guidance.
 - `packages/app/` — 应用入口：主窗口、标题栏（SSD/CSD 条件渲染）、Agent 面板
 - `packages/workspace/` — Workspace 框架：StatusBar（left/right/hidden items）、DockSide、面板切换
 - `packages/ui/` — 共享 GPUI UI 组件
-- **GPUI 来源**：Zed git rev `f6838a7c`（pin 在根 Cargo.toml `[patch.crates-io]`）
+- **GPUI 来源**：Zed git rev `bd747337`（pin 在根 Cargo.toml，共 6 个 `gpui*` + `collections` 等 29 个 zed crate 一起锁）
+- **UI 组件来源**：`ui` = `aa_gpui_kit_ui`，从 `gpui_learn` 的 git rev 拉（`Cargo.toml` 约 536 行）→ 改 gpui rev 后要同步这个 rev
 - **WindowControlArea**：`Drag` + `Close/Minimize/Maximize` 按钮布局（吸收自 aa-player）
 - **服务器调用**：同进程 `session::run_turn()`，不经过 HTTP
 
@@ -105,6 +106,6 @@ skill for more detailed guidance.
 
 **搬 zed 的包之前，先读 `.agents/zed-port.md`。**
 
-zed 参照仓库在 `~/repos/learn_ls/zed`，单文件 crate 拆分后的可见性转发、
+zed 参照仓库在 `~/repos/ide_ls/learn_ls/zed`，单文件 crate 拆分后的可见性转发、
 `collections::` vs `std::collections::`、`RelPath` vs `std::path::Path`、
 模块遮蔽要用 `::rpc::` 绝对路径等坑都记在那儿，照搬时直接套用，别重新推演。

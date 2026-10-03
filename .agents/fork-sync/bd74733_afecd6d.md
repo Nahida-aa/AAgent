@@ -72,7 +72,7 @@ W3 与它们无依赖，可按 crate 多人并行。
 | `c87632ef44` | `project`, `proto`, `remote_server` | ✓ | Read remote shell config when creating a terminal shell (#61451) | `5097d8a` | — |
 | `14dd03e896` | `acp_thread`, `agent_ui` | ✓ | agent_ui: Guard follow-up sends from stale send results (#64917) | | |
 | `12f79c0aeb` | `client`, `cloud_api_client` | ✓ | cloud_api_client: Use the platform TLS verifier for the cloud websocket (#63686) | | |
-| `c32938c34c` | `open_ai` | ? | open_ai: Fix issues with optional arguments when model calls a tool (#64920) | | |
+| `c32938c34c` | `open_ai` | ✓ | open_ai: Fix issues with optional arguments when model calls a tool (#64920) | | |
 | `ead2d9eac0` | `http_client` | ? | http_client: Ensure GitHub digest prefix is always stripped (#64905) | | |
 
 ## 4. ⚠ 冲突预警（按「差异能否被已知移植变换解释」分级）

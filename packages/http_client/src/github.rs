@@ -2,7 +2,7 @@ use crate::{AsyncBody, HttpClient, HttpRequestExt};
 use anyhow::{Context as _, Result, anyhow, bail};
 use futures::AsyncReadExt;
 use http::Request;
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
 use std::{sync::Arc, time::Duration};
 use url::Url;
 
@@ -29,6 +29,7 @@ pub struct GithubRelease {
 pub struct GithubReleaseAsset {
     pub name: String,
     pub browser_download_url: String,
+    #[serde(default, deserialize_with = "deserialize_sha256_digest")]
     pub digest: Option<String>,
 }
 
@@ -75,19 +76,11 @@ pub async fn latest_github_release(
         }
     };
 
-    let mut release = releases
+    releases
         .into_iter()
         .filter(|release| !require_assets || !release.assets.is_empty())
         .find(|release| release.pre_release == pre_release)
-        .context("finding a prerelease")?;
-    release.assets.iter_mut().for_each(|asset| {
-        if let Some(digest) = &mut asset.digest
-            && let Some(stripped) = digest.strip_prefix("sha256:")
-        {
-            *digest = stripped.to_owned();
-        }
-    });
-    Ok(release)
+        .context("finding a prerelease")
 }
 
 pub async fn get_release_by_tag_name(

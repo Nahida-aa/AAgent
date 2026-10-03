@@ -8,7 +8,7 @@
 | 区间提交数 | 17 |
 | gpui 命中提交 | 2 |
 | fork 命中 | 11 个 crate |
-| ⚠ 双方都改过的文件 | 15 |
+| ⚠ 需人工调和（L2） | 5 |
 | 负责人 | — |
 | 创建 | 2026-10-03 |
 
@@ -75,115 +75,63 @@ W3 与它们无依赖，可按 crate 多人并行。
 | `c32938c34c` | `open_ai` | ? | open_ai: Fix issues with optional arguments when model calls a tool (#64920) | | |
 | `ead2d9eac0` | `http_client` | ? | http_client: Ensure GitHub digest prefix is always stripped (#64905) | | |
 
-## 4. ⚠ 双方都改过的文件（必须人工调和）
+## 4. ⚠ 冲突预警（按「差异能否被已知移植变换解释」分级）
 
-上游改过、且 aacode 本地也有提交动过同一文件 —— 这些**不能盲合**，
-`cargo check` 会过但语义可能错。本批共 15 个。
+**不要用「本地有没有提交碰过这个文件」判断冲突** —— copy-fork 里port 动作本身就会让每个
+被同步过的文件出现在 `git log` 里，那样判几乎全是误报。本节用的是：把本地文件与
+**上游 old 版本**比，看差异能否被已知变换（workspace-ify / `src/x.rs`→`src/lib.rs` /
+`zed_actions`→`aacode_actions` / `zlog`→`a_log` 等）解释。
 
-| 本地路径 | 上游路径 |
-| --- | --- |
-| `packages/acp_thread/src/connection.rs` | `crates/acp_thread/src/connection.rs` |
-| `packages/agent_ui/src/conversation_view/thread_view.rs` | `crates/agent_ui/src/conversation_view/thread_view.rs` |
-| `packages/agent_ui/src/message_editor.rs` | `crates/agent_ui/src/message_editor.rs` |
-| `packages/client/Cargo.toml` | `crates/client/Cargo.toml` |
-| `packages/cloud_api_client/Cargo.toml` | `crates/cloud_api_client/Cargo.toml` |
-| `packages/cloud_api_client/src/websocket/native.rs` | `crates/cloud_api_client/src/websocket/native.rs` |
-| `packages/http_client/src/github.rs` | `crates/http_client/src/github.rs` |
-| `packages/node_runtime/Cargo.toml` | `crates/node_runtime/Cargo.toml` |
-| `packages/open_ai/src/completion.rs` | `crates/open_ai/src/completion.rs` |
-| `packages/project/src/terminals.rs` | `crates/project/src/terminals.rs` |
-| `packages/proto/proto/task.proto` | `crates/proto/proto/task.proto` |
-| `packages/proto/proto/zed.proto` | `crates/proto/proto/zed.proto` |
-| `packages/remote_server/Cargo.toml` | `crates/remote_server/Cargo.toml` |
-| `packages/remote_server/src/headless_project.rs` | `crates/remote_server/src/headless_project.rs` |
-| `packages/remote_server/src/remote_editing_tests.rs` | `crates/remote_server/src/remote_editing_tests.rs` |
+| 级别 | 含义 | 本批 |
+| --- | --- | --- |
+| **L0 快进** | 本地 == 上游 old，干净照搬 | 14 |
+| **L1 已知变换** | 差异全是机械移植变换，按例应用即可 | 2 |
+| **L2 需人工** | 有解释不了的差异 | 5 |
 
-逐个确认：
+L2 只能筛出「与上游 old 不同、且不像机械变换」的文件，**判断不了意图**。
+「我们故意删了这些测试」「这个偏离是设计而非疏漏」只有人知道，所以 L2 一律人工确认，
+不要自动当成冲突。
 
-```sh
-git log --oneline -- packages/acp_thread/src/connection.rs
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/acp_thread/src/connection.rs
-```
+| 本地路径 | 上游路径 | 级别 | 未解释行 | 样例 |
+| --- | --- | --- | --- | --- |
+| `packages/acp_thread/src/connection.rs` | `crates/acp_thread/src/connection.rs` | **L0** | 0 | — |
+| `packages/agent_ui/src/conversation_view.rs` | `crates/agent_ui/src/conversation_view.rs` | **L0** | 0 | — |
+| `packages/agent_ui/src/conversation_view/thread_view.rs` | `crates/agent_ui/src/conversation_view/thread_view.rs` | **L1** | 0 | — |
+| `packages/agent_ui/src/message_editor.rs` | `crates/agent_ui/src/message_editor.rs` | **L1** | 0 | — |
+| `packages/client/Cargo.toml` | `crates/client/Cargo.toml` | **L2** | 1 | < workspace = true; |
+| `packages/cloud_api_client/Cargo.toml` | `crates/cloud_api_client/Cargo.toml` | **L2** | 1 | < workspace = true; |
+| `packages/cloud_api_client/src/websocket/native.rs` | `crates/cloud_api_client/src/websocket/native.rs` | **L0** | 0 | — |
+| `packages/http_client/src/github.rs` | `crates/http_client/src/github.rs` | **L0** | 0 | — |
+| `packages/node_runtime/Cargo.toml` | `crates/node_runtime/Cargo.toml` | **L2** | 1 | < workspace = true; |
+| `packages/node_runtime/src/node_runtime.rs` | `crates/node_runtime/src/node_runtime.rs` | **L0** | 0 | — |
+| `packages/open_ai/src/completion.rs` | `crates/open_ai/src/completion.rs` | **L0** | 0 | — |
+| `packages/project/src/lsp_store.rs` | `crates/project/src/lsp_store.rs` | **L0** | 0 | — |
+| `packages/project/src/terminals.rs` | `crates/project/src/terminals.rs` | **L0** | 0 | — |
+| `packages/project/tests/integration/project_tests.rs` | `crates/project/tests/integration/project_tests.rs` | **L0** | 0 | — |
+| `packages/proto/proto/task.proto` | `crates/proto/proto/task.proto` | **L0** | 0 | — |
+| `packages/proto/proto/zed.proto` | `crates/proto/proto/zed.proto` | **L0** | 0 | — |
+| `packages/proto/src/proto.rs` | `crates/proto/src/proto.rs` | **L0** | 0 | — |
+| `packages/remote_server/Cargo.toml` | `crates/remote_server/Cargo.toml` | **L2** | 2 | < workspace = true;< [[bin]]; |
+| `packages/remote_server/src/headless_project.rs` | `crates/remote_server/src/headless_project.rs` | **L0** | 0 | — |
+| `packages/remote_server/src/remote_editing_tests.rs` | `crates/remote_server/src/remote_editing_tests.rs` | **L2** | 550 |     CompletionSource, LanguageServerLogType, ProgressToken, Project, ProjectPath,;    LanguageServerLogType, ProgressToken, Project, ProjectPath,;    lsp_store: |
+| `packages/which_key/src/which_key.rs` | `crates/which_key/src/which_key.rs` | **L0** | 0 | — |
 
-```sh
-git log --oneline -- packages/agent_ui/src/conversation_view/thread_view.rs
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/agent_ui/src/conversation_view/thread_view.rs
-```
-
-```sh
-git log --oneline -- packages/agent_ui/src/message_editor.rs
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/agent_ui/src/message_editor.rs
-```
-
-```sh
-git log --oneline -- packages/client/Cargo.toml
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/client/Cargo.toml
-```
+### L2 逐个确认
 
 ```sh
-git log --oneline -- packages/cloud_api_client/Cargo.toml
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/cloud_api_client/Cargo.toml
+git log --oneline -- <本地路径>                # aacode 侧改动史
+git -C /home/aa/repos/ide_ls/learn_ls/zed diff bd747337d7be138834e20972b9e203c7b239cc47..afecd6d719aad92aecfa2860f49c4f2956708831 -- <上游路径>   # 上游这次改了什么
+diff <(git -C /home/aa/repos/ide_ls/learn_ls/zed show bd747337d7be138834e20972b9e203c7b239cc47:<上游路径>) <本地路径>   # 当前分歧点
 ```
-
-```sh
-git log --oneline -- packages/cloud_api_client/src/websocket/native.rs
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/cloud_api_client/src/websocket/native.rs
-```
-
-```sh
-git log --oneline -- packages/http_client/src/github.rs
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/http_client/src/github.rs
-```
-
-```sh
-git log --oneline -- packages/node_runtime/Cargo.toml
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/node_runtime/Cargo.toml
-```
-
-```sh
-git log --oneline -- packages/open_ai/src/completion.rs
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/open_ai/src/completion.rs
-```
-
-```sh
-git log --oneline -- packages/project/src/terminals.rs
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/project/src/terminals.rs
-```
-
-```sh
-git log --oneline -- packages/proto/proto/task.proto
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/proto/proto/task.proto
-```
-
-```sh
-git log --oneline -- packages/proto/proto/zed.proto
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/proto/proto/zed.proto
-```
-
-```sh
-git log --oneline -- packages/remote_server/Cargo.toml
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/remote_server/Cargo.toml
-```
-
-```sh
-git log --oneline -- packages/remote_server/src/headless_project.rs
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/remote_server/src/headless_project.rs
-```
-
-```sh
-git log --oneline -- packages/remote_server/src/remote_editing_tests.rs
-git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/remote_server/src/remote_editing_tests.rs
-```
-
 
 ## 5. 验收
 
-- [ ] `cargo check -p app -p workspace -p ui`
-- [ ] `cargo check --workspace`
-- [ ] 每条 fork 同步都确认过「该文件 aacode 自己没改动」，有的已在 commit 里说明
-- [ ] gpui_learn 侧的 Web/Android 示例仍能 build
-- [ ] 回来更新 zed-port.md §16 索引与本文件状态
-
+- [ ] W1 gpui_learn rev 换完、适配、检查通过（可选的 Web/Android 示例 build 情况记录）
+- [ ] W2 aacode rev 换完、适配（主线 `app`/`workspace`/`ui` `cargo check` 通过）
+- [ ] W3 每条 fork 同步按「一个上游 sha 一个 commit」原则完成，L2 文件逐个确认并记录结论
+- [ ] `cargo check -p app -p workspace -p ui`（主线门槛）
+- [ ] 必要时 `cargo check --workspace`（主线相关包通过即可，见 AGENTS.md 主线声明）
+- [ ] 回 §16.6 索引表更新状态、负责人；本文件标记 🟢 并补充完成日与实测数据
 ## 6. 踩的坑
 
 <!-- 做的时候随手记，这里是后来人最需要的东西 -->

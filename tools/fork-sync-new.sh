@@ -95,20 +95,88 @@ git -C "$ZD" log --format='@@@%h %s' --name-only "$OLD_FULL..$NEW_FULL" \
   -- $(printf 'crates/%s ' "${HITS[@]}") > "$MAP" 2>/dev/null || true
 trap 'rm -f "$CONFLICTS" "$MAP"' EXIT
 
-# ⚠ 冲突预警：上游改的文件，aacode 自己也改过 → ��须人工调和
+# ⚠ 冲突预警 —— 分三级
+#
+# 关键：不能用「本地有没有提交碰过这个文件」判断。在copy-fork 里，**port 动作本身**
+# 就会让每个被同步过的文件出现在 git log 里（见 0ee33ca 那次重构级对齐），
+# 那样判会把「我们同步过」误当成「我们改过」，几乎全是误报。
+#
+# 正确判据：把本地文件与「上游 old 版本」比，看差异能否被**已知移植变换**解释。
+#   L0 快进    本地 == 上游 old，干净照搬，同步直接取上游新版即可
+#   L1 已知变换  差异全是 workspace-ify / src/x.rs→src/lib.rs / crate 改名等
+#   L2 需人工   有解释不了的差异 —— 可能是有意的aacode 改动，必须逐个看
+#
+# 注意：L2 只能筛出「与上游 old 不同且不像机械变换」的文件，**判断不了意图**。
+# 「我们故意删了这些测试」「这个偏离是设计而非疏漏」这类信息只有人知道，
+# 所以 L2 一律标注需人工确认，不要自动当成冲突。
+PORT_PAT='zed_actions|aacode_actions|aagent|aacode|zlog|a_log|zed_credentials_provider|ad_credentials_provider|version\.workspace|license\.workspace|publish\.workspace|\[lints\]|\[lib\]|\[\[bin\]\]|path = "src/|cargo-shear|doctest = false|version = "0\.1\.0"|license = "GPL|ignored = '
+
+# Cargo.toml 走归一化：剔掉 workspace-ify 会改的元信息段，再把已知改名对齐，
+# 之后还有差异才算真分歧（正常只剩依赖增删）
+norm_manifest() {
+  sed -E 's/^[<>] //' \
+    | sed -E 's/\.(workspace)\b//g' \
+    | grep -vE '^(version|license|publish|description|homepage|repository|rust-version|edition|publish|authors|categories|keywords|readme|versioned_file_path)[[:space:]]*=' \
+    | grep -vE '^\[(lints|lib|bin|\[\[bin\]\]|package\.metadata\.cargo-shear|package\.metadata\.component|package\.metadata\.rzup)\][[:space:]]*$' \
+    | grep -vE '^(path|doctest|name|ignored|harness|crate-type)[[:space:]]*=' \
+    | grep -vE '^#' \
+    | grep -vE '^[[:space:]]*$' \
+    | sed -E 's/\bzed_actions\b/aacode_actions/g; s/\bzlog\b/a_log/g; s/\bzed_credentials_provider\b/ad_credentials_provider/g; s/\bzed_resource_manager\b/a_resource_manager/g'
+}
+
+unexplained_of() {
+  local up="$1" localf="$2"
+  case "$up" in
+    */Cargo.toml)
+      { diff <(norm_manifest < /tmp/opencode/.upstream_file) \
+           <(norm_manifest < "$ROOT/$localf") || true; } \
+        | { grep -E '^[<>]' || true; } | wc -l ;;
+    *)
+      { diff /tmp/opencode/.upstream_file "$ROOT/$localf" || true; } \
+        | { grep -E '^[<>]' || true; } \
+        | { sed -E 's/^[<>] //' | grep -vE "$PORT_PAT" || true; } | wc -l ;;
+  esac
+}
+
 CONFLICTS="$ROOT/.agents/fork-sync/.conflicts.$$"
 : > "$CONFLICTS"
+L0=0; L1=0; L2=0
 for c in "${HITS[@]}"; do
   while IFS= read -r up; do
     rel="${up#crates/$c/}"
     [ "$rel" = "$up" ] && continue           # 不是 crates/<c>/ 下的
     local_path="packages/$c/$rel"
-    if [ -n "$(git -C "$ROOT" log --format=%h -1 -- "$local_path")" ]; then
-      echo "$local_path|$up" >> "$CONFLICTS"
+    git -C "$ZD" show "$OLD_FULL:$up" > /tmp/opencode/.upstream_file 2>/dev/null || continue
+    # 本地文件不存在 = 上游新加的文件，直接照搬，无冲突
+    [ -f "$ROOT/$local_path" ] || { echo -e "$local_path\t$up\tL0\t0\t" >> "$CONFLICTS"; L0=$((L0+1)); continue; }
+    if diff -q /tmp/opencode/.upstream_file "$ROOT/$local_path" >/dev/null 2>&1; then
+      echo -e "$local_path\t$up\tL0\t0\t" >> "$CONFLICTS"; L0=$((L0+1)); continue
     fi
+    # 有差异：把能被已知移植变换解释的剔掉，剩下的就是未解释差异
+    # 注意 set -e -o pipefail：diff 文件不同时返回 1，会连带整条管道失败，必须逐段 || true
+    unexplained=$(unexplained_of "$up" "$local_path")
+    if [ "$unexplained" -eq 0 ]; then lvl=L1; else lvl=L2; fi
+    case $lvl in L1) L1=$((L1+1));; L2) L2=$((L2+1));; esac
+    if [ "$lvl" = L2 ]; then
+      case "$up" in
+        */Cargo.toml)
+          sample=$( { diff <(norm_manifest < /tmp/opencode/.upstream_file) \
+                        <(norm_manifest < "$ROOT/$local_path") || true; } \
+                   | { grep -E '^[<>]' || true; } | head -3 | tr '\n' ';' | cut -c1-160) ;;
+        *)
+          sample=$( { diff /tmp/opencode/.upstream_file "$ROOT/$local_path" || true; } \
+                   | { grep -E '^[<>]' || true; } \
+                   | { sed -E 's/^[<>] //' | grep -vE "$PORT_PAT" || true; } \
+                   | head -3 | tr '\n' ';' | cut -c1-160) ;;
+      esac
+    else
+      sample=
+    fi
+    echo -e "$local_path\t$up\t$lvl\t$unexplained\t$sample" >> "$CONFLICTS"
   done < <(git -C "$ZD" diff --name-only "$OLD_FULL" "$NEW_FULL" -- "crates/$c")
 done
-N_CONFLICT=$(wc -l < "$CONFLICTS")
+rm -f /tmp/opencode/.upstream_file
+N_CONFLICT=$L2
 
 mkdir -p "$OUTDIR"
 TODAY=$(date +%F)
@@ -125,7 +193,7 @@ cat <<EOF
 | 区间提交数 | ${N_TOTAL} |
 | gpui 命中提交 | ${N_GPUI} |
 | fork 命中 | ${N_HIT} 个 crate |
-| ⚠ 双方都改过的文件 | ${N_CONFLICT} |
+| ⚠ 需人工调和（L2） | ${N_CONFLICT} |
 | 负责人 | — |
 | 创建 | ${TODAY} |
 
@@ -204,25 +272,39 @@ fi
 
 cat <<EOF
 
-## 4. ⚠ 双方都改过的文件（必须人工调和）
+## 4. ⚠ 冲突预警（按「差异能否被已知移植变换解释」分级）
 
-上游改过、且 aacode 本地也有提交动过同一文件 —— 这些**不能盲合**，
-\`cargo check\` 会过但语义可能错。本批共 ${N_CONFLICT} 个。
+**不要用「本地有没有提交碰过这个文件」判断冲突** —— copy-fork 里port 动作本身就会让每个
+被同步过的文件出现在 \`git log\` 里，那样判几乎全是误报。本节用的是：把本地文件与
+**上游 old 版本**比，看差异能否被已知变换（workspace-ify / \`src/x.rs\`→\`src/lib.rs\` /
+\`zed_actions\`→\`aacode_actions\` / \`zlog\`→\`a_log\` 等）解释。
 
+| 级别 | 含义 | 本批 |
+| --- | --- | --- |
+| **L0 快进** | 本地 == 上游 old，干净照搬 | ${L0} |
+| **L1 已知变换** | 差异全是机械移植变换，按例应用即可 | ${L1} |
+| **L2 需人工** | 有解释不了的差异 | ${L2} |
+
+L2 只能筛出「与上游 old 不同、且不像机械变换」的文件，**判断不了意图**。
+「我们故意删了这些测试」「这个偏离是设计而非疏漏」只有人知道，所以 L2 一律人工确认，
+不要自动当成冲突。
+
+| 本地路径 | 上游路径 | 级别 | 未解释行 | 样例 |
+| --- | --- | --- | --- | --- |
 EOF
 
-if [ "$N_CONFLICT" -gt 0 ]; then
-  echo '| 本地路径 | 上游路径 |'
-  echo '| --- | --- |'
-  awk -F'|' '{printf "| `%s` | `%s` |\n", $1, $2}' "$CONFLICTS"
-  echo
-  echo '逐个确认：'
-  echo
-  awk -F'|' '{printf "```sh\ngit log --oneline -- %s\ngit -C %s show <sha> -- %s\n```\n\n", $1, "'"$ZD"'", $2}' "$CONFLICTS"
-else
-  echo '无。（脚本按「上游改动文件 ∩ aacode 本地有提交的同名路径」判定，仅供参考，'
-  echo '人肉扫一遍 §3 的 crate 清单更稳。）'
-fi
+awk -F'\t' '{printf "| `%s` | `%s` | **%s** | %s | %s |\n", $1, $2, $3, $4, ($5==""?"—":$5)}' "$CONFLICTS"
+
+cat <<EOF
+
+### L2 逐个确认
+
+\`\`\`sh
+git log --oneline -- <本地路径>                # aacode 侧改动史
+git -C $ZD diff $OLD_FULL..$NEW_FULL -- <上游路径>   # 上游这次改了什么
+diff <(git -C $ZD show $OLD_FULL:<上游路径>) <本地路径>   # 当前分歧点
+\`\`\`
+EOF
 
 cat <<EOF
 

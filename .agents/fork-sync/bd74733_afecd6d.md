@@ -1,0 +1,193 @@
+# 同步 bd74733 → afecd6d（批次 A）
+
+| | |
+| --- | --- |
+| 状态 | 🟡 计划中 |
+| from | `bd747337d7be138834e20972b9e203c7b239cc47`（2026-09-28） |
+| to | `afecd6d719aad92aecfa2860f49c4f2956708831`（2026-09-30） |
+| 区间提交数 | 17 |
+| gpui 命中提交 | 2 |
+| fork 命中 | 11 个 crate |
+| ⚠ 双方都改过的文件 | 15 |
+| 负责人 | — |
+| 创建 | 2026-10-03 |
+
+## 1. 为什么做这一批
+
+先跑通流程 + 建验收标准，不追求吃到多少代码
+
+## 2. 目标 / 非目标
+
+目标：
+
+-
+
+非目标：
+
+-
+
+## 3. 工作流
+
+rev 同步是原子的（换 rev 会带进区间内全部改动），所以 W1/W2 必须同批次推；
+W3 与它们无依赖，可按 crate 多人并行。
+
+### W1 gpui_learn（必须先于 W2）
+
+- [ ] W1.1 根 `Cargo.toml` 10 处 rev → `afecd6d`
+- [ ] W1.2 vendored 平台层适配（`gpui-android` 等）
+- [ ] W1.3 commit + push，记下 gpui_learn 新 sha
+
+### W2 aacode rev + gpui 适配
+
+- [ ] W2.1 根 `Cargo.toml` 29 处 zed rev + `Cargo.toml:536` 的 `ui` rev
+- [ ] W2.2 gpui API 适配（`Platform` trait 新成员等）
+- [ ] W2.3 `cargo check -p app -p workspace -p ui` 过
+- [ ] W2.4 `cargo check --workspace` 过（下限）
+- [ ] W2.5 commit + push
+
+### W3 fork 同步（按 crate 认领，一 crate 一 owner）
+
+命中 11 个 crate：
+
+  - [ ] acp_thread（待认领）
+  - [ ] agent_ui（待认领）
+  - [ ] client（待认领）
+  - [ ] cloud_api_client（待认领）
+  - [ ] http_client（待认领）
+  - [ ] node_runtime（待认领）
+  - [ ] open_ai（待认领）
+  - [ ] project（待认领）
+  - [ ] proto（待认领）
+  - [ ] remote_server（待认领）
+  - [ ] which_key（待认领）
+
+逐条 port 记录（一个上游 sha 一个 commit，便于单独 revert）：
+
+| 上游 sha | crate | aacode 改过该文件? | 动作 | port commit | 认领 |
+| --- | --- | --- | --- | --- | --- |
+| `afecd6d719` | `node_runtime` | ? | node_runtime: Expose standalone system Node discovery (#64928) | | |
+| `017f9b89aa` | `agent_ui` | ? | agent_ui: Hide wrap guides in the agent message editor (#64886) | | |
+| `5d5963361f` | `project` | ? | Diff LSP format responses that replace the whole buffer (#57269) | | |
+| `1dc8844439` | `which_key` | ? | which_key: Show task names for task::Spawn bindings (#64937) | | |
+| `c87632ef44` | `project`, `proto`, `remote_server` | ? | Read remote shell config when creating a terminal shell (#61451) | | |
+| `14dd03e896` | `acp_thread`, `agent_ui` | ? | agent_ui: Guard follow-up sends from stale send results (#64917) | | |
+| `12f79c0aeb` | `client`, `cloud_api_client` | ? | cloud_api_client: Use the platform TLS verifier for the cloud websocket (#63686) | | |
+| `c32938c34c` | `open_ai` | ? | open_ai: Fix issues with optional arguments when model calls a tool (#64920) | | |
+| `ead2d9eac0` | `http_client` | ? | http_client: Ensure GitHub digest prefix is always stripped (#64905) | | |
+
+## 4. ⚠ 双方都改过的文件（必须人工调和）
+
+上游改过、且 aacode 本地也有提交动过同一文件 —— 这些**不能盲合**，
+`cargo check` 会过但语义可能错。本批共 15 个。
+
+| 本地路径 | 上游路径 |
+| --- | --- |
+| `packages/acp_thread/src/connection.rs` | `crates/acp_thread/src/connection.rs` |
+| `packages/agent_ui/src/conversation_view/thread_view.rs` | `crates/agent_ui/src/conversation_view/thread_view.rs` |
+| `packages/agent_ui/src/message_editor.rs` | `crates/agent_ui/src/message_editor.rs` |
+| `packages/client/Cargo.toml` | `crates/client/Cargo.toml` |
+| `packages/cloud_api_client/Cargo.toml` | `crates/cloud_api_client/Cargo.toml` |
+| `packages/cloud_api_client/src/websocket/native.rs` | `crates/cloud_api_client/src/websocket/native.rs` |
+| `packages/http_client/src/github.rs` | `crates/http_client/src/github.rs` |
+| `packages/node_runtime/Cargo.toml` | `crates/node_runtime/Cargo.toml` |
+| `packages/open_ai/src/completion.rs` | `crates/open_ai/src/completion.rs` |
+| `packages/project/src/terminals.rs` | `crates/project/src/terminals.rs` |
+| `packages/proto/proto/task.proto` | `crates/proto/proto/task.proto` |
+| `packages/proto/proto/zed.proto` | `crates/proto/proto/zed.proto` |
+| `packages/remote_server/Cargo.toml` | `crates/remote_server/Cargo.toml` |
+| `packages/remote_server/src/headless_project.rs` | `crates/remote_server/src/headless_project.rs` |
+| `packages/remote_server/src/remote_editing_tests.rs` | `crates/remote_server/src/remote_editing_tests.rs` |
+
+逐个确认：
+
+```sh
+git log --oneline -- packages/acp_thread/src/connection.rs
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/acp_thread/src/connection.rs
+```
+
+```sh
+git log --oneline -- packages/agent_ui/src/conversation_view/thread_view.rs
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/agent_ui/src/conversation_view/thread_view.rs
+```
+
+```sh
+git log --oneline -- packages/agent_ui/src/message_editor.rs
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/agent_ui/src/message_editor.rs
+```
+
+```sh
+git log --oneline -- packages/client/Cargo.toml
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/client/Cargo.toml
+```
+
+```sh
+git log --oneline -- packages/cloud_api_client/Cargo.toml
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/cloud_api_client/Cargo.toml
+```
+
+```sh
+git log --oneline -- packages/cloud_api_client/src/websocket/native.rs
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/cloud_api_client/src/websocket/native.rs
+```
+
+```sh
+git log --oneline -- packages/http_client/src/github.rs
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/http_client/src/github.rs
+```
+
+```sh
+git log --oneline -- packages/node_runtime/Cargo.toml
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/node_runtime/Cargo.toml
+```
+
+```sh
+git log --oneline -- packages/open_ai/src/completion.rs
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/open_ai/src/completion.rs
+```
+
+```sh
+git log --oneline -- packages/project/src/terminals.rs
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/project/src/terminals.rs
+```
+
+```sh
+git log --oneline -- packages/proto/proto/task.proto
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/proto/proto/task.proto
+```
+
+```sh
+git log --oneline -- packages/proto/proto/zed.proto
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/proto/proto/zed.proto
+```
+
+```sh
+git log --oneline -- packages/remote_server/Cargo.toml
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/remote_server/Cargo.toml
+```
+
+```sh
+git log --oneline -- packages/remote_server/src/headless_project.rs
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/remote_server/src/headless_project.rs
+```
+
+```sh
+git log --oneline -- packages/remote_server/src/remote_editing_tests.rs
+git -C /home/aa/repos/ide_ls/learn_ls/zed show <sha> -- crates/remote_server/src/remote_editing_tests.rs
+```
+
+
+## 5. 验收
+
+- [ ] `cargo check -p app -p workspace -p ui`
+- [ ] `cargo check --workspace`
+- [ ] 每条 fork 同步都确认过「该文件 aacode 自己没改动」，有的已在 commit 里说明
+- [ ] gpui_learn 侧的 Web/Android 示例仍能 build
+- [ ] 回来更新 zed-port.md §16 索引与本文件状态
+
+## 6. 踩的坑
+
+<!-- 做的时候随手记，这里是后来人最需要的东西 -->
+
+## 7. 遗留 / 下一批
+
+-

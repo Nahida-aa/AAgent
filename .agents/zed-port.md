@@ -447,16 +447,24 @@ git -C ~/repos/ide_ls/learn_ls/zed show <sha> -- crates/<crate>
 **认领原则**：按 crate 认领（不按提交），避免两个人同时改同一个 `packages/*`。
 一个 crate 一个 owner，PR 里写明认领的 sha 列表。
 
-### 16.6. 分工表
+### 16.6. 同步索引（每次同步一个文件）
 
-| 人 | 负责 | 批次 | 状态 |
-| --- | --- | --- | --- |
-| （待填） | W1 gpui_learn rev | A | ☐ |
-| （待填） | W2 aacode rev + gpui 适配 | A | ☐ |
-| （待填） | W3 fork 同步 · agent 系（`agent` `agent_ui` `acp_thread` `agent_servers`） | A/B/C | ☐ |
-| （待填） | W3 fork 同步 · 语言系（`language` `languages` `language_models` `editor`） | | ☐ |
-| （待填） | W3 fork 同步 · 基建（`project` `fs` `http_client` `cloud_api_*` `node_runtime`） | | ☐ |
-| （待填） | 验收 / review | | ☐ |
+分工、逐条 port 记录、踩的坑都下沉到 `.agents/fork-sync/<old7>_<new7>.md`，
+这里只留索引。约定见该目录的 `README.md`。
+
+```sh
+just fork-sync new      # 生成下一次同步的计划文件（区间数据自动填好）
+just fork-sync list     # 看有哪些同步、什么状态
+```
+
+| 区间 | 批次 | 状态 | 负责人 | 文件 |
+| --- | --- | --- | --- | --- |
+| `bd747337` → `afecd6d719` | A | 🟡 计划中 | — | [bd74733_afecd6d.md](fork-sync/bd74733_afecd6d.md) |
+| `afecd6d719` → `95cd535a5f` | B | ⚪ 未开始 | — | — |
+| `95cd535a5f` → `badfb8d31f` | C | ⚪ 未开始 | — | — |
+
+状态：⚪ 计划中 / 🟡 进行中 / 🟢 完成 / 🔴 放弃。
+分工按 crate 认领，一个 crate 一个 owner，避免两人改同一个 `packages/*`。
 
 ### 16.7. 验收标准
 
@@ -491,12 +499,9 @@ fork(acp_thread): 同步上游 3209c7d31f 权限作用域（#65080），调和 a
 
 - rev 同步**一个批次一个 commit**，适配改动放同一个 commit 或紧邻，别拆散
 - fork 同步**一个上游 sha 一个 commit**，便于单独 revert
-- 每个批次做完回 §4.5 把 ☐ 改成 ☑，并在下面追加实测数据
+- 每个批次做完：把自己那份同步文件的状态改成 🟢，回 §16.6 索引表更新状态与负责人
 
 ### 16.9. 批次记录
 
-| 批次 | 实际目标 rev | 完成日 | 踩的坑 | 遗留 |
-| --- | --- | --- | --- | --- |
-| A | | | | |
-| B | | | | |
-| C | | | | |
+不在这里记 —— 每批的完成日 / 踩的坑 / 遗留写在各自的
+`.agents/fork-sync/<old7>_<new7>.md` 里，做完把 §16.6 索引表的状态更新一下。

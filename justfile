@@ -54,6 +54,17 @@ _fork-scan mode old='' new='':
 ##     just zed-fork-commits                         # 逐条分诊
 ##     just zed-fork-scan bd747337 v1.22.0           # 显式区间
 ## 直接调脚本：tools/zed-fork-scan.sh --commits
+## fork-sync —— rev→rev 同步计划的脚手架（详见 .agents/fork-sync/README.md）
+## new   生成 .agents/fork-sync/<old7>_<new7>.md，区间数据/命中 crate/逐条 port/
+##       ⚠双方都改过的文件清单 都自动填好；已存在则拒绝覆盖
+## list  列出所有同步文件与状态
+## 例：just fork-sync new
+##     just fork-sync new bd747337 afecd6d719
+##     just fork-sync new --batch "批次 A" --note "先跑通流程"
+##     just fork-sync list
+fork-sync mode='new' old='' new='' batch='' note='':
+    tools/fork-sync-new.sh {{ if mode == 'list' { '--list' } else { '' } }} {{ if old != '' { '--old ' + old + ' ' } else { '' } }}{{ if new != '' { '--new ' + new + ' ' } else { '' } }}{{ if batch != '' { '--batch "' + batch + '" ' } else { '' } }}{{ if note != '' { '--note "' + note + '" ' } else { '' } }}
+
 zed-fork-scan old='' new='': (_fork-scan 'table' old new)
 zed-fork-commits old='' new='': (_fork-scan 'commits' old new)
 zed-fork-files old='' new='': (_fork-scan 'files' old new)

@@ -360,6 +360,8 @@ messages!(
     // Reconnect reconciliation must stay ordered with subsequent user toggles.
     (ToggleLspLogs, Foreground),
     (GetDirectoryEnvironment, Background),
+    (GetTerminalShell, Background),
+    (GetTerminalShellResponse, Background),
     (DirectoryEnvironment, Background),
     (GetAgentServerCommand, Background),
     (AgentServerCommand, Background),

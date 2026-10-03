@@ -867,7 +867,10 @@ async fn test_remote_settings(cx: &mut TestAppContext, server_cx: &mut TestAppCo
 
     cx.update_global(|settings_store: &mut SettingsStore, cx| {
         settings_store.set_user_settings(
-            r#"{"languages":{"Rust":{"language_servers":["from-local-settings"]}}}"#,
+            r#"{
+                "languages": {"Rust": {"language_servers": ["from-local-settings"]}},
+                "terminal": {"shell": {"program": "client-shell"}}
+            }"#,
             cx,
         )
     })
@@ -888,7 +891,10 @@ async fn test_remote_settings(cx: &mut TestAppContext, server_cx: &mut TestAppCo
     server_cx
         .update_global(|settings_store: &mut SettingsStore, cx| {
             settings_store.set_server_settings(
-                r#"{"languages":{"Rust":{"language_servers":["from-server-settings"]}}}"#,
+                r#"{
+                    "languages": {"Rust": {"language_servers": ["from-server-settings"]}},
+                    "terminal": {"shell": {"program": "remote-shell"}}
+                }"#,
                 cx,
             )
         })

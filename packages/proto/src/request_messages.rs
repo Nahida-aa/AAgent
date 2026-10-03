@@ -214,6 +214,7 @@ request_messages!(
     (GetTreeDiff, GetTreeDiffResponse),
     (GitClone, GitCloneResponse),
     (GetDirectoryEnvironment, DirectoryEnvironment),
+    (GetTerminalShell, GetTerminalShellResponse),
     (GetProcesses, GetProcessesResponse),
     (GetAgentServerCommand, AgentServerCommand),
     (GetContextServerCommand, ContextServerCommand),

@@ -146,6 +146,7 @@ entity_messages!(
     SetIndexText,
     ToggleLspLogs,
     GetDirectoryEnvironment,
+    GetTerminalShell,
 
     Push,
     Fetch,

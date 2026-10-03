@@ -66,7 +66,7 @@ W3 与它们无依赖，可按 crate 多人并行。
 | 上游 sha | crate | aacode 改过该文件? | 动作 | port commit | 认领 |
 | --- | --- | --- | --- | --- | --- |
 | `afecd6d719` | `node_runtime` | ✓（与上游old等价基础上新增SystemNode） | node_runtime: Expose standalone system Node discovery (#64928) | `23f4b0d` | — |
-| `017f9b89aa` | `agent_ui` | ? | agent_ui: Hide wrap guides in the agent message editor (#64886) | | |
+| `017f9b89aa` | `agent_ui` | ✓（1 行，L1 已知变换内） | agent_ui: Hide wrap guides in the agent message editor (#64886) | `69031de` | — |
 | `5d5963361f` | `project` | ? | Diff LSP format responses that replace the whole buffer (#57269) | | |
 | `1dc8844439` | `which_key` | ? | which_key: Show task names for task::Spawn bindings (#64937) | | |
 | `c87632ef44` | `project`, `proto`, `remote_server` | ? | Read remote shell config when creating a terminal shell (#61451) | | |
